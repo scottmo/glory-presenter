@@ -1,18 +1,20 @@
 package ui.container;
 
 import java.awt.BorderLayout;
-import java.awt.Font;
+import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.Vector;
 import java.util.stream.Collectors;
 
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -21,8 +23,10 @@ import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
+import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.SwingConstants;
 
 import song.SlideTextTransformer;
 import song.Song;
@@ -31,6 +35,7 @@ import song.SongObjectMapper;
 public class SongFormatter extends JPanel {
     private static final String TRANSFORM_BUTTON = "Transform";
     private static final String MAX_LINES_INPUT_LABEL = "Lines Per Slide Per Language";
+    private static final String SONG_SEARCH_INPUT_LABEL = "Search Song";
 
     private static final int SECTION_MARGIN = 10;
 
@@ -42,22 +47,30 @@ public class SongFormatter extends JPanel {
 
     private static final int OUTPUT_VIEW_WIDTH_COL = 20;
 
+    private static Vector<String> songTitles;
+
     public SongFormatter() {
         super();
 
         // components
 
-        JList songList = getSongList();;
+        JList<String> songList = getSongList();;
         JTextArea songViewer = getSongViewer();
         JTextArea outputViewer = getOutputViewer();
+
         JLabel maxLinesLabel = new JLabel(MAX_LINES_INPUT_LABEL);
         JSpinner maxLinesInput = new JSpinner(new SpinnerNumberModel(1, 1, 3, 1));
+
         JButton transformButton = new JButton(TRANSFORM_BUTTON);
+
+        JLabel songSearchInputLabel = new JLabel(SONG_SEARCH_INPUT_LABEL);
+        JTextField songSearchInput = new JTextField();
 
         // behavior
 
         songList.addMouseListener(new MouseAdapter() { 
-            public void mouseClicked(MouseEvent me) {
+            @Override
+            public void mouseReleased(MouseEvent me) {
                 loadSong(songList, songViewer);
             } 
         });
@@ -66,12 +79,38 @@ public class SongFormatter extends JPanel {
             transformSong(songViewer, outputViewer, (Integer)maxLinesInput.getValue());
         });
 
+        songSearchInput.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_ENTER){
+                    Vector<String> songTitles = getSongTitles().stream()
+                        .filter(title -> title.contains(songSearchInput.getText()))
+                        .collect(Collectors.toCollection(Vector::new));
+                    if (songTitles.isEmpty()) {
+                        songTitles = getSongTitles();
+                    }
+                    songList.setListData(songTitles);
+                }
+            }
+        });
+
         // layout
 
         this.setLayout(new BorderLayout(SECTION_MARGIN, SECTION_MARGIN));
 
+        JPanel songListPanel = new JPanel();
+        JPanel songSearchInputGroup = new JPanel();
+        songSearchInputGroup.setLayout(new FlowLayout());
+        songSearchInputGroup.add(songSearchInputLabel);
+        songSearchInputGroup.add(songSearchInput);
+        songSearchInput.setColumns(20);
+
+        songListPanel.setLayout(new BoxLayout(songListPanel, BoxLayout.Y_AXIS));
+        songListPanel.add(songSearchInputGroup);
+        songListPanel.add(songList);
+
         JSplitPane sp1 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
-                new JScrollPane(songList), new JScrollPane(songViewer));
+                new JScrollPane(songListPanel), new JScrollPane(songViewer));
         JSplitPane sp = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
                 sp1, new JScrollPane(outputViewer));  
         this.add(sp, BorderLayout.CENTER);
@@ -85,12 +124,13 @@ public class SongFormatter extends JPanel {
 
     // component init
 
-    private JList getSongList() {
-        List<String> songTitles = getSongTitles();
+    private JList<String> getSongList() {
+        Vector<String> songTitles = getSongTitles();
         if (songTitles.isEmpty()) {
-            songTitles = List.of("Unable to load songs!");
+            songTitles = new Vector<String>();
+            songTitles.add("Unable to load songs!");
         }
-        JList songList = new JList<>(getSongTitles().toArray());
+        JList<String> songList = new JList<>(songTitles);
         songList.setFixedCellHeight(SONG_LIST_FONT_SIZE);
         songList.setFixedCellWidth(SONG_LIST_WIDTH_PX);
         songList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -114,8 +154,10 @@ public class SongFormatter extends JPanel {
 
     // functions
 
-    private static List<String> getSongTitles() {
-        List<String> songTitles;
+    private static Vector<String> getSongTitles() {
+        if (songTitles != null) {
+            return songTitles;
+        }
 
         try {
             songTitles = Files.list(Path.of("resources/songs"))
@@ -123,10 +165,10 @@ public class SongFormatter extends JPanel {
                 .filter(path -> path.endsWith(".yaml"))
                 .map(path -> path.replace(".yaml", ""))
                 .sorted()
-                .collect(Collectors.toList());
+                .collect(Collectors.toCollection(Vector::new));
         } catch (IOException e) {
             System.err.println(e.getMessage());
-            songTitles = Collections.emptyList();
+            songTitles = new Vector<String>();
         }
 
         return songTitles;
