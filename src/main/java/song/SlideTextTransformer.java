@@ -30,6 +30,9 @@ public class SlideTextTransformer {
                 String slide = "";
                 for (String lang : langs) {
                     String[] verseLines = verseText.get(lang);
+                    if (verseLines == null) {
+                        continue;
+                    }
                     for (int i = 0; i < linesPerSlidePerLang; i++) {
                         int currLineInVerse = numSlidePerThisVerse * linesPerSlidePerLang + i;
                         if (currLineInVerse < verseLines.length) {
