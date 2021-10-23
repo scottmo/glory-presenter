@@ -59,7 +59,7 @@ public class SongFormatter extends JPanel {
         JTextArea outputViewer = getOutputViewer();
 
         JLabel maxLinesLabel = new JLabel(MAX_LINES_INPUT_LABEL);
-        JSpinner maxLinesInput = new JSpinner(new SpinnerNumberModel(1, 1, 3, 1));
+        JSpinner maxLinesInput = new JSpinner(new SpinnerNumberModel(1, 1, 10, 1));
 
         JButton transformButton = new JButton(TRANSFORM_BUTTON);
 
@@ -82,7 +82,7 @@ public class SongFormatter extends JPanel {
         songSearchInput.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
-                if (e.getKeyCode() == KeyEvent.VK_ENTER){
+                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
                     Vector<String> songTitles = getSongTitles().stream()
                         .filter(title -> title.contains(songSearchInput.getText()))
                         .collect(Collectors.toCollection(Vector::new));
