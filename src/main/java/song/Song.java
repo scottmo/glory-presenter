@@ -6,6 +6,7 @@ import java.util.Map;
 public record Song(
         String title,
         String collection,
+        String description,
         List<Verse> lyrics,
         List<Integer> verseOrder) {
 
