@@ -2,11 +2,12 @@
 	    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 		xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 
+	<name>Worship Service Tool</name>
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.scottscmo</groupId>
 	<artifactId>worship-service-tool</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>Worship Service Tool</name>
+	<packaging>jar</packaging>
 
 	<properties>
 		<maven.compiler.source>17</maven.compiler.source>
@@ -51,15 +52,26 @@
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
-				<version>3.2.0</version>
-				<configuration>
-					<archive>
-						<manifest>
-							<mainClass>com.scottscmo.Application</mainClass>
-						</manifest>
-					</archive>
-				</configuration>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>3.3.0</version>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+						<configuration>
+							<archive>
+							<manifest>
+								<mainClass>com.scottscmo.Application</mainClass>
+							</manifest>
+							</archive>
+							<descriptorRefs>
+								<descriptorRef>app</descriptorRef>
+							</descriptorRefs>
+						</configuration>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>
