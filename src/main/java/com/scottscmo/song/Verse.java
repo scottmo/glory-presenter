@@ -1,4 +1,4 @@
-package song;
+package com.scottscmo.song;
 
 import java.util.Map;
 import java.util.stream.Collectors;

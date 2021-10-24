@@ -1,11 +1,11 @@
+package com.scottscmo;
 
 import javax.swing.JFrame;
 import javax.swing.JTabbedPane;
 
-import com.formdev.flatlaf.FlatLightLaf;
-
-import ui.Labels;
-import ui.container.SongFormatter;
+import com.formdev.flatlaf.intellijthemes.FlatCarbonIJTheme;
+import com.scottscmo.ui.Labels;
+import com.scottscmo.ui.container.SongFormatter;
 
 public class Application {
 
@@ -25,7 +25,7 @@ public class Application {
     }
 
     public static void main(String[] args) {
-        FlatLightLaf.setup();
+        FlatCarbonIJTheme.setup();
         // Schedule a job for the event-dispatching thread:
         // creating and showing this application's GUI.
         javax.swing.SwingUtilities.invokeLater(new Runnable() {

@@ -1,4 +1,4 @@
-package ui.container;
+package com.scottscmo.ui.container;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
@@ -28,9 +28,9 @@ import javax.swing.ListSelectionModel;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 
-import song.SlideTextTransformer;
-import song.Song;
-import song.SongObjectMapper;
+import com.scottscmo.song.SlideTextTransformer;
+import com.scottscmo.song.Song;
+import com.scottscmo.song.SongObjectMapper;
 
 public class SongFormatter extends JPanel {
     private static final String TRANSFORM_BUTTON = "Transform";

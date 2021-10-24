@@ -1,4 +1,4 @@
-package ppt;
+package com.scottscmo.ppt;
 
 import java.io.File;
 import java.io.FileOutputStream;

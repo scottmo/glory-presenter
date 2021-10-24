@@ -1,4 +1,4 @@
-package song;
+package com.scottscmo.song;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
