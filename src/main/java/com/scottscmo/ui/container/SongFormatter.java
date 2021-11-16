@@ -26,11 +26,11 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.SpinnerNumberModel;
-import javax.swing.SwingConstants;
 
+import com.scottscmo.config.Config;
 import com.scottscmo.song.SlideTextTransformer;
 import com.scottscmo.song.Song;
-import com.scottscmo.song.SongObjectMapper;
+import com.scottscmo.song.adapters.SongYAMLAdapter;
 
 public class SongFormatter extends JPanel {
     private static final String TRANSFORM_BUTTON = "Transform";
@@ -136,6 +136,15 @@ public class SongFormatter extends JPanel {
         songList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         songList.setVisibleRowCount(SONG_LIST_HEIGHT_ROW);
 
+        Config.subscribe(Config.DIR_DATA, dataPath -> {
+            Vector<String> newSongTitles = getSongTitles(Path.of(dataPath, "songs"), true);
+            if (newSongTitles.isEmpty()) {
+                newSongTitles = new Vector<String>();
+                newSongTitles.add("Unable to load songs!");
+            }
+            songList.setListData(newSongTitles);
+        });
+
         return songList;
     }
 
@@ -155,12 +164,16 @@ public class SongFormatter extends JPanel {
     // functions
 
     private static Vector<String> getSongTitles() {
-        if (songTitles != null) {
+        return getSongTitles(Path.of(Config.get(Config.DIR_DATA), "songs"), false);
+    }
+
+    private static Vector<String> getSongTitles(Path dirSongPath, boolean bustCache) {
+        if (!bustCache && songTitles != null) {
             return songTitles;
         }
 
         try {
-            songTitles = Files.list(Path.of("resources/songs"))
+            songTitles = Files.list(dirSongPath)
                 .map(path -> path.getFileName().toString())
                 .filter(path -> path.endsWith(".yaml"))
                 .map(path -> path.replace(".yaml", ""))
@@ -176,7 +189,7 @@ public class SongFormatter extends JPanel {
 
     private static void loadSong(JList songList, JTextArea songViewer) {
         String songName = (String)songList.getSelectedValue();
-        String songContent = SongObjectMapper.getSongFileContent(songName);
+        String songContent = SongYAMLAdapter.getSongFileContent(songName);
         if (songContent == null) {
             songContent = "Error getting content for song " + songName;
         }
@@ -184,7 +197,7 @@ public class SongFormatter extends JPanel {
     }
 
     private static void transformSong(JTextArea inputViewer, JTextArea outputViewer, Integer linesPerSlidePerLang) {
-        Song song = SongObjectMapper.deserialize(inputViewer.getText());
+        Song song = SongYAMLAdapter.deserialize(inputViewer.getText());
         String output = SlideTextTransformer.transform(song, Arrays.asList("zh", "en"),
                 linesPerSlidePerLang.intValue()).stream()
             .collect(Collectors.joining("\n\n---\n\n"));
