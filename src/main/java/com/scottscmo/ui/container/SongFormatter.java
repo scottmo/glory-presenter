@@ -179,7 +179,7 @@ public class SongFormatter extends JPanel {
 
     private static void loadSong(JList songList, JTextArea songViewer) {
         String songName = (String)songList.getSelectedValue();
-        String songContent = SongYAMLAdapter.getSongFileContent(songName);
+        String songContent = SongYAMLAdapter.getSerializedSong(songName);
         if (songContent == null) {
             songContent = "Error getting content for song " + songName;
         }

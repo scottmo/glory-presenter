@@ -24,14 +24,14 @@ public class SongYAMLAdapter {
     }
 
     public static Song getSong(String songName) {
-        String songFileContent = getSongFileContent(songName);
+        String songFileContent = getSerializedSong(songName);
         if (songFileContent != null) {
             return deserialize(songFileContent);
         }
         return null;
     }
 
-    public static String getSongFileContent(String songName) {
+    public static String getSerializedSong(String songName) {
         try {
             return Files.readString(Path.of(Config.get(Config.DIR_DATA), "songs",songName + ".yaml"), StandardCharsets.UTF_8);
         } catch (IOException e) {
