@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.scottscmo.song.adapters.SongYAMLAdapter;
+
 public class SlideTextTransformer {
     public static List<String> transform(Song song, List<String> langs, int linesPerSlidePerLang) {
         if (song == null || langs == null || langs.isEmpty()) {
@@ -51,7 +53,7 @@ public class SlideTextTransformer {
     public static void main(String[] args) throws IOException {
         String path = "test.yaml";
         String content = Files.readString(Path.of(path), StandardCharsets.UTF_8);
-        Song song = SongObjectMapper.deserialize(content);
+        Song song = SongYAMLAdapter.deserialize(content);
         String output = transform(song, Arrays.asList("zh", "en"), 3).stream()
                 .collect(Collectors.joining("\n\n---\n\n"));
         System.out.println(output);

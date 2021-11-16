@@ -1,4 +1,4 @@
-package com.scottscmo.song;
+package com.scottscmo.song.adapters;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -8,8 +8,10 @@ import java.nio.file.Path;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.scottscmo.config.Config;
+import com.scottscmo.song.Song;
 
-public class SongObjectMapper {
+public class SongYAMLAdapter {
     private static final ObjectMapper mapper;
     static {
         mapper = new ObjectMapper(new YAMLFactory());
@@ -34,7 +36,7 @@ public class SongObjectMapper {
 
     public static String getSongFileContent(String songName) {
         try {
-            return Files.readString(Path.of("resources/songs/" + songName + ".yaml"), StandardCharsets.UTF_8);
+            return Files.readString(Path.of(Config.get(Config.DIR_DATA), "songs",songName + ".yaml"), StandardCharsets.UTF_8);
         } catch (IOException e) {
             System.err.println(e.getMessage());
             return null;
