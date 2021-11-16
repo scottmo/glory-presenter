@@ -1,4 +1,4 @@
-package com.scottscmo.ui.container;
+package com.scottscmo.ui.components;
 
 import java.awt.Component;
 import java.nio.file.Path;
