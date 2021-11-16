@@ -29,6 +29,7 @@ import com.scottscmo.config.Config;
 import com.scottscmo.song.SlideTextTransformer;
 import com.scottscmo.song.Song;
 import com.scottscmo.song.adapters.SongYAMLAdapter;
+import com.scottscmo.ui.components.C;
 
 import net.miginfocom.swing.MigLayout;
 
@@ -104,11 +105,7 @@ public class SongFormatter extends JPanel {
         songSearchInput.setColumns(20);
         songListPanel.add(songList, "span");
 
-        JSplitPane sp1 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
-                new JScrollPane(songListPanel), new JScrollPane(songViewer));
-        JSplitPane sp = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
-                sp1, new JScrollPane(outputViewer));  
-        this.add(sp, BorderLayout.CENTER);
+        this.add(C.splitH(songListPanel, songViewer, outputViewer), BorderLayout.CENTER);
 
         JPanel transformPanel = new JPanel();
         transformPanel.add(maxLinesLabel);
