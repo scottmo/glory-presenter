@@ -15,7 +15,7 @@ public record Song(
                 .filter(v -> v.verse().equals(verseNum))
                 .findFirst().get();
         if (verse != null) {
-            return verse.getText();
+            return verse.text();
         }
         return null;
     }

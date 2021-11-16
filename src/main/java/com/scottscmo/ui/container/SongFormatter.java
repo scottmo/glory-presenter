@@ -17,17 +17,15 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
-import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.SpinnerNumberModel;
 
 import com.scottscmo.config.Config;
-import com.scottscmo.song.SlideTextTransformer;
 import com.scottscmo.song.Song;
+import com.scottscmo.song.adapters.SongSlideTextAdapter;
 import com.scottscmo.song.adapters.SongYAMLAdapter;
 import com.scottscmo.ui.components.C;
 
@@ -190,9 +188,8 @@ public class SongFormatter extends JPanel {
 
     private static void transformSong(JTextArea inputViewer, JTextArea outputViewer, Integer linesPerSlidePerLang) {
         Song song = SongYAMLAdapter.deserialize(inputViewer.getText());
-        String output = SlideTextTransformer.transform(song, Arrays.asList("zh", "en"),
-                linesPerSlidePerLang.intValue()).stream()
-            .collect(Collectors.joining("\n\n---\n\n"));
+        String output = SongSlideTextAdapter.serialize(song, Arrays.asList("zh", "en"),
+                linesPerSlidePerLang.intValue());
         outputViewer.setText(output);
     }
 }

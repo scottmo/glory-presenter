@@ -12,10 +12,7 @@ import com.scottscmo.config.Config;
 import com.scottscmo.song.Song;
 
 public class SongYAMLAdapter {
-    private static final ObjectMapper mapper;
-    static {
-        mapper = new ObjectMapper(new YAMLFactory());
-    }
+    private static final ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
 
     public static Song deserialize(String serializedSong) {
         try {
