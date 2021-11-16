@@ -1,7 +1,6 @@
 package com.scottscmo.ui.container;
 
 import java.awt.BorderLayout;
-import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -14,7 +13,6 @@ import java.util.Arrays;
 import java.util.Vector;
 import java.util.stream.Collectors;
 
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -31,6 +29,8 @@ import com.scottscmo.config.Config;
 import com.scottscmo.song.SlideTextTransformer;
 import com.scottscmo.song.Song;
 import com.scottscmo.song.adapters.SongYAMLAdapter;
+
+import net.miginfocom.swing.MigLayout;
 
 public class SongFormatter extends JPanel {
     private static final String TRANSFORM_BUTTON = "Transform";
@@ -98,16 +98,11 @@ public class SongFormatter extends JPanel {
 
         this.setLayout(new BorderLayout(SECTION_MARGIN, SECTION_MARGIN));
 
-        JPanel songListPanel = new JPanel();
-        JPanel songSearchInputGroup = new JPanel();
-        songSearchInputGroup.setLayout(new FlowLayout());
-        songSearchInputGroup.add(songSearchInputLabel);
-        songSearchInputGroup.add(songSearchInput);
+        JPanel songListPanel = new JPanel(new MigLayout("wrap 5"));
+        songListPanel.add(songSearchInputLabel);
+        songListPanel.add(songSearchInput, "span, align left");
         songSearchInput.setColumns(20);
-
-        songListPanel.setLayout(new BoxLayout(songListPanel, BoxLayout.Y_AXIS));
-        songListPanel.add(songSearchInputGroup);
-        songListPanel.add(songList);
+        songListPanel.add(songList, "span");
 
         JSplitPane sp1 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
                 new JScrollPane(songListPanel), new JScrollPane(songViewer));
