@@ -1,12 +1,8 @@
 package com.scottscmo.ui.container;
 
 import java.awt.Color;
-import java.awt.Component;
-import java.awt.event.ActionEvent;
-import java.nio.file.Path;
 import java.util.List;
 
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -16,20 +12,25 @@ import javax.swing.JTextArea;
 import net.miginfocom.swing.MigLayout;
 
 public class CommandRunner extends JPanel {
+
     public CommandRunner() {
         super();
 
-        this.setLayout(new MigLayout());
+        // components init
 
         JLabel inputLabel = new JLabel("Input:");
         JTextArea commandInput = new JTextArea();
-        commandInput.setRows(3);
         JButton runBtn = new JButton("Run");
-        JLabel outputLabel = new JLabel("Running from " + Path.of("").toAbsolutePath().toString() + ". Output:");
+        JLabel outputLabel = new JLabel("Output:");
         JTextArea outputDisplay = new JTextArea();
+
+        // components config
+
+        commandInput.setRows(3);
+
         outputDisplay.setEditable(false);
 
-        runBtn.addActionListener((ActionEvent actionEvent) -> {
+        runBtn.addActionListener(actionEvent -> {
             try {
                 runCommand(commandInput.getText());
             } catch (Exception e) {
@@ -38,6 +39,9 @@ public class CommandRunner extends JPanel {
             }
         });
 
+        // layout
+
+        this.setLayout(new MigLayout());
         List<JComponent> components = List.of(
             inputLabel,
             commandInput,
