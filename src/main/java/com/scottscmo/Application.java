@@ -7,8 +7,8 @@ import javax.swing.JTabbedPane;
 
 import com.formdev.flatlaf.intellijthemes.FlatCarbonIJTheme;
 import com.scottscmo.ui.Labels;
+import com.scottscmo.ui.components.DataPathPicker;
 import com.scottscmo.ui.container.CommandRunner;
-import com.scottscmo.ui.container.DataPathPicker;
 import com.scottscmo.ui.container.SongFormatter;
 
 import net.miginfocom.swing.MigLayout;
