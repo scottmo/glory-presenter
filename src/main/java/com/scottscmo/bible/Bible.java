@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class BibleInfo {
+public class Bible {
     private static final Map<String, BookInfo> bookInfoMap = Map.ofEntries(
         entry("genesis", new BookInfo(
             new int[]{31,25,24,26,32,22,24,22,29,32,32,20,18,24,21,16,27,33,38,18,34,24,20,67,34,35,46,22,35,43,55,32,20,31,29,43,36,30,23,23,57,38,34,34,28,34,31,22,33,26},
