@@ -2,7 +2,9 @@ package com.scottscmo.bible;
 
 import static java.util.Map.entry;
 
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class BibleInfo {
     private static final Map<String, BookInfo> bookInfoMap = Map.ofEntries(
@@ -294,5 +296,12 @@ public class BibleInfo {
             .findFirst()
             .map(kv -> kv.getKey())
             .orElse("");
+    }
+
+    public static List<String> getBookOrder() {
+        return getBookInfoMap().entrySet().stream()
+            .sorted((a, b) -> a.getValue().index - b.getValue().index)
+            .map(bookInfo -> bookInfo.getKey())
+            .collect(Collectors.toList());
     }
 }
