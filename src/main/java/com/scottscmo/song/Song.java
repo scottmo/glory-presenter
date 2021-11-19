@@ -8,9 +8,9 @@ public record Song(
         String collection,
         String description,
         List<Verse> lyrics,
-        List<Integer> verseOrder) {
+        List<String> verseOrder) {
 
-    public Map<String, String[]> getVerseText(Integer verseNum) {
+    public Map<String, String[]> getVerseText(String verseNum) {
         Verse verse = this.lyrics.stream()
                 .filter(v -> v.verse().equals(verseNum))
                 .findFirst().get();

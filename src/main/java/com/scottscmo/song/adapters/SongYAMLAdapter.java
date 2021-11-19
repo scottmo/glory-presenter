@@ -33,7 +33,8 @@ public class SongYAMLAdapter {
 
     public static String getSerializedSong(String songName) {
         try {
-            return Files.readString(Path.of(Config.get(Config.DIR_DATA), "songs",songName + ".yaml"), StandardCharsets.UTF_8);
+            Path songPath = Path.of(Config.get(Config.DIR_DATA), "songs", songName + ".yaml");
+            return Files.readString(songPath, StandardCharsets.UTF_8);
         } catch (IOException e) {
             System.err.println(e.getMessage());
             return null;

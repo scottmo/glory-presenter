@@ -18,7 +18,7 @@ public class SongSlideTextAdapter {
 
         List<String> slides = new ArrayList<String>();
 
-        for (Integer verseNumber : song.verseOrder()) {
+        for (String verseNumber : song.verseOrder()) {
             Map<String, String[]> verseText = song.getVerseText(verseNumber);
 
             assert(langs.stream().allMatch(lang -> verseText.containsKey(lang)));
