@@ -3,4 +3,5 @@ target
 *.yaml
 *.pptx
 
-.settings
+.settings/
+build/
