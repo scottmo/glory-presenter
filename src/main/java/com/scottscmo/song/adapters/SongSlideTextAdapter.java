@@ -43,7 +43,7 @@ public class SongSlideTextAdapter {
                 }
                 slides.add(slide.trim());
                 numSlidePerThisVerse++;
-            }   
+            }
         }
 
         return slides;
