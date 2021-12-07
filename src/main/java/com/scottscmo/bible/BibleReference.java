@@ -9,31 +9,13 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class BibleReference {
+    private static final Pattern RE_VERSE_NOTATION =
+            Pattern.compile("([\\d]?[A-z\\s]+)\\s+([\\d,;:\\-\\s]+)");
+
     private String book;
     private List<VerseRange> ranges;
 
-    public BibleReference(String book, List<VerseRange> ranges) {
-        this.book = book;
-        this.ranges = ranges;
-    }
-
-    public String toString() {
-        if (this.book == null || this.book.isEmpty()) {
-            return "";
-        }
-
-        if (this.ranges == null || this.ranges.isEmpty()) {
-            return this.book;
-        }
-
-        return String.format("%s %s",
-            book,
-            ranges.stream().map(VerseRange::toString).collect(Collectors.joining(";"))
-        );
-    }
-
-    private static final Pattern RE_VERSE_NOTATION = Pattern.compile("([\\d]?[A-z\\s]+)\\s+([\\d,;:\\-\\s]+)");
-    public static BibleReference of(String bibleReferenceStr) {
+    public BibleReference(String bibleReferenceStr) {
         if (bibleReferenceStr == null || bibleReferenceStr.isEmpty()) {
             throw new IllegalArgumentException("Missing verseNotation!");
         }
@@ -60,10 +42,34 @@ public class BibleReference {
             })
             .collect(Collectors.toList());
 
-        return new BibleReference(book, ranges);
+        this.book = book;
+        this.ranges = ranges;
     }
 
-    private static List<Integer> parseVerseRanges(String verseRanges) {
+    public String getBook() {
+        return this.book;
+    }
+
+    public List<VerseRange> getRanges() {
+        return this.ranges;
+    }
+
+    public String toString() {
+        if (this.book == null || this.book.isEmpty()) {
+            return "";
+        }
+
+        if (this.ranges == null || this.ranges.isEmpty()) {
+            return this.book;
+        }
+
+        return String.format("%s %s",
+            book,
+            ranges.stream().map(VerseRange::toString).collect(Collectors.joining(";"))
+        );
+    }
+
+    private List<Integer> parseVerseRanges(String verseRanges) {
         List<Integer> verses = new ArrayList<>();
         for (String verse : verseRanges.split(",")) {
             if (verse.isEmpty()) continue;
@@ -102,8 +108,8 @@ public class BibleReference {
             int startVerse = this.verses[0];
             int endVerse = -1;
             for (int i = 1; i < this.verses.length; i++) {
-                if (endVerse + 1 == this.verses[i]) { // consective, update endVerse to cover current verse
-                    endVerse++;
+                if (this.verses[i-1] + 1 == this.verses[i]) { // consective, update endVerse to cover current verse
+                    endVerse = this.verses[i];
                 } else { // not consective
                     verseRangeStrs.add(formatVerseRange(startVerse, endVerse));
                     startVerse = this.verses[i];
@@ -111,7 +117,7 @@ public class BibleReference {
                 }
             }
             verseRangeStrs.add(formatVerseRange(startVerse, endVerse));
-            return verseRangeStrs.stream().collect(Collectors.joining(","));
+            return this.chapter + ":" + verseRangeStrs.stream().collect(Collectors.joining(","));
         }
 
         private String formatVerseRange(int startVerse, int endVerse) {
