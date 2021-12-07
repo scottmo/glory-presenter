@@ -1,12 +1,21 @@
 package com.scottscmo.bible;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class BibleReference {
     private String book;
     private List<VerseRange> ranges;
+
+    public BibleReference(String book, List<VerseRange> ranges) {
+        this.book = book;
+        this.ranges = ranges;
+    }
 
     public String toString() {
         if (this.book == null || this.book.isEmpty()) {
@@ -23,71 +32,58 @@ public class BibleReference {
         );
     }
 
-    public static BibleReference of() {
+    private static final Pattern RE_VERSE_NOTATION = Pattern.compile("([\\d]?[A-z\\s]+)\\s+([\\d,;:\\-\\s]+)");
+    public static BibleReference of(String bibleReferenceStr) {
+        if (bibleReferenceStr == null || bibleReferenceStr.isEmpty()) {
+            throw new IllegalArgumentException("Missing verseNotation!");
+        }
 
-        // const RE_VERSE_NOTATION = /([\d]?[A-z\s]+)\s+([\d,;:\-\s]+)/;
-        // const RE_WHITESPACE = /\s+/g;
-        
-        // function parseVerseNotation(verseNotation: string) {
-        //     const matches = verseNotation.match(RE_VERSE_NOTATION);
-        //     if (matches && matches.length === 3) { // 3 = full string + book + ranges
-        //         const book = (matches[1] as string)
-        //                 .trim().replace(RE_WHITESPACE, " ").toLowerCase();
-        //         const rangesStr = (matches[2] as string)
-        //                 .trim().replace(RE_WHITESPACE, "");
-        //         return { book, rangesStr };
-        //     }
-        //     return {};
-        // }
-        
-        // function isVerseRange(verseRangeStr: string): boolean {
-        //     return verseRangeStr.includes("-");
-        // }
-        
-        // function parseVerseRange(verseRangeStr: string): number[] {
-        //     const verseRange = [];
-        
-        //     const [ minVerse, maxVerse ] = verseRangeStr.split("-").map(Number);
-        
-        //     if (minVerse > maxVerse) {
-        //         throw new Error(`Invalid verse range: "${verseRangeStr}". End verse should not be less than start verse.`);
-        //     }
-        //     for (let i = minVerse; i <= maxVerse; i++) {
-        //         verseRange.push(i);
-        //     }
-        //     return verseRange;
-        // }
-        
-        // // matthew 1:3-4,2
-        // export function parse(verseNotation: string): Bible.BookRange {
-        //     if (!verseNotation) {
-        //         throw new Error("Missing verseNotation!");
-        //     }
-        
-        //     const { book, rangesStr } = parseVerseNotation(verseNotation);
-        
-        //     if (!book || !rangesStr) {
-        //         throw new Error("Missing book name or verse ranges!");
-        //     }
-        
-        //     const ranges = rangesStr.split(";")
-        //         .filter(Boolean)
-        //         .map((range: string) => {
-        //             const [ chapter, verses = "" ] = range.split(":");
-        //             return {
-        //                 chapter: Number(chapter),
-        //                 verses: verses.split(",")
-        //                     .filter(Boolean)
-        //                     .map(verse => isVerseRange(verse)
-        //                         ? parseVerseRange(verse)
-        //                         : Number(verse))
-        //                     .flat()
-        //             };
-        //         });
-        
-        //     return { book, ranges };
-        // }
-        
+        String book = null;
+        String rangesStr = null;
+        Matcher matcher = RE_VERSE_NOTATION.matcher(bibleReferenceStr);
+        if (matcher.find() && matcher.groupCount() == 2) {
+            book = matcher.group(1).trim().replaceAll("\\s+", " ").toLowerCase();
+            rangesStr = matcher.group(2).trim().replaceAll("\\s+", "");
+        } else {
+            throw new IllegalArgumentException("Missing book name or verse ranges!");
+        }
+
+        List<VerseRange> ranges = Stream.of(rangesStr.split(";"))
+            .filter(s -> !s.isEmpty())
+            .map(range -> {
+                String[] rangeSplits = range.split(":");
+                int chapter = Integer.parseInt(rangeSplits[0]);
+                List<Integer> verses = (rangeSplits.length > 1)
+                    ? parseVerseRanges(rangeSplits[1])
+                    : Collections.emptyList();
+                return new VerseRange(chapter, verses.stream().mapToInt(i->i).toArray());
+            })
+            .collect(Collectors.toList());
+
+        return new BibleReference(book, ranges);
+    }
+
+    private static List<Integer> parseVerseRanges(String verseRanges) {
+        List<Integer> verses = new ArrayList<>();
+        for (String verse : verseRanges.split(",")) {
+            if (verse.isEmpty()) continue;
+
+            if (verse.contains("-")) { // verse range
+                String[] verseSplits = verse.split("-");
+                int minVerse = Integer.parseInt(verseSplits[0]);
+                int maxVerse = Integer.parseInt(verseSplits[1]);
+                if (minVerse > maxVerse) {
+                    throw new IllegalArgumentException("Invalid verse range: " + verse 
+                        + ". End verse should not be less than start verse.");
+                }
+                for (int i = minVerse; i <= maxVerse; i++) {
+                    verses.add(i);
+                }
+            } else { // single verse
+                verses.add(Integer.parseInt(verse));
+            }
+        }
+        return verses;
     }
 
     public record VerseRange(
