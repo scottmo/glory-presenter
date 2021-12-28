@@ -1,5 +1,6 @@
 package com.scottscmo.bible;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -16,11 +17,19 @@ class BibleDB {
         });
     }
 
+    private static Path getDBPath() {
+        return Path.of(Config.get(Config.DIR_DATA), "bible.db");
+    }
+
     static Connection connect() throws SQLException {
-        String dbFilePath = Path.of(Config.get(Config.DIR_DATA), "bible.db").toString();
         if (conn == null) {
-            conn = DriverManager.getConnection("jdbc:sqlite:" + dbFilePath);
+            conn = DriverManager.getConnection("jdbc:sqlite:" + getDBPath().toString());
         }
         return conn;
+    }
+
+    static boolean isEmpty() {
+        Path dbPath = getDBPath();
+        return !(Files.exists(dbPath) && dbPath.toFile().length() > 0);
     }
 }

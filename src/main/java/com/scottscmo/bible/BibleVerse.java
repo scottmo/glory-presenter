@@ -4,7 +4,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 public class BibleVerse {
-    private void createBibleTable(String tableName) throws SQLException {
+    private static void init(String tableName) throws SQLException {
         String sql = """
             CREATE TABLE IF NOT EXISTS %s (
                 bookIndex TEXT NOT NULL,
