@@ -1,4 +1,4 @@
-package com.scottscmo.bible;
+package com.scottscmo.model.bible;
 
 import static java.util.Map.entry;
 

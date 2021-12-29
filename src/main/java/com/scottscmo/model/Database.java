@@ -1,4 +1,4 @@
-package com.scottscmo.bible;
+package com.scottscmo.model;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -8,27 +8,30 @@ import java.sql.SQLException;
 
 import com.scottscmo.config.Config;
 
-class BibleDB {
-    private static Connection conn;
+public class Database {
+    private String dbName;
+    private Connection conn;
 
-    static {
+    public Database(String dbName) {
+        this.dbName = dbName;
+
         Config.subscribe(Config.DIR_DATA, dirData -> {
             conn = null;
         });
     }
 
-    private static Path getDBPath() {
-        return Path.of(Config.get(Config.DIR_DATA), "bible.db");
+    private Path getDBPath() {
+        return Path.of(Config.get(Config.DIR_DATA), this.dbName + ".db");
     }
 
-    static Connection connect() throws SQLException {
+    public Connection connect() throws SQLException {
         if (conn == null) {
             conn = DriverManager.getConnection("jdbc:sqlite:" + getDBPath().toString());
         }
         return conn;
     }
 
-    static boolean isEmpty() {
+    public boolean isEmpty() {
         Path dbPath = getDBPath();
         return !(Files.exists(dbPath) && dbPath.toFile().length() > 0);
     }

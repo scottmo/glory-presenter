@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Arrays;
 
-import com.scottscmo.bible.BibleReference;
+import com.scottscmo.model.bible.BibleReference;
 
 import org.junit.jupiter.api.Test;
 

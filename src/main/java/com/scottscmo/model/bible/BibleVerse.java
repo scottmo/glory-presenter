@@ -1,11 +1,11 @@
-package com.scottscmo.bible;
+package com.scottscmo.model.bible;
 
 import java.sql.SQLException;
 import java.sql.Statement;
 
 public class BibleVerse {
-    private static void init(String tableName) throws SQLException {
-        String sql = """
+    public static void init(String tableName) throws SQLException {
+        String sql = String.format("""
             CREATE TABLE IF NOT EXISTS %s (
                 bookIndex TEXT NOT NULL,
                 chapter INTEGER NOT NULL,
@@ -13,10 +13,12 @@ public class BibleVerse {
                 text TEXT NOT NULL,
                 PRIMARY KEY(bookIndex, chapter, verse)
             )
-        """;
-        sql = String.format(sql, tableName);
-        Statement stmt = BibleDB.connect().createStatement();
-        stmt.executeUpdate(sql);
-        stmt.close();
+        """, tableName);
+
+        try (Statement stmt = BibleDB.connect().createStatement()) {
+            stmt.executeUpdate(sql);
+        }
     }
+
+
 }
