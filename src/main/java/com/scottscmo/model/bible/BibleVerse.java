@@ -5,6 +5,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class BibleVerse {
@@ -36,7 +37,7 @@ public class BibleVerse {
             SELECT * FROM %s WHERE bookIndex = ? AND chapter = ?
         """, getTableName(version));
         if (verses.length > 0) {
-            String verseNumberPlaceholder = "?,".repeat(verses.length - 1) + "?";
+            String verseNumberPlaceholder = String.join(",", Collections.nCopies(verses.length, "?"));
             sql += " AND verse IN (" + verseNumberPlaceholder + ")";
         }
 
