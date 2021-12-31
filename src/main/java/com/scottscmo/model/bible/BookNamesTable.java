@@ -9,12 +9,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class BookNames {
-    private static final String DB_NAME = "book_names";
+class BookNamesTable {
+    private final String DB_NAME = "book_names";
 
-    public static void init() throws SQLException {
-        if (!BibleDB.isEmpty()) return;
-
+    private void createTable() throws SQLException {
         String sql = String.format("""
             CREATE TABLE IF NOT EXISTS %s (
                 id INTEGER NOT NULL,
@@ -32,9 +30,9 @@ public class BookNames {
      * Retrieve list of book names for each version.
      * structure: [ bookIndex: { bibleVersion: bookName }, ...]
      */
-    public static List<Map<String, String>> getBookNames() throws SQLException {
+    List<Map<String, String>> getBookNames() throws SQLException {
         List<Map<String, String>> bookNames = new ArrayList<>();
-        for (int i = 0; i < BibleInfo.getBookInfoMap().size(); i++) {
+        for (int i = 0; i < BibleMetadata.getBookInfoMap().size(); i++) {
             bookNames.add(new HashMap<>());
         }
 
@@ -51,7 +49,9 @@ public class BookNames {
         return bookNames;
     }
 
-    public static int insertBookNames(String version, List<String> bookNames) throws SQLException {
+    int insertBookNames(String version, List<String> bookNames) throws SQLException {
+        createTable();
+
         String sql = String.format("""
             INSERT INTO %s (id, name, version) VALUES (?, ?, ?)
         """, DB_NAME);
