@@ -7,6 +7,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 public class BibleVerse {
     public static void init(String tableName) throws SQLException {
@@ -27,6 +28,39 @@ public class BibleVerse {
 
     public static String getTableName(String version) {
         return "bible_" + version;
+    }
+
+    public void insertBibleVerses(Map<String, List<List<String>>> bible, String version)
+            throws SQLException {
+
+        List<BibleVerseText> verses = new ArrayList<>();
+        for (String book : bible.keySet()) {
+            int bookIndex = BibleInfo.getBookIndex(book);
+            List<List<String>> chapters = bible.get(book);
+            for (int c = 0; c < chapters.size(); c++) {
+                List<String> chapter = chapters.get(c);
+                for (int v = 0; v < chapter.size(); v++) {
+                    verses.add(new BibleVerseText(bookIndex, c + 1, v + 1, chapter.get(v)));
+                }
+            }
+        }
+
+        init(version);
+        String sql = String.format("""
+            INSERT INTO %s (bookIndex, chapter, verse, text) VALUES (?, ?, ?, ?)
+        """, getTableName(version));
+        try (PreparedStatement stmt = BibleDB.connect().prepareStatement(sql)) {
+            for (BibleVerseText bvt : verses) {
+                stmt.setInt(1, bvt.bookIndex());
+                stmt.setInt(2, bvt.chapter());
+                stmt.setInt(3, bvt.verse());
+                stmt.setString(4, bvt.text());
+                stmt.addBatch();
+            }
+            stmt.executeBatch();
+
+            System.out.println("Inserted " + verses.size() + " bible verses.");
+        }
     }
 
     public List<BibleVerseText> getBibleVerse(String version, String bookId, int chapter,
