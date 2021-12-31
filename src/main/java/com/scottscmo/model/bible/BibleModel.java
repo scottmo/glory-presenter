@@ -15,6 +15,8 @@ public class BibleModel {
     private BibleVerseTable bibleVerseTable;
     private BookNamesTable bookNamesTable;
 
+    private List<Map<String, String>> bookNames = null; // cache
+
     public BibleModel() {
         this.bibleVerseTable = new BibleVerseTable();
         this.bookNamesTable = new BookNamesTable();
@@ -25,7 +27,7 @@ public class BibleModel {
             int insertedCount = this.bookNamesTable.insertBookNames(version, new ArrayList<>(bible.keySet()));
             System.out.println("Inserted " + insertedCount + " book names.");
         } catch (SQLException e) {
-            System.err.println("Failed to insert book names");
+            System.err.println("Failed to insert book names!");
             e.printStackTrace();
             return false;
         }
@@ -34,10 +36,24 @@ public class BibleModel {
             int insertedCount = this.bibleVerseTable.insertBibleVerses(version, bible);
             System.out.println("Inserted " + insertedCount + " bible verses.");
         } catch (SQLException e) {
-            System.err.println("Failed to insert bible verses");
+            System.err.println("Failed to insert bible verses!");
             e.printStackTrace();
             return false;
         }
+
+        this.bookNames = null;
         return true;
+    }
+
+    public List<Map<String, String>> getBookNames() {
+        if (bookNames == null) {
+            try {
+                bookNames = this.bookNamesTable.getBookNames();
+            } catch (SQLException e) {
+                System.err.println("Failed to get book names!");
+                e.printStackTrace();
+            }
+        }
+        return bookNames;
     }
 }
