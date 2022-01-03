@@ -13,7 +13,7 @@ class BibleVerseTable {
     private void createTable(String tableName) throws SQLException {
         String sql = String.format("""
             CREATE TABLE IF NOT EXISTS %s (
-                bookIndex TEXT NOT NULL,
+                bookIndex INTEGER NOT NULL,
                 chapter INTEGER NOT NULL,
                 verse INTEGER NOT NULL,
                 text TEXT NOT NULL,
@@ -63,7 +63,7 @@ class BibleVerseTable {
         }
     }
 
-    List<BibleVerse> getBibleVerse(String version, String bookId, int chapter,
+    List<BibleVerse> getBibleVerses(String version, String bookId, int chapter,
             int[] verses) throws SQLException {
         if (verses == null) verses = new int[]{};
 
@@ -76,7 +76,7 @@ class BibleVerseTable {
         }
 
         try (PreparedStatement stmt = BibleDB.connect().prepareStatement(sql)) {
-            stmt.setInt(1, BibleMetadata.getBookIndex(bookId));
+            stmt.setString(1, BibleMetadata.getBookIndex(bookId) + ".0"); // .0 because bookIndex was initially a string, TODO: FIX THIS
             stmt.setInt(2, chapter);
             for (int i = 0; i < verses.length; i++) {
                 stmt.setInt(3 + i, verses[i]);

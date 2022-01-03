@@ -8,16 +8,26 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * e.g. cuv,niv - john 1:2-3;3:4;5:1-3
+ */
 public class BibleReference {
     private static final Pattern RE_VERSE_NOTATION =
             Pattern.compile("([\\d]?[A-z\\s]+)\\s+([\\d,;:\\-\\s]+)");
 
-    private String book;
-    private List<VerseRange> ranges;
+    private String[] versions = null;
+    private String book = null;
+    private List<VerseRange> ranges = null;
 
     public BibleReference(String bibleReferenceStr) {
         if (bibleReferenceStr == null || bibleReferenceStr.isEmpty()) {
             throw new IllegalArgumentException("Missing verseNotation!");
+        }
+
+        String[] bibleReferenceStrParts = bibleReferenceStr.split(" - ");
+        if (bibleReferenceStrParts.length > 1) {
+            this.versions = bibleReferenceStrParts[0].split(",");
+            bibleReferenceStr = bibleReferenceStrParts[1];
         }
 
         String book = null;
@@ -44,6 +54,10 @@ public class BibleReference {
 
         this.book = book;
         this.ranges = ranges;
+    }
+
+    public String[] getVersions() {
+        return this.versions;
     }
 
     public String getBook() {

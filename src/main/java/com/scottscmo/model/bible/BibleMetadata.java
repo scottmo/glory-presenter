@@ -298,8 +298,8 @@ public class BibleMetadata {
             .orElse("");
     }
 
-    public static List<String> getBookOrder() {
-        return getBookInfoMap().entrySet().stream()
+    public static List<String> getBookIdsInOrder() {
+        return bookInfoMap.entrySet().stream()
             .sorted((a, b) -> a.getValue().index - b.getValue().index)
             .map(bookInfo -> bookInfo.getKey())
             .collect(Collectors.toList());

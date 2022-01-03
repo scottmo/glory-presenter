@@ -2,8 +2,11 @@ package com.scottscmo.model.bible;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import com.scottscmo.model.bible.BibleReference.VerseRange;
 
 public class BibleModel {
     private static BibleModel model = null;
@@ -45,7 +48,32 @@ public class BibleModel {
         return true;
     }
 
-    public List<Map<String, String>> getBookNames() {
+    public Map<String, List<BibleVerse>> getBibleVerses(BibleReference ref) {
+        if (ref == null) return null;
+
+        String[] versions = ref.getVersions();
+        String bookId = ref.getBook();
+        try {
+            Map<String, List<BibleVerse>> bibleVerses = new HashMap<>();
+            for (String version : versions) {
+                List<BibleVerse> verses = new ArrayList<>();
+                for (VerseRange range : ref.getRanges()) {
+                    verses.addAll(this.bibleVerseTable.getBibleVerses(version, bookId, range.chapter(), range.verses()));
+                }
+                bibleVerses.put(version, verses);
+            }
+            return bibleVerses;
+        } catch (SQLException e) {
+            System.err.println("Failed to get bible verses!");
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * @return { $bibleVersion: $bookName }
+     */
+    public Map<String, String> getBookNames(String bookId) {
         if (bookNames == null) {
             try {
                 bookNames = this.bookNamesTable.getBookNames();
@@ -54,6 +82,6 @@ public class BibleModel {
                 e.printStackTrace();
             }
         }
-        return bookNames;
+        return bookNames.get(BibleMetadata.getBookIndex(bookId));
     }
 }
