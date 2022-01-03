@@ -274,7 +274,7 @@ public class BibleMetadata {
         )
     );
 
-    record BookMetadata(
+    public record BookMetadata(
         int[] count,
         int index
     ) {}

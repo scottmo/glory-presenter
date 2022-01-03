@@ -30,21 +30,4 @@ public class Presentation {
             ppt.close();
         }
     }
-
-    public static void insertBibleText(String templateFilePath, String outputFilePath, String bibleReference) throws IOException {
-        try (FileInputStream inStream = new FileInputStream(new File(templateFilePath))) {
-            XMLSlideShow ppt = new XMLSlideShow(inStream);
-            bibleTemplateHandler.insertBibleText(ppt, 1, bibleReference);
-
-            // write new PPTX
-            try (FileOutputStream outStream = new FileOutputStream(new File(outputFilePath))) {
-                ppt.write(outStream);
-            }
-            ppt.close();
-        }
-    }
-
-    public static void main(String[] args) throws IOException {
-        insertBibleText("template.pptx", "psalms 1.pptx", "cuv,niv - psalms 1");
-    }
 }

@@ -15,6 +15,9 @@ import org.apache.poi.xslf.usermodel.XSLFSlideMaster;
 public class BibleTemplateHandler implements TemplateHandler {
     private BibleModel bibleModel = BibleModel.getInstance();
 
+    /**
+     * expression format: e.g. {bible} cuv,niv - john 1:2-3;2:1-2
+     */
     @Override
     public void evaluateTemplate(XMLSlideShow slides, int index) {
         XSLFSlide srcSlide = slides.getSlides().get(index);
