@@ -2,6 +2,7 @@
 target
 *.yaml
 *.pptx
+*.db
 
 .settings/
 build/
