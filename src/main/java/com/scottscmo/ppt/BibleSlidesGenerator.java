@@ -40,6 +40,6 @@ public class BibleSlidesGenerator {
     }
 
     public static void main(String[] args) throws IOException {
-        generateSlides("template.pptx", "bible_ppt", "cuv,niv");
+        generateSlides("template-bible.pptx", "bible_ppt", "cuv,niv");
     }
 }
