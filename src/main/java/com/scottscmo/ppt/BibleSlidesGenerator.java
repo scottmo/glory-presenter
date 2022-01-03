@@ -1,6 +1,5 @@
 package com.scottscmo.ppt;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -15,13 +14,13 @@ public class BibleSlidesGenerator {
     private static final BibleTemplateHandler bibleTemplateHandler = new BibleTemplateHandler();
 
     static void insertBibleText(String templateFilePath, String outputFilePath, String bibleReference) throws IOException {
-        try (FileInputStream inStream = new FileInputStream(new File(templateFilePath))) {
+        try (FileInputStream inStream = new FileInputStream(templateFilePath)) {
             XMLSlideShow ppt = new XMLSlideShow(inStream);
             bibleTemplateHandler.insertBibleText(ppt, 1, bibleReference);
             ppt.removeSlide(0);
 
             // write new PPTX
-            try (FileOutputStream outStream = new FileOutputStream(new File(outputFilePath))) {
+            try (FileOutputStream outStream = new FileOutputStream(outputFilePath)) {
                 ppt.write(outStream);
             }
             ppt.close();
@@ -40,6 +39,7 @@ public class BibleSlidesGenerator {
     }
 
     public static void main(String[] args) throws IOException {
-        generateSlides("template-bible.pptx", "bible_ppt", "cuv,niv");
+        String templatePath = "template-bible.pptx";
+        generateSlides(templatePath, "bible_ppt", "cuv,niv");
     }
 }
