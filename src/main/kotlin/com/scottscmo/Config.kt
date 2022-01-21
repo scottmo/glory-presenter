@@ -5,8 +5,8 @@ import java.nio.file.Path
 typealias UpdateListener = (value: String) -> Unit
 
 object Config {
-    private val config: MutableMap<String, String> = HashMap()
-    private val listenersMap: MutableMap<String, MutableList<UpdateListener>> = HashMap()
+    private val config: MutableMap<String, String> = mutableMapOf()
+    private val listenersMap: MutableMap<String, MutableList<UpdateListener>> = mutableMapOf()
     const val DIR_DATA = "dirData"
 
     init {
@@ -28,7 +28,7 @@ object Config {
     }
 
     fun subscribe(key: String, handler: UpdateListener) {
-        val listeners = listenersMap.getOrDefault(key, ArrayList())
+        val listeners = listenersMap.getOrDefault(key, mutableListOf())
         listeners.add(handler)
         listenersMap[key] = listeners
     }

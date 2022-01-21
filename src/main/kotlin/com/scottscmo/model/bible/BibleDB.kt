@@ -17,7 +17,7 @@ internal object BibleDB {
     fun useStatement(run: (stmt: Statement) -> Unit) {
         var stmt: Statement? = null
         try {
-            stmt = BibleDB.connect()!!.createStatement()
+            stmt = connect()!!.createStatement()
             run(stmt)
         } finally {
             stmt?.close()
@@ -27,7 +27,7 @@ internal object BibleDB {
     fun usePrepareStatement(sql: String, run: (stmt: PreparedStatement) -> Unit) {
         var stmt: PreparedStatement? = null
         try {
-            stmt = BibleDB.connect()!!.prepareStatement(sql)
+            stmt = connect()!!.prepareStatement(sql)
             run(stmt)
         } finally {
             stmt?.close()

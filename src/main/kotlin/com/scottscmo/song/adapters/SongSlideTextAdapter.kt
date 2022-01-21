@@ -1,7 +1,6 @@
 package com.scottscmo.song.adapters
 
 import com.scottscmo.song.Song
-import java.util.stream.Collectors
 
 object SongSlideTextAdapter {
     private const val SEPARATOR = "\n\n---\n\n"
