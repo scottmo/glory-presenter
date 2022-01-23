@@ -27,9 +27,20 @@ object Config {
         listenersMap[key]?.forEach { it(value) }
     }
 
-    fun subscribe(key: String, handler: UpdateListener) {
+    fun subscribe(key: String, init: Boolean, handler: UpdateListener) {
         val listeners = listenersMap.getOrDefault(key, mutableListOf())
         listeners.add(handler)
         listenersMap[key] = listeners
+
+        if (init) {
+            val value = config.getOrDefault(key, "")
+            if (value.isNotEmpty()) {
+                handler(value)
+            }
+        }
+    }
+
+    fun subscribe(key: String, handler: UpdateListener) {
+        subscribe(key, false, handler)
     }
 }
