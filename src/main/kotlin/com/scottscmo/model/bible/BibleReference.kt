@@ -49,7 +49,7 @@ class BibleReference(bibleReferenceStr: String) {
         return if (this.ranges.isEmpty()) {
             this.book
         } else {
-            this.book + " " + this.ranges.joinToString { ";" }
+            this.book + " " + this.ranges.joinToString(";")
         }
     }
 
@@ -104,7 +104,7 @@ class BibleReference(bibleReferenceStr: String) {
                 }
             }
             verseRangeStrs.add(formatVerseReferences(startVerse, endVerse))
-            return this.chapter.toString() + ":" + verseRangeStrs.joinToString { "," }
+            return this.chapter.toString() + ":" + verseRangeStrs.joinToString(",")
         }
 
         private fun formatVerseReferences(startVerse: Int, endVerse: Int): String {

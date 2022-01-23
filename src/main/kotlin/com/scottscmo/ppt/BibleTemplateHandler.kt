@@ -39,7 +39,7 @@ class BibleTemplateHandler : TemplateHandler {
         for (version in ref.versions) {
             titleSlideValues["{title_$version}"] = bookNames.getOrDefault(version, "")
         }
-        titleSlideValues["{range}"] = ref.ranges.joinToString { ";" }
+        titleSlideValues["{range}"] = ref.ranges.joinToString(";")
         replaceText(titleSlide, titleSlideValues)
 
         // create verse slides

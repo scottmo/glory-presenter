@@ -62,7 +62,7 @@ internal class BibleVerseTable {
         val tableName = getTableName(version)
         var sql = "SELECT * FROM $tableName WHERE bookIndex = ? AND chapter = ?"
         if (verses.isNotEmpty()) {
-            val verseNumberPlaceholder = List(verses.size){ "?" }.joinToString{ "," }
+            val verseNumberPlaceholder = List(verses.size){ "?" }.joinToString(",")
             sql += " AND verse IN ($verseNumberPlaceholder)"
         }
         BibleDB.usePrepareStatement(sql) { stmt ->
