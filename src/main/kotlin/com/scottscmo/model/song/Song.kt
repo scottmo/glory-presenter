@@ -1,4 +1,4 @@
-package com.scottscmo.song
+package com.scottscmo.model.song
 
 class Song() {
     lateinit var title: String

@@ -2,8 +2,8 @@ package com.scottscmo.ui.container
 
 import com.scottscmo.Config
 import com.scottscmo.Config.DIR_DATA
-import com.scottscmo.song.adapters.SongSlideTextAdapter
-import com.scottscmo.song.adapters.SongYAMLAdapter
+import com.scottscmo.model.song.adapters.SongSlideTextAdapter
+import com.scottscmo.model.song.adapters.SongYAMLAdapter
 import com.scottscmo.ui.components.C
 import net.miginfocom.swing.MigLayout
 import java.awt.BorderLayout

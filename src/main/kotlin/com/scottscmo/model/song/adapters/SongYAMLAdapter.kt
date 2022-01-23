@@ -1,11 +1,11 @@
-package com.scottscmo.song.adapters
+package com.scottscmo.model.song.adapters
 
 import com.fasterxml.jackson.core.JsonProcessingException
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
 import com.scottscmo.Config
 import com.scottscmo.Config.DIR_DATA
-import com.scottscmo.song.Song
+import com.scottscmo.model.song.Song
 import java.io.IOException
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
