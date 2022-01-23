@@ -14,12 +14,8 @@ object Config {
         config[DIR_DATA] = Path.of("./data").toAbsolutePath().toString()
     }
 
-    operator fun get(key: String): String? {
-        return config[key]
-    }
-
-    fun getOrDefault(key: String, defaultValue: String): String {
-        return config.getOrDefault(key, defaultValue)
+    operator fun get(key: String): String {
+        return config[key] ?: ""
     }
 
     operator fun set(key: String, value: String) {
@@ -33,7 +29,7 @@ object Config {
         listenersMap[key] = listeners
 
         if (init) {
-            val value = config.getOrDefault(key, "")
+            val value = this[key]
             if (value.isNotEmpty()) {
                 handler(value)
             }

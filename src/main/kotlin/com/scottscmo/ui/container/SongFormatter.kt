@@ -24,6 +24,8 @@ class SongFormatter : JPanel() {
     private val maxLinesSpinnerInput = JSpinner(SpinnerNumberModel(1, 1, 10, 1))
     private val songSearchInput = JTextField()
 
+    private var songTitles: List<String> = emptyList()
+
     init {
         this.layout = BorderLayout(10, 10)
         this.add(
@@ -65,11 +67,7 @@ class SongFormatter : JPanel() {
 
         // controllers
         Config.subscribe(DIR_DATA, true) { dataPath ->
-            var newSongTitles = getSongTitles(true)
-            if (newSongTitles.isEmpty()) {
-                newSongTitles = listOf("Unable to load songs!")
-            }
-            songList.setListData(newSongTitles.toTypedArray())
+            handleLoadSongList(dataPath)
         }
 
         songList.addMouseListener(object : MouseAdapter() {
@@ -91,23 +89,22 @@ class SongFormatter : JPanel() {
         })
     }
 
-    private var songTitles: List<String> = emptyList()
-    private fun getSongTitles(bustCache: Boolean = false): List<String> {
-        val dirSongPath = Path.of(Config[DIR_DATA], "songs")
-        if (bustCache || songTitles.isEmpty()) {
+    private fun handleLoadSongList(dataPath: String) {
+        val dirSongPath = Path.of(dataPath, "songs")
+        if (songTitles.isEmpty()) {
             songTitles = try {
                 Files.list(dirSongPath)
-                        .map { path -> path.fileName.toString() }
-                        .filter { path -> path.endsWith(".yaml") }
-                        .map { path -> path.replace(".yaml", "") }
-                        .sorted()
-                        .toList()
+                    .map { path -> path.fileName.toString() }
+                    .filter { path -> path.endsWith(".yaml") }
+                    .map { path -> path.replace(".yaml", "") }
+                    .sorted()
+                    .toList()
             } catch (e: IOException) {
                 System.err.println(e.message)
-                emptyList()
+                listOf("Unable to load songs!")
             }
         }
-        return songTitles
+        songList.setListData(songTitles.toTypedArray())
     }
 
     private fun handleLoadSong() {
@@ -122,7 +119,7 @@ class SongFormatter : JPanel() {
     }
 
     private fun handleSearchSong() {
-        songList.setListData(getSongTitles()
+        songList.setListData(songTitles
             .filter { title -> title.contains(songSearchInput.text) }
             .toTypedArray())
     }

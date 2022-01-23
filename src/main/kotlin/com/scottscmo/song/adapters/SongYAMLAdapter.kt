@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
 import com.scottscmo.Config
+import com.scottscmo.Config.DIR_DATA
 import com.scottscmo.song.Song
 import java.io.IOException
 import java.nio.charset.StandardCharsets
@@ -28,7 +29,7 @@ object SongYAMLAdapter {
     }
 
     fun getSerializedSong(songName: String): String? {
-        val songDir = Config.getOrDefault(Config.DIR_DATA, "")
+        val songDir = Config[DIR_DATA]
         if (songDir == "") return null
 
         return try {

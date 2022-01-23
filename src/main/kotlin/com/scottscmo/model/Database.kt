@@ -16,7 +16,7 @@ class Database(private val dbName: String) {
     }
 
     private val dbPath: Path
-        get() = Path.of(Config.getOrDefault(DIR_DATA, "./"), "$dbName.db")
+        get() = Path.of(Config[DIR_DATA], "$dbName.db")
 
     @Throws(SQLException::class)
     fun connect(): Connection? {
