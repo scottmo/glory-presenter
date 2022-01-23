@@ -17,11 +17,11 @@ object C {
         return tail
     }
 
-    fun splitH(vararg components: JComponent): JComponent {
+    fun resizableHBox(vararg components: JComponent): JComponent {
         return splitPane(JSplitPane.HORIZONTAL_SPLIT, *components)
     }
 
-    fun splitV(vararg components: JComponent): JComponent {
+    fun resizableVBox(vararg components: JComponent): JComponent {
         return splitPane(JSplitPane.VERTICAL_SPLIT, *components)
     }
 
