@@ -14,13 +14,13 @@ import javax.swing.SwingUtilities
 class Application() : JFrame() {
 
     init {
-        this.title = Labels.APP_NAME
-        this.defaultCloseOperation = EXIT_ON_CLOSE
+        title = Labels.APP_NAME
+        defaultCloseOperation = EXIT_ON_CLOSE
 
-        render(this.contentPane)
+        render(contentPane)
 
         // auto-resize to component, use setSize if need fixed size
-        this.pack()
+        pack()
     }
 
     private fun render(appContainer: Container) {
