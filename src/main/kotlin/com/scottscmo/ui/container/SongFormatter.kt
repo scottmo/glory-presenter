@@ -14,6 +14,7 @@ import java.awt.event.MouseEvent
 import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Path
+import java.util.stream.Collectors
 import javax.swing.*
 
 class SongFormatter : JPanel() {
@@ -98,7 +99,7 @@ class SongFormatter : JPanel() {
                     .filter { path -> path.endsWith(".yaml") }
                     .map { path -> path.replace(".yaml", "") }
                     .sorted()
-                    .toList()
+                    .collect(Collectors.toList())
             } catch (e: IOException) {
                 System.err.println(e.message)
                 listOf("Unable to load songs!")
