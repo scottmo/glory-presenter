@@ -16,7 +16,7 @@ class SlidesGenerators : JPanel() {
             "template" to FormInput("Template File", "text", "template-bible.pptx"),
             "outputDir" to FormInput("Output Folder", "text", "bible_ppt")
         )) {
-            BibleSlidesGenerator.generateSlides(it["template"], it["outputDir"], it["versions"], it["verses"])
+            BibleSlidesGenerator.generate(it["template"], it["outputDir"], it["versions"], it["verses"])
             "Bible slides have been successfully generated!"
         }.ui, "wrap")
     }

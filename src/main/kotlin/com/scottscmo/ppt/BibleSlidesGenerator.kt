@@ -12,7 +12,7 @@ object BibleSlidesGenerator {
     private val bibleTemplateHandler = BibleTemplateHandler()
 
     @Throws(IOException::class)
-    fun insertBibleText(templateFilePath: String, outputFilePath: String, bibleReference: String) {
+    private fun insertBibleText(templateFilePath: String, outputFilePath: String, bibleReference: String) {
         FileInputStream(templateFilePath).use { inStream ->
             val ppt = XMLSlideShow(inStream)
             bibleTemplateHandler.insertBibleText(ppt, bibleReference)
@@ -23,7 +23,7 @@ object BibleSlidesGenerator {
     }
 
     @Throws(IOException::class)
-    fun generateSlides(templatePath: String, destDir: String, versions: String, verses: String = "") {
+    fun generate(templatePath: String, destDir: String, versions: String, verses: String = "") {
         if (verses.isEmpty()) {
             BibleMetadata.bookInfoMap.forEach {
                 for (i in it.value.count.indices) {
