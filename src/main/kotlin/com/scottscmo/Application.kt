@@ -1,12 +1,11 @@
 package com.scottscmo
 
 import com.formdev.flatlaf.intellijthemes.FlatCarbonIJTheme
-import com.scottscmo.ui.Labels
+import com.scottscmo.ui.OutputDisplay
 import com.scottscmo.ui.components.DataPathPicker
-import com.scottscmo.ui.container.CommandRunner
+import com.scottscmo.ui.container.SlidesGenerators
 import com.scottscmo.ui.container.SongFormatter
 import net.miginfocom.swing.MigLayout
-import java.awt.Container
 import javax.swing.JFrame
 import javax.swing.JTabbedPane
 import javax.swing.SwingUtilities
@@ -14,31 +13,27 @@ import javax.swing.SwingUtilities
 class Application() : JFrame() {
 
     init {
-        title = Labels.APP_NAME
+        title = "Worship Service Tool"
         defaultCloseOperation = EXIT_ON_CLOSE
 
-        render(contentPane)
+        OutputDisplay.app = this
 
-        // auto-resize to component, use setSize if need fixed size
-        pack()
-    }
+        contentPane.apply {
+            layout = MigLayout()
+            add(DataPathPicker.create(this), "wrap")
+            add(JTabbedPane().apply {
+                addTab("Song Formatter", SongFormatter())
+                addTab("Slides Generators", SlidesGenerators())
+            })
+        }
 
-    private fun render(appContainer: Container) {
-        val tabbedPane = JTabbedPane()
-        tabbedPane.addTab(Labels.TAB_SONG_FORMATTER, SongFormatter())
-        tabbedPane.addTab(Labels.TAB_COMMAND_RUNNER, CommandRunner())
-        appContainer.layout = MigLayout()
-        appContainer.add(DataPathPicker.create(appContainer), "wrap")
-        appContainer.add(tabbedPane)
+        pack() // auto-resize to component, use setSize if need fixed size
     }
 }
 
 fun main() {
     FlatCarbonIJTheme.setup()
-    // Schedule a job for the event-dispatching thread:
-    // creating and showing this application's GUI.
     SwingUtilities.invokeLater {
-        val app = Application()
-        app.isVisible = true
+        Application().apply { isVisible = true }
     }
 }

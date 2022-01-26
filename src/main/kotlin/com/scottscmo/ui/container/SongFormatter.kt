@@ -30,41 +30,29 @@ class SongFormatter : JPanel() {
     init {
         minimumSize = Dimension(640, 480)
         layout = BorderLayout(10, 10)
-        add(
-            C.resizableHBox(
-                JPanel(MigLayout("wrap 5")).apply {
-                    add(JLabel("Search Song"))
-                    add(songSearchInput
-                        .apply {
-                            columns = 20
-                        }, "span, align left")
-                    add(songList
-                        .apply {
-                            fixedCellHeight = 16
-                            fixedCellWidth = 400
-                            visibleRowCount = 10
-                            selectionMode = ListSelectionModel.SINGLE_SELECTION
-                        }, "span")
-                },
-                songTextArea
-                    .apply {
-                        columns = 30
-                    },
-                outputTextArea
-                    .apply {
-                        columns = 30
-                    }
-            ),
-            BorderLayout.CENTER
-        )
-        add(
-            JPanel().apply {
-                add(JLabel("Lines Per Slide Per Language"))
-                add(maxLinesSpinnerInput)
-                add(transformButton)
+
+        add(C.resizableHBox(
+            JPanel(MigLayout("wrap 5")).apply {
+                add(JLabel("Search Song"))
+                add(songSearchInput.apply {
+                    columns = 20
+                }, "span, align left")
+                add(songList.apply {
+                    fixedCellHeight = 16
+                    fixedCellWidth = 400
+                    visibleRowCount = 10
+                    selectionMode = ListSelectionModel.SINGLE_SELECTION
+                }, "span")
             },
-            BorderLayout.SOUTH
-        )
+            songTextArea.apply { columns = 30 },
+            outputTextArea.apply { columns = 30 }
+        ), BorderLayout.CENTER)
+
+        add(JPanel().apply {
+            add(JLabel("Lines Per Slide Per Language"))
+            add(maxLinesSpinnerInput)
+            add(transformButton)
+        }, BorderLayout.SOUTH)
 
         // controllers
         Config.subscribe(DIR_DATA, true) { dataPath ->
