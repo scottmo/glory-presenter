@@ -12,12 +12,10 @@ import java.awt.event.KeyAdapter
 import java.awt.event.KeyEvent
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
+import java.io.File
 import java.io.IOException
-import java.nio.file.Files
 import java.nio.file.Path
-import java.util.stream.Collectors
 import javax.swing.*
-import javax.swing.text.DefaultCaret
 
 class SongFormatter : JPanel() {
     private val songList = JList(emptyArray<String>())
@@ -93,14 +91,13 @@ class SongFormatter : JPanel() {
     }
 
     private fun handleLoadSongList(dataPath: String) {
-        val dirSongPath = Path.of(dataPath, "songs")
         songTitles = try {
-            Files.list(dirSongPath)
-                .map { path -> path.fileName.toString() }
-                .filter { path -> path.endsWith(".yaml") }
-                .map { path -> path.replace(".yaml", "") }
-                .sorted()
-                .collect(Collectors.toList())
+            File(Path.of(dataPath, "songs").toString()).listFiles()
+                ?.map { f -> f.name }
+                ?.filter { fname -> fname.endsWith(".yaml") }
+                ?.map { fname -> fname.replace(".yaml", "") }
+                ?.sorted()
+            ?: emptyList()
         } catch (e: IOException) {
             System.err.println(e.message)
             listOf("Unable to load songs!")
