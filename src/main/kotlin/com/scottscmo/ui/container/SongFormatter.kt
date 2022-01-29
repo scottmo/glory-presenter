@@ -2,8 +2,10 @@ package com.scottscmo.ui.container
 
 import com.scottscmo.Config
 import com.scottscmo.Config.DIR_DATA
+import com.scottscmo.model.song.adapters.SongCSVAdapter
 import com.scottscmo.model.song.adapters.SongSlideTextAdapter
 import com.scottscmo.model.song.adapters.SongYAMLAdapter
+import com.scottscmo.ui.OutputDisplay
 import com.scottscmo.ui.components.C
 import net.miginfocom.swing.MigLayout
 import java.awt.BorderLayout
@@ -24,6 +26,7 @@ class SongFormatter : JPanel() {
     private val transformButton = JButton("Transform")
     private val maxLinesSpinnerInput = JSpinner(SpinnerNumberModel(1, 1, 10, 1))
     private val songSearchInput = JTextField()
+    private val saveAsCSVButton = JButton("Save as CSV")
 
     private var songTitles: List<String> = emptyList()
 
@@ -52,6 +55,7 @@ class SongFormatter : JPanel() {
             add(JLabel("Lines Per Slide Per Language"))
             add(maxLinesSpinnerInput)
             add(transformButton)
+            add(saveAsCSVButton)
         }, BorderLayout.SOUTH)
 
         // controllers
@@ -76,6 +80,25 @@ class SongFormatter : JPanel() {
                 handleSearchSong()
             }
         })
+
+        saveAsCSVButton.addActionListener {
+            handleSaveAsCSV()
+        }
+    }
+
+    private fun handleSaveAsCSV() {
+        val song = SongYAMLAdapter.deserialize(songTextArea.text)
+        if (song != null) {
+            try {
+                val filePath = Path.of(Config[DIR_DATA], "songs_csv", "${song.title}.csv").toString()
+                SongCSVAdapter.serializeToCSV(filePath, song, listOf("zh", "en"), maxLinesSpinnerInput.value as Int)
+                OutputDisplay.show("Saved successfully!")
+            } catch (e: IOException) {
+                OutputDisplay.error("Unable to save to CSV: ${e.message}")
+            }
+        } else {
+            OutputDisplay.error("Unable to convert song!")
+        }
     }
 
     private fun handleLoadSongList(dataPath: String) {
