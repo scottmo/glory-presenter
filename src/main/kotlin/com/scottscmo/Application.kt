@@ -31,11 +31,16 @@ class Application() : JFrame() {
 
         pack() // auto-resize to component, use setSize if need fixed size
     }
-}
 
-fun main(args: Array<String>) {
-    FlatCarbonIJTheme.setup()
-    SwingUtilities.invokeLater {
-        Application().apply { isVisible = true }
+    // cannot put this outside of class, otherwise java -jar cannot find main
+    companion object {
+        @JvmStatic
+        fun main(args: Array<String>) {
+            FlatCarbonIJTheme.setup()
+            SwingUtilities.invokeLater {
+                Application().apply { isVisible = true }
+            }
+        }
     }
 }
+
