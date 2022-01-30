@@ -1,6 +1,7 @@
 package com.scottscmo
 
 import com.formdev.flatlaf.intellijthemes.FlatCarbonIJTheme
+import com.scottscmo.ui.FilePicker
 import com.scottscmo.ui.OutputDisplay
 import com.scottscmo.ui.components.DataPathPicker
 import com.scottscmo.ui.container.SlidesGenerators
@@ -16,11 +17,12 @@ class Application() : JFrame() {
         title = "Worship Service Tool"
         defaultCloseOperation = EXIT_ON_CLOSE
 
-        OutputDisplay.app = this
+        OutputDisplay.host = this
+        FilePicker.host = this
 
         contentPane.apply {
             layout = MigLayout()
-            add(DataPathPicker.create(this), "wrap")
+            add(DataPathPicker.create(), "wrap")
             add(JTabbedPane().apply {
                 addTab("Song Formatter", SongFormatter())
                 addTab("Slides Generators", SlidesGenerators())
@@ -31,7 +33,7 @@ class Application() : JFrame() {
     }
 }
 
-fun main() {
+fun main(args: Array<String>) {
     FlatCarbonIJTheme.setup()
     SwingUtilities.invokeLater {
         Application().apply { isVisible = true }

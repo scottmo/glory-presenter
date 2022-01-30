@@ -1,14 +1,14 @@
 package com.scottscmo.ui.components
 
+import com.scottscmo.ui.FilePicker
 import com.scottscmo.ui.OutputDisplay
 import net.miginfocom.swing.MigLayout
 import java.awt.Component
 import java.awt.Dimension
 import java.awt.Font
-import javax.swing.JButton
-import javax.swing.JLabel
-import javax.swing.JPanel
-import javax.swing.JTextField
+import java.awt.event.MouseAdapter
+import java.awt.event.MouseEvent
+import javax.swing.*
 
 
 class Form(title: String, inputConfigs: Map<String, FormInput>, onSubmit: (form: Form) -> String) {
@@ -18,14 +18,27 @@ class Form(title: String, inputConfigs: Map<String, FormInput>, onSubmit: (form:
 
     init {
         ui.apply {
-            minimumSize = Dimension(300, 0)
+            minimumSize = Dimension(400, 0)
             layout = MigLayout("gap 5", "[100]5[100, left, fill, grow]", "[][]20[]")
 
             add(JLabel(title).apply { font = Font(font.name, Font.BOLD, font.size + 2) }, "span")
 
             for ((k, v) in inputConfigs) {
                 if (v.type == "text") {
-                    val input = JTextField().apply { text = v.defaultValue }
+                    val input = JTextField(v.defaultValue)
+                    inputs[k] = input
+                    add(JLabel(v.label))
+                    add(input, "wrap")
+                } else if (v.type == "file" || v.type == "directory") {
+                    val input = JTextField(v.defaultValue.ifEmpty { "select ${v.type}" }).apply {
+                        addMouseListener(object : MouseAdapter() {
+                            override fun mouseReleased(me: MouseEvent) {
+                                FilePicker.show(v.type, v.defaultValue) { selectedPath ->
+                                    text = selectedPath
+                                }
+                            }
+                        })
+                    }
                     inputs[k] = input
                     add(JLabel(v.label))
                     add(input, "wrap")
