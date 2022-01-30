@@ -26,16 +26,6 @@ class SlidesGenerators : JPanel() {
             "Slides have been successfully generated!"
         }.ui, "wrap")
 
-        add(Form("Bible Slides Generator", mapOf(
-            "verses" to FormInput("Verses", "text"),
-            "versions" to FormInput("Bible Versions", "text", "cuv,niv"),
-            "tmplFilePath" to FormInput("Template File", "file", Config.getRelativePath("template-bible.pptx")),
-            "outputDirPath" to outputDirConfig
-        )) {
-            BibleSlidesGenerator.generate(it["tmplFilePath"], it["outputDirPath"], it["versions"], it["verses"])
-            "Bible slides have been successfully generated!"
-        }.ui)
-
         add(Form("Song Slides Generator", mapOf(
             "dataFilePath" to inputCSVConfig,
             "tmplFilePath" to FormInput("Template File", "file", Config.getRelativePath("template-song.pptx")),
@@ -44,6 +34,16 @@ class SlidesGenerators : JPanel() {
             CSVSlidesGenerator.generate(it["dataFilePath"], listOf("verse_zh", "verse_en"), it["tmplFilePath"],
                 it["outputFilePath"])
             "Slides have been successfully generated!"
+        }.ui)
+
+        add(Form("Bible Slides Generator", mapOf(
+            "verses" to FormInput("Verses", "text"),
+            "versions" to FormInput("Bible Versions", "text", "cuv,niv"),
+            "tmplFilePath" to FormInput("Template File", "file", Config.getRelativePath("template-bible.pptx")),
+            "outputDirPath" to outputDirConfig
+        )) {
+            BibleSlidesGenerator.generate(it["tmplFilePath"], it["outputDirPath"], it["versions"], it["verses"])
+            "Bible slides have been successfully generated!"
         }.ui, "wrap")
     }
 }
