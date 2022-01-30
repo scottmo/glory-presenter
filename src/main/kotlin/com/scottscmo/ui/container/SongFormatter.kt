@@ -1,52 +1,36 @@
 package com.scottscmo.ui.container
 
 import com.scottscmo.Config
-import com.scottscmo.Config.DATA_DIR
 import com.scottscmo.model.song.adapters.SongCSVAdapter
 import com.scottscmo.model.song.adapters.SongSlideTextAdapter
 import com.scottscmo.model.song.adapters.SongYAMLAdapter
+import com.scottscmo.ui.FilePicker
 import com.scottscmo.ui.OutputDisplay
 import com.scottscmo.ui.components.C
-import net.miginfocom.swing.MigLayout
 import java.awt.BorderLayout
 import java.awt.Dimension
-import java.awt.event.KeyAdapter
-import java.awt.event.KeyEvent
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
-import java.io.File
 import java.io.IOException
+import java.nio.charset.StandardCharsets
+import java.nio.file.Files
 import java.nio.file.Path
 import javax.swing.*
 
 class SongFormatter : JPanel() {
-    private val songList = JList(emptyArray<String>())
+    private val songPicker = JButton("Select Song YAML")
     private val songTextArea = JTextArea()
     private val outputTextArea = JTextArea()
     private val transformButton = JButton("Transform")
     private val maxLinesSpinnerInput = JSpinner(SpinnerNumberModel(1, 1, 10, 1))
-    private val songSearchInput = JTextField()
     private val saveAsCSVButton = JButton("Save as CSV")
-
-    private var songTitles: List<String> = emptyList()
 
     init {
         minimumSize = Dimension(640, 480)
         layout = BorderLayout(10, 10)
 
+        add(songPicker, BorderLayout.NORTH)
         add(C.resizableHBox(
-            JPanel(MigLayout("wrap 5")).apply {
-                add(JLabel("Search Song"))
-                add(songSearchInput.apply {
-                    columns = 20
-                }, "span, align left")
-                add(songList.apply {
-                    fixedCellHeight = 16
-                    fixedCellWidth = 400
-                    visibleRowCount = 10
-                    selectionMode = ListSelectionModel.SINGLE_SELECTION
-                }, "span")
-            },
             songTextArea.apply { columns = 30 },
             outputTextArea.apply { columns = 30 }
         ), BorderLayout.CENTER)
@@ -58,28 +42,17 @@ class SongFormatter : JPanel() {
             add(saveAsCSVButton)
         }, BorderLayout.SOUTH)
 
-        // controllers
-        Config.subscribe(DATA_DIR, true) { dataPath ->
-            handleLoadSongList(dataPath)
-        }
-
-        songList.addMouseListener(object : MouseAdapter() {
+        songPicker.addMouseListener(object : MouseAdapter() {
             override fun mouseReleased(me: MouseEvent) {
-                handleLoadSong()
+                FilePicker.show("file", Config.getRelativePath("songs")) { selectedPath ->
+                    handleLoadSongFromPath(selectedPath)
+                }
             }
         })
 
         transformButton.addActionListener {
             handleTransformSong()
         }
-
-        songSearchInput.addKeyListener(object : KeyAdapter() {
-            override fun keyPressed(e: KeyEvent) {
-                if (e.keyCode != KeyEvent.VK_ENTER) return
-
-                handleSearchSong()
-            }
-        })
 
         saveAsCSVButton.addActionListener {
             handleSaveAsCSV()
@@ -101,26 +74,14 @@ class SongFormatter : JPanel() {
         }
     }
 
-    private fun handleLoadSongList(dataPath: String) {
-        songTitles = try {
-            File(Path.of(dataPath, "songs").toString()).listFiles()
-                ?.map { f -> f.name }
-                ?.filter { fname -> fname.endsWith(".yaml") }
-                ?.map { fname -> fname.replace(".yaml", "") }
-                ?.sorted()
-            ?: emptyList()
+    private fun handleLoadSongFromPath(songPath: String) {
+        val songContent = try {
+            Files.readString(Path.of(songPath), StandardCharsets.UTF_8)
         } catch (e: IOException) {
-            System.err.println(e.message)
-            listOf("Unable to load songs!")
+            "Error getting content for song $songPath"
         }
-        songList.setListData(songTitles.toTypedArray())
-    }
-
-    private fun handleLoadSong() {
-        val songName = songList.selectedValue as String
         songTextArea.apply {
-            text = SongYAMLAdapter.getSerializedSong(songName)
-                ?: "Error getting content for song $songName"
+            text = songContent
             caretPosition = 0 // scroll to top
         }
     }
@@ -131,11 +92,5 @@ class SongFormatter : JPanel() {
             text = SongSlideTextAdapter.serialize(song, listOf("zh", "en"), maxLinesSpinnerInput.value as Int)
             caretPosition = 0 // scroll to top
         }
-    }
-
-    private fun handleSearchSong() {
-        songList.setListData(songTitles
-            .filter { title -> title.contains(songSearchInput.text) }
-            .toTypedArray())
     }
 }
