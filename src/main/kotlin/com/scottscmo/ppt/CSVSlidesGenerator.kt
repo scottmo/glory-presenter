@@ -10,10 +10,11 @@ import java.nio.file.Path
 
 object CSVSlidesGenerator {
     @Throws(IOException::class)
-    fun generate(dataFilePath: String, headers: Array<String>, tmplFilePath: String, outputFilePath: String) {
+    fun generate(dataFilePath: String, headers: List<String>, tmplFilePath: String, outputDirPath: String) {
         val title = Path.of(dataFilePath).fileName.toString().split(".")[0]
+        val outputFilePath = Path.of(outputDirPath, "$title.pptx").toString()
         val records = CSVFormat.DEFAULT
-            .withHeader(*headers)
+            .withHeader(*headers.toTypedArray())
             .withFirstRecordAsHeader()
             .parse(FileReader(dataFilePath))
             .toList()
@@ -29,13 +30,15 @@ object CSVSlidesGenerator {
                 slide.importContent(srcSlide)
             }
             ppt.removeSlide(0)
-            FileOutputStream(outputFilePath).use { outStream -> ppt.write(outStream) }
+            FileOutputStream(outputFilePath).use {
+                outStream -> ppt.write(outStream)
+            }
             ppt.close()
         }
 
         // Replace text for each slide.
         // Each slide's replacements corresponds to each item in data.
-        FileInputStream(outputFilePath).use { inStream ->
+        FileInputStream(outputDirPath).use { inStream ->
             val ppt = XMLSlideShow(inStream)
             ppt.slides.zip(records).forEach { (slide, record) ->
                 val values = headers.associate {
@@ -44,7 +47,9 @@ object CSVSlidesGenerator {
                 values["{title}"] = title
                 TemplatingUtil.replaceText(slide, values)
             }
-            FileOutputStream(outputFilePath).use { outStream -> ppt.write(outStream) }
+            FileOutputStream(outputFilePath).use {
+                outStream -> ppt.write(outStream)
+            }
             ppt.close()
         }
     }

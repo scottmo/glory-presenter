@@ -3,6 +3,7 @@ package com.scottscmo
 import com.fasterxml.jackson.core.JsonProcessingException
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
+import java.io.IOException
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.Path
@@ -21,12 +22,16 @@ object Config {
             val mapType = mapper.typeFactory.constructMapType(MutableMap::class.java, String::class.java, String::class.java)
             mapper.readValue(content, mapType)
         } catch (e: JsonProcessingException) {
-            mutableMapOf(
-                DATA_DIR to Path.of(DEFAULT_DATA_DIR).toAbsolutePath().toString()
-            )
+            getDefaultConfig()
+        } catch (e: IOException) {
+            getDefaultConfig()
         }
 
     private val listenersMap: MutableMap<String, MutableList<UpdateListener>> = mutableMapOf()
+
+    private fun getDefaultConfig() = mutableMapOf(
+        DATA_DIR to Path.of(DEFAULT_DATA_DIR).toFile().canonicalPath
+    )
 
     operator fun get(key: String): String {
         return config[key] ?: ""
@@ -38,7 +43,7 @@ object Config {
     }
 
     fun getRelativePath(fileName: String): String {
-        return Path.of(config[DATA_DIR] ?: DEFAULT_DATA_DIR, fileName).toString()
+        return Path.of(config[DATA_DIR] ?: DEFAULT_DATA_DIR, fileName).toFile().canonicalPath
     }
 
     fun subscribe(key: String, init: Boolean, handler: UpdateListener) {

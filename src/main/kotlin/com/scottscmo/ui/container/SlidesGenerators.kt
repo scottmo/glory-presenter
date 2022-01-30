@@ -10,38 +10,39 @@ import javax.swing.JPanel
 
 class SlidesGenerators : JPanel() {
     init {
+        val inputCSVConfig = FormInput("Input CSV", "file", Config.getRelativePath("input.csv"))
+        val outputDirConfig = FormInput("Output Folder", "directory", Config.getRelativePath("../output"))
+
         layout = MigLayout()
 
         add(Form("CSV -> Slides Generator", mapOf(
-            "dataFilePath" to FormInput("Input CSV", "text", "input.csv"),
+            "dataFilePath" to inputCSVConfig,
             "headers" to FormInput("Field Names", "text"),
-            "tmplFilePath" to FormInput("Template File", "text", "template.pptx"),
-            "outputFilePath" to FormInput("Output File Path", "text", "output.pptx")
+            "tmplFilePath" to FormInput("Template File", "file", Config.getRelativePath("template.pptx")),
+            "outputDirPath" to outputDirConfig
         )) {
-            CSVSlidesGenerator.generate(
-                Config.getRelativePath(it["dataFilePath"]), it["headers"].split(",").toTypedArray(),
-                Config.getRelativePath(it["tmplFilePath"]), Config.getRelativePath(it["outputFilePath"]))
+            CSVSlidesGenerator.generate(it["dataFilePath"], it["headers"].split(","),
+                it["tmplFilePath"], it["outputDirPath"])
             "Slides have been successfully generated!"
         }.ui, "wrap")
 
         add(Form("Bible Slides Generator", mapOf(
             "verses" to FormInput("Verses", "text"),
             "versions" to FormInput("Bible Versions", "text", "cuv,niv"),
-            "template" to FormInput("Template File", "text", "template-bible.pptx"),
-            "outputDir" to FormInput("Output Folder", "text", "bible_ppt")
+            "tmplFilePath" to FormInput("Template File", "file", Config.getRelativePath("template-bible.pptx")),
+            "outputDirPath" to outputDirConfig
         )) {
-            BibleSlidesGenerator.generate(it["template"], it["outputDir"], it["versions"], it["verses"])
+            BibleSlidesGenerator.generate(it["tmplFilePath"], it["outputDirPath"], it["versions"], it["verses"])
             "Bible slides have been successfully generated!"
         }.ui)
 
         add(Form("Song Slides Generator", mapOf(
-            "dataFilePath" to FormInput("Input CSV", "text", "input.csv"),
-            "outputFilePath" to FormInput("Output File Path", "text", "output.pptx")
+            "dataFilePath" to inputCSVConfig,
+            "tmplFilePath" to FormInput("Template File", "file", Config.getRelativePath("template-song.pptx")),
+            "outputDirPath" to outputDirConfig
         )) {
-            CSVSlidesGenerator.generate(
-                Config.getRelativePath(it["dataFilePath"]), arrayOf("verse_zh", "verse_en"),
-                Config.getRelativePath("template-song.pptx"),
-                Config.getRelativePath(it["outputFilePath"]))
+            CSVSlidesGenerator.generate(it["dataFilePath"], listOf("verse_zh", "verse_en"), it["tmplFilePath"],
+                it["outputFilePath"])
             "Slides have been successfully generated!"
         }.ui, "wrap")
     }
