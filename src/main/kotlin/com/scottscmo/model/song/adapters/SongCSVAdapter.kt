@@ -47,7 +47,7 @@ object SongCSVAdapter {
 
     @Throws(IOException::class)
     fun serializeToCSV(filePath: String, song: Song, langs: List<String>, maxLines: Int): Unit {
-        val headers = langs.map { lang -> "title_$lang" }.toTypedArray()
+        val headers = langs.map { lang -> "verse_$lang" }.toTypedArray()
         val data = serializeToMap(song, langs, maxLines)
         val numRows = data[langs[0]]?.size ?: 0
 
