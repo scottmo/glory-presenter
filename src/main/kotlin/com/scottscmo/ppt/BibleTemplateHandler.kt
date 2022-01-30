@@ -43,7 +43,7 @@ class BibleTemplateHandler {
             titleSlideValues["{title_$version}"] = bookNames.getOrDefault(version, "")
         }
         titleSlideValues["{range}"] = ref.ranges.joinToString(";")
-        TemplatingUtil.replaceText(titleSlide, titleSlideValues)
+        TemplatingUtil.replacePlaceholders(titleSlide, titleSlideValues)
 
         // create verse slides
         val verseLayouts: MutableMap<String, XSLFSlideLayout?> = mutableMapOf()
@@ -58,7 +58,7 @@ class BibleTemplateHandler {
                 val slide = ppt.createSlide(verseLayouts["${this.verseMasterKeyPrefix}_$version"])
                 val verse = bibleVerses[version]!![i]
                 val refStr = String.format("%s %d:%d", bookNames[version], verse.chapter, verse.verse)
-                TemplatingUtil.replaceText(slide, mapOf(
+                TemplatingUtil.replacePlaceholders(slide, mapOf(
                     "{verse}" to verse.verse.toString() + " " + verse.text,
                     "{title}" to refStr
                 ))

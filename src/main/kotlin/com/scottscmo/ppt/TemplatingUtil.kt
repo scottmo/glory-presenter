@@ -5,6 +5,33 @@ import org.apache.poi.xslf.usermodel.*
 object TemplatingUtil {
 
     fun replaceText(slide: XSLFSlide, replacements: Map<String, String>) {
+        slide.shapes
+            .filterIsInstance<XSLFTextShape>()
+            .forEach { shape -> replaceText(shape, replacements) }
+    }
+
+    private fun replaceText(shape: XSLFTextShape, replacements: Map<String, String>) {
+        shape.textParagraphs.forEach { pp ->
+            var text = pp.text
+            for ((searchText, replacement) in replacements) {
+                if (text.contains(searchText)) {
+                    text = text.replace(searchText, replacement)
+                }
+            }
+            for (textRun in pp.textRuns) {
+                if (textRun.rawText != "\n") {
+                    textRun.setText("")
+                }
+            }
+            pp.textRuns[0].setText(text)
+            val ppxml = pp.xmlObject
+            for (i in ppxml.sizeOfBrArray() downTo 1) {
+                ppxml.removeBr(i - 1)
+            }
+        }
+    }
+
+    fun replacePlaceholders(slide: XSLFSlide, replacements: Map<String, String>) {
         for (textShape in slide.placeholders) {
             var text = textShape.text
             for ((searchText, replacement) in replacements) {
@@ -47,8 +74,8 @@ object TemplatingUtil {
         }
     }
 
-    fun replaceText(slide: XSLFSlide, searchText: String, replacement: String) {
-        replaceText(slide, mapOf(searchText to replacement))
+    fun replacePlaceholders(slide: XSLFSlide, searchText: String, replacement: String) {
+        replacePlaceholders(slide, mapOf(searchText to replacement))
     }
 
     fun findText(slide: XSLFSlide, searchText: String): String? {

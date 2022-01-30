@@ -23,6 +23,10 @@ object Config {
         listenersMap[key]?.forEach { it(value) }
     }
 
+    fun getRelativePath(fileName: String): String {
+        return Path.of(config[DIR_DATA] ?: "./data", fileName).toString()
+    }
+
     fun subscribe(key: String, init: Boolean, handler: UpdateListener) {
         val listeners = listenersMap.getOrDefault(key, mutableListOf())
         listeners.add(handler)

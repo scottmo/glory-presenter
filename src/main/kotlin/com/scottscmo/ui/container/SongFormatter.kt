@@ -90,7 +90,7 @@ class SongFormatter : JPanel() {
         val song = SongYAMLAdapter.deserialize(songTextArea.text)
         if (song != null) {
             try {
-                val filePath = Path.of(Config[DIR_DATA], "songs_csv", "${song.title}.csv").toString()
+                val filePath = Config.getRelativePath("songs_csv/${song.title}.csv")
                 SongCSVAdapter.serializeToCSV(filePath, song, listOf("zh", "en"), maxLinesSpinnerInput.value as Int)
                 OutputDisplay.show("Saved successfully!")
             } catch (e: IOException) {
