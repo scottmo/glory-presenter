@@ -2,10 +2,7 @@ package com.scottscmo.ppt
 
 import org.apache.poi.xslf.usermodel.*
 
-interface TemplateHandler {
-    fun evaluateTemplate(ppt: XMLSlideShow, index: Int) {
-
-    }
+object TemplatingUtil {
 
     fun replaceText(slide: XSLFSlide, replacements: Map<String, String>) {
         for (textShape in slide.placeholders) {

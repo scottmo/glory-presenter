@@ -17,7 +17,7 @@ object Presentation {
             val slides = ppt.slides
             for (i in slides.indices) {
                 bibleTemplateHandler.evaluateTemplate(ppt, slides[i].slideNumber - 1)
-                songTemplateHandler.evaluateTemplate(ppt, slides[i].slideNumber - 1)
+//                songTemplateHandler.evaluateTemplate(ppt, slides[i].slideNumber - 1)
             }
             FileOutputStream(File(outputFilePath)).use { outStream -> ppt.write(outStream) }
             ppt.close()
