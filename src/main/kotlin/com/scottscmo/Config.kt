@@ -1,18 +1,32 @@
 package com.scottscmo
 
+import com.fasterxml.jackson.core.JsonProcessingException
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
+import java.nio.charset.StandardCharsets
+import java.nio.file.Files
 import java.nio.file.Path
 
 typealias UpdateListener = (value: String) -> Unit
 
 object Config {
-    private val config: MutableMap<String, String> = mutableMapOf()
-    private val listenersMap: MutableMap<String, MutableList<UpdateListener>> = mutableMapOf()
-    const val DIR_DATA = "dirData"
+    const val DATA_DIR = "dataDir"
+    private const val DEFAULT_DATA_DIR = "./data"
 
-    init {
-        // default config
-        config[DIR_DATA] = Path.of("./data").toAbsolutePath().toString()
-    }
+    private const val CONFIG_PATH = "./config.yaml"
+
+    private val config: MutableMap<String, String> = try {
+            val mapper = ObjectMapper(YAMLFactory())
+            val content = Files.readString(Path.of(CONFIG_PATH), StandardCharsets.UTF_8)
+            val mapType = mapper.typeFactory.constructMapType(MutableMap::class.java, String::class.java, String::class.java)
+            mapper.readValue(content, mapType)
+        } catch (e: JsonProcessingException) {
+            mutableMapOf(
+                DATA_DIR to Path.of(DEFAULT_DATA_DIR).toAbsolutePath().toString()
+            )
+        }
+
+    private val listenersMap: MutableMap<String, MutableList<UpdateListener>> = mutableMapOf()
 
     operator fun get(key: String): String {
         return config[key] ?: ""
@@ -24,7 +38,7 @@ object Config {
     }
 
     fun getRelativePath(fileName: String): String {
-        return Path.of(config[DIR_DATA] ?: "./data", fileName).toString()
+        return Path.of(config[DATA_DIR] ?: DEFAULT_DATA_DIR, fileName).toString()
     }
 
     fun subscribe(key: String, init: Boolean, handler: UpdateListener) {

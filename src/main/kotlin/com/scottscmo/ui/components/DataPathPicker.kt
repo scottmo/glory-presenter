@@ -1,7 +1,7 @@
 package com.scottscmo.ui.components
 
 import com.scottscmo.Config
-import com.scottscmo.Config.DIR_DATA
+import com.scottscmo.Config.DATA_DIR
 import javax.swing.JComponent
 import javax.swing.JButton
 import java.awt.Component
@@ -11,7 +11,7 @@ import javax.swing.JFileChooser
 object DataPathPicker {
     private const val BUTTON_TEXT_PREFIX = "Data Path: "
     fun create(host: Component): JComponent {
-        val dataPath = Path.of(Config[DIR_DATA])
+        val dataPath = Path.of(Config[DATA_DIR])
         val setDataPathBtn = JButton(BUTTON_TEXT_PREFIX + dataPath.toString())
 
         setDataPathBtn.addActionListener { _ ->
@@ -22,7 +22,7 @@ object DataPathPicker {
             if (returnVal == JFileChooser.APPROVE_OPTION) {
                 val newDataPath = fc.selectedFile.toPath().toAbsolutePath().toString()
                 setDataPathBtn.text = BUTTON_TEXT_PREFIX + newDataPath
-                Config[DIR_DATA] = newDataPath
+                Config[DATA_DIR] = newDataPath
             }
         }
         return setDataPathBtn

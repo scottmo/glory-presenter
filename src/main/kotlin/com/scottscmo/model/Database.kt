@@ -1,7 +1,7 @@
 package com.scottscmo.model
 
 import com.scottscmo.Config
-import com.scottscmo.Config.DIR_DATA
+import com.scottscmo.Config.DATA_DIR
 import java.nio.file.Files
 import java.nio.file.Path
 import java.sql.Connection
@@ -12,11 +12,11 @@ class Database(private val dbName: String) {
     private var conn: Connection? = null
 
     init {
-        Config.subscribe(DIR_DATA) { _ -> conn = null }
+        Config.subscribe(DATA_DIR) { _ -> conn = null }
     }
 
     private val dbPath: Path
-        get() = Path.of(Config[DIR_DATA], "$dbName.db")
+        get() = Path.of(Config.getRelativePath("$dbName.db"))
 
     @Throws(SQLException::class)
     fun connect(): Connection? {

@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
 import com.scottscmo.Config
-import com.scottscmo.Config.DIR_DATA
 import com.scottscmo.model.song.Song
 import java.io.IOException
 import java.nio.charset.StandardCharsets
@@ -29,11 +28,8 @@ object SongYAMLAdapter {
     }
 
     fun getSerializedSong(songName: String): String? {
-        val songDir = Config[DIR_DATA]
-        if (songDir == "") return null
-
         return try {
-            val songPath = Path.of(songDir, "songs", "$songName.yaml")
+            val songPath = Path.of(Config.getRelativePath("songs/$songName.yaml"))
             Files.readString(songPath, StandardCharsets.UTF_8)
         } catch (e: IOException) {
             System.err.println(e.message)

@@ -1,7 +1,7 @@
 package com.scottscmo.ui.container
 
 import com.scottscmo.Config
-import com.scottscmo.Config.DIR_DATA
+import com.scottscmo.Config.DATA_DIR
 import com.scottscmo.model.song.adapters.SongCSVAdapter
 import com.scottscmo.model.song.adapters.SongSlideTextAdapter
 import com.scottscmo.model.song.adapters.SongYAMLAdapter
@@ -59,7 +59,7 @@ class SongFormatter : JPanel() {
         }, BorderLayout.SOUTH)
 
         // controllers
-        Config.subscribe(DIR_DATA, true) { dataPath ->
+        Config.subscribe(DATA_DIR, true) { dataPath ->
             handleLoadSongList(dataPath)
         }
 
