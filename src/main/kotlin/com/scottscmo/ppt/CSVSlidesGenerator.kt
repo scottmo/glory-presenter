@@ -11,6 +11,11 @@ import java.nio.file.Path
 object CSVSlidesGenerator {
     @Throws(IOException::class)
     fun generate(dataFilePath: String, headers: List<String>, tmplFilePath: String, outputDirPath: String) {
+        require(dataFilePath.isNotEmpty()) { "Input data path should not be empty" }
+        require(headers.isNotEmpty()) { "Headers should not be empty" }
+        require(tmplFilePath.isNotEmpty()) { "Template file path should not be empty" }
+        require(outputDirPath.isNotEmpty()) { "Output directory should not be empty" }
+
         val title = Path.of(dataFilePath).fileName.toString().split(".")[0]
         val outputFilePath = Path.of(outputDirPath, "$title.pptx").toString()
         val records = CSVFormat.DEFAULT
@@ -38,7 +43,7 @@ object CSVSlidesGenerator {
 
         // Replace text for each slide.
         // Each slide's replacements corresponds to each item in data.
-        FileInputStream(outputDirPath).use { inStream ->
+        FileInputStream(outputFilePath).use { inStream ->
             val ppt = XMLSlideShow(inStream)
             ppt.slides.zip(records).forEach { (slide, record) ->
                 val values = headers.associate {
