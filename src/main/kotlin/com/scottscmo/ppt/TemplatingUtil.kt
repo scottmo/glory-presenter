@@ -13,21 +13,15 @@ object TemplatingUtil {
     private fun replaceText(shape: XSLFTextShape, replacements: Map<String, String>) {
         shape.textParagraphs.forEach { pp ->
             var text = pp.text
+
+            clearText(pp)
+
             for ((searchText, replacement) in replacements) {
                 if (text.contains(searchText)) {
                     text = text.replace(searchText, replacement)
                 }
             }
-            for (textRun in pp.textRuns) {
-                if (textRun.rawText != "\n") {
-                    textRun.setText("")
-                }
-            }
-            pp.textRuns[0].setText(text)
-            val ppxml = pp.xmlObject
-            for (i in ppxml.sizeOfBrArray() downTo 1) {
-                ppxml.removeBr(i - 1)
-            }
+            setText(pp, text)
         }
     }
 
@@ -57,20 +51,40 @@ object TemplatingUtil {
     }
 
     /**
+     * setText that handles "\n" properly
+     */
+    fun setText(pp: XSLFTextParagraph, text: String) {
+        val baseTextRun = pp.textRuns[0]
+        val lines = text.split("\n")
+        baseTextRun.setText(lines[0])
+        for (i in 1 until lines.size) {
+            pp.addLineBreak()
+            pp.addNewTextRun().apply {
+                setText(lines[i])
+                fontColor = baseTextRun.fontColor
+                fontFamily = baseTextRun.fontFamily
+                fontSize = baseTextRun.fontSize
+            }
+        }
+    }
+
+    /**
      * Helper to remove all texts and new lines.
      * XSLFTextShape.setText("") is bugged when there's new line
      */
     fun clearText(textShape: XSLFTextShape) {
-        for (pp in textShape.textParagraphs) {
-            for (textRun in pp.textRuns) {
-                if (textRun.rawText != "\n") {
-                    textRun.setText("")
-                }
+        textShape.textParagraphs.forEach { clearText(it) }
+    }
+
+    fun clearText(pp: XSLFTextParagraph) {
+        for (textRun in pp.textRuns) {
+            if (textRun.rawText != "\n") {
+                textRun.setText("")
             }
-            val ppxml = pp.xmlObject
-            for (i in ppxml.sizeOfBrArray() downTo 1) {
-                ppxml.removeBr(i - 1)
-            }
+        }
+        val ppxml = pp.xmlObject
+        for (i in ppxml.sizeOfBrArray() downTo 1) {
+            ppxml.removeBr(i - 1)
         }
     }
 
