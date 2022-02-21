@@ -52,7 +52,7 @@ class Form(title: String, inputConfigs: Map<String, FormInput>, onSubmit: (form:
             try {
                 OutputDisplay.show(onSubmit(this))
             } catch (e: Exception) {
-                OutputDisplay.error(e.message)
+                OutputDisplay.error(e.message + "\n" + e.stackTrace.copyOfRange(0, 10).joinToString("\n"))
             }
         }
     }
