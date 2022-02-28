@@ -40,6 +40,20 @@ internal class BookNamesTable {
     }
 
     @Throws(SQLException::class)
+    fun queryVersions(): List<String> {
+        val versions = mutableListOf<String>()
+        val sql = "SELECT DISTINCT version FROM $DB_NAME"
+        BibleDB.useStatement { stmt ->
+            val rs = stmt.executeQuery(sql)
+            while (rs.next()) {
+                versions.add(rs.getString("version"))
+            }
+        }
+
+        return versions
+    }
+
+    @Throws(SQLException::class)
     fun insert(version: String, bookNames: List<String>): Int {
         createTable()
 

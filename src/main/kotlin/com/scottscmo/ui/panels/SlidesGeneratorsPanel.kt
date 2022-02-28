@@ -10,6 +10,8 @@ import javax.swing.JPanel
 
 class SlidesGeneratorsPanel : JPanel() {
     init {
+        layout = MigLayout()
+
         // common fields
         val dataPathKey = "dataFilePath"
         val templatePathKey = "tmplFilePath"
@@ -18,8 +20,6 @@ class SlidesGeneratorsPanel : JPanel() {
         // common field defaults
         val dataPathDefault = FormInput("Input CSV", "file", Config.getRelativePath("input.csv"))
         val outputDirDefault = FormInput("Output Folder", "directory", Config.getRelativePath("../output"))
-
-        layout = MigLayout()
 
         val headersKey = "headers"
         add(Form("CSV -> Slides Generator", mapOf(

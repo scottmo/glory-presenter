@@ -6,13 +6,20 @@ import com.scottscmo.Config
 import com.scottscmo.model.bible.BibleModel
 import com.scottscmo.ui.components.Form
 import com.scottscmo.ui.components.FormInput
+import net.miginfocom.swing.MigLayout
 import java.io.File
+import javax.swing.JLabel
 import javax.swing.JPanel
 
 class BibleInfoPanel : JPanel() {
     private val mapper = ObjectMapper()
     private val bibleJsonTypeRef = object : TypeReference<Map<String, List<List<String>>>>() {}
     init {
+        layout = MigLayout()
+
+        val availableVersions = BibleModel.instance.getAvailableVersions()
+        add(JLabel("Available versions: ${availableVersions.joinToString(", ")}"))
+
         val dataPathKey = "dataFilePath"
         val versionKey = "version"
         add(Form("Bible Importer", mapOf(
@@ -22,6 +29,6 @@ class BibleInfoPanel : JPanel() {
             val bibleJson = mapper.readValue(File(it[dataPathKey]), bibleJsonTypeRef)
             val insertedVerseCount = BibleModel.instance.insert(bibleJson, it[versionKey])
             "Successfully inserted $insertedVerseCount ${it[versionKey]} bible verses"
-        }.ui)
+        }.ui, "wrap")
     }
 }

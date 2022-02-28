@@ -55,6 +55,10 @@ class BibleModel {
         }
     }
 
+    fun getAvailableVersions(): List<String> {
+        return  this.bookNamesTable.queryVersions()
+    }
+
     /**
      * @return { $bibleVersion: $bookName }
      */
