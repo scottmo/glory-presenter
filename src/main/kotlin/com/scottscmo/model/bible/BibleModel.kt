@@ -11,25 +11,28 @@ class BibleModel {
     private val bookNamesTable: BookNamesTable = BookNamesTable()
     private var bookNames: List<Map<String, String>>? = null // cache
 
-    fun insert(bible: Map<String, List<List<String>>>, version: String): Boolean {
+    fun insert(bible: Map<String, List<List<String>>>, version: String): Int {
+
         try {
             val insertedCount = bookNamesTable.insert(version, ArrayList(bible.keys))
             println("Inserted $insertedCount book names.")
         } catch (e: SQLException) {
             System.err.println("Failed to insert book names!")
             e.printStackTrace()
-            return false
+            return 0
         }
+
+        var insertedVerseCount = 0
         try {
-            val insertedCount = bibleVerseTable.insert(version, bible)
-            println("Inserted $insertedCount bible verses.")
+            insertedVerseCount = bibleVerseTable.insert(version, bible)
+            println("Inserted $insertedVerseCount bible verses.")
         } catch (e: SQLException) {
             System.err.println("Failed to insert bible verses!")
             e.printStackTrace()
-            return false
+            return 0
         }
         bookNames = null
-        return true
+        return insertedVerseCount
     }
 
     fun getBibleVerses(ref: BibleReference): Map<String, List<BibleVerse>>? {

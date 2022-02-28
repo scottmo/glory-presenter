@@ -1,4 +1,4 @@
-package com.scottscmo.ui.container
+package com.scottscmo.ui.panels
 
 import com.scottscmo.Config
 import com.scottscmo.model.song.adapters.SongCSVAdapter
@@ -17,7 +17,7 @@ import java.nio.file.Files
 import java.nio.file.Path
 import javax.swing.*
 
-class SongFormatter : JPanel() {
+class SongFormatterPanel : JPanel() {
     private val songPicker = JButton("Select Song YAML")
     private val songTextArea = JTextArea()
     private val outputTextArea = JTextArea()

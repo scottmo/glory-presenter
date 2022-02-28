@@ -1,4 +1,4 @@
-package com.scottscmo.ui.container
+package com.scottscmo.ui.panels
 
 import com.scottscmo.Config
 import com.scottscmo.ppt.BibleSlidesGenerator
@@ -8,7 +8,7 @@ import com.scottscmo.ui.components.FormInput
 import net.miginfocom.swing.MigLayout
 import javax.swing.JPanel
 
-class SlidesGenerators : JPanel() {
+class SlidesGeneratorsPanel : JPanel() {
     init {
         // common fields
         val dataPathKey = "dataFilePath"

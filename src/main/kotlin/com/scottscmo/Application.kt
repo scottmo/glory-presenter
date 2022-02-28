@@ -4,8 +4,9 @@ import com.formdev.flatlaf.intellijthemes.FlatCarbonIJTheme
 import com.scottscmo.ui.FilePicker
 import com.scottscmo.ui.OutputDisplay
 import com.scottscmo.ui.components.DataPathPicker
-import com.scottscmo.ui.container.SlidesGenerators
-import com.scottscmo.ui.container.SongFormatter
+import com.scottscmo.ui.panels.BibleInfoPanel
+import com.scottscmo.ui.panels.SlidesGeneratorsPanel
+import com.scottscmo.ui.panels.SongFormatterPanel
 import net.miginfocom.swing.MigLayout
 import javax.swing.JFrame
 import javax.swing.JTabbedPane
@@ -24,8 +25,9 @@ class Application() : JFrame() {
             layout = MigLayout()
             add(DataPathPicker.create(), "wrap")
             add(JTabbedPane().apply {
-                addTab("Song Formatter", SongFormatter())
-                addTab("Slides Generators", SlidesGenerators())
+                addTab("Bible", BibleInfoPanel())
+                addTab("Song Formatter", SongFormatterPanel())
+                addTab("Slides Generators", SlidesGeneratorsPanel())
             })
         }
 
