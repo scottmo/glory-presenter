@@ -22,7 +22,7 @@ class BibleModel {
             return 0
         }
 
-        var insertedVerseCount = 0
+        val insertedVerseCount: Int
         try {
             insertedVerseCount = bibleVerseTable.insert(version, bible)
             println("Inserted $insertedVerseCount bible verses.")
