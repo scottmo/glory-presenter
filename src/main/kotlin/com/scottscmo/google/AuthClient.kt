@@ -11,6 +11,7 @@ import com.google.api.client.json.gson.GsonFactory
 import com.google.api.client.util.store.FileDataStoreFactory
 import com.google.api.services.slides.v1.SlidesScopes
 import com.scottscmo.Config
+import com.scottscmo.Config.CLIENT_INFO_KEY
 import com.scottscmo.util.Cryptor
 import java.io.File
 import java.io.IOException
@@ -38,10 +39,10 @@ class AuthClient {
      */
     @Throws(IOException::class)
     fun getCredentials(HTTP_TRANSPORT: NetHttpTransport): Credential {
-        require(Config["clientInfoKey"].isNotEmpty()) { "clientInfoKey is missing from config.yaml!" }
+        require(Config[CLIENT_INFO_KEY].isNotEmpty()) { "clientInfoKey is missing from config.yaml!" }
 
         // Load client secrets.
-        val credentials = Cryptor.decrypt(Config.getRelativePath(CREDENTIALS_FILE_PATH), Config["clientInfoKey"])
+        val credentials = Cryptor.decrypt(Config.getRelativePath(CREDENTIALS_FILE_PATH), Config[CLIENT_INFO_KEY])
         val clientSecrets = GoogleClientSecrets.load(jsonFactory, InputStreamReader(credentials.inputStream()))
 
         // Build flow and trigger user authorization request.

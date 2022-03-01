@@ -12,8 +12,9 @@ typealias UpdateListener = (value: String) -> Unit
 
 object Config {
     const val DATA_DIR = "dataDir"
-    private const val DEFAULT_DATA_DIR = "./data"
+    const val CLIENT_INFO_KEY = "clientInfoKey"
 
+    private const val DEFAULT_DATA_DIR = "./data"
     private const val CONFIG_PATH = "./config.yaml"
 
     private val config: MutableMap<String, String> = try {
