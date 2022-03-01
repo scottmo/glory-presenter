@@ -7,12 +7,11 @@ import com.scottscmo.google.AuthClient
 
 class SlidesApiClient {
     private val appName = "Worship Service Tool"
-    private val service: Slides
 
-    init {
+    private val service: Slides by lazy {
         val auth = AuthClient.instance
         val httpTransport = GoogleNetHttpTransport.newTrustedTransport()
-        service = Slides.Builder(httpTransport, auth.jsonFactory, auth.getCredentials(httpTransport))
+        Slides.Builder(httpTransport, auth.jsonFactory, auth.getCredentials(httpTransport))
             .setApplicationName(appName)
             .build()
     }
