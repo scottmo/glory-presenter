@@ -5,6 +5,7 @@ import com.scottscmo.ui.FilePicker
 import com.scottscmo.ui.OutputDisplay
 import com.scottscmo.ui.components.DataPathPicker
 import com.scottscmo.ui.panels.BibleInfoPanel
+import com.scottscmo.ui.panels.GSlidesPanel
 import com.scottscmo.ui.panels.SlidesGeneratorsPanel
 import com.scottscmo.ui.panels.SongFormatterPanel
 import net.miginfocom.swing.MigLayout
@@ -28,6 +29,7 @@ class Application() : JFrame() {
                 addTab("Bible", BibleInfoPanel())
                 addTab("Song Formatter", SongFormatterPanel())
                 addTab("Slides Generators", SlidesGeneratorsPanel())
+                addTab("Google Slides", GSlidesPanel())
             })
         }
 

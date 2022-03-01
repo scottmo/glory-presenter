@@ -11,19 +11,20 @@ import com.google.api.client.json.gson.GsonFactory
 import com.google.api.client.util.store.FileDataStoreFactory
 import com.google.api.services.slides.v1.SlidesScopes
 import com.scottscmo.Config
+import com.scottscmo.util.Cryptor
 import java.io.File
-import java.io.FileInputStream
 import java.io.IOException
 import java.io.InputStreamReader
+
+const val API_CONFIG_DIR = "google_api"
+const val CREDENTIALS_FILE_PATH = "${API_CONFIG_DIR}/client.info"
 
 class AuthClient {
     companion object {
         val instance = AuthClient()
     }
 
-    private val apiConfigDir = "google_api"
-    private val tokensDirPath = apiConfigDir
-    private val credentialFilePath = "${apiConfigDir}/credentials.json"
+    private val tokensDirPath = API_CONFIG_DIR
 
     private val scopes = listOf(SlidesScopes.PRESENTATIONS)
 
@@ -37,9 +38,11 @@ class AuthClient {
      */
     @Throws(IOException::class)
     fun getCredentials(HTTP_TRANSPORT: NetHttpTransport): Credential {
+        require(Config["clientInfoKey"].isNotEmpty()) { "clientInfoKey is missing from config.yaml!" }
+
         // Load client secrets.
-        val credentialIn = FileInputStream(Config.getRelativePath(credentialFilePath))
-        val clientSecrets = GoogleClientSecrets.load(jsonFactory, InputStreamReader(credentialIn))
+        val credentials = Cryptor.decrypt(Config.getRelativePath(CREDENTIALS_FILE_PATH), Config["clientInfoKey"])
+        val clientSecrets = GoogleClientSecrets.load(jsonFactory, InputStreamReader(credentials.inputStream()))
 
         // Build flow and trigger user authorization request.
         val flow = GoogleAuthorizationCodeFlow.Builder(
