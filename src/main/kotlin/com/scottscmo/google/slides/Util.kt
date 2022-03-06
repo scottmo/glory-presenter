@@ -37,4 +37,17 @@ object Util {
         }
     }
 
+    fun getRGBColor(rgbValues: String?): OpaqueColor {
+        val rgbString = if (rgbValues.isNullOrEmpty()) "255, 255, 255" else rgbValues
+        val (r, g, b) = rgbString.split(",")
+            .map { it.trim() }
+            .map { it.toFloat() / 255 }
+        return OpaqueColor().apply {
+            rgbColor = RgbColor().apply {
+                red = r
+                green = g
+                blue = b
+            }
+        }
+    }
 }
