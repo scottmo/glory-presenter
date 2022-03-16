@@ -2,7 +2,6 @@ package com.scottscmo.google.slides
 
 import com.google.api.services.slides.v1.model.*
 import com.scottscmo.util.StringUtils
-import org.bouncycastle.cert.ocsp.Req
 
 object Actions {
     /**
@@ -66,7 +65,7 @@ object Actions {
         }
     }
 
-    fun createTextBox(textBoxId: String, pageElementId: String,
+    private fun createTextBox(textBoxId: String, pageElementId: String,
             w: Double, h: Double, tx: Double, ty: Double): Request {
         return Request().apply {
             createShape = CreateShapeRequest().apply {
@@ -91,9 +90,10 @@ object Actions {
     }
 
     fun insertText(textBoxId: String, textContent: String, config: SlideTextConfig,
-            textInsertionIndex: Int): List<Request> {
+            textInsertionIndex: Int = 0): List<Request> {
         val textInsertRequest = Request()
-        val textStyleReqeust = Request()
+        val textStyleRequest = Request()
+
         // text
         textInsertRequest.apply {
             insertText = InsertTextRequest().apply {
@@ -121,7 +121,7 @@ object Actions {
             }
         }
         if (hasParagraphStyle) {
-            textStyleReqeust.apply {
+            textStyleRequest.apply {
                 updateParagraphStyle = UpdateParagraphStyleRequest().apply {
                     objectId = textBoxId
                     style = paragraphStyle
@@ -164,7 +164,7 @@ object Actions {
             }
         }
         if (hasTextStyle) {
-            textStyleReqeust.apply {
+            textStyleRequest.apply {
                 updateTextStyle = UpdateTextStyleRequest().apply {
                     objectId = textBoxId
                     style = textStyle
@@ -174,7 +174,21 @@ object Actions {
             }
         }
 
-        return listOf(textInsertRequest, textStyleReqeust)
+        return listOf(textInsertRequest, textStyleRequest)
+    }
+
+    fun createText(textBoxId: String, pageElementId: String, textContent: String,
+            config: SlideTextConfig, isFullPage: Boolean): List<Request> {
+        val requests = mutableListOf<Request>()
+
+        val textBoxW = DefaultSlideConfig.SLIDE_W
+        val textBoxH = if (isFullPage || config.fontSize <= 0) DefaultSlideConfig.SLIDE_H
+                else config.fontSize * 2
+        requests.add(createTextBox(textBoxId, pageElementId, textBoxW, textBoxH, config.x, config.y))
+
+        requests.addAll(insertText(textBoxId, textContent, config))
+
+        return requests
     }
 
     /**

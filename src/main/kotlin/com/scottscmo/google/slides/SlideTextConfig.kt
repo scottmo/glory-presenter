@@ -7,6 +7,6 @@ data class SlideTextConfig(
     val fontSize: Double,
     val fontColor: String = "",
     val fontStyles: String = "",
-    val x: Int,
-    val y: Int,
+    val x: Double,
+    val y: Double,
 )
