@@ -2,6 +2,7 @@ package com.scottscmo.google.slides
 
 import com.google.api.services.slides.v1.model.*
 import com.scottscmo.util.StringUtils
+import org.bouncycastle.cert.ocsp.Req
 
 object Actions {
     /**
@@ -23,7 +24,7 @@ object Actions {
      * set base font for a text run
      */
     private fun setBaseFontForText(pageElementId: String, textRun: TextRun,
-            slideTextConfig: Map<String, SlideTextConfig>, startIndex: Int = 0): List<Request> {
+            slideTextConfig: Map<String, SlideTextConfig>, startIndex: Int): List<Request> {
         if (textRun.content.isNullOrEmpty()) return emptyList()
 
         return StringUtils.splitByCharset(textRun.content, true)
@@ -63,6 +64,117 @@ object Actions {
                 applyMode = "ABSOLUTE"
             }
         }
+    }
+
+    fun createTextBox(textBoxId: String, pageElementId: String,
+            w: Double, h: Double, tx: Double, ty: Double): Request {
+        return Request().apply {
+            createShape = CreateShapeRequest().apply {
+                objectId = textBoxId
+                shapeType = "TEXT_BOX"
+                elementProperties = PageElementProperties().apply {
+                    pageObjectId = pageElementId
+                    setSize(Size().apply {
+                        width = Util.getDimension(w)
+                        height = Util.getDimension(h)
+                    })
+                    transform = AffineTransform().apply {
+                        scaleX = 1.0
+                        scaleY = 1.0
+                        translateX = tx
+                        translateY = ty
+                        unit = "PT"
+                    }
+                }
+            }
+        }
+    }
+
+    fun insertText(textBoxId: String, textContent: String, config: SlideTextConfig,
+            textInsertionIndex: Int): List<Request> {
+        val textInsertRequest = Request()
+        val textStyleReqeust = Request()
+        // text
+        textInsertRequest.apply {
+            insertText = InsertTextRequest().apply {
+                objectId = textBoxId
+                text = textContent
+                insertionIndex = textInsertionIndex
+            }
+        }
+
+        val insertTextRange = Util.getTextRange(textInsertionIndex, textInsertionIndex + textContent.length)
+
+        // paragraph style
+        var hasParagraphStyle = false
+        val paragraphStyle = ParagraphStyle().apply {
+            if (config.alignment.isNotEmpty()) {
+                hasParagraphStyle = true
+                alignment = config.alignment
+            }
+            if (config.margin > 0) {
+                hasParagraphStyle = true
+                val indent = Util.getDimension(config.margin)
+                indentFirstLine = indent
+                indentStart = indent
+                indentEnd = indent
+            }
+        }
+        if (hasParagraphStyle) {
+            textStyleReqeust.apply {
+                updateParagraphStyle = UpdateParagraphStyleRequest().apply {
+                    objectId = textBoxId
+                    style = paragraphStyle
+                    fields = "*"
+                    textRange = insertTextRange
+                }
+            }
+        }
+
+        // text style
+        var hasTextStyle = false
+        val textStyle = TextStyle().apply {
+            if (config.fontStyles.isNotEmpty()) {
+                hasTextStyle = true
+                smallCaps = config.fontStyles.contains("smallCaps")
+                strikethrough = config.fontStyles.contains("strikethrough")
+                underline = config.fontStyles.contains("underline")
+                bold = config.fontStyles.contains("bold")
+                italic = config.fontStyles.contains("italic")
+            }
+            if (config.fontColor.isNotEmpty()) {
+                hasTextStyle = true
+                foregroundColor = OptionalColor().apply {
+                    opaqueColor = Util.getRGBColor(config.fontColor)
+                }
+            }
+            if (config.fontSize > 0) {
+                hasTextStyle = true
+                fontSize = Util.getDimension(config.fontSize)
+            }
+            if (config.fontFamily.isNotEmpty()) {
+                hasTextStyle = true
+                fontFamily = config.fontFamily
+            }
+            if (config.fontStyles.contains("bold")) {
+                weightedFontFamily = WeightedFontFamily().apply {
+                    fontFamily = config.fontFamily
+                    weight = 700
+                }
+            }
+        }
+        if (hasTextStyle) {
+            textStyleReqeust.apply {
+                updateTextStyle = UpdateTextStyleRequest().apply {
+                    objectId = textBoxId
+                    style = textStyle
+                    fields = "*"
+                    textRange = insertTextRange
+                }
+            }
+        }
+
+        return listOf(textInsertRequest, textStyleReqeust)
     }
 
     /**
