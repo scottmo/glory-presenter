@@ -191,6 +191,128 @@ object Actions {
         return requests
     }
 
+    private fun copyText(srcElement: PageElement, dstElement: PageElement, withStyles: Boolean): List<Request> {
+        val requests = mutableListOf<Request>()
+
+        val pageElementId = dstElement.objectId
+
+        srcElement.shape.text.textElements
+            .filter { it.textRun?.content?.isNotEmpty() ?: false }
+            .forEach {
+                requests.add(Request().apply { 
+                    insertText = InsertTextRequest().apply { 
+                        objectId = pageElementId
+                        text = it.textRun.content
+                        insertionIndex = it.startIndex
+                    }
+                })
+            }
+        
+        if (!withStyles) {
+            return requests
+        }
+
+        srcElement.shape.text.textElements
+            .forEach {
+                if (it.paragraphMarker != null) {
+                    requests.add(Request().apply {
+                        updateParagraphStyle = UpdateParagraphStyleRequest().apply {
+                            objectId = pageElementId
+                            style = it.paragraphMarker.style
+                            fields = "*"
+                            textRange = Util.getTextRange(it.startIndex, it.endIndex)
+                        }
+                    })
+                } else {
+                    requests.add(Request().apply {
+                        updateTextStyle = UpdateTextStyleRequest().apply {
+                            objectId = pageElementId
+                            style = it.textRun.style
+                            fields = "*"
+                            textRange = Util.getTextRange(it.startIndex, it.endIndex)
+                        }
+                    })
+                }
+            }
+
+        return requests
+    }
+
+    private fun copyShape(srcElement: PageElement, dstElement: PageElement): Request {
+        val srcShapeProperties = srcElement.shape?.shapeProperties ?: return Request()
+
+        return Request().apply {
+            updateShapeProperties = UpdateShapePropertiesRequest().apply {
+                objectId = dstElement.objectId
+                shapeProperties = ShapeProperties().apply {
+                    contentAlignment = srcShapeProperties.contentAlignment
+                    link = srcShapeProperties.link
+                    if (srcShapeProperties.outline.propertyState != "NOT_RENDERED") {
+                        outline = srcShapeProperties.outline
+                    }
+                    if (srcShapeProperties.shapeBackgroundFill.propertyState != "NOT_RENDERED") {
+                        shapeBackgroundFill = srcShapeProperties.shapeBackgroundFill
+                    }
+                    // skip autofit and shadow
+                }
+            }
+        }
+    }
+
+    private fun copyTransform(srcElement: PageElement, dstElement: PageElement): Request {
+        return Request().apply {
+            updatePageElementTransform = UpdatePageElementTransformRequest().apply {
+                objectId = dstElement.objectId
+                transform = srcElement.transform
+                applyMode = "ABSOLUTE"
+            }
+        }
+    }
+
+    private fun deleteObject(id: String): Request {
+        return Request().apply {
+            deleteObject = DeleteObjectRequest().apply {
+                objectId = id
+            }
+        }
+    }
+
+    fun createSlide(slideId: String, slideIndex: Int): Request {
+        return Request().apply {
+            createSlide = CreateSlideRequest().apply {
+                objectId = slideId
+                insertionIndex = slideIndex
+                slideLayoutReference = LayoutReference().apply {
+                    predefinedLayout = "TITLE_ONLY"
+                }
+                placeholderIdMappings = listOf(LayoutPlaceholderIdMapping().apply {
+                    objectId = DefaultSlideConfig.ID_PLACEHOLDER_PREFIX + "-" + slideId
+                    layoutPlaceholder = Placeholder().apply {
+                        type = "TITLE"
+                    }
+                })
+            }
+        }
+    }
+
+    fun setDefaultTitleText(slide: Page): List<Request> {
+        val firstText = Util.getFirstText(slide)
+        val title = Util.getTitlePlaceholder(slide)
+
+        if (title == null || firstText?.objectId == null || firstText == title) {
+            return emptyList()
+        }
+
+        val requests = mutableListOf<Request>()
+
+        requests.addAll(copyText(firstText, title, true))
+        requests.add(copyShape(firstText, title))
+        requests.add(copyTransform(firstText, title))
+        requests.add(deleteObject(firstText.objectId))
+
+        return requests
+    }
+
     /**
      * use to match slide configuration. hard-coding en, zh for now.
      */
