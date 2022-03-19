@@ -1,7 +1,6 @@
 package com.scottscmo.ui
 
 import com.scottscmo.Config
-import com.scottscmo.Config.DATA_DIR
 import java.nio.file.Path
 import javax.swing.JFileChooser
 import javax.swing.JFrame
@@ -9,7 +8,7 @@ import javax.swing.JFrame
 object FilePicker {
     var host: JFrame? = null
 
-    fun show(mode: String = "fileAndDirectory", defaultPath: String = Config[DATA_DIR],
+    fun show(mode: String = "fileAndDirectory", defaultPath: String = Config.get().dataDir,
             onSelected: (filePath: String) -> Unit) {
 
         val fc = JFileChooser().apply {

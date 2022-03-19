@@ -1,7 +1,7 @@
 package com.scottscmo.model
 
 import com.scottscmo.Config
-import com.scottscmo.Config.DATA_DIR
+import com.scottscmo.Event
 import java.nio.file.Files
 import java.nio.file.Path
 import java.sql.Connection
@@ -12,7 +12,7 @@ class Database(private val dbName: String) {
     private var conn: Connection? = null
 
     init {
-        Config.subscribe(DATA_DIR) { _ -> conn = null }
+        Event.subscribe(Event.DATA_DIR) { _ -> conn = null }
     }
 
     private val dbPath: Path

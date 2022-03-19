@@ -1,66 +1,56 @@
 package com.scottscmo
 
-import com.fasterxml.jackson.core.JsonProcessingException
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
-import java.io.IOException
-import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.Path
 
-typealias UpdateListener = (value: String) -> Unit
-
 object Config {
-    const val DATA_DIR = "dataDir"
-    const val CLIENT_INFO_KEY = "clientInfoKey"
-
-    private const val DEFAULT_DATA_DIR = "./data"
     private const val CONFIG_PATH = "./config.yaml"
 
-    private val config: MutableMap<String, String> = try {
-            val mapper = ObjectMapper(YAMLFactory())
-            val content = Files.readString(Path.of(CONFIG_PATH), StandardCharsets.UTF_8)
-            val mapType = mapper.typeFactory.constructMapType(MutableMap::class.java, String::class.java, String::class.java)
-            mapper.readValue(content, mapType)
-        } catch (e: JsonProcessingException) {
-            getDefaultConfig()
-        } catch (e: IOException) {
-            getDefaultConfig()
+    private lateinit var config: AppConfig
+
+    fun get(): AppConfig = config
+
+    fun load() {
+        config = Files.newBufferedReader(Path.of(CONFIG_PATH)).use {
+            ObjectMapper(YAMLFactory()).readValue(it, AppConfig::class.java)
         }
-
-    private val listenersMap: MutableMap<String, MutableList<UpdateListener>> = mutableMapOf()
-
-    private fun getDefaultConfig() = mutableMapOf(
-        DATA_DIR to Path.of(DEFAULT_DATA_DIR).toFile().canonicalPath
-    )
-
-    operator fun get(key: String): String {
-        return config[key] ?: ""
-    }
-
-    operator fun set(key: String, value: String) {
-        config[key] = value
-        listenersMap[key]?.forEach { it(value) }
     }
 
     fun getRelativePath(fileName: String): String {
-        return Path.of(config[DATA_DIR] ?: DEFAULT_DATA_DIR, fileName).toFile().canonicalPath
-    }
-
-    fun subscribe(key: String, init: Boolean, handler: UpdateListener) {
-        val listeners = listenersMap.getOrDefault(key, mutableListOf())
-        listeners.add(handler)
-        listenersMap[key] = listeners
-
-        if (init) {
-            val value = this[key]
-            if (value.isNotEmpty()) {
-                handler(value)
-            }
-        }
-    }
-
-    fun subscribe(key: String, handler: UpdateListener) {
-        subscribe(key, false, handler)
+        return Path.of(config.dataDir, fileName).toFile().canonicalPath
     }
 }
+
+data class AppConfig(
+    var dataDir: String = "./data",
+    val clientInfoKey: String = "secretKey",
+    val bibleVersionToLanguage: Map<String, List<String>>,
+    val googleSlideConfig: SlideConfig,
+)
+
+data class SlideConfig(
+    val unit: String = "PT",
+    val slideWidth: Double = 720.0,
+    val slideHeight: Double = 405.0,
+    val paragraph: ParagraphConfig,
+    val text: Map<String, TextConfig>,
+)
+
+data class ParagraphConfig(
+    val alignment: String = "CENTER",
+    val indentation: Double = 0.0,
+    val x: Double = 0.0,
+    val y: Double = 0.0,
+)
+
+data class TextConfig(
+    val delimiter: String = "",
+    val fontFamily: String = "",
+    val fontSize: Double = 50.0,
+    val fontColor: String = "",
+    val fontStyles: String = "",
+    val numberOfCharactersPerLine: Int = 10,
+    val numberOfLinesPerSlide: Int = 5,
+)

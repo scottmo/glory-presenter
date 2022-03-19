@@ -9,6 +9,7 @@ import com.scottscmo.ui.panels.GSlidesPanel
 import com.scottscmo.ui.panels.SlidesGeneratorsPanel
 import com.scottscmo.ui.panels.SongFormatterPanel
 import net.miginfocom.swing.MigLayout
+import java.lang.Exception
 import javax.swing.JFrame
 import javax.swing.JTabbedPane
 import javax.swing.SwingUtilities
@@ -34,6 +35,12 @@ class Application() : JFrame() {
         }
 
         pack() // auto-resize to component, use setSize if need fixed size
+
+        try {
+            Config.load()
+        } catch (e: Exception) {
+            OutputDisplay.error(e)
+        }
     }
 
     // cannot put this outside of class, otherwise java -jar cannot find main
