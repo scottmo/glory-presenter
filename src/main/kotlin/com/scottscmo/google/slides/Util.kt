@@ -1,6 +1,7 @@
 package com.scottscmo.google.slides
 
 import com.google.api.services.slides.v1.model.*
+import com.scottscmo.util.StringUtils
 
 object Util {
     fun getTextElements(element: PageElement): List<TextElement> {
@@ -49,5 +50,29 @@ object Util {
                 blue = b
             }
         }
+    }
+
+    fun distributeTextToSlides(text: String, charsPerLine: Int,
+            linesPerSlides: Int): List<String> {
+        val slideTexts = mutableListOf<String>()
+
+        val sentences = StringUtils.splitBySentences(text)
+
+        val charsPerSlide = charsPerLine * linesPerSlides
+
+        var currentLine = ""
+        sentences.forEach { sentence ->
+            val newSlideText = currentLine + sentence
+            if (newSlideText.length > charsPerSlide) {
+                slideTexts.add(currentLine)
+                currentLine = sentence
+            } else {
+                currentLine = newSlideText
+            }
+        }
+        if (currentLine.isNotEmpty()) {
+            slideTexts.add(currentLine)
+        }
+        return slideTexts
     }
 }
