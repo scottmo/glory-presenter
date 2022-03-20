@@ -1,0 +1,30 @@
+dataDir: ./data
+clientInfoKey: secretKeyHere
+bibleVersionToLanguage:
+  zh: ["cuv"]
+  en: ["niv", "asv", "nasb"]
+googleSlideConfig:
+  unit: "PT"
+  slideWidth: 720
+  slideHeight: 405
+  paragraph:
+    alignment: "CENTER"
+    margin: 0
+  text:
+    zh:
+      delimiter: ""
+      fontColor: "255, 255, 255"
+      fontFamily: "STKaiti"
+      fontSize: 55
+      fontStyles: "bold"
+      numberOfCharactersPerLine: 10
+      numberOfLinesPerSlide: 4
+    en:
+      delimiter: " "
+      alignment: "CENTER"
+      fontColor: "255, 255, 153"
+      fontFamily: "Arial Narrow"
+      fontSize: 46
+      fontStyles: "bold"
+      numberOfCharactersPerLine: 30
+      numberOfLinesPerSlide: 5
