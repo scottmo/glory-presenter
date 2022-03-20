@@ -1,20 +1,22 @@
 package com.scottscmo.google.slides
 
 import com.google.api.services.slides.v1.model.*
+import com.scottscmo.ParagraphConfig
+import com.scottscmo.TextConfig
 import com.scottscmo.util.StringUtils
 
 object Actions {
     /**
      * set base font for a slide
      */
-    fun setBaseFont(slide: Page, slideTextConfig: Map<String, SlideTextConfig>): List<Request> {
+    fun setBaseFont(slide: Page, textConfigMap: Map<String, TextConfig>): List<Request> {
         return slide.pageElements
             .filter { it.objectId != null }
             .map { pageElement ->
                 Util.getTextElements(pageElement).filter { !it.textRun.isNullOrEmpty() }
                     .map { textElement ->
                         setBaseFontForText(pageElement.objectId, textElement.textRun,
-                            slideTextConfig, textElement.startIndex)
+                            textConfigMap, textElement.startIndex)
                     }.flatten()
             }.flatten()
     }
@@ -23,7 +25,7 @@ object Actions {
      * set base font for a text run
      */
     private fun setBaseFontForText(pageElementId: String, textRun: TextRun,
-            slideTextConfig: Map<String, SlideTextConfig>, startIndex: Int): List<Request> {
+            textConfigMap: Map<String, TextConfig>, startIndex: Int): List<Request> {
         if (textRun.content.isNullOrEmpty()) return emptyList()
 
         return StringUtils.splitByCharset(textRun.content, true)
@@ -39,11 +41,11 @@ object Actions {
                     )
                     style = textRun.style.clone().apply {
                         foregroundColor = OptionalColor().apply {
-                            opaqueColor = Util.getRGBColor(slideTextConfig[lang]?.fontColor)
+                            opaqueColor = Util.getRGBColor(textConfigMap[lang]?.fontColor)
                         }
-                        fontFamily = slideTextConfig[lang]?.fontFamily
+                        fontFamily = textConfigMap[lang]?.fontFamily
                         weightedFontFamily = textRun.style.weightedFontFamily.clone().apply {
-                            fontFamily = slideTextConfig[lang]?.fontFamily
+                            fontFamily = textConfigMap[lang]?.fontFamily
                         }
                     }
                 }
@@ -89,7 +91,8 @@ object Actions {
         }
     }
 
-    fun insertText(textBoxId: String, textContent: String, config: SlideTextConfig,
+    fun insertText(textBoxId: String, textContent: String,
+            paragraphConfig: ParagraphConfig, textConfig: TextConfig,
             textInsertionIndex: Int = 0): List<Request> {
         val textInsertRequest = Request()
         val textStyleRequest = Request()
@@ -108,13 +111,13 @@ object Actions {
         // paragraph style
         var hasParagraphStyle = false
         val paragraphStyle = ParagraphStyle().apply {
-            if (config.alignment.isNotEmpty()) {
+            if (paragraphConfig.alignment.isNotEmpty()) {
                 hasParagraphStyle = true
-                alignment = config.alignment
+                alignment = paragraphConfig.alignment
             }
-            if (config.margin > 0) {
+            if (paragraphConfig.indentation > 0) {
                 hasParagraphStyle = true
-                val indent = Util.getDimension(config.margin)
+                val indent = Util.getDimension(paragraphConfig.indentation)
                 indentFirstLine = indent
                 indentStart = indent
                 indentEnd = indent
@@ -134,31 +137,31 @@ object Actions {
         // text style
         var hasTextStyle = false
         val textStyle = TextStyle().apply {
-            if (config.fontStyles.isNotEmpty()) {
+            if (textConfig.fontStyles.isNotEmpty()) {
                 hasTextStyle = true
-                smallCaps = config.fontStyles.contains("smallCaps")
-                strikethrough = config.fontStyles.contains("strikethrough")
-                underline = config.fontStyles.contains("underline")
-                bold = config.fontStyles.contains("bold")
-                italic = config.fontStyles.contains("italic")
+                smallCaps = textConfig.fontStyles.contains("smallCaps")
+                strikethrough = textConfig.fontStyles.contains("strikethrough")
+                underline = textConfig.fontStyles.contains("underline")
+                bold = textConfig.fontStyles.contains("bold")
+                italic = textConfig.fontStyles.contains("italic")
             }
-            if (config.fontColor.isNotEmpty()) {
+            if (textConfig.fontColor.isNotEmpty()) {
                 hasTextStyle = true
                 foregroundColor = OptionalColor().apply {
-                    opaqueColor = Util.getRGBColor(config.fontColor)
+                    opaqueColor = Util.getRGBColor(textConfig.fontColor)
                 }
             }
-            if (config.fontSize > 0) {
+            if (textConfig.fontSize > 0) {
                 hasTextStyle = true
-                fontSize = Util.getDimension(config.fontSize)
+                fontSize = Util.getDimension(textConfig.fontSize)
             }
-            if (config.fontFamily.isNotEmpty()) {
+            if (textConfig.fontFamily.isNotEmpty()) {
                 hasTextStyle = true
-                fontFamily = config.fontFamily
+                fontFamily = textConfig.fontFamily
             }
-            if (config.fontStyles.contains("bold")) {
+            if (textConfig.fontStyles.contains("bold")) {
                 weightedFontFamily = WeightedFontFamily().apply {
-                    fontFamily = config.fontFamily
+                    fontFamily = textConfig.fontFamily
                     weight = 700
                 }
             }
@@ -178,15 +181,15 @@ object Actions {
     }
 
     fun createText(textBoxId: String, pageElementId: String, textContent: String,
-            config: SlideTextConfig, isFullPage: Boolean): List<Request> {
+        paragraphConfig: ParagraphConfig, textConfig: TextConfig, isFullPage: Boolean): List<Request> {
         val requests = mutableListOf<Request>()
 
         val textBoxW = DefaultSlideConfig.SLIDE_W
-        val textBoxH = if (isFullPage || config.fontSize <= 0) DefaultSlideConfig.SLIDE_H
-                else config.fontSize * 2
-        requests.add(createTextBox(textBoxId, pageElementId, textBoxW, textBoxH, config.x, config.y))
+        val textBoxH = if (isFullPage || textConfig.fontSize <= 0) DefaultSlideConfig.SLIDE_H
+                else textConfig.fontSize * 2
+        requests.add(createTextBox(textBoxId, pageElementId, textBoxW, textBoxH, paragraphConfig.x, paragraphConfig.y))
 
-        requests.addAll(insertText(textBoxId, textContent, config))
+        requests.addAll(insertText(textBoxId, textContent, paragraphConfig, textConfig))
 
         return requests
     }

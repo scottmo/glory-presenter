@@ -5,6 +5,7 @@ import com.google.api.services.slides.v1.Slides
 import com.google.api.services.slides.v1.model.BatchUpdatePresentationRequest
 import com.google.api.services.slides.v1.model.Page
 import com.google.api.services.slides.v1.model.Request
+import com.scottscmo.TextConfig
 import com.scottscmo.google.AuthClient
 import java.lang.Integer.min
 
@@ -37,5 +38,9 @@ class SlidesApiClient {
             startIndex = endIndex
         }
         return true
+    }
+
+    fun insertBibleText(presentationId: String, versions: String, query: String, insertionIndex: Int, slideTextConfig: TextConfig) {
+
     }
 }

@@ -40,7 +40,7 @@ data class SlideConfig(
 
 data class ParagraphConfig(
     val alignment: String = "CENTER",
-    val indentation: Double = 0.0,
+    val indentation: Double = -1.0,
     val x: Double = 0.0,
     val y: Double = 0.0,
 )
