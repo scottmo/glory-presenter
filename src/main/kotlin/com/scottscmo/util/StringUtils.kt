@@ -114,4 +114,28 @@ object StringUtils {
         }
         return sentences;
     }
+
+    fun distributeTextToBlocks(text: String, charsPerLine: Int,
+        linesPerBlock: Int): List<String> {
+        val slideTexts = mutableListOf<String>()
+
+        val sentences = StringUtils.splitBySentences(text)
+
+        val charsPerSlide = charsPerLine * linesPerBlock
+
+        var currentSlideText = ""
+        sentences.forEach { sentence ->
+            val newSlideText = currentSlideText + sentence
+            if (newSlideText.length > charsPerSlide) {
+                slideTexts.add(currentSlideText)
+                currentSlideText = sentence
+            } else {
+                currentSlideText = newSlideText
+            }
+        }
+        if (currentSlideText.isNotEmpty()) {
+            slideTexts.add(currentSlideText)
+        }
+        return slideTexts
+    }
 }

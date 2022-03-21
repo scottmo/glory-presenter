@@ -9,6 +9,7 @@ import com.scottscmo.Config
 import com.scottscmo.google.AuthClient
 import com.scottscmo.model.bible.BibleModel
 import com.scottscmo.model.bible.BibleReference
+import com.scottscmo.util.StringUtils
 import java.lang.Integer.min
 
 
@@ -87,7 +88,7 @@ class SlidesApiClient {
 
                 val textConfig = slideConfig.text[lang]
                 val verse = bibleVerses[version]!![i]
-                val verseTexts = Util.distributeTextToSlides("${verse.index} ${verse.text}",
+                val verseTexts = StringUtils.distributeTextToBlocks("${verse.index} ${verse.text}",
                     textConfig!!.numberOfCharactersPerLine,
                     textConfig.numberOfLinesPerSlide)
                 verseTexts.forEach { verseText ->
