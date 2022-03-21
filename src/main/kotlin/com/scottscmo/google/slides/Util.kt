@@ -7,7 +7,7 @@ import java.util.*
 object Util {
     fun generateObjectId(namespace: String): String {
         val uuid = UUID.randomUUID().toString()
-        return "$namespace-$uuid".substring(0, 50)
+        return "$namespace-$uuid".substring(0, 38)
     }
 
     fun getTextElements(element: PageElement): List<TextElement> {
