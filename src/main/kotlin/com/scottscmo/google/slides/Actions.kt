@@ -94,17 +94,16 @@ object Actions {
     fun insertText(textBoxId: String, textContent: String,
             paragraphConfig: ParagraphConfig, textConfig: TextConfig,
             textInsertionIndex: Int = 0): List<Request> {
-        val textInsertRequest = Request()
-        val textStyleRequest = Request()
+        val requests = mutableListOf<Request>()
 
         // text
-        textInsertRequest.apply {
+        requests.add(Request().apply {
             insertText = InsertTextRequest().apply {
                 objectId = textBoxId
                 text = textContent
                 insertionIndex = textInsertionIndex
             }
-        }
+        })
 
         val insertTextRange = Util.getTextRange(textInsertionIndex, textInsertionIndex + textContent.length)
 
@@ -124,14 +123,14 @@ object Actions {
             }
         }
         if (hasParagraphStyle) {
-            textStyleRequest.apply {
+            requests.add(Request().apply {
                 updateParagraphStyle = UpdateParagraphStyleRequest().apply {
                     objectId = textBoxId
                     style = paragraphStyle
                     fields = "*"
                     textRange = insertTextRange
                 }
-            }
+            })
         }
 
         // text style
@@ -167,17 +166,17 @@ object Actions {
             }
         }
         if (hasTextStyle) {
-            textStyleRequest.apply {
+            requests.add(Request().apply {
                 updateTextStyle = UpdateTextStyleRequest().apply {
                     objectId = textBoxId
                     style = textStyle
                     fields = "*"
                     textRange = insertTextRange
                 }
-            }
+            })
         }
 
-        return listOf(textInsertRequest, textStyleRequest)
+        return requests
     }
 
     fun createText(textBoxId: String, pageElementId: String, textContent: String,
