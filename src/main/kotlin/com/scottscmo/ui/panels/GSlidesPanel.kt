@@ -19,7 +19,7 @@ import javax.swing.JTextField
 class GSlidesPanel : JPanel() {
     private val slidesApiClient = SlidesApiClient()
     private val slideUrlInput = JTextField()
-    private val insertionIndexInput = JTextField()
+    private val insertionIndexInput = JTextField("0")
 
     init {
         layout = MigLayout()
@@ -36,7 +36,7 @@ class GSlidesPanel : JPanel() {
             "Credentials imported!"
         }.ui, "wrap")
 
-        add(JLabel("Google Slides URL"))
+        add(JLabel("Google Slides URL/ID"))
         add(slideUrlInput, "wrap")
 
         add(JLabel("Insertion Index"))
@@ -45,7 +45,7 @@ class GSlidesPanel : JPanel() {
         val versesKey = "verses"
         val versionsKey = "versions"
         add(Form("Bible Slides Generator", mapOf(
-            versesKey to FormInput("Verses", "text"),
+            versesKey to FormInput("Verses", "text", "john 1:2-5,7-8"),
             versionsKey to FormInput("Bible Versions", "text", "cuv,niv"),
         )) {
             val bibleRef = BibleReference("${it[versionsKey]} - ${it[versesKey]}")
@@ -55,8 +55,12 @@ class GSlidesPanel : JPanel() {
     }
 
     private fun getPresentationId(): String {
-        val url = URL(slideUrlInput.text)
-        return url.path.substring(url.path.indexOf("/d/") + 3, url.path.lastIndexOf("/"))
+        val input = slideUrlInput.text
+        if (input.contains("/")) {
+            val url = URL(slideUrlInput.text)
+            return url.path.substring(url.path.indexOf("/d/") + 3, url.path.lastIndexOf("/"))
+        }
+        return input
     }
 
     private fun getInsertionIndex(): Int {
