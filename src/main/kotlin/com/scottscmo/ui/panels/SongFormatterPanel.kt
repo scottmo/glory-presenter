@@ -6,8 +6,7 @@ import com.scottscmo.model.song.adapters.SongSlideTextAdapter
 import com.scottscmo.model.song.adapters.SongYAMLAdapter
 import com.scottscmo.ui.FilePicker
 import com.scottscmo.ui.OutputDisplay
-import com.scottscmo.ui.components.C
-import java.awt.BorderLayout
+import net.miginfocom.swing.MigLayout
 import java.awt.Dimension
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
@@ -17,35 +16,50 @@ import java.nio.file.Files
 import java.nio.file.Path
 import javax.swing.*
 
+// using this to expand the textarea to max height for visual purpose
+private val EMPTY_TEXT_PLACEHOLDER = "\n".repeat(30)
+
 class SongFormatterPanel : JPanel() {
     private val songPicker = JButton("Select Song YAML")
-    private val songTextArea = JTextArea()
-    private val outputTextArea = JTextArea()
-    private val transformButton = JButton("Transform")
+    private val songTextArea = JTextArea(EMPTY_TEXT_PLACEHOLDER)
+
     private val maxLinesSpinnerInput = JSpinner(SpinnerNumberModel(1, 1, 10, 1))
+    private val transformButton = JButton("Transform")
     private val saveAsCSVButton = JButton("Save as CSV")
+    private val outputTextArea = JTextArea(EMPTY_TEXT_PLACEHOLDER)
+
+    private val songSlideTextPicker = JButton("Select Stored Song Slide Text")
+    private val songSlideTextArea = JTextArea(EMPTY_TEXT_PLACEHOLDER)
 
     init {
-        minimumSize = Dimension(640, 480)
-        layout = BorderLayout(10, 10)
-
-        add(songPicker, BorderLayout.NORTH)
-        add(C.resizableHBox(
-            songTextArea.apply { columns = 30 },
-            outputTextArea.apply { columns = 30 }
-        ), BorderLayout.CENTER)
+        preferredSize = Dimension(640, 480)
+        layout = MigLayout("wrap 3", "sg main, grow, left", "top")
 
         add(JPanel().apply {
-            add(JLabel("Lines Per Slide Per Language"))
-            add(maxLinesSpinnerInput)
-            add(transformButton)
-            add(saveAsCSVButton)
-        }, BorderLayout.SOUTH)
+            layout = MigLayout()
+            add(songPicker, "wrap, growx")
+            add(JScrollPane(songTextArea.apply { columns = 30 }), "grow")
+        })
+        add(JPanel().apply {
+            layout = MigLayout()
+            add(JPanel().apply {
+                add(JLabel("Lines Per Slide Per Language"))
+                add(maxLinesSpinnerInput)
+                add(transformButton)
+            }, "wrap")
+            add(saveAsCSVButton, "wrap")
+            add(JScrollPane(outputTextArea.apply { columns = 30 }), "grow")
+        })
+        add(JPanel().apply {
+            layout = MigLayout()
+            add(songSlideTextPicker, "wrap, growx")
+            add(JScrollPane(songSlideTextArea.apply { columns = 30 }), "grow")
+        })
 
         songPicker.addMouseListener(object : MouseAdapter() {
             override fun mouseReleased(me: MouseEvent) {
                 FilePicker.show("file", Config.getRelativePath("songs")) { selectedPath ->
-                    handleLoadSongFromPath(selectedPath)
+                    handleLoadSongFromPath(selectedPath, songTextArea)
                 }
             }
         })
@@ -57,6 +71,14 @@ class SongFormatterPanel : JPanel() {
         saveAsCSVButton.addActionListener {
             handleSaveAsCSV()
         }
+
+        songSlideTextPicker.addMouseListener(object : MouseAdapter() {
+            override fun mouseReleased(me: MouseEvent) {
+                FilePicker.show("file", Config.getRelativePath("songs_txt")) { selectedPath ->
+                    handleLoadSongFromPath(selectedPath, songSlideTextArea)
+                }
+            }
+        })
     }
 
     private fun handleSaveAsCSV() {
@@ -74,13 +96,13 @@ class SongFormatterPanel : JPanel() {
         }
     }
 
-    private fun handleLoadSongFromPath(songPath: String) {
+    private fun handleLoadSongFromPath(songPath: String, displayArea: JTextArea) {
         val songContent = try {
             Files.readString(Path.of(songPath), StandardCharsets.UTF_8)
         } catch (e: IOException) {
             "Error getting content for song $songPath"
         }
-        songTextArea.apply {
+        displayArea.apply {
             text = songContent
             caretPosition = 0 // scroll to top
         }
