@@ -4,10 +4,7 @@ import com.formdev.flatlaf.intellijthemes.FlatCarbonIJTheme
 import com.scottscmo.ui.FilePicker
 import com.scottscmo.ui.OutputDisplay
 import com.scottscmo.ui.components.DataPathPicker
-import com.scottscmo.ui.panels.BibleInfoPanel
-import com.scottscmo.ui.panels.GSlidesPanel
-import com.scottscmo.ui.panels.SlidesGeneratorsPanel
-import com.scottscmo.ui.panels.SongFormatterPanel
+import com.scottscmo.ui.panels.*
 import net.miginfocom.swing.MigLayout
 import java.lang.Exception
 import javax.swing.JFrame
@@ -35,8 +32,9 @@ class Application() : JFrame() {
             add(JTabbedPane().apply {
                 addTab("Bible", BibleInfoPanel())
                 addTab("Song Formatter", SongFormatterPanel())
-                addTab("Slides Generators", SlidesGeneratorsPanel())
+                addTab("PPTX Generators", SlidesGeneratorsPanel())
                 addTab("Google Slides", GSlidesPanel())
+                addTab("Settings", SettingsPanel())
             })
         }
 

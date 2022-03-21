@@ -1,11 +1,9 @@
 package com.scottscmo.ui.panels
 
-import com.scottscmo.Config
 import com.scottscmo.google.slides.SlidesApiClient
 import com.scottscmo.model.bible.BibleReference
 import com.scottscmo.ui.components.Form
 import com.scottscmo.ui.components.FormInput
-import com.scottscmo.util.Cryptor
 import net.miginfocom.swing.MigLayout
 import java.net.URL
 import javax.swing.JButton
@@ -20,19 +18,6 @@ class GSlidesPanel : JPanel() {
 
     init {
         layout = MigLayout()
-
-        // api importer
-        add(Form("Google API Credentials Importer", mapOf(
-            "credentialsFilePath" to FormInput("Credentials json", "file",
-                    Config.getRelativePath("${Config.GOOGLE_API_DIR}/credentials.json")),
-        )) {
-            require(Config.get().clientInfoKey.isNotEmpty()) { "clientInfoKey is missing from config.yaml!" }
-
-            Cryptor.encryptFile(it["credentialsFilePath"],
-                Config.getRelativePath(Config.GOOGLE_API_CREDENTIALS_PATH),
-                Config.get().clientInfoKey)
-            "Credentials imported!"
-        }.ui, "wrap")
 
         // ppt id
         add(JLabel("Google Slides URL/ID"))
