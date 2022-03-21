@@ -18,7 +18,7 @@ class BibleInfoPanel : JPanel() {
         layout = MigLayout()
 
         val availableVersions = BibleModel.get().getAvailableVersions()
-        add(JLabel("Available versions: ${availableVersions.joinToString(", ")}"))
+        add(JLabel("Available versions: ${availableVersions.joinToString(", ")}"), "wrap")
 
         val dataPathKey = "dataFilePath"
         val versionKey = "version"
