@@ -6,6 +6,13 @@ import java.nio.file.Files
 import java.nio.file.Path
 
 object Config {
+    const val SONG_YAML_DIR = "songs"
+    const val SONG_TEXT_DIR = "songs_txt"
+    const val SONG_CSV_DIR = "songs_csv"
+
+    const val GOOGLE_API_DIR = "google_api"
+    const val GOOGLE_API_CREDENTIALS_PATH = "${Config.GOOGLE_API_DIR}/client.info"
+
     private const val CONFIG_PATH = "./config.yaml"
 
     private lateinit var config: AppConfig

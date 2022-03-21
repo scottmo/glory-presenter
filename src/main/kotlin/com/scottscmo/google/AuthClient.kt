@@ -16,15 +16,12 @@ import java.io.File
 import java.io.IOException
 import java.io.InputStreamReader
 
-const val API_CONFIG_DIR = "google_api"
-const val CREDENTIALS_FILE_PATH = "${API_CONFIG_DIR}/client.info"
-
 class AuthClient {
     companion object {
         val instance = AuthClient()
     }
 
-    private val tokensDirPath = API_CONFIG_DIR
+    private val tokensDirPath = Config.GOOGLE_API_DIR
 
     private val scopes = listOf(SlidesScopes.PRESENTATIONS)
 
@@ -41,7 +38,7 @@ class AuthClient {
         require(Config.get().clientInfoKey.isNotEmpty()) { "clientInfoKey is missing from config.yaml!" }
 
         // Load client secrets.
-        val credentials = Cryptor.decrypt(Config.getRelativePath(CREDENTIALS_FILE_PATH), Config.get().clientInfoKey)
+        val credentials = Cryptor.decrypt(Config.getRelativePath(Config.GOOGLE_API_CREDENTIALS_PATH), Config.get().clientInfoKey)
         val clientSecrets = GoogleClientSecrets.load(jsonFactory, InputStreamReader(credentials.inputStream()))
 
         // Build flow and trigger user authorization request.

@@ -1,8 +1,6 @@
 package com.scottscmo.ui.panels
 
 import com.scottscmo.Config
-import com.scottscmo.google.API_CONFIG_DIR
-import com.scottscmo.google.CREDENTIALS_FILE_PATH
 import com.scottscmo.google.slides.SlidesApiClient
 import com.scottscmo.model.bible.BibleReference
 import com.scottscmo.ui.components.Form
@@ -26,12 +24,12 @@ class GSlidesPanel : JPanel() {
         // api importer
         add(Form("Google API Credentials Importer", mapOf(
             "credentialsFilePath" to FormInput("Credentials json", "file",
-                    Config.getRelativePath("$API_CONFIG_DIR/credentials.json")),
+                    Config.getRelativePath("${Config.GOOGLE_API_DIR}/credentials.json")),
         )) {
             require(Config.get().clientInfoKey.isNotEmpty()) { "clientInfoKey is missing from config.yaml!" }
 
             Cryptor.encryptFile(it["credentialsFilePath"],
-                Config.getRelativePath(CREDENTIALS_FILE_PATH),
+                Config.getRelativePath(Config.GOOGLE_API_CREDENTIALS_PATH),
                 Config.get().clientInfoKey)
             "Credentials imported!"
         }.ui, "wrap")
