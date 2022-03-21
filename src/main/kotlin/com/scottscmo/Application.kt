@@ -23,6 +23,12 @@ class Application() : JFrame() {
         OutputDisplay.host = this
         FilePicker.host = this
 
+        try {
+            Config.load()
+        } catch (e: Exception) {
+            OutputDisplay.error(e)
+        }
+
         contentPane.apply {
             layout = MigLayout()
             add(DataPathPicker.create(), "wrap")
@@ -35,12 +41,6 @@ class Application() : JFrame() {
         }
 
         pack() // auto-resize to component, use setSize if need fixed size
-
-        try {
-            Config.load()
-        } catch (e: Exception) {
-            OutputDisplay.error(e)
-        }
     }
 
     // cannot put this outside of class, otherwise java -jar cannot find main

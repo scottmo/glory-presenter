@@ -24,33 +24,74 @@ object Config {
 }
 
 data class AppConfig(
-    var dataDir: String = "./data",
-    val clientInfoKey: String = "secretKey",
-    val bibleVersionToLanguage: Map<String, String>,
-    val googleSlideConfig: SlideConfig,
-)
+    var dataDir: String,
+    var clientInfoKey: String,
+    var bibleVersionToLanguage: Map<String, String>,
+    var googleSlideConfig: SlideConfig,
+) {
+    // default config
+    constructor(): this(
+        "./data",
+        "secretKey",
+        mapOf(
+            "cuv" to "zh",
+            "niv" to "en"
+        ),
+        SlideConfig(
+            "PT",
+            720.0,
+            405.0,
+            ParagraphConfig(
+                "CENTER",
+                -1.0,
+                0.0,
+                0.0
+            ),
+            mapOf(
+                "zh" to TextConfig(
+                    "",
+                    "STKaiti",
+                    55.0,
+                    "255, 255, 255",
+                    "bold",
+                    10,
+                    4
+                ),
+                "en" to TextConfig(
+                    " ",
+                    "Arial Narrow",
+                    40.0,
+                    "255, 255, 153",
+                    "bold",
+                    30,
+                    5
+                )
+            )
+        )
+    )
+}
 
 data class SlideConfig(
-    val unit: String = "PT",
-    val slideWidth: Double = 720.0,
-    val slideHeight: Double = 405.0,
+    val unit: String,
+    val slideWidth: Double,
+    val slideHeight: Double,
     val paragraph: ParagraphConfig,
     val text: Map<String, TextConfig>,
 )
 
 data class ParagraphConfig(
-    val alignment: String = "CENTER",
-    val indentation: Double = -1.0,
-    val x: Double = 0.0,
-    val y: Double = 0.0,
+    val alignment: String,
+    val indentation: Double,
+    val x: Double,
+    val y: Double,
 )
 
 data class TextConfig(
-    val delimiter: String = "",
-    val fontFamily: String = "",
-    val fontSize: Double = 50.0,
-    val fontColor: String = "",
-    val fontStyles: String = "",
-    val numberOfCharactersPerLine: Int = 10,
-    val numberOfLinesPerSlide: Int = 5,
+    val delimiter: String,
+    val fontFamily: String,
+    val fontSize: Double,
+    val fontColor: String,
+    val fontStyles: String,
+    val numberOfCharactersPerLine: Int,
+    val numberOfLinesPerSlide: Int,
 )
