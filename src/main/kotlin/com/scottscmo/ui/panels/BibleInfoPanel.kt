@@ -17,7 +17,7 @@ class BibleInfoPanel : JPanel() {
     init {
         layout = MigLayout()
 
-        val availableVersions = BibleModel.instance.getAvailableVersions()
+        val availableVersions = BibleModel.get().getAvailableVersions()
         add(JLabel("Available versions: ${availableVersions.joinToString(", ")}"))
 
         val dataPathKey = "dataFilePath"
@@ -27,7 +27,7 @@ class BibleInfoPanel : JPanel() {
             versionKey to FormInput("Field Names", "text", "niv")
         )) {
             val bibleJson = mapper.readValue(File(it[dataPathKey]), bibleJsonTypeRef)
-            val insertedVerseCount = BibleModel.instance.insert(bibleJson, it[versionKey])
+            val insertedVerseCount = BibleModel.get().insert(bibleJson, it[versionKey])
             "Successfully inserted $insertedVerseCount ${it[versionKey]} bible verses"
         }.ui, "wrap")
     }

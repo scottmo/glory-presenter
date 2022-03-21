@@ -2,8 +2,14 @@ package com.scottscmo.google.slides
 
 import com.google.api.services.slides.v1.model.*
 import com.scottscmo.util.StringUtils
+import java.util.*
 
 object Util {
+    fun generateObjectId(namespace: String): String {
+        val uuid = UUID.randomUUID().toString()
+        return "$namespace-$uuid".substring(0, 50)
+    }
+
     fun getTextElements(element: PageElement): List<TextElement> {
         return element.shape?.text?.textElements ?: emptyList()
     }
@@ -60,18 +66,18 @@ object Util {
 
         val charsPerSlide = charsPerLine * linesPerSlides
 
-        var currentLine = ""
+        var currentSlideText = ""
         sentences.forEach { sentence ->
-            val newSlideText = currentLine + sentence
+            val newSlideText = currentSlideText + sentence
             if (newSlideText.length > charsPerSlide) {
-                slideTexts.add(currentLine)
-                currentLine = sentence
+                slideTexts.add(currentSlideText)
+                currentSlideText = sentence
             } else {
-                currentLine = newSlideText
+                currentSlideText = newSlideText
             }
         }
-        if (currentLine.isNotEmpty()) {
-            slideTexts.add(currentLine)
+        if (currentSlideText.isNotEmpty()) {
+            slideTexts.add(currentSlideText)
         }
         return slideTexts
     }

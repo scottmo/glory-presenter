@@ -4,7 +4,8 @@ import java.sql.SQLException
 
 class BibleModel {
     companion object {
-        val instance: BibleModel = BibleModel()
+        private val instance = BibleModel()
+        fun get() = instance
     }
 
     private val bibleVerseTable: BibleVerseTable = BibleVerseTable()
@@ -35,7 +36,7 @@ class BibleModel {
         return insertedVerseCount
     }
 
-    fun getBibleVerses(ref: BibleReference): Map<String, List<BibleVerse>>? {
+    fun getBibleVerses(ref: BibleReference): Map<String, List<BibleVerse>> {
         val versions = ref.versions
         val bookId = ref.book
         return try {
@@ -49,14 +50,12 @@ class BibleModel {
             }
             bibleVerses
         } catch (e: SQLException) {
-            System.err.println("Failed to get bible verses!")
-            e.printStackTrace()
-            null
+            throw Error("Failed to get bible verses!\n${e.stackTrace}")
         }
     }
 
     fun getAvailableVersions(): List<String> {
-        return  this.bookNamesTable.queryVersions()
+        return this.bookNamesTable.queryVersions()
     }
 
     /**
@@ -67,8 +66,7 @@ class BibleModel {
             try {
                 this.bookNames = this.bookNamesTable.queryAll()
             } catch (e: SQLException) {
-                System.err.println("Failed to get book names!")
-                e.printStackTrace()
+                throw Error("Failed to get book names!\n${e.stackTrace}")
             }
         }
         return this.bookNames?.getOrNull(BibleMetadata.getBookIndex(bookId))

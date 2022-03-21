@@ -1,8 +1,10 @@
 dataDir: ./data
 clientInfoKey: secretKeyHere
 bibleVersionToLanguage:
-  zh: ["cuv"]
-  en: ["niv", "asv", "nasb"]
+  cuv: zh
+  niv: en
+  asv: en
+  nasb: en
 googleSlideConfig:
   unit: "PT"
   slideWidth: 720

@@ -26,7 +26,7 @@ object Config {
 data class AppConfig(
     var dataDir: String = "./data",
     val clientInfoKey: String = "secretKey",
-    val bibleVersionToLanguage: Map<String, List<String>>,
+    val bibleVersionToLanguage: Map<String, String>,
     val googleSlideConfig: SlideConfig,
 )
 
