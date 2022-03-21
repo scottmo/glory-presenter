@@ -95,7 +95,7 @@ object StringUtils {
         val quotes = "'\"‘“"; // both Chinese and English
 
         val sentences = mutableListOf<String>();
-        var sentence = "";
+        var sentence = str[0].toString();
         for (i in 1 until str.length) {
             val char = str[i];
             val prevChar = str[i-1];
