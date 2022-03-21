@@ -42,6 +42,22 @@ class SlidesApiClient {
         return true
     }
 
+    fun setDefaultTitleText(presentationId: String) {
+        val slides = getSlides(presentationId)
+        val requests = slides.filter { it.pageElements.isNotEmpty() }
+            .map { Actions.setDefaultTitleText(it) }
+            .flatten()
+        updateSlides(presentationId, requests)
+    }
+
+    fun setBaseFont(presentationId: String) {
+        val slides = getSlides(presentationId)
+        val requests = slides.filter { it.pageElements.isNotEmpty() }
+            .map { Actions.setBaseFont(it, Config.get().googleSlideConfig.text) }
+            .flatten()
+        updateSlides(presentationId, requests)
+    }
+
     fun insertBibleText(presentationId: String, bibleRef: BibleReference, insertionIndex: Int) {
         val slideConfig = Config.get().googleSlideConfig
         val bibleVersionToLanguage = Config.get().bibleVersionToLanguage

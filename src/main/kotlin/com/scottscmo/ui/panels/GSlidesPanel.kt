@@ -10,6 +10,7 @@ import com.scottscmo.ui.components.FormInput
 import com.scottscmo.util.Cryptor
 import net.miginfocom.swing.MigLayout
 import java.net.URL
+import javax.swing.JButton
 import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.JTextField
@@ -42,6 +43,19 @@ class GSlidesPanel : JPanel() {
         // ppt slide insertion index
         add(JLabel("Insertion Index"))
         add(insertionIndexInput, "wrap")
+
+        // basic actions
+        add(JButton("Set Default Title Text").apply {
+            addActionListener {
+                slidesApiClient.setDefaultTitleText(getPresentationId())
+            }
+        })
+
+        add(JButton("Set Base Font").apply {
+            addActionListener {
+                slidesApiClient.setBaseFont(getPresentationId())
+            }
+        })
 
         // bible verses
         val versesKey = "verses"
