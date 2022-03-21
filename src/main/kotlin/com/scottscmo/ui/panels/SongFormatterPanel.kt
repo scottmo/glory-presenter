@@ -4,14 +4,11 @@ import com.scottscmo.Config
 import com.scottscmo.model.song.adapters.SongCSVAdapter
 import com.scottscmo.model.song.adapters.SongSlideTextAdapter
 import com.scottscmo.model.song.adapters.SongYAMLAdapter
-import com.scottscmo.ui.FilePicker
 import com.scottscmo.ui.OutputDisplay
+import com.scottscmo.ui.components.FileEditor
 import net.miginfocom.swing.MigLayout
 import java.awt.Dimension
-import java.awt.event.MouseAdapter
-import java.awt.event.MouseEvent
 import java.io.IOException
-import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.Path
 import javax.swing.*
@@ -20,49 +17,36 @@ import javax.swing.*
 private val EMPTY_TEXT_PLACEHOLDER = "\n".repeat(30)
 
 class SongFormatterPanel : JPanel() {
-    private val songPicker = JButton("Select Song YAML")
-    private val songTextArea = JTextArea(EMPTY_TEXT_PLACEHOLDER)
+    private val songEditor = FileEditor(Config.SONG_YAML_DIR, "Select Song", EMPTY_TEXT_PLACEHOLDER)
 
     private val maxLinesSpinnerInput = JSpinner(SpinnerNumberModel(1, 1, 10, 1))
     private val transformButton = JButton("Transform")
     private val saveAsCSVButton = JButton("Save as CSV")
+    private val saveAsTXTButton = JButton("Save as Slide Text")
     private val outputTextArea = JTextArea(EMPTY_TEXT_PLACEHOLDER)
 
-    private val songSlideTextPicker = JButton("Select Stored Song Slide Text")
-    private val songSlideTextArea = JTextArea(EMPTY_TEXT_PLACEHOLDER)
+    private val songSlideEditor = FileEditor(Config.SONG_TEXT_DIR, "Select Stored Song Slide Text", EMPTY_TEXT_PLACEHOLDER)
 
     init {
         preferredSize = Dimension(640, 480)
         layout = MigLayout("wrap 3", "sg main, grow, left", "top")
 
-        add(JPanel().apply {
-            layout = MigLayout()
-            add(songPicker, "wrap, growx")
-            add(JScrollPane(songTextArea.apply { columns = 30 }), "grow")
-        })
+        // yaml song picker
+        add(songEditor.ui)
+        // yaml to slide text/csv transformer
         add(JPanel().apply {
             layout = MigLayout()
             add(JPanel().apply {
                 add(JLabel("Lines Per Slide Per Language"))
                 add(maxLinesSpinnerInput)
                 add(transformButton)
-            }, "wrap")
-            add(saveAsCSVButton, "wrap")
-            add(JScrollPane(outputTextArea.apply { columns = 30 }), "grow")
+            }, "wrap, span")
+            add(JScrollPane(outputTextArea.apply { columns = 30 }), "wrap, span, grow")
+            add(saveAsCSVButton)
+            add(saveAsTXTButton)
         })
-        add(JPanel().apply {
-            layout = MigLayout()
-            add(songSlideTextPicker, "wrap, growx")
-            add(JScrollPane(songSlideTextArea.apply { columns = 30 }), "grow")
-        })
-
-        songPicker.addMouseListener(object : MouseAdapter() {
-            override fun mouseReleased(me: MouseEvent) {
-                FilePicker.show("file", Config.getRelativePath("songs")) { selectedPath ->
-                    handleLoadSongFromPath(selectedPath, songTextArea)
-                }
-            }
-        })
+        // slide text
+        add(songSlideEditor.ui)
 
         transformButton.addActionListener {
             handleTransformSong()
@@ -72,20 +56,16 @@ class SongFormatterPanel : JPanel() {
             handleSaveAsCSV()
         }
 
-        songSlideTextPicker.addMouseListener(object : MouseAdapter() {
-            override fun mouseReleased(me: MouseEvent) {
-                FilePicker.show("file", Config.getRelativePath("songs_txt")) { selectedPath ->
-                    handleLoadSongFromPath(selectedPath, songSlideTextArea)
-                }
-            }
-        })
+        saveAsTXTButton.addActionListener {
+            handleSaveAsTxt()
+        }
     }
 
     private fun handleSaveAsCSV() {
-        val song = SongYAMLAdapter.deserialize(songTextArea.text)
+        val song = SongYAMLAdapter.deserialize(songEditor.content)
         if (song != null) {
             try {
-                val filePath = Config.getRelativePath("songs_csv/${song.title}.csv")
+                val filePath = Config.getRelativePath("${Config.SONG_CSV_DIR}/${song.title}.csv")
                 SongCSVAdapter.serializeToCSV(filePath, song, listOf("zh", "en"), maxLinesSpinnerInput.value as Int)
                 OutputDisplay.show("Saved successfully!")
             } catch (e: IOException) {
@@ -96,23 +76,21 @@ class SongFormatterPanel : JPanel() {
         }
     }
 
-    private fun handleLoadSongFromPath(songPath: String, displayArea: JTextArea) {
-        val songContent = try {
-            Files.readString(Path.of(songPath), StandardCharsets.UTF_8)
-        } catch (e: IOException) {
-            "Error getting content for song $songPath"
-        }
-        displayArea.apply {
-            text = songContent
+    private fun handleTransformSong() {
+        val song = SongYAMLAdapter.deserialize(songEditor.content)
+        outputTextArea.apply {
+            text = SongSlideTextAdapter.serialize(song, listOf("zh", "en"), maxLinesSpinnerInput.value as Int)
             caretPosition = 0 // scroll to top
         }
     }
 
-    private fun handleTransformSong() {
-        val song = SongYAMLAdapter.deserialize(songTextArea.text)
-        outputTextArea.apply {
-            text = SongSlideTextAdapter.serialize(song, listOf("zh", "en"), maxLinesSpinnerInput.value as Int)
-            caretPosition = 0 // scroll to top
+    private fun handleSaveAsTxt() {
+        val song = SongYAMLAdapter.deserialize(songEditor.content)
+        if (song != null) {
+            val filePath = Config.getRelativePath("${com.scottscmo.Config.SONG_TEXT_DIR}/${song.title}.txt")
+            Files.writeString(Path.of(filePath), outputTextArea.text)
+        } else {
+            OutputDisplay.error("Unable to convert song!")
         }
     }
 }
