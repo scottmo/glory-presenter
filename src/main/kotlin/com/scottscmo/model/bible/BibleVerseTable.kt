@@ -45,7 +45,7 @@ internal class BibleVerseTable {
             for (bvt in verses) {
                 stmt.setInt(1, bvt.bookIndex)
                 stmt.setInt(2, bvt.chapter)
-                stmt.setInt(3, bvt.verse)
+                stmt.setInt(3, bvt.index)
                 stmt.setString(4, bvt.text)
                 stmt.addBatch()
             }

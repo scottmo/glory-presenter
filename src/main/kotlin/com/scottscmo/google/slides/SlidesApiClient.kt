@@ -6,7 +6,6 @@ import com.google.api.services.slides.v1.model.BatchUpdatePresentationRequest
 import com.google.api.services.slides.v1.model.Page
 import com.google.api.services.slides.v1.model.Request
 import com.scottscmo.Config
-import com.scottscmo.TextConfig
 import com.scottscmo.google.AuthClient
 import com.scottscmo.model.bible.BibleModel
 import com.scottscmo.model.bible.BibleReference
@@ -43,8 +42,7 @@ class SlidesApiClient {
         return true
     }
 
-    fun insertBibleText(presentationId: String, versions: String, query: String, insertionIndex: Int) {
-        val bibleRef = BibleReference("$versions - $query")
+    fun insertBibleText(presentationId: String, bibleRef: BibleReference, insertionIndex: Int) {
         val slideConfig = Config.get().googleSlideConfig
         val bibleVersionToLanguage = Config.get().bibleVersionToLanguage
 
@@ -62,7 +60,7 @@ class SlidesApiClient {
         val queriedBookNames = bibleRef.versions
             .map { version -> bookNames.getOrDefault(version, "") }
             .filter { it.isNotEmpty() }
-        val titleText = query.replace(bibleRef.book, queriedBookNames.joinToString("\n"))
+        val titleText = queriedBookNames.joinToString("\n") + "\n" + bibleRef.ranges.joinToString(";")
         slideTexts.add(Pair(bibleRef.versions[0], titleText))
 
         // verses
@@ -72,7 +70,8 @@ class SlidesApiClient {
                 val lang = bibleVersionToLanguage[version]
 
                 val textConfig = slideConfig.text[lang]
-                val verseTexts = Util.distributeTextToSlides(bibleVerses[version]!![i].text,
+                val verse = bibleVerses[version]!![i]
+                val verseTexts = Util.distributeTextToSlides("${verse.index} ${verse.text}",
                     textConfig!!.numberOfCharactersPerLine,
                     textConfig.numberOfLinesPerSlide)
                 verseTexts.forEach { verseText ->
@@ -89,12 +88,16 @@ class SlidesApiClient {
             requireNotNull(textConfig) { "No matching text config for $version version" }
 
             val slideId = Util.generateObjectId(DefaultSlideConfig.ID_SLIDE_PREFIX)
-            val titleId = Util.generateObjectId(DefaultSlideConfig.ID_PLACEHOLDER_PREFIX)
+            val createSlideReq = Actions.createSlide(slideId, insertionIndex)
 
-            requests.add(Actions.createSlide(slideId, insertionIndex))
-            requests.add(Actions.resizeToFullPage(titleId))
-            requests.addAll(Actions.insertText(titleId, text,
-                slideConfig.paragraph, textConfig, insertionIndex))
+            val titleId = createSlideReq.createSlide.placeholderIdMappings[0].objectId
+            val resizeReq = Actions.resizeToFullPage(titleId)
+
+            val insertReqs = Actions.insertText(titleId, text, slideConfig.paragraph, textConfig)
+
+            requests.add(createSlideReq)
+            requests.add(resizeReq)
+            requests.addAll(insertReqs)
         }
         updateSlides(presentationId, requests)
     }

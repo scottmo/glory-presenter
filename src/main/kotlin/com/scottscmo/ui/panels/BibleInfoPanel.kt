@@ -24,7 +24,7 @@ class BibleInfoPanel : JPanel() {
         val versionKey = "version"
         add(Form("Bible Importer", mapOf(
             dataPathKey to FormInput("Input JSON", "file", Config.getRelativePath("bible.json")),
-            versionKey to FormInput("Field Names", "text", "niv")
+            versionKey to FormInput("Version", "text", "niv")
         )) {
             val bibleJson = mapper.readValue(File(it[dataPathKey]), bibleJsonTypeRef)
             val insertedVerseCount = BibleModel.get().insert(bibleJson, it[versionKey])

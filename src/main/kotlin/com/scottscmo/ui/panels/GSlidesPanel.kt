@@ -3,13 +3,24 @@ package com.scottscmo.ui.panels
 import com.scottscmo.Config
 import com.scottscmo.google.API_CONFIG_DIR
 import com.scottscmo.google.CREDENTIALS_FILE_PATH
+import com.scottscmo.google.slides.SlidesApiClient
+import com.scottscmo.model.bible.BibleReference
+import com.scottscmo.ppt.BibleSlidesGenerator
 import com.scottscmo.ui.components.Form
 import com.scottscmo.ui.components.FormInput
 import com.scottscmo.util.Cryptor
 import net.miginfocom.swing.MigLayout
+import java.net.URL
+import javax.swing.JLabel
 import javax.swing.JPanel
+import javax.swing.JTextArea
+import javax.swing.JTextField
 
 class GSlidesPanel : JPanel() {
+    private val slidesApiClient = SlidesApiClient()
+    private val slideUrlInput = JTextField()
+    private val insertionIndexInput = JTextField()
+
     init {
         layout = MigLayout()
 
@@ -24,5 +35,31 @@ class GSlidesPanel : JPanel() {
                 Config.get().clientInfoKey)
             "Credentials imported!"
         }.ui, "wrap")
+
+        add(JLabel("Google Slides URL"))
+        add(slideUrlInput, "wrap")
+
+        add(JLabel("Insertion Index"))
+        add(insertionIndexInput, "wrap")
+
+        val versesKey = "verses"
+        val versionsKey = "versions"
+        add(Form("Bible Slides Generator", mapOf(
+            versesKey to FormInput("Verses", "text"),
+            versionsKey to FormInput("Bible Versions", "text", "cuv,niv"),
+        )) {
+            val bibleRef = BibleReference("${it[versionsKey]} - ${it[versesKey]}")
+            slidesApiClient.insertBibleText(getPresentationId(), bibleRef, getInsertionIndex())
+            "Bible slides have been successfully generated!"
+        }.ui, "wrap")
+    }
+
+    private fun getPresentationId(): String {
+        val url = URL(slideUrlInput.text)
+        return url.path.substring(url.path.indexOf("/d/") + 3, url.path.lastIndexOf("/"))
+    }
+
+    private fun getInsertionIndex(): Int {
+        return insertionIndexInput.text.toInt()
     }
 }

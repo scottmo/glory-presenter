@@ -6,7 +6,7 @@ import org.apache.poi.xslf.usermodel.XMLSlideShow
 import org.apache.poi.xslf.usermodel.XSLFSlideLayout
 
 class BibleTemplateHandler {
-    private val bibleModel: BibleModel = BibleModel.instance
+    private val bibleModel: BibleModel = BibleModel.get()
     private val titleMasterKey = "title"
     private val verseMasterKeyPrefix = "verse"
     private val mainLayoutKey = "main"
@@ -29,7 +29,6 @@ class BibleTemplateHandler {
 
     fun insertBibleText(ppt: XMLSlideShow, ref: BibleReference) {
         val bibleVerses = bibleModel.getBibleVerses(ref)
-        requireNotNull(bibleVerses) { "Unable to find bible verse with $ref" }
         val bookNames = bibleModel.getBookNames(ref.book)
         requireNotNull(bookNames) { "Unable to query book names with book ${ref.book}" }
 
@@ -57,9 +56,9 @@ class BibleTemplateHandler {
             for (version in ref.versions) {
                 val slide = ppt.createSlide(verseLayouts["${this.verseMasterKeyPrefix}_$version"])
                 val verse = bibleVerses[version]!![i]
-                val refStr = String.format("%s %d:%d", bookNames[version], verse.chapter, verse.verse)
+                val refStr = String.format("%s %d:%d", bookNames[version], verse.chapter, verse.index)
                 TemplatingUtil.replacePlaceholders(slide, mapOf(
-                    "{verse}" to verse.verse.toString() + " " + verse.text,
+                    "{verse}" to verse.index.toString() + " " + verse.text,
                     "{title}" to refStr
                 ))
             }
