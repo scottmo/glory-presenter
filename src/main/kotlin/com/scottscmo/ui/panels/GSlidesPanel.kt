@@ -5,7 +5,6 @@ import com.scottscmo.google.API_CONFIG_DIR
 import com.scottscmo.google.CREDENTIALS_FILE_PATH
 import com.scottscmo.google.slides.SlidesApiClient
 import com.scottscmo.model.bible.BibleReference
-import com.scottscmo.ppt.BibleSlidesGenerator
 import com.scottscmo.ui.components.Form
 import com.scottscmo.ui.components.FormInput
 import com.scottscmo.util.Cryptor
@@ -13,7 +12,6 @@ import net.miginfocom.swing.MigLayout
 import java.net.URL
 import javax.swing.JLabel
 import javax.swing.JPanel
-import javax.swing.JTextArea
 import javax.swing.JTextField
 
 class GSlidesPanel : JPanel() {
@@ -24,6 +22,7 @@ class GSlidesPanel : JPanel() {
     init {
         layout = MigLayout()
 
+        // api importer
         add(Form("Google API Credentials Importer", mapOf(
             "credentialsFilePath" to FormInput("Credentials json", "file",
                     Config.getRelativePath("$API_CONFIG_DIR/credentials.json")),
@@ -36,12 +35,15 @@ class GSlidesPanel : JPanel() {
             "Credentials imported!"
         }.ui, "wrap")
 
+        // ppt id
         add(JLabel("Google Slides URL/ID"))
         add(slideUrlInput, "wrap")
 
+        // ppt slide insertion index
         add(JLabel("Insertion Index"))
         add(insertionIndexInput, "wrap")
 
+        // bible verses
         val versesKey = "verses"
         val versionsKey = "versions"
         add(Form("Bible Slides Generator", mapOf(
