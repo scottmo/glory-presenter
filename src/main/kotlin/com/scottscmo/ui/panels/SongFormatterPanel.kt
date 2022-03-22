@@ -2,7 +2,6 @@ package com.scottscmo.ui.panels
 
 import com.scottscmo.Config
 import com.scottscmo.model.song.adapters.SongCSVAdapter
-import com.scottscmo.model.song.adapters.SongSlideTextAdapter
 import com.scottscmo.model.song.adapters.SongYAMLAdapter
 import com.scottscmo.ui.OutputDisplay
 import com.scottscmo.ui.components.FileEditor
@@ -22,10 +21,10 @@ class SongFormatterPanel : JPanel() {
     private val maxLinesSpinnerInput = JSpinner(SpinnerNumberModel(1, 1, 10, 1))
     private val transformButton = JButton("Transform")
     private val saveAsCSVButton = JButton("Save as CSV")
-    private val saveAsTXTButton = JButton("Save as Slide Text")
+    private val saveAsTXTButton = JButton("Save as Slide-Format Song")
     private val outputTextArea = JTextArea(EMPTY_TEXT_PLACEHOLDER)
 
-    private val songSlideEditor = FileEditor(Config.SONG_TEXT_DIR, "Select Stored Song Slide Text", EMPTY_TEXT_PLACEHOLDER)
+    private val songSlideEditor = FileEditor(Config.SONG_SLIDES_DIR, "Select Stored Slide-Format Song", EMPTY_TEXT_PLACEHOLDER)
 
     init {
         preferredSize = Dimension(640, 480)
@@ -77,17 +76,18 @@ class SongFormatterPanel : JPanel() {
     }
 
     private fun handleTransformSong() {
-        val song = SongYAMLAdapter.deserialize(songEditor.content)
-        outputTextArea.apply {
-            text = SongSlideTextAdapter.serialize(song, listOf("zh", "en"), maxLinesSpinnerInput.value as Int)
-            caretPosition = 0 // scroll to top
+        SongYAMLAdapter.deserialize(songEditor.content)?.let { song ->
+            outputTextArea.apply {
+                text = SongYAMLAdapter.serialize(song, listOf("zh", "en"), maxLinesSpinnerInput.value as Int)
+                caretPosition = 0 // scroll to top
+            }
         }
     }
 
     private fun handleSaveAsTxt() {
         val song = SongYAMLAdapter.deserialize(songEditor.content)
         if (song != null) {
-            val filePath = Config.getRelativePath("${com.scottscmo.Config.SONG_TEXT_DIR}/${song.title}.txt")
+            val filePath = Config.getRelativePath("${com.scottscmo.Config.SONG_SLIDES_DIR}/${song.title}.yaml")
             Files.writeString(Path.of(filePath), outputTextArea.text)
         } else {
             OutputDisplay.error("Unable to convert song!")

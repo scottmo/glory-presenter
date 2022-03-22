@@ -7,6 +7,7 @@ import java.nio.file.Path
 
 object Config {
     const val SONG_YAML_DIR = "songs"
+    const val SONG_SLIDES_DIR = "songs_slide"
     const val SONG_TEXT_DIR = "songs_txt"
     const val SONG_CSV_DIR = "songs_csv"
 

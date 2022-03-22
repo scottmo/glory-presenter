@@ -2,7 +2,6 @@ package com.scottscmo.model.song
 
 class Song() {
     lateinit var title: String
-    lateinit var description: String
     lateinit var collection: String
     lateinit var lyrics: List<Verse>
     lateinit var verseOrder: List<String>
