@@ -8,7 +8,7 @@ import com.scottscmo.ui.components.FormInput
 import net.miginfocom.swing.MigLayout
 import javax.swing.JPanel
 
-class SlidesGeneratorsPanel : JPanel() {
+class PPTXGeneratorsPanel : JPanel() {
     init {
         layout = MigLayout()
 

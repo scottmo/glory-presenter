@@ -32,7 +32,7 @@ class Application() : JFrame() {
             add(JTabbedPane().apply {
                 addTab("Bible", BibleInfoPanel())
                 addTab("Song Formatter", SongFormatterPanel())
-                addTab("PPTX Generators", SlidesGeneratorsPanel())
+                addTab("PPTX Generators", PPTXGeneratorsPanel())
                 addTab("Google Slides", GSlidesPanel())
                 addTab("Settings", SettingsPanel())
             })
