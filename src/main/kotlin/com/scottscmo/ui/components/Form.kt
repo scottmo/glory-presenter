@@ -19,7 +19,7 @@ class Form(title: String, inputConfigs: Map<String, FormInput>, onSubmit: (form:
     init {
         ui.apply {
             minimumSize = Dimension(400, 0)
-            layout = MigLayout("gap 5", "[100]5[100, left, fill, grow]", "[][]20[]")
+            layout = MigLayout("ins 0, wrap 2", "[100][100, left, fill, grow]")
 
             add(JLabel(title).apply { font = Font(font.name, Font.BOLD, font.size + 2) }, "span")
 
@@ -28,7 +28,7 @@ class Form(title: String, inputConfigs: Map<String, FormInput>, onSubmit: (form:
                     val input = JTextField(v.defaultValue)
                     inputs[k] = input
                     add(JLabel(v.label))
-                    add(input, "wrap")
+                    add(input)
                 } else if (v.type == "file" || v.type == "directory") {
                     val input = JTextField(v.defaultValue.ifEmpty { "select ${v.type}" }).apply {
                         addMouseListener(object : MouseAdapter() {
@@ -41,7 +41,7 @@ class Form(title: String, inputConfigs: Map<String, FormInput>, onSubmit: (form:
                     }
                     inputs[k] = input
                     add(JLabel(v.label))
-                    add(input, "wrap")
+                    add(input)
                 }
             }
 

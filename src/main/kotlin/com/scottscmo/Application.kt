@@ -16,6 +16,7 @@ class Application() : JFrame() {
     init {
         title = "Worship Service Tool"
         defaultCloseOperation = EXIT_ON_CLOSE
+        isResizable = false
 
         OutputDisplay.host = this
         FilePicker.host = this
@@ -27,8 +28,8 @@ class Application() : JFrame() {
         }
 
         contentPane.apply {
-            layout = MigLayout()
-            add(DataPathPicker.create(), "wrap")
+            layout = MigLayout("ins 0, wrap")
+            add(DataPathPicker.create())
             add(JTabbedPane().apply {
                 addTab("Bible", BibleInfoPanel())
                 addTab("Song Formatter", SongFormatterPanel())

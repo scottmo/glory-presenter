@@ -19,12 +19,13 @@ class BibleInfoPanel : JPanel() {
     init {
         layout = MigLayout("", "left", "top")
 
-        val availableVersions = BibleModel.get().getAvailableVersions()
-        add(JLabel("Available versions: ${availableVersions.joinToString(", ")}"),
+        val availableVersions = BibleModel.get().getAvailableVersions().joinToString(", ")
+        add(JLabel("Available versions: $availableVersions"),
             "wrap")
 
         val bookIds = BibleMetadata.getBookIdsInOrder().joinToString(", ")
-        add(JTextArea("Book IDs: $bookIds").apply {
+        add(JLabel("Book IDs:"), "wrap")
+        add(JTextArea(bookIds).apply {
             columns = 100
             isEditable = false
             lineWrap = true

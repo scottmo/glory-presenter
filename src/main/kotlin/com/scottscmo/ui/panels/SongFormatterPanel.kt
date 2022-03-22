@@ -34,7 +34,7 @@ class SongFormatterPanel : JPanel() {
         add(songEditor.ui)
         // yaml to slide text/csv transformer
         add(JPanel().apply {
-            layout = MigLayout()
+            layout = MigLayout("ins 0")
             add(JPanel().apply {
                 add(JLabel("Lines Per Slide Per Language"))
                 add(maxLinesSpinnerInput)

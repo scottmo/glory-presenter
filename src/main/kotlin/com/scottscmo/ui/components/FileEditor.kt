@@ -26,7 +26,7 @@ class FileEditor(initDir: String, filePickerLabel: String, initContent: String =
 
     init {
         ui.apply {
-            layout = MigLayout()
+            layout = MigLayout("ins 0")
             add(filePicker, "wrap, span, growx")
             add(JScrollPane(textArea.apply { columns = 30 }), "wrap, span, grow")
             add(reloadButton)

@@ -21,24 +21,24 @@ class GSlidesPanel : JPanel() {
 
         // ppt id
         add(JLabel("Google Slides URL/ID"))
-        add(slideUrlInput, "wrap")
+        add(slideUrlInput, "growx, wrap")
 
         // ppt slide insertion index
         add(JLabel("Insertion Index"))
-        add(insertionIndexInput, "wrap")
+        add(insertionIndexInput, "growx, wrap")
 
         // basic actions
         add(JButton("Set Default Title Text").apply {
             addActionListener {
                 slidesApiClient.setDefaultTitleText(getPresentationId())
             }
-        })
+        }, "wrap")
 
         add(JButton("Set Base Font").apply {
             addActionListener {
                 slidesApiClient.setBaseFont(getPresentationId())
             }
-        })
+        }, "wrap")
 
         // bible verses
         val versesKey = "verses"
@@ -50,7 +50,7 @@ class GSlidesPanel : JPanel() {
             val bibleRef = BibleReference("${it[versionsKey]} - ${it[versesKey]}")
             slidesApiClient.insertBibleText(getPresentationId(), bibleRef, getInsertionIndex())
             "Bible slides have been successfully generated!"
-        }.ui, "wrap")
+        }.ui, "span, wrap")
     }
 
     private fun getPresentationId(): String {
