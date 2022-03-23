@@ -29,7 +29,7 @@ class Application() : JFrame() {
 
         contentPane.apply {
             layout = MigLayout("ins 0, wrap")
-            add(DataPathPicker.create())
+            add(DataPathPicker().ui)
             add(JTabbedPane().apply {
                 addTab("Bible", BibleInfoPanel())
                 addTab("Song Formatter", SongFormatterPanel())

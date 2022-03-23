@@ -7,19 +7,21 @@ import java.nio.file.Path
 import javax.swing.JButton
 import javax.swing.JComponent
 
-object DataPathPicker {
-    private const val BUTTON_TEXT_PREFIX = "Data Path: "
-    fun create(): JComponent {
-        val dataPath = Path.of(Config.get().dataDir)
-        val setDataPathBtn = JButton(BUTTON_TEXT_PREFIX + dataPath.toString())
+private const val BUTTON_TEXT_PREFIX = "Data Path: "
 
-        setDataPathBtn.addActionListener { _ ->
-            FilePicker.show("directory") { newDataPath ->
-                setDataPathBtn.text = BUTTON_TEXT_PREFIX + newDataPath
-                Config.get().dataDir = newDataPath
-                Event.emit(Event.DATA_DIR, newDataPath)
+class DataPathPicker {
+    val ui = JButton()
+
+    init {
+        ui.apply {
+            text = BUTTON_TEXT_PREFIX + Path.of(Config.get().dataDir)
+            addActionListener { _ ->
+                FilePicker.show("directory") { newDataPath ->
+                    text = BUTTON_TEXT_PREFIX + newDataPath
+                    Config.get().dataDir = newDataPath
+                    Event.emit(Event.DATA_DIR, newDataPath)
+                }
             }
         }
-        return setDataPathBtn
     }
 }
