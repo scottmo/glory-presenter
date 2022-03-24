@@ -2,6 +2,7 @@ package com.scottscmo.ui.components
 
 import com.scottscmo.Config
 import com.scottscmo.ui.FilePicker
+import com.scottscmo.ui.OutputDisplay
 import net.miginfocom.swing.MigLayout
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
@@ -36,17 +37,18 @@ class FileEditor(initDir: String, filePickerLabel: String, initContent: String =
         filePicker.addMouseListener(object : MouseAdapter() {
             override fun mouseReleased(me: MouseEvent) {
                 FilePicker.show("file", Config.getRelativePath(initDir)) { selectedPath ->
-                    handleLoadFile(selectedPath)
+                    filePath = selectedPath
+                    loadFileToTextArea(filePath, textArea)
                 }
             }
         })
 
         saveButton.addActionListener {
-            handleWriteFile()
+            Files.writeString(Path.of(filePath), textArea.text)
         }
 
         reloadButton.addActionListener {
-            handleLoadFile(filePath)
+            loadFileToTextArea(filePath, textArea)
         }
     }
 
@@ -56,20 +58,17 @@ class FileEditor(initDir: String, filePickerLabel: String, initContent: String =
     val path: String
         get() = filePath
 
-    private fun handleLoadFile(path: String) {
-        val content = try {
-            Files.readString(Path.of(path), StandardCharsets.UTF_8)
-        } catch (e: IOException) {
-            "Error getting content for song $path"
+    companion object {
+        private fun loadFileToTextArea(path: String, textArea: JTextArea) {
+            try {
+                val content = Files.readString(Path.of(path), StandardCharsets.UTF_8)
+                textArea.apply {
+                    text = content
+                    caretPosition = 0 // scroll to top
+                }
+            } catch (e: IOException) {
+                OutputDisplay.error("Error getting content for song $path")
+            }
         }
-        this.filePath = path
-        textArea.apply {
-            text = content
-            caretPosition = 0 // scroll to top
-        }
-    }
-
-    private fun handleWriteFile() {
-        Files.writeString(Path.of(filePath), textArea.text)
     }
 }

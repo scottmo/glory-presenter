@@ -48,49 +48,55 @@ class SongFormatterPanel : JPanel() {
         add(songSlideEditor.ui)
 
         transformButton.addActionListener {
-            handleTransformSong()
+            handleTransformSong(songEditor.content, getMaxLines(), outputTextArea)
         }
 
         saveAsCSVButton.addActionListener {
-            handleSaveAsCSV()
+            handleSaveAsCSV(songEditor.content, getMaxLines())
         }
 
         saveAsTXTButton.addActionListener {
-            handleSaveAsTxt()
+            handleSaveAsTxt(outputTextArea.text)
         }
     }
 
-    private fun handleSaveAsCSV() {
-        val song = SongYAMLAdapter.deserialize(songEditor.content)
-        if (song != null) {
-            try {
-                val filePath = Config.getRelativePath("${Config.SONG_CSV_DIR}/${song.title}.csv")
-                SongCSVAdapter.serializeToCSV(filePath, song, listOf("zh", "en"), maxLinesSpinnerInput.value as Int)
-                OutputDisplay.show("Saved successfully!")
-            } catch (e: IOException) {
-                OutputDisplay.error("Unable to save to CSV: ${e.message}")
-            }
-        } else {
-            OutputDisplay.error("Unable to convert song!")
-        }
+    private fun getMaxLines(): Int {
+        return maxLinesSpinnerInput.value as Int
     }
 
-    private fun handleTransformSong() {
-        SongYAMLAdapter.deserialize(songEditor.content)?.let { song ->
-            outputTextArea.apply {
-                text = SongYAMLAdapter.serialize(song, listOf("zh", "en"), maxLinesSpinnerInput.value as Int)
-                caretPosition = 0 // scroll to top
+    companion object {
+        private fun handleSaveAsCSV(serializedSong: String, maxLines: Int) {
+            val song = SongYAMLAdapter.deserialize(serializedSong)
+            if (song != null) {
+                try {
+                    val filePath = Config.getRelativePath("${Config.SONG_CSV_DIR}/${song.title}.csv")
+                    SongCSVAdapter.serializeToCSV(filePath, song, listOf("zh", "en"), maxLines)
+                    OutputDisplay.show("Saved successfully!")
+                } catch (e: IOException) {
+                    OutputDisplay.error("Unable to save to CSV: ${e.message}")
+                }
+            } else {
+                OutputDisplay.error("Unable to convert song!")
             }
         }
-    }
 
-    private fun handleSaveAsTxt() {
-        val song = SongYAMLAdapter.deserialize(songEditor.content)
-        if (song != null) {
-            val filePath = Config.getRelativePath("${com.scottscmo.Config.SONG_SLIDES_DIR}/${song.title}.yaml")
-            Files.writeString(Path.of(filePath), outputTextArea.text)
-        } else {
-            OutputDisplay.error("Unable to convert song!")
+        private fun handleTransformSong(serializedSong: String, maxLines: Int, outputTextArea: JTextArea) {
+            SongYAMLAdapter.deserialize(serializedSong)?.let { song ->
+                outputTextArea.apply {
+                    text = SongYAMLAdapter.serialize(song, listOf("zh", "en"), maxLines)
+                    caretPosition = 0 // scroll to top
+                }
+            }
+        }
+
+        private fun handleSaveAsTxt(serializedSong: String) {
+            val song = SongYAMLAdapter.deserialize(serializedSong)
+            if (song != null) {
+                val filePath = Config.getRelativePath("${Config.SONG_SLIDES_DIR}/${song.title}.yaml")
+                Files.writeString(Path.of(filePath), serializedSong)
+            } else {
+                OutputDisplay.error("Unable to convert song!")
+            }
         }
     }
 }

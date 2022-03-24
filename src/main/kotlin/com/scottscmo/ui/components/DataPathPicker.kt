@@ -5,7 +5,6 @@ import com.scottscmo.Event
 import com.scottscmo.ui.FilePicker
 import java.nio.file.Path
 import javax.swing.JButton
-import javax.swing.JComponent
 
 private const val BUTTON_TEXT_PREFIX = "Data Path: "
 

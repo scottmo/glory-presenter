@@ -8,11 +8,10 @@ import javax.swing.JScrollPane
  * Component builder helper
  */
 object C {
-    // split pane
     private fun splitPane(orientation: Int, vararg components: JComponent): JComponent {
-        var tail = scroll(components[0])
+        var tail: JComponent = JScrollPane(components[0])
         for (i in 1 until components.size) {
-            tail = JSplitPane(orientation, tail, scroll(components[i]))
+            tail = JSplitPane(orientation, tail, JScrollPane(components[i]))
         }
         return tail
     }
@@ -23,10 +22,5 @@ object C {
 
     fun resizableVBox(vararg components: JComponent): JComponent {
         return splitPane(JSplitPane.VERTICAL_SPLIT, *components)
-    }
-
-    // scroll pane
-    fun scroll(component: JComponent): JComponent {
-        return JScrollPane(component)
     }
 }
