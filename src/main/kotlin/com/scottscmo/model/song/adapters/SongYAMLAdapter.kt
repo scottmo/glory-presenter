@@ -20,13 +20,7 @@ object SongYAMLAdapter {
 
     fun deserialize(serializedSong: String?): Song? {
         if (serializedSong == null) return null
-
-        return try {
-            mapper.readValue(serializedSong, Song::class.java)
-        } catch (e: JsonProcessingException) {
-            e.printStackTrace()
-            null
-        }
+        return mapper.readValue(serializedSong, Song::class.java)
     }
 
     fun serialize(song: Song, langs: List<String>, maxLines: Int): String {
@@ -83,17 +77,12 @@ object SongYAMLAdapter {
     }
 
     private fun getSerializedSong(songName: String): String? {
-        return try {
-            val songPath = Path.of(Config.getRelativePath("songs/$songName.yaml"))
-            Files.readString(songPath, StandardCharsets.UTF_8)
-        } catch (e: IOException) {
-            System.err.println(e.message)
-            null
-        }
+        val songPath = Path.of(Config.getRelativePath("${Config.SONG_YAML_DIR}/$songName.yaml"))
+        return Files.readString(songPath, StandardCharsets.UTF_8)
     }
 
-    private fun serializeToMap(song: Song?, langs: List<String>?, maxLines: Int): Map<String, List<String>> {
-        if (song == null || langs.isNullOrEmpty()) {
+    private fun serializeToMap(song: Song, langs: List<String>, maxLines: Int): Map<String, List<String>> {
+        if (langs.isEmpty()) {
             return emptyMap()
         }
         val data: MutableMap<String, MutableList<String>> = mutableMapOf()
@@ -109,18 +98,16 @@ object SongYAMLAdapter {
                 for (lang in langs) {
                     val lines = data[lang] ?: mutableListOf()
                     var line = ""
-                    val verseLines = verseText[lang]
-                    if (verseLines.isNullOrEmpty()) {
-                        continue
-                    }
-                    for (i in 0 until maxLines) {
-                        val currLineInVerse = numSlidePerThisVerse * maxLines + i
-                        if (currLineInVerse < verseLines.size) {
-                            line += verseLines[currLineInVerse] + "\n"
+                    verseText[lang]?.let { verseLines ->
+                        for (i in 0 until maxLines) {
+                            val currLineInVerse = numSlidePerThisVerse * maxLines + i
+                            if (currLineInVerse < verseLines.size) {
+                                line += verseLines[currLineInVerse] + "\n"
+                            }
                         }
+                        lines.add(line.trim())
+                        data[lang] = lines
                     }
-                    lines.add(line.trim())
-                    data[lang] = lines
                 }
                 numSlidePerThisVerse++
             }
