@@ -1,13 +1,11 @@
 package com.scottscmo.ui.panels
 
 import com.scottscmo.Config
-import com.scottscmo.model.song.adapters.SongCSVAdapter
 import com.scottscmo.model.song.adapters.SongYAMLAdapter
 import com.scottscmo.ui.OutputDisplay
 import com.scottscmo.ui.components.FileEditor
 import net.miginfocom.swing.MigLayout
 import java.awt.Dimension
-import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Path
 import javax.swing.*
@@ -20,7 +18,6 @@ class SongFormatterPanel : JPanel() {
 
     private val maxLinesSpinnerInput = JSpinner(SpinnerNumberModel(1, 1, 10, 1))
     private val transformButton = JButton("Transform")
-    private val saveAsCSVButton = JButton("Save as CSV")
     private val saveAsTXTButton = JButton("Save as Slide-Format Song")
     private val outputTextArea = JTextArea(EMPTY_TEXT_PLACEHOLDER)
 
@@ -41,7 +38,6 @@ class SongFormatterPanel : JPanel() {
                 add(transformButton)
             }, "wrap, span")
             add(JScrollPane(outputTextArea.apply { columns = 30 }), "wrap, span, grow")
-            add(saveAsCSVButton)
             add(saveAsTXTButton)
         })
         // slide text
@@ -49,10 +45,6 @@ class SongFormatterPanel : JPanel() {
 
         transformButton.addActionListener {
             handleTransformSong(songEditor.content, getMaxLines(), outputTextArea)
-        }
-
-        saveAsCSVButton.addActionListener {
-            handleSaveAsCSV(songEditor.content, getMaxLines())
         }
 
         saveAsTXTButton.addActionListener {
@@ -65,21 +57,6 @@ class SongFormatterPanel : JPanel() {
     }
 
     companion object {
-        private fun handleSaveAsCSV(serializedSong: String, maxLines: Int) {
-            val song = SongYAMLAdapter.deserialize(serializedSong)
-            if (song != null) {
-                try {
-                    val filePath = Config.getRelativePath("${Config.SONG_CSV_DIR}/${song.title}.csv")
-                    SongCSVAdapter.serializeToCSV(filePath, song, listOf("zh", "en"), maxLines)
-                    OutputDisplay.show("Saved successfully!")
-                } catch (e: IOException) {
-                    OutputDisplay.error("Unable to save to CSV: ${e.message}")
-                }
-            } else {
-                OutputDisplay.error("Unable to convert song!")
-            }
-        }
-
         private fun handleTransformSong(serializedSong: String, maxLines: Int, outputTextArea: JTextArea) {
             SongYAMLAdapter.deserialize(serializedSong)?.let { song ->
                 outputTextArea.apply {

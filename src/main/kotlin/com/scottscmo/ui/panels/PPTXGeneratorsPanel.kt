@@ -2,7 +2,7 @@ package com.scottscmo.ui.panels
 
 import com.scottscmo.Config
 import com.scottscmo.ppt.BibleSlidesGenerator
-import com.scottscmo.ppt.CSVSlidesGenerator
+import com.scottscmo.ppt.PPTXGenerators
 import com.scottscmo.ui.components.Form
 import com.scottscmo.ui.components.FormInput
 import net.miginfocom.swing.MigLayout
@@ -18,28 +18,23 @@ class PPTXGeneratorsPanel : JPanel() {
         val outputDirKey = "outputDirPath"
 
         // common field defaults
-        val dataPathDefault = FormInput("Input CSV", "file", Config.getRelativePath("input.csv"))
         val outputDirDefault = FormInput("Output Folder", "directory", Config.getRelativePath("../output"))
 
-        val headersKey = "headers"
-        add(Form("CSV -> Slides Generator", mapOf(
-            dataPathKey to dataPathDefault,
-            headersKey to FormInput("Field Names", "text"),
-            templatePathKey to FormInput("Template File", "file", Config.getRelativePath("template.pptx")),
+        add(Form("PPTX Generator", mapOf(
+            dataPathKey to FormInput("Input YAML", "file", Config.getRelativePath(".")),
+            templatePathKey to FormInput("Template File", "file", Config.getRelativePath(".")),
             outputDirKey to outputDirDefault
         )) {
-            CSVSlidesGenerator.generate(it[dataPathKey], it[headersKey].split(","),
-                it[templatePathKey], it[outputDirKey])
+            PPTXGenerators.generate(it[dataPathKey], it[templatePathKey], it[outputDirKey])
             "Slides have been successfully generated!"
         }.ui, "wrap")
 
         add(Form("Song Slides Generator", mapOf(
-            dataPathKey to dataPathDefault,
+            dataPathKey to FormInput("Input YAML", "file", Config.getRelativePath(Config.SONG_SLIDES_DIR)),
             templatePathKey to FormInput("Template File", "file", Config.getRelativePath("template-song.pptx")),
             outputDirKey to outputDirDefault
         )) {
-            CSVSlidesGenerator.generate(it[dataPathKey], listOf("verse_zh", "verse_en"), it[templatePathKey],
-                it[outputDirKey])
+            PPTXGenerators.generate(it[dataPathKey], it[templatePathKey], it[outputDirKey])
             "Slides have been successfully generated!"
         }.ui)
 
