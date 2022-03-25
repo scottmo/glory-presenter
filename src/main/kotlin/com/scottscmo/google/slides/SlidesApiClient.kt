@@ -44,22 +44,24 @@ class SlidesApiClient {
     }
 
     fun setDefaultTitleText(presentationId: String) {
+        val requestBuilder = RequestBuilder()
         val slides = getSlides(presentationId)
-        val requests = slides.filter { it.pageElements.isNotEmpty() }
-            .map { Actions.setDefaultTitleText(it) }
-            .flatten()
-        updateSlides(presentationId, requests)
+        slides.forEach { slide ->
+            requestBuilder.setDefaultTitleText(slide)
+        }
+        updateSlides(presentationId, requestBuilder.build())
     }
 
     fun setBaseFont(presentationId: String) {
+        val requestBuilder = RequestBuilder()
         val slides = getSlides(presentationId)
-        val requests = slides.filter { it.pageElements.isNotEmpty() }
-            .map { Actions.setBaseFont(it, Config.get().googleSlideConfig.textConfigs) }
-            .flatten()
-        updateSlides(presentationId, requests)
+        slides.forEach { slide ->
+            requestBuilder.setBaseFont(slide, Config.get().googleSlideConfig.textConfigs)
+        }
+        updateSlides(presentationId, requestBuilder.build())
     }
 
-    fun insertBibleText(presentationId: String, bibleRef: BibleReference, insertionIndex: Int) {
+    fun insertBibleText(presentationId: String, bibleRef: BibleReference, slideIndex: Int) {
         val slideConfig = Config.get().googleSlideConfig
         val bibleVersionToTextConfig = slideConfig.bibleVersionToTextConfig
 
@@ -98,24 +100,36 @@ class SlidesApiClient {
         }
 
         // create slide update requests from slide texts
-        val requests = mutableListOf<Request>()
+        val requestBuilder = RequestBuilder()
         slideTexts.filter { it.second.isNotEmpty() }.reversed().forEach { (version, text) ->
             val lang = bibleVersionToTextConfig[version]
             val textConfig = slideConfig.textConfigs[lang]
             requireNotNull(textConfig) { "No matching text config for $version version" }
 
-            val slideId = Util.generateObjectId(DefaultSlideConfig.ID_SLIDE_PREFIX)
-            val createSlideReq = Actions.createSlide(slideId, insertionIndex)
-
-            val titleId = createSlideReq.createSlide.placeholderIdMappings[0].objectId
-            val resizeReq = Actions.resizeToFullPage(titleId)
-
-            val insertReqs = Actions.insertText(titleId, text, slideConfig.paragraph, textConfig)
-
-            requests.add(createSlideReq)
-            requests.add(resizeReq)
-            requests.addAll(insertReqs)
+            val titleId = requestBuilder.createSlideWithFullText(slideIndex)
+            requestBuilder.insertText(titleId, text, slideConfig.paragraph, textConfig)
         }
+        updateSlides(presentationId, requestBuilder.build())
+    }
+
+    fun insertSong(presentationId: String, title: String, lyrics: List<String>, insertionIndex: Int) {
+        val requests = mutableListOf<Request>()
+
+        // title
+
+
+
         updateSlides(presentationId, requests)
+    }
+
+    private fun insertSongTitle(title: String, slideIndex: Int): List<Request> {
+        val slideConfig = Config.get().googleSlideConfig
+
+        val requestBuilder = RequestBuilder()
+        val titleId = requestBuilder.createSlideWithFullText(slideIndex)
+        requestBuilder.insertText(titleId, title, slideConfig.paragraph,
+                slideConfig.textConfigs[slideConfig.defaultTextConfig]!!)
+
+        return requestBuilder.build()
     }
 }

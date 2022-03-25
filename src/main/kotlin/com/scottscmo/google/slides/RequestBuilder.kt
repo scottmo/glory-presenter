@@ -6,56 +6,62 @@ import com.scottscmo.SlideConfig
 import com.scottscmo.TextConfig
 import com.scottscmo.util.StringUtils
 
-object Actions {
+class RequestBuilder {
+    private val requests = mutableListOf<Request>()
+
+    fun build(): List<Request> {
+        return requests
+    }
+
     /**
      * set base font for a slide
      */
-    fun setBaseFont(slide: Page, textConfigs: Map<String, TextConfig>): List<Request> {
-        return slide.pageElements
+    fun setBaseFont(slide: Page, textConfigs: Map<String, TextConfig>) {
+        slide.pageElements
             .filter { it.objectId != null }
-            .map { pageElement ->
-                Util.getTextElements(pageElement).filter { !it.textRun.isNullOrEmpty() }
-                    .map { textElement ->
+            .forEach { pageElement ->
+                Util.getTextElements(pageElement)
+                    .filter { !it.textRun.isNullOrEmpty() }
+                    .forEach { textElement ->
                         setBaseFontForText(pageElement.objectId, textElement.textRun,
                             textConfigs, textElement.startIndex)
-                    }.flatten()
-            }.flatten()
+                    }
+        }
     }
 
     /**
      * set base font for a text run
      */
     private fun setBaseFontForText(pageElementId: String, textRun: TextRun,
-            textConfigs: Map<String, TextConfig>, startIndex: Int): List<Request> {
-        if (textRun.content.isNullOrEmpty()) return emptyList()
-
-        return StringUtils.splitByCharset(textRun.content, true)
-            .map { contentSegment ->
-            val textConfigName = getTextConfigName(contentSegment)
-            Request().apply {
-                updateTextStyle = UpdateTextStyleRequest().apply {
-                    objectId = pageElementId
-                    fields = "*"
-                    textRange = Util.getTextRange(
-                        startIndex + contentSegment.startIndex,
-                        startIndex + contentSegment.endIndex
-                    )
-                    style = textRun.style.clone().apply {
-                        foregroundColor = OptionalColor().apply {
-                            opaqueColor = Util.getRGBColor(textConfigs[textConfigName]?.fontColor)
-                        }
-                        fontFamily = textConfigs[textConfigName]?.fontFamily
-                        weightedFontFamily = textRun.style.weightedFontFamily.clone().apply {
+            textConfigs: Map<String, TextConfig>, startIndex: Int) {
+        textRun.content?.let { content ->
+            StringUtils.splitByCharset(content, true).forEach { contentSegment ->
+                val textConfigName = getTextConfigName(contentSegment)
+                requests.add(Request().apply {
+                    updateTextStyle = UpdateTextStyleRequest().apply {
+                        objectId = pageElementId
+                        fields = "*"
+                        textRange = Util.getTextRange(
+                            startIndex + contentSegment.startIndex,
+                            startIndex + contentSegment.endIndex
+                        )
+                        style = textRun.style.clone().apply {
+                            foregroundColor = OptionalColor().apply {
+                                opaqueColor = Util.getRGBColor(textConfigs[textConfigName]?.fontColor)
+                            }
                             fontFamily = textConfigs[textConfigName]?.fontFamily
+                            weightedFontFamily = textRun.style.weightedFontFamily.clone().apply {
+                                fontFamily = textConfigs[textConfigName]?.fontFamily
+                            }
                         }
                     }
-                }
+                })
             }
         }
     }
 
-    fun resizeToFullPage(pageElementId: String): Request {
-        return Request().apply {
+    fun resizeToFullPage(pageElementId: String) {
+        requests.add(Request().apply {
             updatePageElementTransform = UpdatePageElementTransformRequest().apply {
                 objectId = pageElementId
                 transform = AffineTransform().apply {
@@ -65,12 +71,12 @@ object Actions {
                 }
                 applyMode = "ABSOLUTE"
             }
-        }
+        })
     }
 
     private fun createTextBox(textBoxId: String, pageElementId: String,
-            w: Double, h: Double, tx: Double, ty: Double): Request {
-        return Request().apply {
+            w: Double, h: Double, tx: Double, ty: Double) {
+        requests.add(Request().apply {
             createShape = CreateShapeRequest().apply {
                 objectId = textBoxId
                 shapeType = "TEXT_BOX"
@@ -89,14 +95,12 @@ object Actions {
                     }
                 }
             }
-        }
+        })
     }
 
     fun insertText(textBoxId: String, textContent: String,
             paragraphConfig: ParagraphConfig, textConfig: TextConfig,
-            textInsertionIndex: Int = 0): List<Request> {
-        val requests = mutableListOf<Request>()
-
+            textInsertionIndex: Int = 0) {
         // text
         requests.add(Request().apply {
             insertText = InsertTextRequest().apply {
@@ -176,8 +180,6 @@ object Actions {
                 }
             })
         }
-
-        return requests
     }
 
     /**
@@ -187,34 +189,27 @@ object Actions {
      * @param langs - languages to use. skip if there's no text in that language
      * @return list of update requests
      */
-    fun insertText(textBoxId: String, texts: Map<String, String>, langs: List<String>,
-            slideConfig: SlideConfig): List<Request> {
+    fun insertText(textBoxId: String, textConfig: Map<String, String>, textConfigNames: List<String>,
+            slideConfig: SlideConfig) {
         // we always insert from the top of the text box, so reverse the list and when inserting,
         // we push the text down
-        return langs.reversed()
-            .filter { lang -> texts.containsKey(lang) }
-            .map { lang ->
-                Actions.insertText(textBoxId, texts[lang]!!, slideConfig.paragraph, slideConfig.textConfigs[lang]!!)
-            }.flatten()
+        textConfigNames.reversed()
+            .filter { configName -> textConfig.containsKey(configName) }
+            .forEach { configName ->
+                this.insertText(textBoxId, textConfig[configName]!!, slideConfig.paragraph, slideConfig.textConfigs[configName]!!)
+            }
     }
 
     fun createText(textBoxId: String, pageElementId: String, textContent: String,
-        paragraphConfig: ParagraphConfig, textConfig: TextConfig, isFullPage: Boolean): List<Request> {
-        val requests = mutableListOf<Request>()
-
+        paragraphConfig: ParagraphConfig, textConfig: TextConfig, isFullPage: Boolean) {
         val textBoxW = DefaultSlideConfig.SLIDE_W
         val textBoxH = if (isFullPage || textConfig.fontSize <= 0) DefaultSlideConfig.SLIDE_H
                 else textConfig.fontSize * 2
-        requests.add(createTextBox(textBoxId, pageElementId, textBoxW, textBoxH, paragraphConfig.x, paragraphConfig.y))
-
-        requests.addAll(insertText(textBoxId, textContent, paragraphConfig, textConfig))
-
-        return requests
+        this.createTextBox(textBoxId, pageElementId, textBoxW, textBoxH, paragraphConfig.x, paragraphConfig.y)
+        this.insertText(textBoxId, textContent, paragraphConfig, textConfig)
     }
 
-    private fun copyText(srcElement: PageElement, dstElement: PageElement, withStyles: Boolean): List<Request> {
-        val requests = mutableListOf<Request>()
-
+    private fun copyText(srcElement: PageElement, dstElement: PageElement, withStyles: Boolean) {
         val pageElementId = dstElement.objectId
 
         srcElement.shape.text.textElements
@@ -230,7 +225,7 @@ object Actions {
             }
         
         if (!withStyles) {
-            return requests
+            return
         }
 
         srcElement.shape.text.textElements
@@ -255,51 +250,54 @@ object Actions {
                     })
                 }
             }
-
-        return requests
     }
 
-    private fun copyShape(srcElement: PageElement, dstElement: PageElement): Request {
-        val srcShapeProperties = srcElement.shape?.shapeProperties ?: return Request()
-
-        return Request().apply {
-            updateShapeProperties = UpdateShapePropertiesRequest().apply {
-                objectId = dstElement.objectId
-                shapeProperties = ShapeProperties().apply {
-                    contentAlignment = srcShapeProperties.contentAlignment
-                    link = srcShapeProperties.link
-                    if (srcShapeProperties.outline.propertyState != "NOT_RENDERED") {
-                        outline = srcShapeProperties.outline
+    private fun copyShape(srcElement: PageElement, dstElement: PageElement) {
+        srcElement.shape?.shapeProperties?.let { srcShapeProperties ->
+            requests.add(Request().apply {
+                updateShapeProperties = UpdateShapePropertiesRequest().apply {
+                    objectId = dstElement.objectId
+                    shapeProperties = ShapeProperties().apply {
+                        contentAlignment = srcShapeProperties.contentAlignment
+                        link = srcShapeProperties.link
+                        if (srcShapeProperties.outline.propertyState != "NOT_RENDERED") {
+                            outline = srcShapeProperties.outline
+                        }
+                        if (srcShapeProperties.shapeBackgroundFill.propertyState != "NOT_RENDERED") {
+                            shapeBackgroundFill = srcShapeProperties.shapeBackgroundFill
+                        }
+                        // skip autofit and shadow
                     }
-                    if (srcShapeProperties.shapeBackgroundFill.propertyState != "NOT_RENDERED") {
-                        shapeBackgroundFill = srcShapeProperties.shapeBackgroundFill
-                    }
-                    // skip autofit and shadow
                 }
-            }
+            })
         }
     }
 
-    private fun copyTransform(srcElement: PageElement, dstElement: PageElement): Request {
-        return Request().apply {
+    private fun copyTransform(srcElement: PageElement, dstElement: PageElement) {
+        requests.add(Request().apply {
             updatePageElementTransform = UpdatePageElementTransformRequest().apply {
                 objectId = dstElement.objectId
                 transform = srcElement.transform
                 applyMode = "ABSOLUTE"
             }
-        }
+        })
     }
 
-    private fun deleteObject(id: String): Request {
-        return Request().apply {
+    private fun deleteObject(id: String) {
+        requests.add(Request().apply {
             deleteObject = DeleteObjectRequest().apply {
                 objectId = id
             }
-        }
+        })
     }
 
-    fun createSlide(slideId: String, slideIndex: Int): Request {
-        return Request().apply {
+    fun createSlide(slideIndex: Int): String {
+        val slideId = Util.generateObjectId(DefaultSlideConfig.ID_SLIDE_PREFIX)
+        return this.createSlide(slideIndex, slideId)
+    }
+
+    fun createSlide(slideIndex: Int, slideId: String): String {
+        requests.add(Request().apply {
             createSlide = CreateSlideRequest().apply {
                 objectId = slideId
                 insertionIndex = slideIndex
@@ -307,31 +305,43 @@ object Actions {
                     predefinedLayout = "TITLE_ONLY"
                 }
                 placeholderIdMappings = listOf(LayoutPlaceholderIdMapping().apply {
-                    objectId = DefaultSlideConfig.ID_PLACEHOLDER_PREFIX + "-" + slideId
+                    objectId = getPlaceHolderId(slideId)
                     layoutPlaceholder = Placeholder().apply {
                         type = "TITLE"
                     }
                 })
             }
-        }
+        })
+        return slideId
     }
 
-    fun setDefaultTitleText(slide: Page): List<Request> {
+    fun getPlaceHolderId(slideId: String): String {
+        return DefaultSlideConfig.ID_PLACEHOLDER_PREFIX + "-" + slideId
+    }
+
+    /**
+     * Create a slide with title text resized to full slide and return its id
+     * @return text box objectId
+     */
+    fun createSlideWithFullText(slideIndex: Int): String {
+        val slideId = this.createSlide(slideIndex)
+        val titleId = this.getPlaceHolderId(slideId)
+        this.resizeToFullPage(titleId)
+        return titleId
+    }
+
+    fun setDefaultTitleText(slide: Page) {
         val firstText = Util.getFirstText(slide)
         val title = Util.getTitlePlaceholder(slide)
 
         if (title == null || firstText?.objectId == null || firstText == title) {
-            return emptyList()
+            return
         }
 
-        val requests = mutableListOf<Request>()
-
-        requests.addAll(copyText(firstText, title, true))
-        requests.add(copyShape(firstText, title))
-        requests.add(copyTransform(firstText, title))
-        requests.add(deleteObject(firstText.objectId))
-
-        return requests
+        this.copyText(firstText, title, true)
+        this.copyShape(firstText, title)
+        this.copyTransform(firstText, title)
+        this.deleteObject(firstText.objectId)
     }
 
     /**
