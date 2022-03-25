@@ -12,7 +12,7 @@ object Config {
     const val SONG_CSV_DIR = "songs_csv"
 
     const val GOOGLE_API_DIR = "google_api"
-    const val GOOGLE_API_CREDENTIALS_PATH = "${Config.GOOGLE_API_DIR}/client.info"
+    const val GOOGLE_API_CREDENTIALS_PATH = "${GOOGLE_API_DIR}/client.info"
 
     private const val CONFIG_PATH = "./config.yaml"
 
@@ -34,17 +34,12 @@ object Config {
 data class AppConfig(
     var dataDir: String,
     var clientInfoKey: String,
-    var bibleVersionToLanguage: Map<String, String>,
     var googleSlideConfig: SlideConfig,
 ) {
     // default config
     constructor(): this(
         "./data",
         "secretKey",
-        mapOf(
-            "cuv" to "zh",
-            "niv" to "en"
-        ),
         SlideConfig(
             "PT",
             720.0,
@@ -54,6 +49,11 @@ data class AppConfig(
                 -1.0,
                 0.0,
                 0.0
+            ),
+            "en",
+            mapOf(
+                "cuv" to "zh",
+                "niv" to "en"
             ),
             mapOf(
                 "zh" to TextConfig(
@@ -84,7 +84,9 @@ data class SlideConfig(
     val slideWidth: Double,
     val slideHeight: Double,
     val paragraph: ParagraphConfig,
-    val text: Map<String, TextConfig>,
+    var defaultTextConfig: String,
+    var bibleVersionToTextConfig: Map<String, String>,
+    val textConfigs: Map<String, TextConfig>,
 )
 
 data class ParagraphConfig(

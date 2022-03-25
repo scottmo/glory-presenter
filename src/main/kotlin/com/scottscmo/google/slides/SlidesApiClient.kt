@@ -54,14 +54,14 @@ class SlidesApiClient {
     fun setBaseFont(presentationId: String) {
         val slides = getSlides(presentationId)
         val requests = slides.filter { it.pageElements.isNotEmpty() }
-            .map { Actions.setBaseFont(it, Config.get().googleSlideConfig.text) }
+            .map { Actions.setBaseFont(it, Config.get().googleSlideConfig.textConfigs) }
             .flatten()
         updateSlides(presentationId, requests)
     }
 
     fun insertBibleText(presentationId: String, bibleRef: BibleReference, insertionIndex: Int) {
         val slideConfig = Config.get().googleSlideConfig
-        val bibleVersionToLanguage = Config.get().bibleVersionToLanguage
+        val bibleVersionToTextConfig = slideConfig.bibleVersionToTextConfig
 
         // query bible data
         val bookNames = BibleModel.get().getBookNames(bibleRef.book)
@@ -84,9 +84,9 @@ class SlidesApiClient {
         val numVerses = bibleVerses[bibleRef.versions[0]]!!.size
         for (i in 0 until numVerses) {
             bibleRef.versions.forEach { version ->
-                val lang = bibleVersionToLanguage[version]
+                val groupName = bibleVersionToTextConfig[version]
 
-                val textConfig = slideConfig.text[lang]
+                val textConfig = slideConfig.textConfigs[groupName]
                 val verse = bibleVerses[version]!![i]
                 val verseTexts = StringUtils.distributeTextToBlocks("${verse.index} ${verse.text}",
                     textConfig!!.numberOfCharactersPerLine,
@@ -100,8 +100,8 @@ class SlidesApiClient {
         // create slide update requests from slide texts
         val requests = mutableListOf<Request>()
         slideTexts.filter { it.second.isNotEmpty() }.reversed().forEach { (version, text) ->
-            val lang = bibleVersionToLanguage[version]
-            val textConfig = slideConfig.text[lang]
+            val lang = bibleVersionToTextConfig[version]
+            val textConfig = slideConfig.textConfigs[lang]
             requireNotNull(textConfig) { "No matching text config for $version version" }
 
             val slideId = Util.generateObjectId(DefaultSlideConfig.ID_SLIDE_PREFIX)

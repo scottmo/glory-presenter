@@ -2,6 +2,7 @@ package com.scottscmo.google.slides
 
 import com.google.api.services.slides.v1.model.*
 import com.scottscmo.ParagraphConfig
+import com.scottscmo.SlideConfig
 import com.scottscmo.TextConfig
 import com.scottscmo.util.StringUtils
 
@@ -9,14 +10,14 @@ object Actions {
     /**
      * set base font for a slide
      */
-    fun setBaseFont(slide: Page, textConfigMap: Map<String, TextConfig>): List<Request> {
+    fun setBaseFont(slide: Page, textConfigs: Map<String, TextConfig>): List<Request> {
         return slide.pageElements
             .filter { it.objectId != null }
             .map { pageElement ->
                 Util.getTextElements(pageElement).filter { !it.textRun.isNullOrEmpty() }
                     .map { textElement ->
                         setBaseFontForText(pageElement.objectId, textElement.textRun,
-                            textConfigMap, textElement.startIndex)
+                            textConfigs, textElement.startIndex)
                     }.flatten()
             }.flatten()
     }
@@ -25,12 +26,12 @@ object Actions {
      * set base font for a text run
      */
     private fun setBaseFontForText(pageElementId: String, textRun: TextRun,
-            textConfigMap: Map<String, TextConfig>, startIndex: Int): List<Request> {
+            textConfigs: Map<String, TextConfig>, startIndex: Int): List<Request> {
         if (textRun.content.isNullOrEmpty()) return emptyList()
 
         return StringUtils.splitByCharset(textRun.content, true)
             .map { contentSegment ->
-            val lang = getLanguage(contentSegment)
+            val textConfigName = getTextConfigName(contentSegment)
             Request().apply {
                 updateTextStyle = UpdateTextStyleRequest().apply {
                     objectId = pageElementId
@@ -41,11 +42,11 @@ object Actions {
                     )
                     style = textRun.style.clone().apply {
                         foregroundColor = OptionalColor().apply {
-                            opaqueColor = Util.getRGBColor(textConfigMap[lang]?.fontColor)
+                            opaqueColor = Util.getRGBColor(textConfigs[textConfigName]?.fontColor)
                         }
-                        fontFamily = textConfigMap[lang]?.fontFamily
+                        fontFamily = textConfigs[textConfigName]?.fontFamily
                         weightedFontFamily = textRun.style.weightedFontFamily.clone().apply {
-                            fontFamily = textConfigMap[lang]?.fontFamily
+                            fontFamily = textConfigs[textConfigName]?.fontFamily
                         }
                     }
                 }
@@ -177,6 +178,24 @@ object Actions {
         }
 
         return requests
+    }
+
+    /**
+     * Insert multilingual texts.
+     * @param textBoxId - objectId/pageElementId for the text box
+     * @param texts - lang to text map
+     * @param langs - languages to use. skip if there's no text in that language
+     * @return list of update requests
+     */
+    fun insertText(textBoxId: String, texts: Map<String, String>, langs: List<String>,
+            slideConfig: SlideConfig): List<Request> {
+        // we always insert from the top of the text box, so reverse the list and when inserting,
+        // we push the text down
+        return langs.reversed()
+            .filter { lang -> texts.containsKey(lang) }
+            .map { lang ->
+                Actions.insertText(textBoxId, texts[lang]!!, slideConfig.paragraph, slideConfig.textConfigs[lang]!!)
+            }.flatten()
     }
 
     fun createText(textBoxId: String, pageElementId: String, textContent: String,
@@ -318,7 +337,7 @@ object Actions {
     /**
      * use to match slide configuration. hard-coding en, zh for now.
      */
-    private fun getLanguage(segment: StringUtils.StringSegment): String {
+    private fun getTextConfigName(segment: StringUtils.StringSegment): String {
         return if (segment.isAscii) "en" else "zh"
     }
 }
