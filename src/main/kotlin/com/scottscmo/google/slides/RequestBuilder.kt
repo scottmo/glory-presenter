@@ -201,8 +201,10 @@ class RequestBuilder {
         // we push the text down
         slideConfig.textConfigsOrder.reversed()
             .filter { configName -> textConfig.containsKey(configName) }
-            .forEach { configName ->
-                insertText(textBoxId, textConfig[configName]!!, slideConfig.paragraph, slideConfig.textConfigs[configName]!!)
+            .forEachIndexed { index, configName ->
+                val ln = if (index == 0) "" else "\n"
+                insertText(textBoxId, textConfig[configName]!! + ln,
+                        slideConfig.paragraph, slideConfig.textConfigs[configName]!!)
             }
     }
 

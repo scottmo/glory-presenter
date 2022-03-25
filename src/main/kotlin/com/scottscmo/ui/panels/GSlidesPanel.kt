@@ -4,7 +4,6 @@ import com.scottscmo.Config
 import com.scottscmo.google.slides.SlidesApiClient
 import com.scottscmo.model.bible.BibleReference
 import com.scottscmo.model.song.adapters.SongYAMLAdapter
-import com.scottscmo.ppt.BibleSlidesGenerator
 import com.scottscmo.ui.components.Form
 import com.scottscmo.ui.components.FormInput
 import net.miginfocom.swing.MigLayout
@@ -69,7 +68,7 @@ class GSlidesPanel : JPanel() {
             } else {
                 "Unable to generate song slides!"
             }
-        }.ui, "wrap")
+        }.ui, "span, wrap")
     }
 
     private fun getPresentationId(): String {

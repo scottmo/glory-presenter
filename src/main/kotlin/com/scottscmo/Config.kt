@@ -33,8 +33,8 @@ object Config {
 
 data class AppConfig(
     var dataDir: String,
-    var clientInfoKey: String,
-    var googleSlideConfig: SlideConfig,
+    val clientInfoKey: String,
+    val googleSlideConfig: SlideConfig,
 ) {
     // default config
     constructor(): this(
@@ -81,29 +81,29 @@ data class AppConfig(
 }
 
 data class SlideConfig(
-    val unit: String,
-    val slideWidth: Double,
-    val slideHeight: Double,
-    val paragraph: ParagraphConfig,
-    var defaultTextConfig: String,
-    var textConfigsOrder: List<String>,
-    var bibleVersionToTextConfig: Map<String, String>,
-    val textConfigs: Map<String, TextConfig>,
+    val unit: String = "PT",
+    val slideWidth: Double = 0.0,
+    val slideHeight: Double = 0.0,
+    val paragraph: ParagraphConfig = ParagraphConfig(),
+    val defaultTextConfig: String = "",
+    val textConfigsOrder: List<String> = emptyList(),
+    val bibleVersionToTextConfig: Map<String, String> = emptyMap(),
+    val textConfigs: Map<String, TextConfig> = emptyMap(),
 )
 
 data class ParagraphConfig(
-    val alignment: String,
-    val indentation: Double,
-    val x: Double,
-    val y: Double,
+    val alignment: String = "CENTER",
+    val indentation: Double = 0.0,
+    val x: Double = 0.0,
+    val y: Double = 0.0,
 )
 
 data class TextConfig(
-    val wordDelimiter: String,
-    val fontFamily: String,
-    val fontSize: Double,
-    val fontColor: String,
-    val fontStyles: String,
-    val numberOfCharactersPerLine: Int,
-    val numberOfLinesPerSlide: Int,
+    val wordDelimiter: String = "",
+    val fontFamily: String = "",
+    val fontSize: Double = 12.0,
+    val fontColor: String = "0, 0, 0",
+    val fontStyles: String = "",
+    val numberOfCharactersPerLine: Int = 30,
+    val numberOfLinesPerSlide: Int = 4,
 )

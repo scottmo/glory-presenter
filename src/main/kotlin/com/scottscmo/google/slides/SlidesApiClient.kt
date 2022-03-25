@@ -113,26 +113,33 @@ class SlidesApiClient {
         updateSlides(presentationId, requestBuilder.build())
     }
 
-    fun insertSong(presentationId: String, song: Song, slideIndex: Int) {
+    fun insertSong(presentationId: String, song: Song, slideInsertIndex: Int) {
         val slideConfig = Config.get().googleSlideConfig
+        val defaultTextConfig = slideConfig.textConfigs[slideConfig.defaultTextConfig]!!
+
         val requestBuilder = RequestBuilder()
+        var slideIndex = slideInsertIndex
 
         // title
-        val textBoxId = requestBuilder.createSlideWithFullText(slideIndex)
-        requestBuilder.insertText(textBoxId, song.title, slideConfig.paragraph,
-            slideConfig.textConfigs[slideConfig.defaultTextConfig]!!)
+        val textBoxId = requestBuilder.createSlideWithFullText(slideIndex++)
+        requestBuilder.insertText(textBoxId, song.title, slideConfig.paragraph, defaultTextConfig)
 
         // lyrics
         song.lyrics.forEach { verse ->
-            val slideId = requestBuilder.createSlide(slideIndex)
+            val slideId = requestBuilder.createSlide(slideIndex++)
+
+            // verse text
             val verseTextBoxId = requestBuilder.getPlaceHolderId(slideId)
             requestBuilder.resizeToFullPage(verseTextBoxId)
             requestBuilder.insertText(verseTextBoxId, verse.text, slideConfig)
 
+            // footer
             val footerTitleBoxId = requestBuilder.createTextBox(slideId, DefaultSlideConfig.SLIDE_W, DefaultSlideConfig.FOOTER_TITLE_SIZE * 2,
                 0.0, DefaultSlideConfig.FOOTER_TITLE_Y)
-            requestBuilder.insertText(footerTitleBoxId, song.title, slideConfig.paragraph,
-                slideConfig.textConfigs[slideConfig.defaultTextConfig]!!)
+            val footerTextConfig = defaultTextConfig.copy(
+                fontSize = DefaultSlideConfig.FOOTER_TITLE_SIZE
+            )
+            requestBuilder.insertText(footerTitleBoxId, song.title, slideConfig.paragraph, footerTextConfig)
         }
 
         updateSlides(presentationId, requestBuilder.build())
