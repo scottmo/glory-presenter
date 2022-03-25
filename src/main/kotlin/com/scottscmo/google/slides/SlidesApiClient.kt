@@ -9,6 +9,7 @@ import com.scottscmo.Config
 import com.scottscmo.google.AuthClient
 import com.scottscmo.model.bible.BibleModel
 import com.scottscmo.model.bible.BibleReference
+import com.scottscmo.model.song.Song
 import com.scottscmo.util.StringUtils
 import java.lang.Integer.min
 
@@ -112,24 +113,28 @@ class SlidesApiClient {
         updateSlides(presentationId, requestBuilder.build())
     }
 
-    fun insertSong(presentationId: String, title: String, lyrics: List<String>, insertionIndex: Int) {
-        val requests = mutableListOf<Request>()
+    fun insertSong(presentationId: String, song: Song, slideIndex: Int) {
+        val slideConfig = Config.get().googleSlideConfig
+        val requestBuilder = RequestBuilder()
 
         // title
+        val textBoxId = requestBuilder.createSlideWithFullText(slideIndex)
+        requestBuilder.insertText(textBoxId, song.title, slideConfig.paragraph,
+            slideConfig.textConfigs[slideConfig.defaultTextConfig]!!)
 
+        // lyrics
+        song.lyrics.forEach { verse ->
+            val slideId = requestBuilder.createSlide(slideIndex)
+            val verseTextBoxId = requestBuilder.getPlaceHolderId(slideId)
+            requestBuilder.resizeToFullPage(verseTextBoxId)
+            requestBuilder.insertText(verseTextBoxId, verse.text, slideConfig)
 
-
-        updateSlides(presentationId, requests)
-    }
-
-    private fun insertSongTitle(title: String, slideIndex: Int): List<Request> {
-        val slideConfig = Config.get().googleSlideConfig
-
-        val requestBuilder = RequestBuilder()
-        val titleId = requestBuilder.createSlideWithFullText(slideIndex)
-        requestBuilder.insertText(titleId, title, slideConfig.paragraph,
+            val footerTitleBoxId = requestBuilder.createTextBox(slideId, DefaultSlideConfig.SLIDE_W, DefaultSlideConfig.FOOTER_TITLE_SIZE * 2,
+                0.0, DefaultSlideConfig.FOOTER_TITLE_Y)
+            requestBuilder.insertText(footerTitleBoxId, song.title, slideConfig.paragraph,
                 slideConfig.textConfigs[slideConfig.defaultTextConfig]!!)
+        }
 
-        return requestBuilder.build()
+        updateSlides(presentationId, requestBuilder.build())
     }
 }

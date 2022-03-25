@@ -74,8 +74,14 @@ class RequestBuilder {
         })
     }
 
+    fun createTextBox(pageElementId: String,
+            w: Double, h: Double, tx: Double, ty: Double): String {
+        val textBoxId = Util.generateObjectId(DefaultSlideConfig.ID_SHAPE_PREFIX)
+        return createTextBox(textBoxId, pageElementId, w, h, tx, ty)
+    }
+
     private fun createTextBox(textBoxId: String, pageElementId: String,
-            w: Double, h: Double, tx: Double, ty: Double) {
+            w: Double, h: Double, tx: Double, ty: Double): String {
         requests.add(Request().apply {
             createShape = CreateShapeRequest().apply {
                 objectId = textBoxId
@@ -96,6 +102,7 @@ class RequestBuilder {
                 }
             }
         })
+        return textBoxId
     }
 
     fun insertText(textBoxId: String, textContent: String,
@@ -189,24 +196,25 @@ class RequestBuilder {
      * @param langs - languages to use. skip if there's no text in that language
      * @return list of update requests
      */
-    fun insertText(textBoxId: String, textConfig: Map<String, String>, textConfigNames: List<String>,
-            slideConfig: SlideConfig) {
+    fun insertText(textBoxId: String, textConfig: Map<String, String>, slideConfig: SlideConfig) {
         // we always insert from the top of the text box, so reverse the list and when inserting,
         // we push the text down
-        textConfigNames.reversed()
+        slideConfig.textConfigsOrder.reversed()
             .filter { configName -> textConfig.containsKey(configName) }
             .forEach { configName ->
-                this.insertText(textBoxId, textConfig[configName]!!, slideConfig.paragraph, slideConfig.textConfigs[configName]!!)
+                insertText(textBoxId, textConfig[configName]!!, slideConfig.paragraph, slideConfig.textConfigs[configName]!!)
             }
     }
 
-    fun createText(textBoxId: String, pageElementId: String, textContent: String,
-        paragraphConfig: ParagraphConfig, textConfig: TextConfig, isFullPage: Boolean) {
+    fun createText(pageElementId: String, textContent: String,
+        paragraphConfig: ParagraphConfig, textConfig: TextConfig, isFullPage: Boolean): String {
         val textBoxW = DefaultSlideConfig.SLIDE_W
         val textBoxH = if (isFullPage || textConfig.fontSize <= 0) DefaultSlideConfig.SLIDE_H
                 else textConfig.fontSize * 2
-        this.createTextBox(textBoxId, pageElementId, textBoxW, textBoxH, paragraphConfig.x, paragraphConfig.y)
-        this.insertText(textBoxId, textContent, paragraphConfig, textConfig)
+
+        val textBoxId = createTextBox(pageElementId, textBoxW, textBoxH, paragraphConfig.x, paragraphConfig.y)
+        insertText(textBoxId, textContent, paragraphConfig, textConfig)
+        return textBoxId
     }
 
     private fun copyText(srcElement: PageElement, dstElement: PageElement, withStyles: Boolean) {
@@ -296,7 +304,7 @@ class RequestBuilder {
         return this.createSlide(slideIndex, slideId)
     }
 
-    fun createSlide(slideIndex: Int, slideId: String): String {
+    private fun createSlide(slideIndex: Int, slideId: String): String {
         requests.add(Request().apply {
             createSlide = CreateSlideRequest().apply {
                 objectId = slideId

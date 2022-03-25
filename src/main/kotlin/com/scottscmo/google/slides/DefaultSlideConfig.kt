@@ -13,9 +13,4 @@ object DefaultSlideConfig {
 
     const val FOOTER_TITLE_SIZE = 12.0
     const val FOOTER_TITLE_Y = 380.0
-
-    val WORD_DELIMITER = mapOf<String, String>(
-        "en" to " ",
-        "zh" to ""
-    )
 }

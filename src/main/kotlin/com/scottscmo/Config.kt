@@ -51,6 +51,7 @@ data class AppConfig(
                 0.0
             ),
             "en",
+            listOf("zh", "en"),
             mapOf(
                 "cuv" to "zh",
                 "niv" to "en"
@@ -85,6 +86,7 @@ data class SlideConfig(
     val slideHeight: Double,
     val paragraph: ParagraphConfig,
     var defaultTextConfig: String,
+    var textConfigsOrder: List<String>,
     var bibleVersionToTextConfig: Map<String, String>,
     val textConfigs: Map<String, TextConfig>,
 )
@@ -97,7 +99,7 @@ data class ParagraphConfig(
 )
 
 data class TextConfig(
-    val delimiter: String,
+    val wordDelimiter: String,
     val fontFamily: String,
     val fontSize: Double,
     val fontColor: String,

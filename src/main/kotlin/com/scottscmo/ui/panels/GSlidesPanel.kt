@@ -1,11 +1,16 @@
 package com.scottscmo.ui.panels
 
+import com.scottscmo.Config
 import com.scottscmo.google.slides.SlidesApiClient
 import com.scottscmo.model.bible.BibleReference
+import com.scottscmo.model.song.adapters.SongYAMLAdapter
+import com.scottscmo.ppt.BibleSlidesGenerator
 import com.scottscmo.ui.components.Form
 import com.scottscmo.ui.components.FormInput
 import net.miginfocom.swing.MigLayout
 import java.net.URL
+import java.nio.file.Files
+import java.nio.file.Path
 import javax.swing.JButton
 import javax.swing.JLabel
 import javax.swing.JPanel
@@ -51,6 +56,20 @@ class GSlidesPanel : JPanel() {
             slidesApiClient.insertBibleText(getPresentationId(), bibleRef, getInsertionIndex())
             "Bible slides have been successfully generated!"
         }.ui, "span, wrap")
+
+        val songPathKey = "song"
+        add(Form("Song Slides Generator", mapOf(
+            songPathKey to FormInput("Song", "file", Config.getRelativePath(Config.SONG_SLIDES_DIR)),
+        )) {
+            val slideSong = Files.readString(Path.of(it[songPathKey]))
+            val song = SongYAMLAdapter.deserialize(slideSong)
+            if (song != null) {
+                slidesApiClient.insertSong(getPresentationId(), song, getInsertionIndex())
+                "Song slides have been successfully generated!"
+            } else {
+                "Unable to generate song slides!"
+            }
+        }.ui, "wrap")
     }
 
     private fun getPresentationId(): String {
