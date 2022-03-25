@@ -5,11 +5,19 @@ import com.scottscmo.ui.components.Form
 import com.scottscmo.ui.components.FormInput
 import com.scottscmo.util.Cryptor
 import net.miginfocom.swing.MigLayout
+import javax.swing.JButton
 import javax.swing.JPanel
 
 class SettingsPanel : JPanel() {
     init {
         layout = MigLayout()
+
+        // reload configs
+        add(JButton("Reload config.yaml").apply {
+            addActionListener {
+                Config.load()
+            }
+        }, "wrap")
 
         // api importer
         add(Form("Google API Credentials Importer", mapOf(
