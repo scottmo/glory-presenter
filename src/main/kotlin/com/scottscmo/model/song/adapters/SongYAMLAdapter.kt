@@ -21,9 +21,9 @@ object SongYAMLAdapter {
         return mapper.readValue(serializedSong, Song::class.java)
     }
 
-    fun serialize(song: Song, langs: List<String>, maxLines: Int): String {
-        val redistributedSections = serializeToMap(song, langs, maxLines)
-        val numSections = redistributedSections[langs[0]]?.size ?: 0
+    fun serialize(song: Song, sectionTypes: List<String>, maxLines: Int): String {
+        val redistributedSections = serializeToMap(song, sectionTypes, maxLines)
+        val numSections = redistributedSections.values.toList()[0].size
 
         // turn each row of the map into a section
         val newOrder = mutableListOf<String>()
@@ -31,8 +31,10 @@ object SongYAMLAdapter {
         for (i in 0 until numSections) {
             val sectionName = "s$i"
             val sectionText = mutableMapOf<String, String>()
-            for (lang in langs) {
-                sectionText[lang] = redistributedSections[lang]!![i]
+            for (type in sectionTypes) {
+                redistributedSections[type]?.let { redistributedSectionText ->
+                    sectionText[type] = redistributedSectionText[i]
+                }
             }
             newOrder.add(sectionName)
             newSections.add(Section().apply {
@@ -79,24 +81,24 @@ object SongYAMLAdapter {
         return Files.readString(songPath, StandardCharsets.UTF_8)
     }
 
-    private fun serializeToMap(song: Song, langs: List<String>, maxLines: Int): Map<String, List<String>> {
-        if (langs.isEmpty()) {
+    private fun serializeToMap(song: Song, sectionTypes: List<String>, maxLines: Int): Map<String, List<String>> {
+        if (sectionTypes.isEmpty()) {
             return emptyMap()
         }
         val data: MutableMap<String, MutableList<String>> = mutableMapOf()
         for (sectionName in song.order) {
             val sectionText = song.getSectionText(sectionName)
 
-            require(!sectionText.isNullOrEmpty() && langs.all { sectionText.containsKey(it) })
+            require(!sectionText.isNullOrEmpty())
 
             // assuming all langs have same # of section lines
-            val numSectionLines = sectionText[langs[0]]!!.size
+            val numSectionLines = sectionText.values.toList()[0].size
             var numSlidePerThisSection = 0
             while (numSlidePerThisSection * maxLines < numSectionLines) {
-                for (lang in langs) {
-                    val lines = data[lang] ?: mutableListOf()
+                for (type in sectionTypes) {
+                    val lines = data[type] ?: mutableListOf()
                     var line = ""
-                    sectionText[lang]?.let { sectionLines ->
+                    sectionText[type]?.let { sectionLines ->
                         for (i in 0 until maxLines) {
                             val currLineInSection = numSlidePerThisSection * maxLines + i
                             if (currLineInSection < sectionLines.size) {
@@ -104,7 +106,7 @@ object SongYAMLAdapter {
                             }
                         }
                         lines.add(line.trim())
-                        data[lang] = lines
+                        data[type] = lines
                     }
                 }
                 numSlidePerThisSection++
