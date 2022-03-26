@@ -14,7 +14,7 @@ object PPTXGenerators {
         val inputContent = Files.readString(Path.of(dataFilePath))
         val input = SongYAMLAdapter.deserialize(inputContent)
 
-        input?.lyrics?.let { sections ->
+        input?.sections?.let { sections ->
             val title = input.title
             val outputFilePath = Path.of(outputDirPath, "$title.pptx").toString()
 

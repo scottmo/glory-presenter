@@ -11,18 +11,6 @@ class BibleTemplateHandler {
     private val verseMasterKeyPrefix = "verse"
     private val mainLayoutKey = "main"
 
-    /**
-     * expression format: e.g. {bible} cuv,niv - john 1:2-3;2:1-2
-     */
-    fun evaluateTemplate(ppt: XMLSlideShow, index: Int) {
-        val srcSlide = ppt.slides[index]
-        val bibleReference = TemplatingUtil.findText(srcSlide, "{bible}")
-        if (!bibleReference.isNullOrEmpty()) {
-            insertBibleText(ppt, bibleReference.substring(7).trim())
-            println("Inserting bible text at " + srcSlide.slideNumber)
-        }
-    }
-
     fun insertBibleText(ppt: XMLSlideShow, bibleReferenceStr: String) {
         insertBibleText(ppt, BibleReference(bibleReferenceStr))
     }

@@ -125,13 +125,13 @@ class SlidesApiClient {
         requestBuilder.insertText(textBoxId, song.title, slideConfig.paragraph, defaultTextConfig)
 
         // lyrics
-        song.lyrics.forEach { verse ->
+        song.sections.forEach { section ->
             val slideId = requestBuilder.createSlide(slideIndex++)
 
-            // verse text
-            val verseTextBoxId = requestBuilder.getPlaceHolderId(slideId)
-            requestBuilder.resizeToFullPage(verseTextBoxId)
-            requestBuilder.insertText(verseTextBoxId, verse.text, slideConfig)
+            // section text
+            val sectionTextBoxId = requestBuilder.getPlaceHolderId(slideId)
+            requestBuilder.resizeToFullPage(sectionTextBoxId)
+            requestBuilder.insertText(sectionTextBoxId, section.text, slideConfig)
 
             // footer
             val footerTitleBoxId = requestBuilder.createTextBox(slideId, DefaultSlideConfig.SLIDE_W, DefaultSlideConfig.FOOTER_TITLE_SIZE * 2,

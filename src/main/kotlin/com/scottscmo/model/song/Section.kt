@@ -1,7 +1,7 @@
 package com.scottscmo.model.song
 
-class Verse() {
-    lateinit var verse: String
+class Section() {
+    lateinit var name: String
     lateinit var text: Map<String, String>
 
     fun textLines(): Map<String, List<String>> {

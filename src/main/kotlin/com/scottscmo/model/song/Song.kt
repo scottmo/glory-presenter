@@ -2,12 +2,12 @@ package com.scottscmo.model.song
 
 class Song() {
     lateinit var title: String
-    lateinit var collection: String
-    lateinit var lyrics: List<Verse>
-    lateinit var verseOrder: List<String>
+    lateinit var tags: String
+    lateinit var sections: List<Section>
+    lateinit var order: List<String>
 
-    fun getVerseText(verseNum: String): Map<String, List<String>>? {
-        val verse = this.lyrics.firstOrNull { it.verse == verseNum }
+    fun getSectionText(name: String): Map<String, List<String>>? {
+        val verse = this.sections.firstOrNull { it.name == name }
         return verse?.textLines()
     }
 }
