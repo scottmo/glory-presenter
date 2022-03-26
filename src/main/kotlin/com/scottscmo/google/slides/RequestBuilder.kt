@@ -8,6 +8,12 @@ import com.scottscmo.TextConfig
 import com.scottscmo.util.StringUtils
 
 class RequestBuilder {
+    companion object {
+        const val ID_SHAPE_PREFIX = "o"
+        const val ID_SLIDE_PREFIX = "s"
+        const val ID_PLACEHOLDER_PREFIX = "p"
+    }
+
     private val requests = mutableListOf<Request>()
 
     fun build(): List<Request> {
@@ -77,7 +83,7 @@ class RequestBuilder {
 
     fun createTextBox(pageElementId: String,
             w: Double, h: Double, tx: Double, ty: Double): String {
-        val textBoxId = Util.generateObjectId(DefaultSlideConfig.ID_SHAPE_PREFIX)
+        val textBoxId = Util.generateObjectId(ID_SHAPE_PREFIX)
         return createTextBox(textBoxId, pageElementId, w, h, tx, ty)
     }
 
@@ -303,7 +309,7 @@ class RequestBuilder {
     }
 
     fun createSlide(slideIndex: Int): String {
-        val slideId = Util.generateObjectId(DefaultSlideConfig.ID_SLIDE_PREFIX)
+        val slideId = Util.generateObjectId(ID_SLIDE_PREFIX)
         return this.createSlide(slideIndex, slideId)
     }
 
@@ -327,7 +333,7 @@ class RequestBuilder {
     }
 
     fun getPlaceHolderId(slideId: String): String {
-        return DefaultSlideConfig.ID_PLACEHOLDER_PREFIX + "-" + slideId
+        return ID_PLACEHOLDER_PREFIX + "-" + slideId
     }
 
     /**
