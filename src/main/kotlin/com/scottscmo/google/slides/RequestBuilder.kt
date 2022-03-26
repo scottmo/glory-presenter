@@ -1,6 +1,7 @@
 package com.scottscmo.google.slides
 
 import com.google.api.services.slides.v1.model.*
+import com.scottscmo.Config
 import com.scottscmo.ParagraphConfig
 import com.scottscmo.SlideConfig
 import com.scottscmo.TextConfig
@@ -355,9 +356,10 @@ class RequestBuilder {
     }
 
     /**
-     * use to match slide configuration. hard-coding en, zh for now.
+     * use to match slide configuration. convenient method for CJK languages.
      */
     private fun getTextConfigName(segment: StringUtils.StringSegment): String {
-        return if (segment.isAscii) "en" else "zh"
+        val slideConfig = Config.get().googleSlideConfig
+        return if (segment.isAscii) slideConfig.defaultAsciiTextConfig else slideConfig.defaultNonAsciiTextConfig
     }
 }
