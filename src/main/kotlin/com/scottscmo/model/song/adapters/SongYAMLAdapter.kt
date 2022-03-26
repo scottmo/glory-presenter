@@ -21,8 +21,8 @@ object SongYAMLAdapter {
         return mapper.readValue(serializedSong, Song::class.java)
     }
 
-    fun serialize(song: Song, sectionTypes: List<String>, maxLines: Int): String {
-        val redistributedSections = serializeToMap(song, sectionTypes, maxLines)
+    fun serialize(song: Song, textGroups: List<String>, maxLines: Int): String {
+        val redistributedSections = serializeToMap(song, textGroups, maxLines)
         val numSections = redistributedSections.values.toList()[0].size
 
         // turn each row of the map into a section
@@ -31,9 +31,9 @@ object SongYAMLAdapter {
         for (i in 0 until numSections) {
             val sectionName = "s$i"
             val sectionText = mutableMapOf<String, String>()
-            for (type in sectionTypes) {
-                redistributedSections[type]?.let { redistributedSectionText ->
-                    sectionText[type] = redistributedSectionText[i]
+            for (group in textGroups) {
+                redistributedSections[group]?.let { redistributedSectionText ->
+                    sectionText[group] = redistributedSectionText[i]
                 }
             }
             newOrder.add(sectionName)
@@ -81,8 +81,8 @@ object SongYAMLAdapter {
         return Files.readString(songPath, StandardCharsets.UTF_8)
     }
 
-    private fun serializeToMap(song: Song, sectionTypes: List<String>, maxLines: Int): Map<String, List<String>> {
-        if (sectionTypes.isEmpty()) {
+    private fun serializeToMap(song: Song, textGroups: List<String>, maxLines: Int): Map<String, List<String>> {
+        if (textGroups.isEmpty()) {
             return emptyMap()
         }
         val data: MutableMap<String, MutableList<String>> = mutableMapOf()
@@ -95,10 +95,10 @@ object SongYAMLAdapter {
             val numSectionLines = sectionText.values.toList()[0].size
             var numSlidePerThisSection = 0
             while (numSlidePerThisSection * maxLines < numSectionLines) {
-                for (type in sectionTypes) {
-                    val lines = data[type] ?: mutableListOf()
+                for (group in textGroups) {
+                    val lines = data[group] ?: mutableListOf()
                     var line = ""
-                    sectionText[type]?.let { sectionLines ->
+                    sectionText[group]?.let { sectionLines ->
                         for (i in 0 until maxLines) {
                             val currLineInSection = numSlidePerThisSection * maxLines + i
                             if (currLineInSection < sectionLines.size) {
@@ -106,7 +106,7 @@ object SongYAMLAdapter {
                             }
                         }
                         lines.add(line.trim())
-                        data[type] = lines
+                        data[group] = lines
                     }
                 }
                 numSlidePerThisSection++
