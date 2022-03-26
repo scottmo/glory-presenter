@@ -126,15 +126,15 @@ class SlidesApiClient {
 
         // lyrics
         song.order.forEach { sectionName ->
-            val sectionText = song.getSectionText(sectionName)
-            requireNotNull(sectionText) { "Unable to find section $sectionName" }
+            val section = song.getSection(sectionName)
+            requireNotNull(section) { "Unable to find section $sectionName" }
 
             val slideId = requestBuilder.createSlide(slideIndex++)
 
             // section text
             val sectionTextBoxId = requestBuilder.getPlaceHolderId(slideId)
             requestBuilder.resizeToFullPage(sectionTextBoxId)
-            requestBuilder.insertText(sectionTextBoxId, sectionText, slideConfig)
+            requestBuilder.insertText(sectionTextBoxId, section.text, slideConfig)
 
             // footer
             val footerTitleBoxId = requestBuilder.createTextBox(slideId, DefaultSlideConfig.SLIDE_W, DefaultSlideConfig.FOOTER_TITLE_SIZE * 2,

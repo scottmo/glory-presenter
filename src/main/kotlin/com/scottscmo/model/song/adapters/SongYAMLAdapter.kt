@@ -87,9 +87,10 @@ object SongYAMLAdapter {
         }
         val data: MutableMap<String, MutableList<String>> = mutableMapOf()
         for (sectionName in song.order) {
-            val sectionText = song.getSectionTextLines(sectionName)
+            val section = song.getSection(sectionName)
+            requireNotNull(section) { "Unable to find section $sectionName" }
 
-            require(!sectionText.isNullOrEmpty())
+            val sectionText = section.textLines()
 
             // assuming all langs have same # of section lines
             val numSectionLines = sectionText.values.toList()[0].size
