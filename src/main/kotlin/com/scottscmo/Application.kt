@@ -42,8 +42,6 @@ class Application() : JFrame() {
         fun main(args: Array<String>) {
             FlatCarbonIJTheme.setup()
             SwingUtilities.invokeLater {
-                Application().apply { isVisible = true }
-
                 val defaultHandler = Thread.getDefaultUncaughtExceptionHandler()
                 Thread.setDefaultUncaughtExceptionHandler { thread, throwable ->
                     defaultHandler?.uncaughtException(thread, throwable)
@@ -51,6 +49,8 @@ class Application() : JFrame() {
                     OutputDisplay.error(throwable.message + "\n"
                         + throwable.stackTrace.copyOfRange(0, 10).joinToString("\n"))
                 }
+
+                Application().apply { isVisible = true }
             }
         }
     }
