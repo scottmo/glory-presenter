@@ -87,7 +87,7 @@ object SongYAMLAdapter {
         }
         val data: MutableMap<String, MutableList<String>> = mutableMapOf()
         for (sectionName in song.order) {
-            val sectionText = song.getSectionText(sectionName)
+            val sectionText = song.getSectionTextLines(sectionName)
 
             require(!sectionText.isNullOrEmpty())
 
