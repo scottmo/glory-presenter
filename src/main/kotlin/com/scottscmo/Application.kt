@@ -6,7 +6,6 @@ import com.scottscmo.ui.OutputDisplay
 import com.scottscmo.ui.components.DataPathPicker
 import com.scottscmo.ui.panels.*
 import net.miginfocom.swing.MigLayout
-import java.lang.Exception
 import javax.swing.JFrame
 import javax.swing.JTabbedPane
 import javax.swing.SwingUtilities
@@ -21,11 +20,7 @@ class Application() : JFrame() {
         OutputDisplay.host = this
         FilePicker.host = this
 
-        try {
-            Config.load()
-        } catch (e: Exception) {
-            OutputDisplay.error(e)
-        }
+        Config.load()
 
         contentPane.apply {
             layout = MigLayout("ins 0, wrap")
@@ -42,13 +37,20 @@ class Application() : JFrame() {
         pack() // auto-resize to component, use setSize if need fixed size
     }
 
-    // cannot put this outside of class, otherwise java -jar cannot find main
     companion object {
         @JvmStatic
         fun main(args: Array<String>) {
             FlatCarbonIJTheme.setup()
             SwingUtilities.invokeLater {
                 Application().apply { isVisible = true }
+
+                val defaultHandler = Thread.getDefaultUncaughtExceptionHandler()
+                Thread.setDefaultUncaughtExceptionHandler { thread, throwable ->
+                    defaultHandler?.uncaughtException(thread, throwable)
+                    // show uncaught error to user
+                    OutputDisplay.error(throwable.message + "\n"
+                        + throwable.stackTrace.copyOfRange(0, 10).joinToString("\n"))
+                }
             }
         }
     }

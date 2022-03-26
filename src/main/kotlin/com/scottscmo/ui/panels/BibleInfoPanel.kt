@@ -20,8 +20,7 @@ class BibleInfoPanel : JPanel() {
         layout = MigLayout("", "left", "top")
 
         val availableVersions = BibleModel.get().getAvailableVersions().joinToString(", ")
-        add(JLabel("Available versions: $availableVersions"),
-            "wrap")
+        add(JLabel("Available versions: $availableVersions"), "wrap")
 
         val bookIds = BibleMetadata.getBookIdsInOrder().joinToString(", ")
         add(JLabel("Book IDs:"), "wrap")

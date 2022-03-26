@@ -2,10 +2,8 @@ package com.scottscmo.ui.panels
 
 import com.scottscmo.Config
 import com.scottscmo.model.song.adapters.SongYAMLAdapter
-import com.scottscmo.ui.OutputDisplay
 import com.scottscmo.ui.components.FileEditor
 import net.miginfocom.swing.MigLayout
-import java.awt.Dimension
 import java.nio.file.Files
 import java.nio.file.Path
 import javax.swing.*
@@ -57,7 +55,7 @@ class SongFormatterPanel : JPanel() {
         private fun handleTransformSong(serializedSong: String, maxLines: Int, outputTextArea: JTextArea) {
             SongYAMLAdapter.deserialize(serializedSong)?.let { song ->
                 outputTextArea.apply {
-                    text = SongYAMLAdapter.serialize(song, listOf("zh", "en"), maxLines)
+                    text = SongYAMLAdapter.serialize(song, Config.get().googleSlideConfig.textConfigsOrder, maxLines)
                     caretPosition = 0 // scroll to top
                 }
             }
@@ -65,12 +63,10 @@ class SongFormatterPanel : JPanel() {
 
         private fun handleSaveAsTxt(serializedSong: String) {
             val song = SongYAMLAdapter.deserialize(serializedSong)
-            if (song != null) {
-                val filePath = Config.getRelativePath("${Config.SONG_SLIDES_DIR}/${song.title}.yaml")
-                Files.writeString(Path.of(filePath), serializedSong)
-            } else {
-                OutputDisplay.error("Unable to convert song!")
-            }
+            requireNotNull(song) { "Unable to convert song!" }
+
+            val filePath = Config.getRelativePath("${Config.SONG_SLIDES_DIR}/${song.title}.yaml")
+            Files.writeString(Path.of(filePath), serializedSong)
         }
     }
 }
