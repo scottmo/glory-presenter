@@ -19,7 +19,7 @@ internal class BibleVerseTable {
         }
     }
 
-    fun getTableName(version: String): String {
+    private fun getTableName(version: String): String {
         return "bible_$version"
     }
 

@@ -28,9 +28,7 @@ class BibleModel {
             insertedVerseCount = bibleVerseTable.insert(version, bible)
             println("Inserted $insertedVerseCount bible verses.")
         } catch (e: SQLException) {
-            System.err.println("Failed to insert bible verses!")
-            e.printStackTrace()
-            return 0
+            throw Error("Failed to insert bible verses!\n${e.stackTrace}")
         }
         bookNames = null
         return insertedVerseCount

@@ -3,7 +3,9 @@ package com.scottscmo.model.bible
 import java.sql.SQLException
 
 internal class BookNamesTable {
-    private val DB_NAME = "book_names"
+    companion object {
+        private const val DB_NAME = "book_names"
+    }
 
     @Throws(SQLException::class)
     private fun createTable() {
