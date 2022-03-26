@@ -15,11 +15,12 @@ import javax.swing.JPanel
 import javax.swing.JScrollPane
 import javax.swing.JTextArea
 
-class FileEditor(initDir: String, filePickerLabel: String, initContent: String = "") {
+class FileEditor(initDir: String, filePickerLabel: String, initContent: String = "",
+        editorHeight: Int = 25, editorWidth: Int = 30) {
     val ui = JPanel()
 
     private val filePicker = JButton(filePickerLabel)
-    private val textArea = JTextArea(initContent)
+    private val textArea = JTextArea(initContent, editorHeight, editorWidth)
     private val saveButton = JButton("Save")
     private val reloadButton = JButton("Reload")
 
@@ -28,8 +29,8 @@ class FileEditor(initDir: String, filePickerLabel: String, initContent: String =
     init {
         ui.apply {
             layout = MigLayout("ins 0")
-            add(filePicker, "wrap, span, growx")
             add(JScrollPane(textArea.apply { columns = 30 }), "wrap, span, grow")
+            add(filePicker, "wrap, span, growx")
             add(reloadButton)
             add(saveButton)
         }

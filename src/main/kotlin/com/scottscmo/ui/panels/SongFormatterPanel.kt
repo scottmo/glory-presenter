@@ -10,34 +10,31 @@ import java.nio.file.Files
 import java.nio.file.Path
 import javax.swing.*
 
-// using this to expand the textarea to max height for visual purpose
-private val EMPTY_TEXT_PLACEHOLDER = "\n".repeat(30)
-
 class SongFormatterPanel : JPanel() {
-    private val songEditor = FileEditor(Config.SONG_YAML_DIR, "Select Song", EMPTY_TEXT_PLACEHOLDER)
+    private val songEditor = FileEditor(Config.SONG_YAML_DIR, "Select Song")
 
     private val maxLinesSpinnerInput = JSpinner(SpinnerNumberModel(1, 1, 10, 1))
     private val transformButton = JButton("Transform")
     private val saveAsTXTButton = JButton("Save as Slide-Format Song")
-    private val outputTextArea = JTextArea(EMPTY_TEXT_PLACEHOLDER)
+    private val outputTextArea = JTextArea(25, 30)
 
-    private val songSlideEditor = FileEditor(Config.SONG_SLIDES_DIR, "Select Stored Slide-Format Song", EMPTY_TEXT_PLACEHOLDER)
+    private val songSlideEditor = FileEditor(Config.SONG_SLIDES_DIR, "Select Stored Slide-Format Song")
 
     init {
-        preferredSize = Dimension(640, 480)
         layout = MigLayout("wrap 3", "sg main, grow, left", "top")
 
         // yaml song picker
         add(songEditor.ui)
         // yaml to slide text/csv transformer
         add(JPanel().apply {
-            layout = MigLayout("ins 0")
+            layout = MigLayout("wrap, ins 0")
+            add(JScrollPane(outputTextArea), "span, grow")
             add(JPanel().apply {
-                add(JLabel("Lines Per Slide Per Language"))
-                add(maxLinesSpinnerInput)
+                layout = MigLayout("ins 0")
                 add(transformButton)
-            }, "wrap, span")
-            add(JScrollPane(outputTextArea.apply { columns = 30 }), "wrap, span, grow")
+                add(maxLinesSpinnerInput)
+                add(JLabel("Lines Per Slide Per Language"))
+            }, "span")
             add(saveAsTXTButton)
         })
         // slide text
