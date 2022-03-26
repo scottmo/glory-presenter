@@ -29,15 +29,6 @@ class PPTXGeneratorsPanel : JPanel() {
             "Slides have been successfully generated!"
         }.ui, "wrap")
 
-        add(Form("Song Slides Generator", mapOf(
-            dataPathKey to FormInput("Input YAML", "file", Config.getRelativePath(Config.SONG_SLIDES_DIR)),
-            templatePathKey to FormInput("Template File", "file", Config.getRelativePath("template-song.pptx")),
-            outputDirKey to outputDirDefault
-        )) {
-            PPTXGenerators.generate(it[dataPathKey], it[templatePathKey], it[outputDirKey])
-            "Slides have been successfully generated!"
-        }.ui)
-
         val versesKey = "verses"
         val versionsKey = "versions"
         add(Form("Bible Slides Generator", mapOf(

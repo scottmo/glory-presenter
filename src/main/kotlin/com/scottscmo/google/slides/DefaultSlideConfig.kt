@@ -9,8 +9,6 @@ object DefaultSlideConfig {
     const val SLIDE_W = 720.0
     const val SLIDE_BASE = 236.25
 
-    const val SLIDE_DELIMITER = "\n\n---\n\n"
-
     const val FOOTER_TITLE_SIZE = 12.0
     const val FOOTER_TITLE_Y = 380.0
 }

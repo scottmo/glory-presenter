@@ -14,7 +14,9 @@ class SongFormatterPanel : JPanel() {
     private val maxLinesSpinnerInput = JSpinner(SpinnerNumberModel(1, 1, 10, 1))
     private val transformButton = JButton("Transform")
     private val saveAsTXTButton = JButton("Save as Slide-Format Song")
-    private val outputTextArea = JTextArea(25, 30)
+    private val outputTextArea = JTextArea(25, 45).apply {
+        font = Config.textAreaFont
+    }
 
     private val songSlideEditor = FileEditor(Config.SONG_SLIDES_DIR, "Select Stored Slide-Format Song")
 
@@ -26,13 +28,13 @@ class SongFormatterPanel : JPanel() {
         // yaml to slide text/csv transformer
         add(JPanel().apply {
             layout = MigLayout("wrap, ins 0")
-            add(JScrollPane(outputTextArea), "span, grow")
             add(JPanel().apply {
                 layout = MigLayout("ins 0")
                 add(transformButton)
                 add(maxLinesSpinnerInput)
-                add(JLabel("Lines Per Slide Per Language"))
+                add(JLabel("Lines/Section/Text Group"))
             }, "span")
+            add(JScrollPane(outputTextArea), "span, grow")
             add(saveAsTXTButton)
         })
         // slide text
@@ -40,8 +42,10 @@ class SongFormatterPanel : JPanel() {
 
         transformButton.addActionListener {
             handleTransformSong(songEditor.content, getMaxLines(), outputTextArea)
+            saveAsTXTButton.isEnabled = true
         }
 
+        saveAsTXTButton.isEnabled = false
         saveAsTXTButton.addActionListener {
             handleSaveAsTxt(outputTextArea.text)
         }

@@ -25,7 +25,7 @@ class BibleInfoPanel : JPanel() {
         val bookIds = BibleMetadata.getBookIdsInOrder().joinToString(", ")
         add(JLabel("Book IDs:"), "wrap")
         add(JTextArea(bookIds).apply {
-            columns = 100
+            columns = 85
             isEditable = false
             lineWrap = true
             wrapStyleWord = true

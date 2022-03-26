@@ -4,6 +4,7 @@ import com.scottscmo.Config
 import com.scottscmo.ui.FilePicker
 import com.scottscmo.ui.OutputDisplay
 import net.miginfocom.swing.MigLayout
+import java.awt.Font
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import java.io.IOException
@@ -15,12 +16,21 @@ import javax.swing.JPanel
 import javax.swing.JScrollPane
 import javax.swing.JTextArea
 
-class FileEditor(initDir: String, filePickerLabel: String, initContent: String = "",
-        editorHeight: Int = 25, editorWidth: Int = 30) {
+private const val DEFAULT_HEIGHT = 25
+private const val DEFAULT_WIDTH = 45
+
+fun FileEditor(pathString: String, filePickerLabel: String = pathString,
+        editorHeight: Int = DEFAULT_HEIGHT, editorWidth: Int = DEFAULT_WIDTH) =
+    FileEditor(Path.of(Config.getRelativePath(pathString)), filePickerLabel, editorHeight, editorWidth)
+
+class FileEditor(path: Path, filePickerLabel: String = path.toString(),
+        editorHeight: Int = DEFAULT_HEIGHT, editorWidth: Int = DEFAULT_WIDTH) {
     val ui = JPanel()
 
     private val filePicker = JButton(filePickerLabel)
-    private val textArea = JTextArea(initContent, editorHeight, editorWidth)
+    private val textArea = JTextArea(editorHeight, editorWidth).apply {
+        font = Config.textAreaFont
+    }
     private val saveButton = JButton("Save")
     private val reloadButton = JButton("Reload")
 
@@ -29,20 +39,33 @@ class FileEditor(initDir: String, filePickerLabel: String, initContent: String =
     init {
         ui.apply {
             layout = MigLayout("ins 0")
-            add(JScrollPane(textArea.apply { columns = 30 }), "wrap, span, grow")
             add(filePicker, "wrap, span, growx")
+            add(JScrollPane(textArea), "wrap, span, grow")
             add(reloadButton)
             add(saveButton)
         }
 
-        filePicker.addMouseListener(object : MouseAdapter() {
-            override fun mouseReleased(me: MouseEvent) {
-                FilePicker.show("file", Config.getRelativePath(initDir)) { selectedPath ->
-                    filePath = selectedPath
-                    loadFileToTextArea(filePath, textArea)
+        val isFilePickerEnabled = Files.isDirectory(path)
+        if (isFilePickerEnabled) {
+            filePicker.addMouseListener(object : MouseAdapter() {
+                override fun mouseReleased(me: MouseEvent) {
+                    FilePicker.show("file", path.toString()) { selectedPath ->
+                        filePath = selectedPath
+                        loadFileToTextArea(filePath, textArea)
+                        toggleReadWriteButtons(true)
+                    }
                 }
+            })
+        } else {
+            filePath = path.toString()
+            filePicker.text = "Load $filePath"
+            filePicker.addActionListener {
+                filePicker.isEnabled = false
+                filePicker.text = filePath
+                loadFileToTextArea(filePath, textArea)
+                toggleReadWriteButtons(true)
             }
-        })
+        }
 
         saveButton.addActionListener {
             Files.writeString(Path.of(filePath), textArea.text)
@@ -51,6 +74,8 @@ class FileEditor(initDir: String, filePickerLabel: String, initContent: String =
         reloadButton.addActionListener {
             loadFileToTextArea(filePath, textArea)
         }
+
+        toggleReadWriteButtons(false)
     }
 
     val content: String
@@ -58,6 +83,11 @@ class FileEditor(initDir: String, filePickerLabel: String, initContent: String =
 
     val path: String
         get() = filePath
+
+    fun toggleReadWriteButtons(isEnabled: Boolean) {
+        saveButton.isEnabled = isEnabled
+        reloadButton.isEnabled = isEnabled
+    }
 
     companion object {
         private fun loadFileToTextArea(path: String, textArea: JTextArea) {
@@ -68,7 +98,7 @@ class FileEditor(initDir: String, filePickerLabel: String, initContent: String =
                     caretPosition = 0 // scroll to top
                 }
             } catch (e: IOException) {
-                OutputDisplay.error("Error getting content for song $path")
+                OutputDisplay.error("Unable to load $path")
             }
         }
     }

@@ -2,6 +2,7 @@ package com.scottscmo
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
+import java.awt.Font
 import java.nio.file.Files
 import java.nio.file.Path
 
@@ -14,7 +15,9 @@ object Config {
     const val GOOGLE_API_DIR = "google_api"
     const val GOOGLE_API_CREDENTIALS_PATH = "${GOOGLE_API_DIR}/client.info"
 
-    private const val CONFIG_PATH = "./config.yaml"
+    const val CONFIG_PATH = "./config.yaml"
+
+    val textAreaFont = Font(Font.MONOSPACED, Font.PLAIN, 12)
 
     private lateinit var config: AppConfig
 
