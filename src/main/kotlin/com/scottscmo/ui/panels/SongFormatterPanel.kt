@@ -1,7 +1,6 @@
 package com.scottscmo.ui.panels
 
 import com.scottscmo.Config
-import com.scottscmo.model.song.converters.HTMLConverter
 import com.scottscmo.model.song.converters.MDConverter
 import com.scottscmo.model.song.converters.YAMLConverter
 import com.scottscmo.ui.components.FileEditor
@@ -16,7 +15,6 @@ class SongFormatterPanel : JPanel() {
     private val maxLinesSpinnerInput = JSpinner(SpinnerNumberModel(1, 1, 10, 1))
     private val transformButton = JButton("Transform")
     private val saveTransformedButton = JButton("Save as Slide-Format Song")
-    private val saveAsHTMLButton = JButton("Save as HTML")
     private val saveAsMDButton = JButton("Save as MD")
     private val outputTextArea = JTextArea(25, 45).apply {
         font = Config.textAreaFont
@@ -40,7 +38,6 @@ class SongFormatterPanel : JPanel() {
             }, "span")
             add(JScrollPane(outputTextArea), "span, grow")
             add(saveTransformedButton)
-            add(saveAsHTMLButton)
             add(saveAsMDButton)
         })
         // slide text
@@ -52,10 +49,6 @@ class SongFormatterPanel : JPanel() {
 
         saveTransformedButton.addActionListener {
             handleSaveTransformed(outputTextArea.text)
-        }
-
-        saveAsHTMLButton.addActionListener {
-            handleSaveAsHTML(outputTextArea.text, getMaxLines())
         }
 
         saveAsMDButton.addActionListener {
@@ -83,15 +76,6 @@ class SongFormatterPanel : JPanel() {
 
             val filePath = Config.getRelativePath("${Config.SONG_SLIDES_DIR}/${song.title}.yaml")
             Files.writeString(Path.of(filePath), serializedSong)
-        }
-
-        private fun handleSaveAsHTML(serializedSong: String, maxLines: Int) {
-            val song = YAMLConverter.parse(serializedSong)
-            requireNotNull(song) { "Unable to convert song!" }
-
-            val filePath = Config.getOutputDir("${song.title}.html")
-            val content = HTMLConverter.stringify(song, Config.get().googleSlideConfig.textConfigsOrder, maxLines)
-            Files.writeString(Path.of(filePath), content)
         }
 
         private fun handleSaveAsMD(serializedSong: String, maxLines: Int) {
