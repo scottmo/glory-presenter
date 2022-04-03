@@ -2,6 +2,7 @@ package com.scottscmo.ui.panels
 
 import com.scottscmo.Config
 import com.scottscmo.model.song.converters.HTMLConverter
+import com.scottscmo.model.song.converters.MDConverter
 import com.scottscmo.model.song.converters.YAMLConverter
 import com.scottscmo.ui.components.FileEditor
 import net.miginfocom.swing.MigLayout
@@ -16,6 +17,7 @@ class SongFormatterPanel : JPanel() {
     private val transformButton = JButton("Transform")
     private val saveTransformedButton = JButton("Save as Slide-Format Song")
     private val saveAsHTMLButton = JButton("Save as HTML")
+    private val saveAsMDButton = JButton("Save as MD")
     private val outputTextArea = JTextArea(25, 45).apply {
         font = Config.textAreaFont
     }
@@ -39,24 +41,25 @@ class SongFormatterPanel : JPanel() {
             add(JScrollPane(outputTextArea), "span, grow")
             add(saveTransformedButton)
             add(saveAsHTMLButton)
+            add(saveAsMDButton)
         })
         // slide text
         add(songSlideEditor.ui)
 
         transformButton.addActionListener {
             handleTransformSong(songEditor.content, getMaxLines(), outputTextArea)
-            saveTransformedButton.isEnabled = true
-            saveAsHTMLButton.isEnabled = true
         }
 
-        saveTransformedButton.isEnabled = false
         saveTransformedButton.addActionListener {
-            handleSaveAsTxt(outputTextArea.text)
+            handleSaveTransformed(outputTextArea.text)
         }
 
-        saveAsHTMLButton.isEnabled = false
         saveAsHTMLButton.addActionListener {
             handleSaveAsHTML(outputTextArea.text, getMaxLines())
+        }
+
+        saveAsMDButton.addActionListener {
+            handleSaveAsMD(outputTextArea.text, getMaxLines())
         }
     }
 
@@ -74,7 +77,7 @@ class SongFormatterPanel : JPanel() {
             }
         }
 
-        private fun handleSaveAsTxt(serializedSong: String) {
+        private fun handleSaveTransformed(serializedSong: String) {
             val song = YAMLConverter.parse(serializedSong)
             requireNotNull(song) { "Unable to convert song!" }
 
@@ -88,6 +91,15 @@ class SongFormatterPanel : JPanel() {
 
             val filePath = Config.getOutputDir("${song.title}.html")
             val content = HTMLConverter.stringify(song, Config.get().googleSlideConfig.textConfigsOrder, maxLines)
+            Files.writeString(Path.of(filePath), content)
+        }
+
+        private fun handleSaveAsMD(serializedSong: String, maxLines: Int) {
+            val song = YAMLConverter.parse(serializedSong)
+            requireNotNull(song) { "Unable to convert song!" }
+
+            val filePath = Config.getOutputDir("${song.title}.md")
+            val content = MDConverter.stringify(song, Config.get().googleSlideConfig.textConfigsOrder, maxLines)
             Files.writeString(Path.of(filePath), content)
         }
     }
