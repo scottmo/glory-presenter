@@ -9,13 +9,13 @@ import java.nio.file.Path
 object Config {
     const val SONG_YAML_DIR = "songs"
     const val SONG_SLIDES_DIR = "songs_slide"
-    const val SONG_TEXT_DIR = "songs_txt"
-    const val SONG_CSV_DIR = "songs_csv"
 
     const val GOOGLE_API_DIR = "google_api"
     const val GOOGLE_API_CREDENTIALS_PATH = "${GOOGLE_API_DIR}/client.info"
 
     const val CONFIG_PATH = "./config.yaml"
+
+    private const val OUTPUT_DIR = "../output" // same level as data
 
     val textAreaFont = Font(Font.MONOSPACED, Font.PLAIN, 12)
 
@@ -31,6 +31,10 @@ object Config {
 
     fun getRelativePath(fileName: String): String {
         return Path.of(config.dataDir, fileName).toFile().canonicalPath
+    }
+
+    fun getOutputDir(fileName: String): String {
+        return getRelativePath(Path.of(OUTPUT_DIR, fileName).toString())
     }
 }
 
