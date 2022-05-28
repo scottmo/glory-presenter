@@ -61,10 +61,16 @@ class SongFormatterPanel : JPanel() {
     }
 
     companion object {
+        private val SINGLE_LINE_VERSE = Regex("(\\s{4})(\\w+):\\s([^|][^-].+)")
+        private val MULTI_LINE_VERSE_REPL = "$1$2: |-\n$1  $3"
+
         private fun handleTransformSong(serializedSong: String, maxLines: Int, outputTextArea: JTextArea) {
             YAMLConverter.parse(serializedSong)?.let { song ->
+                var transformedText = YAMLConverter.stringify(song, Config.get().googleSlideConfig.textConfigsOrder, maxLines)
+                transformedText = transformedText.replace(SINGLE_LINE_VERSE, MULTI_LINE_VERSE_REPL)
+
                 outputTextArea.apply {
-                    text = YAMLConverter.stringify(song, Config.get().googleSlideConfig.textConfigsOrder, maxLines)
+                    text = transformedText
                     caretPosition = 0 // scroll to top
                 }
             }
