@@ -1,6 +1,6 @@
 package com.scottscmo
 
-import com.formdev.flatlaf.intellijthemes.FlatCarbonIJTheme
+import com.formdev.flatlaf.FlatLightLaf
 import com.scottscmo.ui.FilePicker
 import com.scottscmo.ui.OutputDisplay
 import com.scottscmo.ui.components.DataPathPicker
@@ -20,8 +20,6 @@ class Application() : JFrame() {
         OutputDisplay.host = this
         FilePicker.host = this
 
-        Config.load()
-
         contentPane.apply {
             layout = MigLayout("ins 0, wrap")
             add(DataPathPicker().ui)
@@ -40,7 +38,8 @@ class Application() : JFrame() {
     companion object {
         @JvmStatic
         fun main(args: Array<String>) {
-            FlatCarbonIJTheme.setup()
+            Config.load()
+            FlatLightLaf.setup()
             SwingUtilities.invokeLater {
                 val defaultHandler = Thread.getDefaultUncaughtExceptionHandler()
                 Thread.setDefaultUncaughtExceptionHandler { thread, throwable ->

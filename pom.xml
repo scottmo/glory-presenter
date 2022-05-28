@@ -28,11 +28,6 @@
 			<version>1.6.5</version>
 		</dependency>
 		<dependency>
-			<groupId>com.formdev</groupId>
-			<artifactId>flatlaf-intellij-themes</artifactId>
-			<version>1.6.5</version>
-		</dependency>
-		<dependency>
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi</artifactId>
 			<version>5.0.0</version>
