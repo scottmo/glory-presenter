@@ -1,7 +1,7 @@
 package com.scottscmo.ui.panels
 
 import com.scottscmo.Config
-import com.scottscmo.model.song.converters.MDConverter
+import com.scottscmo.model.song.converters.KVMDConverter
 import com.scottscmo.model.song.converters.YAMLConverter
 import com.scottscmo.ui.components.FileEditor
 import net.miginfocom.swing.MigLayout
@@ -89,7 +89,7 @@ class SongFormatterPanel : JPanel() {
             requireNotNull(song) { "Unable to convert song!" }
 
             val filePath = Config.getOutputDir("${song.title}.md")
-            val content = MDConverter.stringify(song, Config.get().googleSlideConfig.textConfigsOrder, maxLines)
+            val content = KVMDConverter.stringify(song, Config.get().googleSlideConfig.textConfigsOrder, maxLines)
             Files.writeString(Path.of(filePath), content)
         }
     }

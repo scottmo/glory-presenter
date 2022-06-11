@@ -2,8 +2,12 @@ package com.scottscmo.model.song.converters
 
 import com.scottscmo.model.song.Song
 
-object MDConverter {
+object KVMDConverter {
     private const val SECTION_DELIMITER = "\n---\n"
+
+    fun parse(): Song? {
+        return null
+    }
 
     fun stringify(song: Song, textGroups: List<String>, maxLines: Int): String {
         val title = "## ${song.title}"
