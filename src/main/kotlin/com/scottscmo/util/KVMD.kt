@@ -63,7 +63,7 @@ object KVMD {
 
     private fun parseMetadataValue(value: String): Any {
         if (value.startsWith("[") && value.endsWith("]")) { // array
-            return value.substring(1, value.length - 1).split(",")
+            return value.substring(1, value.length - 1).split(",").map { it.trim() }
         }
         return value // string
     }
@@ -115,7 +115,7 @@ object KVMD {
 
     private fun stringifyMetadataValue(value: Any): String {
         if (value is List<*>) {
-            return "[" + value.joinToString(",") + "]"
+            return "[" + value.joinToString(", ") + "]"
         }
         return value.toString()
     }
