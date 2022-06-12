@@ -1,8 +1,8 @@
 .DS_Store
 target
-*.yaml
 *.pptx
 *.db
+*.md
 
 .settings/
 build/

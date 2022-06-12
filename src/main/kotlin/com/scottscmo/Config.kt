@@ -1,19 +1,18 @@
 package com.scottscmo
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
 import java.awt.Font
 import java.nio.file.Files
 import java.nio.file.Path
 
 object Config {
-    const val SONG_YAML_DIR = "songs"
+    const val SONG_DIR = "songs"
     const val SONG_SLIDES_DIR = "songs_slide"
 
     const val GOOGLE_API_DIR = "google_api"
     const val GOOGLE_API_CREDENTIALS_PATH = "${GOOGLE_API_DIR}/client.info"
 
-    const val CONFIG_PATH = "./config.yaml"
+    const val CONFIG_PATH = "./config.json"
 
     private const val OUTPUT_DIR = "../output" // same level as data
 
@@ -25,7 +24,7 @@ object Config {
 
     fun load() {
         config = Files.newBufferedReader(Path.of(CONFIG_PATH)).use {
-            ObjectMapper(YAMLFactory()).readValue(it, AppConfig::class.java)
+            ObjectMapper().readValue(it, AppConfig::class.java)
         }
     }
 

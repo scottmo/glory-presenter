@@ -31,7 +31,7 @@ class SettingsPanel : JPanel() {
             "credentialsFilePath" to FormInput("Credentials json", "file",
                 Config.getRelativePath("${Config.GOOGLE_API_DIR}/credentials.json")),
         )) {
-            require(Config.get().clientInfoKey.isNotEmpty()) { "clientInfoKey is missing from config.yaml!" }
+            require(Config.get().clientInfoKey.isNotEmpty()) { "clientInfoKey is missing from config.json!" }
 
             Cryptor.encryptFile(it["credentialsFilePath"],
                 Config.getRelativePath(Config.GOOGLE_API_CREDENTIALS_PATH),

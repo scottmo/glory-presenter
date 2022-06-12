@@ -21,7 +21,7 @@ class PPTXGeneratorsPanel : JPanel() {
         val outputDirDefault = FormInput("Output Folder", "directory", Config.getRelativePath("../output"))
 
         add(Form("PPTX Generator", mapOf(
-            dataPathKey to FormInput("Input YAML", "file", Config.getRelativePath(".")),
+            dataPathKey to FormInput("Input File", "file", Config.getRelativePath(".")),
             templatePathKey to FormInput("Template File", "file", Config.getRelativePath(".")),
             outputDirKey to outputDirDefault
         )) {

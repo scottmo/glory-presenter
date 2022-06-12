@@ -35,7 +35,7 @@ class AuthClient {
      */
     @Throws(IOException::class)
     fun getCredentials(HTTP_TRANSPORT: NetHttpTransport): Credential {
-        require(Config.get().clientInfoKey.isNotEmpty()) { "clientInfoKey is missing from config.yaml!" }
+        require(Config.get().clientInfoKey.isNotEmpty()) { "clientInfoKey is missing from config.json!" }
 
         // Load client secrets.
         val credentials = Cryptor.decrypt(Config.getRelativePath(Config.GOOGLE_API_CREDENTIALS_PATH), Config.get().clientInfoKey)

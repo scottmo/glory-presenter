@@ -9,7 +9,7 @@ import java.nio.file.Path
 import javax.swing.*
 
 class SongFormatterPanel : JPanel() {
-    private val songEditor = FileEditor(Config.SONG_YAML_DIR, "Select Song")
+    private val songEditor = FileEditor(Config.SONG_DIR, "Select Song")
 
     private val maxLinesSpinnerInput = JSpinner(SpinnerNumberModel(1, 1, 10, 1))
     private val transformButton = JButton("Transform")
@@ -23,9 +23,9 @@ class SongFormatterPanel : JPanel() {
     init {
         layout = MigLayout("wrap 3", "sg main, grow, left", "top")
 
-        // yaml song picker
+        // song picker
         add(songEditor.ui)
-        // yaml to slide text/csv transformer
+        // song to slide text/csv transformer
         add(JPanel().apply {
             layout = MigLayout("wrap, ins 0")
             add(JPanel().apply {
@@ -73,7 +73,7 @@ class SongFormatterPanel : JPanel() {
             val song = KVMDConverter.parse(serializedSong)
             requireNotNull(song) { "Unable to convert song!" }
 
-            val filePath = Config.getRelativePath("${Config.SONG_SLIDES_DIR}/${song.title}.yaml")
+            val filePath = Config.getRelativePath("${Config.SONG_SLIDES_DIR}/${song.title}.md")
             Files.writeString(Path.of(filePath), serializedSong)
         }
     }
