@@ -1,6 +1,6 @@
 package com.scottscmo.ppt
 
-import com.scottscmo.model.song.converters.YAMLConverter
+import com.scottscmo.model.song.converters.KVMDConverter
 import org.apache.poi.xslf.usermodel.XMLSlideShow
 import java.io.FileInputStream
 import java.io.FileOutputStream
@@ -12,7 +12,7 @@ object PPTXGenerators {
     @Throws(IOException::class)
     fun generate(dataFilePath: String, tmplFilePath: String, outputDirPath: String) {
         val inputContent = Files.readString(Path.of(dataFilePath))
-        val input = YAMLConverter.parse(inputContent)
+        val input = KVMDConverter.parse(inputContent)
 
         input?.sections?.let { sections ->
             val title = input.title

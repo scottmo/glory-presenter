@@ -2,7 +2,6 @@ package com.scottscmo.ui.panels
 
 import com.scottscmo.Config
 import com.scottscmo.model.song.converters.KVMDConverter
-import com.scottscmo.model.song.converters.YAMLConverter
 import com.scottscmo.ui.components.FileEditor
 import net.miginfocom.swing.MigLayout
 import java.nio.file.Files
@@ -15,7 +14,6 @@ class SongFormatterPanel : JPanel() {
     private val maxLinesSpinnerInput = JSpinner(SpinnerNumberModel(1, 1, 10, 1))
     private val transformButton = JButton("Transform")
     private val saveTransformedButton = JButton("Save as Slide-Format Song")
-    private val saveAsMDButton = JButton("Save as MD")
     private val outputTextArea = JTextArea(25, 45).apply {
         font = Config.textAreaFont
     }
@@ -38,7 +36,6 @@ class SongFormatterPanel : JPanel() {
             }, "span")
             add(JScrollPane(outputTextArea), "span, grow")
             add(saveTransformedButton)
-            add(saveAsMDButton)
         })
         // slide text
         add(songSlideEditor.ui)
@@ -49,10 +46,6 @@ class SongFormatterPanel : JPanel() {
 
         saveTransformedButton.addActionListener {
             handleSaveTransformed(outputTextArea.text)
-        }
-
-        saveAsMDButton.addActionListener {
-            handleSaveAsMD(outputTextArea.text, getMaxLines())
         }
     }
 
@@ -65,8 +58,8 @@ class SongFormatterPanel : JPanel() {
         private val MULTI_LINE_VERSE_REPL = "$1$2: |-\n$1  $3"
 
         private fun handleTransformSong(serializedSong: String, maxLines: Int, outputTextArea: JTextArea) {
-            YAMLConverter.parse(serializedSong)?.let { song ->
-                var transformedText = YAMLConverter.stringify(song, Config.get().googleSlideConfig.textConfigsOrder, maxLines)
+            KVMDConverter.parse(serializedSong)?.let { song ->
+                var transformedText = KVMDConverter.stringify(song, Config.get().googleSlideConfig.textConfigsOrder, maxLines)
                 transformedText = transformedText.replace(SINGLE_LINE_VERSE, MULTI_LINE_VERSE_REPL)
 
                 outputTextArea.apply {
@@ -77,20 +70,11 @@ class SongFormatterPanel : JPanel() {
         }
 
         private fun handleSaveTransformed(serializedSong: String) {
-            val song = YAMLConverter.parse(serializedSong)
+            val song = KVMDConverter.parse(serializedSong)
             requireNotNull(song) { "Unable to convert song!" }
 
             val filePath = Config.getRelativePath("${Config.SONG_SLIDES_DIR}/${song.title}.yaml")
             Files.writeString(Path.of(filePath), serializedSong)
-        }
-
-        private fun handleSaveAsMD(serializedSong: String, maxLines: Int) {
-            val song = YAMLConverter.parse(serializedSong)
-            requireNotNull(song) { "Unable to convert song!" }
-
-            val filePath = Config.getOutputDir("${song.title}.md")
-            val content = KVMDConverter.stringify(song, Config.get().googleSlideConfig.textConfigsOrder, maxLines)
-            Files.writeString(Path.of(filePath), content)
         }
     }
 }

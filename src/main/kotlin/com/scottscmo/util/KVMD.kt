@@ -133,8 +133,7 @@ object KVMD {
             }
     }
 
-    @JvmStatic
-    fun main(args: Array<String>) {
+    private fun testParser() {
         val parsed = parse("""
 獻上感恩 Give Thanks
 ===
@@ -163,5 +162,10 @@ let the poor say I am rich
         println(parsed)
         val parsedStr = stringify(parsed)
         println(parsedStr)
+    }
+
+    @JvmStatic
+    fun main(args: Array<String>) {
+        testParser()
     }
 }

@@ -3,7 +3,7 @@ package com.scottscmo.ui.panels
 import com.scottscmo.Config
 import com.scottscmo.google.slides.SlidesApiClient
 import com.scottscmo.model.bible.BibleReference
-import com.scottscmo.model.song.converters.YAMLConverter
+import com.scottscmo.model.song.converters.KVMDConverter
 import com.scottscmo.ui.components.Form
 import com.scottscmo.ui.components.FormInput
 import net.miginfocom.swing.MigLayout
@@ -61,7 +61,7 @@ class GSlidesPanel : JPanel() {
             songPathKey to FormInput("Song", "file", Config.getRelativePath(Config.SONG_SLIDES_DIR)),
         )) {
             val slideSong = Files.readString(Path.of(it[songPathKey]))
-            val song = YAMLConverter.parse(slideSong)
+            val song = KVMDConverter.parse(slideSong)
             if (song != null) {
                 slidesApiClient.insertSong(getPresentationId(), song, getInsertionIndex())
                 "Song slides have been successfully generated!"
