@@ -21,6 +21,10 @@ object KVMD {
         return (obj[KEY_CONTENT] ?: mapOf<String, Any>()) as Map<String, Any>
     }
 
+    fun create(namespace: String, metadata: Map<String, Any>, content: Map<String, Any>): Map<String, Any> {
+        return mapOf(KEY_NAMESPACE to namespace, KEY_METADATA to metadata, KEY_CONTENT to content)
+    }
+
     fun parse(input: String): Map<String, Any> {
         val namespace: String
         val metadata: Map<String, Any>
@@ -47,7 +51,7 @@ object KVMD {
             }
         }
 
-        return mapOf(KEY_NAMESPACE to namespace, KEY_METADATA to metadata, KEY_CONTENT to content)
+        return create(namespace, metadata, content)
     }
 
     private fun parseMetadata(input: String): Map<String, Any> {
@@ -106,7 +110,7 @@ object KVMD {
 
         return listOf(namespace, metadataStr, contentStr)
             .filter { it.isNotEmpty() }
-            .joinToString("\n$SECTION_DELIMITER\n")
+            .joinToString("\n$SECTION_DELIMITER\n") + "\n"
     }
 
     private fun stringifyMetadataValue(value: Any): String {
