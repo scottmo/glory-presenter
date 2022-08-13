@@ -26,6 +26,7 @@ fun FileEditor(pathString: String, filePickerLabel: String = pathString,
 class FileEditor(path: Path, filePickerLabel: String = path.toString(),
         editorHeight: Int = DEFAULT_HEIGHT, editorWidth: Int = DEFAULT_WIDTH) {
     val ui = JPanel()
+    var filePath = ""
 
     private val filePicker = JButton(filePickerLabel)
     private val textArea = JTextArea(editorHeight, editorWidth).apply {
@@ -33,8 +34,6 @@ class FileEditor(path: Path, filePickerLabel: String = path.toString(),
     }
     private val saveButton = JButton("Save")
     private val reloadButton = JButton("Reload")
-
-    private var filePath = ""
 
     init {
         ui.apply {

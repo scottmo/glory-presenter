@@ -45,7 +45,8 @@ class SongFormatterPanel : JPanel() {
         }
 
         saveTransformedButton.addActionListener {
-            handleSaveTransformed(outputTextArea.text)
+            val filePath = Config.getRelativePath("${Config.SONG_SLIDES_DIR}/${Path.of(songEditor.filePath).fileName}")
+            handleSaveTransformed(filePath, outputTextArea.text)
         }
     }
 
@@ -55,7 +56,7 @@ class SongFormatterPanel : JPanel() {
 
     companion object {
         private val SINGLE_LINE_VERSE = Regex("(\\s{4})(\\w+):\\s([^|][^-].+)")
-        private val MULTI_LINE_VERSE_REPL = "$1$2: |-\n$1  $3"
+        private const val MULTI_LINE_VERSE_REPL = "$1$2: |-\n$1  $3"
 
         private fun handleTransformSong(serializedSong: String, maxLines: Int, outputTextArea: JTextArea) {
             KVMDConverter.parse(serializedSong)?.let { song ->
@@ -69,11 +70,10 @@ class SongFormatterPanel : JPanel() {
             }
         }
 
-        private fun handleSaveTransformed(serializedSong: String) {
+        private fun handleSaveTransformed(filePath: String, serializedSong: String) {
             val song = KVMDConverter.parse(serializedSong)
             requireNotNull(song) { "Unable to convert song!" }
 
-            val filePath = Config.getRelativePath("${Config.SONG_SLIDES_DIR}/${song.title}.md")
             Files.writeString(Path.of(filePath), serializedSong)
         }
     }
