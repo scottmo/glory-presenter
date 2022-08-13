@@ -1,7 +1,6 @@
 package com.scottscmo
 
 import com.formdev.flatlaf.FlatLightLaf
-import com.scottscmo.ui.FilePicker
 import com.scottscmo.ui.OutputDisplay
 import com.scottscmo.ui.components.DataPathPicker
 import com.scottscmo.ui.panels.*
@@ -16,9 +15,6 @@ class Application() : JFrame() {
         title = "Worship Service Tool"
         defaultCloseOperation = EXIT_ON_CLOSE
         isResizable = false
-
-        OutputDisplay.host = this
-        FilePicker.host = this
 
         contentPane.apply {
             layout = MigLayout("ins 0, wrap")
@@ -36,6 +32,10 @@ class Application() : JFrame() {
     }
 
     companion object {
+        private lateinit var app: Application
+        fun get(): Application {
+            return app
+        }
         @JvmStatic
         fun main(args: Array<String>) {
             Config.load()
@@ -49,7 +49,7 @@ class Application() : JFrame() {
                         + throwable.stackTrace.copyOfRange(0, 10).joinToString("\n"))
                 }
 
-                Application().apply { isVisible = true }
+                app = Application().apply { isVisible = true }
             }
         }
     }

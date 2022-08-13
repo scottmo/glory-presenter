@@ -4,7 +4,6 @@ import com.scottscmo.Config
 import com.scottscmo.ui.FilePicker
 import com.scottscmo.ui.OutputDisplay
 import net.miginfocom.swing.MigLayout
-import java.awt.Font
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import java.io.IOException

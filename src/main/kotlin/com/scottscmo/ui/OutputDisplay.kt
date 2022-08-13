@@ -1,18 +1,17 @@
 package com.scottscmo.ui
 
+import com.scottscmo.Application
 import java.lang.Exception
-import javax.swing.JFrame
 import javax.swing.JOptionPane
 
 object OutputDisplay {
-    var host: JFrame? = null
 
     fun show(msg: String?) {
-        JOptionPane.showMessageDialog(host, msg);
+        JOptionPane.showMessageDialog(Application.get(), msg)
     }
 
     fun error(msg: String?) {
-        JOptionPane.showMessageDialog(host, msg, msg, JOptionPane.ERROR_MESSAGE);
+        JOptionPane.showMessageDialog(Application.get(), msg, msg, JOptionPane.ERROR_MESSAGE)
     }
 
     fun error(e: Exception) {
