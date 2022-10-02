@@ -6,6 +6,7 @@ import com.scottscmo.ui.components.Form
 import com.scottscmo.ui.components.FormInput
 import com.scottscmo.util.Cryptor
 import net.miginfocom.swing.MigLayout
+import java.io.File
 import java.nio.file.Path
 import javax.swing.JButton
 import javax.swing.JPanel
@@ -33,10 +34,18 @@ class SettingsPanel : JPanel() {
         )) {
             require(Config.get().clientInfoKey.isNotEmpty()) { "clientInfoKey is missing from config.json!" }
 
+            // encrypt credentials
             Cryptor.encryptFile(it["credentialsFilePath"],
                 Config.getRelativePath(Config.GOOGLE_API_CREDENTIALS_PATH),
                 Config.get().clientInfoKey)
-            "Credentials imported!"
+
+            // remove existing token
+            val storedToken = File(Config.getRelativePath("${Config.GOOGLE_API_DIR}/StoredCredential"))
+            if (storedToken.exists()) {
+                storedToken.delete()
+            }
+
+            "Credentials imported! Please restart app."
         }.ui)
     }
 }
