@@ -29,7 +29,7 @@ class Form(title: String, inputConfigs: Map<String, FormInput>, onSubmit: (form:
                     inputs[k] = input
                     add(JLabel(v.label))
                     add(input)
-                } else if (v.type == "file" || v.type == "directory") {
+                } else if (listOf("file", "directory", "fileAndDirectory", "filelist").contains(v.type)) {
                     val input = JTextField(v.defaultValue.ifEmpty { "select ${v.type}" }).apply {
                         addMouseListener(object : MouseAdapter() {
                             override fun mouseReleased(me: MouseEvent) {

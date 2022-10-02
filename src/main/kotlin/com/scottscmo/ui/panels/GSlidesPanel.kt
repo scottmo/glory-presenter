@@ -58,7 +58,7 @@ class GSlidesPanel : JPanel() {
 
         val songPathKey = "song"
         add(Form("Song Slides Generator", mapOf(
-            songPathKey to FormInput("Song", "file", Config.getRelativePath(Config.SONG_SLIDES_DIR)),
+            songPathKey to FormInput("Song", "filelist", Config.getRelativePath(Config.SONG_SLIDES_DIR)),
         )) {
             val slideSong = Files.readString(Path.of(it[songPathKey]))
             val song = KVMDConverter.parse(slideSong)

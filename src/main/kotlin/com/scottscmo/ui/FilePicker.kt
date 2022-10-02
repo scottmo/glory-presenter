@@ -18,7 +18,7 @@ object FilePicker {
     fun show(mode: String = "fileAndDirectory", dirPath: String = Config.get().dataDir,
              onSelected: (filePath: String) -> Unit) {
 
-        if (mode != "file") {
+        if (mode != "filelist") {
             showSystemPicker(mode, dirPath, onSelected)
             return
         }
@@ -98,8 +98,12 @@ object FilePicker {
 
     private fun showSystemPicker(mode: String = "fileAndDirectory", defaultPath: String = Config.get().dataDir,
                                  onSelected: (filePath: String) -> Unit) {
+        var startPath = Path.of(defaultPath).toFile()
+        if (!startPath.isDirectory) {
+            startPath = startPath.parentFile
+        }
         val fc = JFileChooser().apply {
-            currentDirectory = Path.of(defaultPath).toFile() // start at application data directory
+            currentDirectory = startPath
             fileSelectionMode = when (mode) {
                 "file" -> JFileChooser.FILES_ONLY
                 "directory" -> JFileChooser.DIRECTORIES_ONLY

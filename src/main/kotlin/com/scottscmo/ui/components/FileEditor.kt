@@ -47,7 +47,7 @@ class FileEditor(path: Path, filePickerLabel: String = path.toString(),
         if (isFilePickerEnabled) {
             filePicker.addMouseListener(object : MouseAdapter() {
                 override fun mouseReleased(me: MouseEvent) {
-                    FilePicker.show("file", path.toString()) { selectedPath ->
+                    FilePicker.show("filelist", path.toString()) { selectedPath ->
                         filePath = selectedPath
                         loadFileToTextArea(filePath, textArea)
                         toggleReadWriteButtons(true)
