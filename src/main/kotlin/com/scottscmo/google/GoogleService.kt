@@ -1,23 +1,27 @@
-package com.scottscmo.google.slides
+package com.scottscmo.google
 
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport
+import com.google.api.client.googleapis.json.GoogleJsonResponseException
+import com.google.api.services.drive.Drive
+import com.google.api.services.drive.model.File
 import com.google.api.services.slides.v1.Slides
 import com.google.api.services.slides.v1.model.BatchUpdatePresentationRequest
 import com.google.api.services.slides.v1.model.Page
 import com.google.api.services.slides.v1.model.Request
 import com.scottscmo.Config
-import com.scottscmo.google.AuthClient
+import com.scottscmo.google.slides.Action
+import com.scottscmo.google.slides.DefaultSlideConfig
+import com.scottscmo.google.slides.RequestBuilder
 import com.scottscmo.model.bible.BibleModel
 import com.scottscmo.model.bible.BibleReference
 import com.scottscmo.model.song.Song
 import com.scottscmo.util.StringUtils
 import java.lang.Integer.min
 
+class GoogleService {
+    private val appName = "Glory Presenter"
 
-class SlidesApiClient {
-    private val appName = "Worship Service Tool"
-
-    private val service: Slides by lazy {
+    private val slidesApi: Slides by lazy {
         val auth = AuthClient.instance
         val httpTransport = GoogleNetHttpTransport.newTrustedTransport()
         Slides.Builder(httpTransport, auth.jsonFactory, auth.getCredentials(httpTransport))
@@ -25,8 +29,36 @@ class SlidesApiClient {
             .build()
     }
 
+    private val driveApi: Drive by lazy {
+        val auth = AuthClient.instance
+        val httpTransport = GoogleNetHttpTransport.newTrustedTransport()
+
+        Drive.Builder(httpTransport, auth.jsonFactory, auth.getCredentials(httpTransport))
+            .setApplicationName(appName)
+            .build()
+    }
+
+    fun copyPresentation(title: String, folderId: String, templatePresentationId: String): String? {
+        var presentation: File? = null
+        try {
+            val fileMetadata = File().apply {
+                name = title
+                parents = listOf(folderId)
+            }
+            presentation = driveApi.files().copy(templatePresentationId, fileMetadata).execute()
+        } catch (e: GoogleJsonResponseException) {
+            val error = e.details
+            if (error.code == 404) {
+                System.out.printf("Presentation not found with id '%s'.\n", templatePresentationId)
+            } else {
+                throw e
+            }
+        }
+        return presentation?.id
+    }
+
     fun getSlides(presentationId: String): List<Page> {
-        val response = service.presentations()[presentationId].execute()
+        val response = slidesApi.presentations()[presentationId].execute()
         return response.slides
     }
 
@@ -38,7 +70,7 @@ class SlidesApiClient {
         while (startIndex < updateRequests.size) {
             val endIndex = min(startIndex + batchSize, updateRequests.size)
             val body = BatchUpdatePresentationRequest().setRequests(updateRequests.subList(startIndex, endIndex))
-            service.presentations().batchUpdate(presentationId, body).execute()
+            slidesApi.presentations().batchUpdate(presentationId, body).execute()
             startIndex = endIndex
         }
         return true
@@ -137,8 +169,11 @@ class SlidesApiClient {
             requestBuilder.insertText(sectionTextBoxId, section.text, slideConfig)
 
             // footer
-            val footerTitleBoxId = requestBuilder.createTextBox(slideId, DefaultSlideConfig.SLIDE_W, DefaultSlideConfig.FOOTER_TITLE_SIZE * 2,
-                0.0, DefaultSlideConfig.FOOTER_TITLE_Y)
+            val footerTitleBoxId = requestBuilder.createTextBox(slideId,
+                DefaultSlideConfig.SLIDE_W, DefaultSlideConfig.FOOTER_TITLE_SIZE * 2,
+                0.0,
+                DefaultSlideConfig.FOOTER_TITLE_Y
+            )
             val footerTextConfig = defaultTextConfig.copy(
                 fontSize = DefaultSlideConfig.FOOTER_TITLE_SIZE
             )
@@ -146,5 +181,15 @@ class SlidesApiClient {
         }
 
         updateSlides(presentationId, requestBuilder.build())
+    }
+
+    fun generateSlides(presentationId: String, actions: List<Action>) {
+        actions.reversed().forEach {
+            if (it.type == "bible") {
+                insertBibleText(presentationId, BibleReference(it.input), it.index)
+            } else if (it.type == "hymn") {
+
+            }
+        }
     }
 }

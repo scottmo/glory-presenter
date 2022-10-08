@@ -9,6 +9,7 @@ import com.google.api.client.http.javanet.NetHttpTransport
 import com.google.api.client.json.JsonFactory
 import com.google.api.client.json.gson.GsonFactory
 import com.google.api.client.util.store.FileDataStoreFactory
+import com.google.api.services.drive.DriveScopes
 import com.google.api.services.slides.v1.SlidesScopes
 import com.scottscmo.Config
 import com.scottscmo.util.Cryptor
@@ -23,7 +24,7 @@ class AuthClient {
 
     private val tokensDirPath = Config.GOOGLE_API_DIR
 
-    private val scopes = listOf(SlidesScopes.PRESENTATIONS)
+    private val scopes = listOf(SlidesScopes.PRESENTATIONS, DriveScopes.DRIVE)
 
     val jsonFactory: JsonFactory = GsonFactory.getDefaultInstance()
 
