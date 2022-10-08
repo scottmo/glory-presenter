@@ -15,6 +15,7 @@ import com.scottscmo.google.slides.RequestBuilder
 import com.scottscmo.model.bible.BibleModel
 import com.scottscmo.model.bible.BibleReference
 import com.scottscmo.model.song.Song
+import com.scottscmo.model.song.SongLoader
 import com.scottscmo.util.StringUtils
 import java.lang.Integer.min
 
@@ -183,12 +184,19 @@ class GoogleService {
         updateSlides(presentationId, requestBuilder.build())
     }
 
+    private fun insertSong(presentationId: String, songTitle: String, slideIndex: Int) {
+        val song = SongLoader.getSong(Config.getRelativePath(Config.SONG_SLIDES_DIR), songTitle)
+        if (song != null) {
+            insertSong(presentationId, song, slideIndex)
+        }
+    }
+
     fun generateSlides(presentationId: String, actions: List<Action>) {
         actions.reversed().forEach {
             if (it.type == "bible") {
                 insertBibleText(presentationId, BibleReference(it.input), it.index)
             } else if (it.type == "hymn") {
-
+                insertSong(presentationId, it.input, it.index)
             }
         }
     }
