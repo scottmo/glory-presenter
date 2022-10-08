@@ -1,7 +1,7 @@
 package com.scottscmo.ui.panels
 
 import com.scottscmo.Config
-import com.scottscmo.google.GoogleService
+import com.scottscmo.google.slides.GoogleSlidesService
 import com.scottscmo.google.slides.Action
 import com.scottscmo.model.bible.BibleReference
 import com.scottscmo.model.song.converters.KVMDConverter
@@ -17,7 +17,7 @@ import javax.swing.JPanel
 import javax.swing.JTextField
 
 class GSlidesPanel : JPanel() {
-    private val googleService = GoogleService()
+    private val googleService = GoogleSlidesService()
     private val slideUrlInput = JTextField()
     private val insertionIndexInput = JTextField("0")
 
@@ -74,22 +74,13 @@ class GSlidesPanel : JPanel() {
             "templateId" to FormInput("Template ID", "text"),
             "inserts"    to FormInput("Inserts", "textarea")
         )) {
-            val inserts = try {
-                it["inserts"].split("\n").map {insert ->
-                    val ( index, action ) = insert.split(":", limit=2).map { s -> s.trim() }
-                    val ( type, input ) = action.split("/", limit=2).map { s -> s.trim() }
-                    Action(type, index.toInt(), input)
-                }
-            } catch (e: Exception) {
-                null
-            }
-            if (inserts != null) {
-                googleService.copyPresentation(it["title"], it["folderId"], it["templateId"])?.let { pid ->
-                    googleService.generateSlides(pid, inserts)
-                }
+            try {
+                val inserts = parseSlideInserts(it["inserts"])
+                val presentationId = googleService.copyPresentation(it["title"], it["folderId"], it["templateId"])
+                googleService.generateSlides(presentationId, inserts)
                 "Generated!"
-            } else {
-                "Invalid inserts"
+            } catch (e :Exception) {
+                 e.message!!
             }
         }.ui, "span, wrap")
     }
@@ -105,5 +96,17 @@ class GSlidesPanel : JPanel() {
 
     private fun getInsertionIndex(): Int {
         return insertionIndexInput.text.toInt()
+    }
+
+    private fun parseSlideInserts(inserts: String): List<Action> {
+        try {
+            return inserts.split("\n").map {insert ->
+                val ( index, action ) = insert.split(":", limit=2).map { s -> s.trim() }
+                val ( type, input ) = action.split("/", limit=2).map { s -> s.trim() }
+                Action(type, index.toInt(), input)
+            }
+        } catch (e: Exception) {
+            throw Exception("Invalid inserts! ${e.message}")
+        }
     }
 }

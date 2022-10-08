@@ -1,4 +1,4 @@
-package com.scottscmo.google
+package com.scottscmo.google.slides
 
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport
 import com.google.api.client.googleapis.json.GoogleJsonResponseException
@@ -9,9 +9,7 @@ import com.google.api.services.slides.v1.model.BatchUpdatePresentationRequest
 import com.google.api.services.slides.v1.model.Page
 import com.google.api.services.slides.v1.model.Request
 import com.scottscmo.Config
-import com.scottscmo.google.slides.Action
-import com.scottscmo.google.slides.DefaultSlideConfig
-import com.scottscmo.google.slides.RequestBuilder
+import com.scottscmo.google.AuthClient
 import com.scottscmo.model.bible.BibleModel
 import com.scottscmo.model.bible.BibleReference
 import com.scottscmo.model.song.Song
@@ -19,7 +17,7 @@ import com.scottscmo.model.song.SongLoader
 import com.scottscmo.util.StringUtils
 import java.lang.Integer.min
 
-class GoogleService {
+class GoogleSlidesService {
     private val appName = "Glory Presenter"
 
     private val slidesApi: Slides by lazy {
@@ -39,23 +37,22 @@ class GoogleService {
             .build()
     }
 
-    fun copyPresentation(title: String, folderId: String, templatePresentationId: String): String? {
-        var presentation: File? = null
+    fun copyPresentation(title: String, folderId: String, templatePresentationId: String): String {
         try {
             val fileMetadata = File().apply {
                 name = title
                 parents = listOf(folderId)
             }
-            presentation = driveApi.files().copy(templatePresentationId, fileMetadata).execute()
+            val presentation = driveApi.files().copy(templatePresentationId, fileMetadata).execute()
+            return presentation.id
         } catch (e: GoogleJsonResponseException) {
             val error = e.details
             if (error.code == 404) {
-                System.out.printf("Presentation not found with id '%s'.\n", templatePresentationId)
+                throw Exception("Presentation not found with id '%s'.\n$templatePresentationId")
             } else {
                 throw e
             }
         }
-        return presentation?.id
     }
 
     fun getSlides(presentationId: String): List<Page> {
@@ -192,12 +189,20 @@ class GoogleService {
     }
 
     fun generateSlides(presentationId: String, actions: List<Action>) {
+        val failedActions = mutableListOf<Action>()
         actions.reversed().forEach {
-            if (it.type == "bible") {
-                insertBibleText(presentationId, BibleReference(it.input), it.index)
-            } else if (it.type == "hymn") {
-                insertSong(presentationId, it.input, it.index)
+            try {
+                if (it.type == "bible") {
+                    insertBibleText(presentationId, BibleReference(it.input), it.index)
+                } else if (it.type == "hymn") {
+                    insertSong(presentationId, it.input, it.index)
+                }
+            } catch (e: Exception) {
+                failedActions.add(it)
             }
+        }
+        if (failedActions.isNotEmpty()) {
+            throw Exception("Failed to run these actions: $failedActions")
         }
     }
 }
