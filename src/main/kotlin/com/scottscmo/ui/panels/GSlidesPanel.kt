@@ -1,8 +1,8 @@
 package com.scottscmo.ui.panels
 
 import com.scottscmo.Config
-import com.scottscmo.google.slides.GoogleSlidesService
 import com.scottscmo.google.slides.Action
+import com.scottscmo.google.slides.GoogleSlidesService
 import com.scottscmo.model.bible.BibleReference
 import com.scottscmo.model.song.converters.KVMDConverter
 import com.scottscmo.ui.components.Form
