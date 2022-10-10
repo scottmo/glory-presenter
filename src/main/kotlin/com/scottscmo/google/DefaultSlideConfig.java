@@ -1,4 +1,4 @@
-package com.scottscmo.google.slides;
+package com.scottscmo.google;
 
 public final class DefaultSlideConfig {
     public static final double SLIDE_H = 405.0;

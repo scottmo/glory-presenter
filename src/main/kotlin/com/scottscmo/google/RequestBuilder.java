@@ -1,4 +1,4 @@
-package com.scottscmo.google.slides;
+package com.scottscmo.google;
 
 import com.google.api.services.slides.v1.model.*;
 import com.scottscmo.Config;
