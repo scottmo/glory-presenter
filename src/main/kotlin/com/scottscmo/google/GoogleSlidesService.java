@@ -10,8 +10,6 @@ import com.google.api.services.slides.v1.model.BatchUpdatePresentationRequest;
 import com.google.api.services.slides.v1.model.Page;
 import com.google.api.services.slides.v1.model.Request;
 import com.scottscmo.Config;
-import com.scottscmo.SlideConfig;
-import com.scottscmo.TextConfig;
 import com.scottscmo.model.bible.BibleModel;
 import com.scottscmo.model.bible.BibleReference;
 import com.scottscmo.model.bible.BibleVerse;
@@ -19,6 +17,8 @@ import com.scottscmo.model.song.Section;
 import com.scottscmo.model.song.Song;
 import com.scottscmo.model.song.SongLoader;
 import com.scottscmo.util.StringUtils;
+import config.SlideConfig;
+import config.TextConfig;
 import org.apache.commons.math3.util.Pair;
 
 import java.io.IOException;
@@ -33,6 +33,7 @@ public final class GoogleSlidesService {
     private static final String appName = "Glory Presenter";
 
     private Slides _slidesApi;
+
     private Slides getSlidesApi() {
         if (_slidesApi == null) {
             AuthClient auth = new AuthClient();
@@ -49,6 +50,7 @@ public final class GoogleSlidesService {
     }
 
     private Drive _driveApi;
+
     private Drive getDriveApi() {
         if (_driveApi == null) {
             AuthClient auth = new AuthClient();
@@ -106,14 +108,14 @@ public final class GoogleSlidesService {
         RequestBuilder requestBuilder = new RequestBuilder();
         List<Page> slides = getSlides(presentationId);
         slides.forEach(slide -> {
-            requestBuilder.setBaseFont(slide, Config.INSTANCE.get().getGoogleSlideConfig().getTextConfigs());
+            requestBuilder.setBaseFont(slide, Config.get().googleSlideConfig().textConfigs());
         });
         updateSlides(presentationId, requestBuilder.build());
     }
 
     public void insertBibleText(String presentationId, BibleReference bibleRef, int slideIndex) throws IOException {
-        SlideConfig slideConfig = Config.INSTANCE.get().getGoogleSlideConfig();
-        Map<String, String> bibleVersionToTextConfig = slideConfig.getBibleVersionToTextConfig();
+        SlideConfig slideConfig = Config.get().googleSlideConfig();
+        Map<String, String> bibleVersionToTextConfig = slideConfig.bibleVersionToTextConfig();
 
         // query bible data
         Map<String, String> bookNames = BibleModel.Companion.get().getBookNames(bibleRef.getBook());
@@ -141,12 +143,12 @@ public final class GoogleSlidesService {
         for (int i = 0; i < numVerses; i++) {
             for (String version : bibleRef.getVersions()) {
                 String groupName = bibleVersionToTextConfig.get(version);
-                TextConfig textConfig = slideConfig.getTextConfigs().get(groupName);
+                TextConfig textConfig = slideConfig.textConfigs().get(groupName);
                 BibleVerse verse = bibleVerses.get(version).get(i);
                 List<String> verseTexts = StringUtils.INSTANCE.distributeTextToBlocks(
                         verse.getIndex() + " " + verse.getText(),
-                        textConfig.getNumberOfCharactersPerLine(),
-                        textConfig.getNumberOfLinesPerSlide());
+                        textConfig.numberOfCharactersPerLine(),
+                        textConfig.numberOfLinesPerSlide());
                 for (String verseText : verseTexts) {
                     slideTexts.add(new Pair<>(version, verseText));
                 }
@@ -161,26 +163,26 @@ public final class GoogleSlidesService {
                     String version = verseText.getKey();
                     String text = verseText.getValue();
                     String lang = bibleVersionToTextConfig.get(version);
-                    TextConfig textConfig = slideConfig.getTextConfigs().get(lang);
+                    TextConfig textConfig = slideConfig.textConfigs().get(lang);
                     assert textConfig != null : "No matching text config for $version version";
 
                     String titleId = requestBuilder.createSlideWithFullText(slideIndex);
-                    requestBuilder.insertText(titleId, text, slideConfig.getParagraph(), textConfig);
+                    requestBuilder.insertText(titleId, text, slideConfig.paragraph(), textConfig);
                 });
 
         updateSlides(presentationId, requestBuilder.build());
     }
 
     public void insertSong(String presentationId, Song song, int slideInsertIndex) throws IOException {
-        SlideConfig slideConfig = Config.INSTANCE.get().getGoogleSlideConfig();
-        TextConfig defaultTextConfig = slideConfig.getTextConfigs().get(slideConfig.getDefaultTextConfig());
+        SlideConfig slideConfig = Config.get().googleSlideConfig();
+        TextConfig defaultTextConfig = slideConfig.textConfigs().get(slideConfig.defaultTextConfig());
 
         RequestBuilder requestBuilder = new RequestBuilder();
         int slideIndex = slideInsertIndex;
 
         // title
         String textBoxId = requestBuilder.createSlideWithFullText(slideIndex++);
-        requestBuilder.insertText(textBoxId, song.title, slideConfig.getParagraph(), defaultTextConfig);
+        requestBuilder.insertText(textBoxId, song.title, slideConfig.paragraph(), defaultTextConfig);
 
         // lyrics
         for (String sectionName : song.order) {
@@ -201,20 +203,20 @@ public final class GoogleSlidesService {
                     DefaultSlideConfig.FOOTER_TITLE_Y
             );
             TextConfig footerTextConfig = new TextConfig(
-                    defaultTextConfig.getWordDelimiter(),
-                    defaultTextConfig.getFontFamily(),
+                    defaultTextConfig.wordDelimiter(),
+                    defaultTextConfig.fontFamily(),
                     DefaultSlideConfig.FOOTER_TITLE_SIZE,
-                    defaultTextConfig.getFontColor(),
-                    defaultTextConfig.getFontStyles(),
-                    defaultTextConfig.getNumberOfCharactersPerLine(),
-                    defaultTextConfig.getNumberOfLinesPerSlide());
-            requestBuilder.insertText(footerTitleBoxId, song.title, slideConfig.getParagraph(), footerTextConfig);
+                    defaultTextConfig.fontColor(),
+                    defaultTextConfig.fontStyles(),
+                    defaultTextConfig.numberOfCharactersPerLine(),
+                    defaultTextConfig.numberOfLinesPerSlide());
+            requestBuilder.insertText(footerTitleBoxId, song.title, slideConfig.paragraph(), footerTextConfig);
         }
         updateSlides(presentationId, requestBuilder.build());
     }
 
     private void insertSong(String presentationId, String songTitle, int slideIndex) throws IOException {
-        Song song = SongLoader.INSTANCE.getSong(Config.INSTANCE.getRelativePath(Config.SONG_SLIDES_DIR), songTitle);
+        Song song = SongLoader.INSTANCE.getSong(Config.getRelativePath(Config.SONG_SLIDES_DIR), songTitle);
         if (song != null) {
             insertSong(presentationId, song, slideIndex);
         }

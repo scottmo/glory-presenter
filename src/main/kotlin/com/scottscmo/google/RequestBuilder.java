@@ -2,10 +2,10 @@ package com.scottscmo.google;
 
 import com.google.api.services.slides.v1.model.*;
 import com.scottscmo.Config;
-import com.scottscmo.ParagraphConfig;
-import com.scottscmo.SlideConfig;
-import com.scottscmo.TextConfig;
 import com.scottscmo.util.StringUtils;
+import config.ParagraphConfig;
+import config.SlideConfig;
+import config.TextConfig;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -45,7 +45,7 @@ public final class RequestBuilder {
      * set base font for a text run
      */
     private void setBaseFontForText(String pageElementId, TextRun textRun,
-            Map<String, TextConfig> textConfigs, int startIndex) {
+                                    Map<String, TextConfig> textConfigs, int startIndex) {
         Optional.ofNullable(textRun.getContent()).ifPresent(content -> {
             StringUtils.INSTANCE.splitByCharset(content, true).forEach(contentSegment -> {
                 String textConfigName = getTextConfigName(contentSegment);
@@ -60,10 +60,10 @@ public final class RequestBuilder {
                                 ))
                                 .setStyle(textRun.getStyle().clone()
                                         .setForegroundColor(new OptionalColor()
-                                                .setOpaqueColor(Util.getRGBColor(textConfig.getFontColor())))
-                                        .setFontFamily(textConfig.getFontFamily())
+                                                .setOpaqueColor(Util.getRGBColor(textConfig.fontColor())))
+                                        .setFontFamily(textConfig.fontFamily())
                                         .setWeightedFontFamily(textRun.getStyle().getWeightedFontFamily().clone()
-                                                .setFontFamily(textConfig.getFontFamily())))));
+                                                .setFontFamily(textConfig.fontFamily())))));
             });
         });
     }
@@ -80,13 +80,13 @@ public final class RequestBuilder {
     }
 
     public String createTextBox(String pageElementId,
-            Double w, Double h, Double tx, Double ty) {
+                                Double w, Double h, Double tx, Double ty) {
         String textBoxId = Util.generateObjectId(ID_SHAPE_PREFIX);
         return createTextBox(textBoxId, pageElementId, w, h, tx, ty);
     }
 
     private String createTextBox(String textBoxId, String pageElementId,
-            Double w, Double h, Double tx, Double ty) {
+                                 Double w, Double h, Double tx, Double ty) {
         requests.add(new Request()
                 .setCreateShape(new CreateShapeRequest()
                         .setObjectId(textBoxId)
@@ -106,13 +106,13 @@ public final class RequestBuilder {
     }
 
     public void insertText(String textBoxId, String textContent,
-            ParagraphConfig paragraphConfig, TextConfig textConfig) {
+                           ParagraphConfig paragraphConfig, TextConfig textConfig) {
         insertText(textBoxId, textContent, paragraphConfig, textConfig, 0);
     }
 
     public void insertText(String textBoxId, String textContent,
-            ParagraphConfig paragraphConfig, TextConfig textConfig,
-            int textInsertionIndex) {
+                           ParagraphConfig paragraphConfig, TextConfig textConfig,
+                           int textInsertionIndex) {
         // text
         requests.add(new Request()
                 .setInsertText(new InsertTextRequest()
@@ -125,16 +125,16 @@ public final class RequestBuilder {
         // paragraph style
         boolean hasParagraphStyle = false;
         ParagraphStyle ppStyle = new ParagraphStyle();
-        if (!paragraphConfig.getAlignment().isEmpty()) {
+        if (!paragraphConfig.alignment().isEmpty()) {
             hasParagraphStyle = true;
-            ppStyle.setAlignment(paragraphConfig.getAlignment());
+            ppStyle.setAlignment(paragraphConfig.alignment());
         }
-        if (paragraphConfig.getIndentation() > 0) {
+        if (paragraphConfig.indentation() > 0) {
             hasParagraphStyle = true;
-            Dimension indent = Util.getDimension(paragraphConfig.getIndentation());
+            Dimension indent = Util.getDimension(paragraphConfig.indentation());
             ppStyle.setIndentFirstLine(indent)
-                .setIndentStart(indent)
-                .setIndentEnd(indent);
+                    .setIndentStart(indent)
+                    .setIndentEnd(indent);
         }
 
         if (hasParagraphStyle) {
@@ -149,30 +149,30 @@ public final class RequestBuilder {
         // text style
         boolean hasTextStyle = false;
         TextStyle textStyle = new TextStyle();
-        if (!textConfig.getFontStyles().isEmpty()) {
+        if (!textConfig.fontStyles().isEmpty()) {
             hasTextStyle = true;
-            textStyle.setSmallCaps(textConfig.getFontStyles().contains("smallCaps"))
-                    .setStrikethrough(textConfig.getFontStyles().contains("strikethrough"))
-                    .setUnderline(textConfig.getFontStyles().contains("underline"))
-                    .setBold(textConfig.getFontStyles().contains("bold"))
-                    .setItalic(textConfig.getFontStyles().contains("italic"));
+            textStyle.setSmallCaps(textConfig.fontStyles().contains("smallCaps"))
+                    .setStrikethrough(textConfig.fontStyles().contains("strikethrough"))
+                    .setUnderline(textConfig.fontStyles().contains("underline"))
+                    .setBold(textConfig.fontStyles().contains("bold"))
+                    .setItalic(textConfig.fontStyles().contains("italic"));
         }
-        if (!textConfig.getFontColor().isEmpty()) {
+        if (!textConfig.fontColor().isEmpty()) {
             hasTextStyle = true;
             textStyle.setForegroundColor(new OptionalColor()
-                    .setOpaqueColor(Util.getRGBColor(textConfig.getFontColor())));
+                    .setOpaqueColor(Util.getRGBColor(textConfig.fontColor())));
         }
-        if (textConfig.getFontSize() > 0) {
+        if (textConfig.fontSize() > 0) {
             hasTextStyle = true;
-            textStyle.setFontSize(Util.getDimension(textConfig.getFontSize()));
+            textStyle.setFontSize(Util.getDimension(textConfig.fontSize()));
         }
-        if (!textConfig.getFontFamily().isEmpty()) {
+        if (!textConfig.fontFamily().isEmpty()) {
             hasTextStyle = true;
-            textStyle.setFontFamily(textConfig.getFontFamily());
+            textStyle.setFontFamily(textConfig.fontFamily());
         }
-        if (textConfig.getFontStyles().contains("bold")) {
+        if (textConfig.fontStyles().contains("bold")) {
             textStyle.setWeightedFontFamily(new WeightedFontFamily()
-                    .setFontFamily(textConfig.getFontFamily())
+                    .setFontFamily(textConfig.fontFamily())
                     .setWeight(700));
         }
 
@@ -192,7 +192,7 @@ public final class RequestBuilder {
     public void insertText(String textBoxId, Map<String, String> textConfig, SlideConfig slideConfig) {
         // we always insert from the top of the text box, so reverse the list and when inserting,
         // we push the text down
-        List<String> textConfigsOrder = slideConfig.getTextConfigsOrder().stream()
+        List<String> textConfigsOrder = slideConfig.textConfigsOrder().stream()
                 .sorted(Collections.reverseOrder())
                 .filter(textConfig::containsKey)
                 .toList();
@@ -200,18 +200,18 @@ public final class RequestBuilder {
             String configName = textConfigsOrder.get(i);
             String ln = i == 0 ? "" : "\n";
             insertText(textBoxId, textConfig.get(configName) + ln,
-                    slideConfig.getParagraph(), slideConfig.getTextConfigs().get(configName));
+                    slideConfig.paragraph(), slideConfig.textConfigs().get(configName));
         }
     }
 
     public String createText(String pageElementId, String textContent,
                              ParagraphConfig paragraphConfig, TextConfig textConfig, boolean isFullPage) {
         double textBoxW = DefaultSlideConfig.SLIDE_W;
-        double textBoxH = (isFullPage || textConfig.getFontSize() <= 0)
+        double textBoxH = (isFullPage || textConfig.fontSize() <= 0)
                 ? DefaultSlideConfig.SLIDE_H
-                : textConfig.getFontSize() * 2;
+                : textConfig.fontSize() * 2;
 
-        String textBoxId = createTextBox(pageElementId, textBoxW, textBoxH, paragraphConfig.getX(), paragraphConfig.getY());
+        String textBoxId = createTextBox(pageElementId, textBoxW, textBoxH, paragraphConfig.x(), paragraphConfig.y());
         insertText(textBoxId, textContent, paragraphConfig, textConfig);
         return textBoxId;
     }
@@ -314,6 +314,7 @@ public final class RequestBuilder {
 
     /**
      * Create a slide with title text resized to full slide and return its id
+     *
      * @return text box objectId
      */
     public String createSlideWithFullText(int slideIndex) {
@@ -342,7 +343,7 @@ public final class RequestBuilder {
      * use to match slide configuration. convenient method for CJK languages.
      */
     private String getTextConfigName(StringUtils.StringSegment segment) {
-        SlideConfig slideConfig = Config.INSTANCE.get().getGoogleSlideConfig();
-        return segment.isAscii() ? slideConfig.getDefaultAsciiTextConfig() : slideConfig.getDefaultNonAsciiTextConfig();
+        SlideConfig slideConfig = Config.get().googleSlideConfig();
+        return segment.isAscii() ? slideConfig.defaultAsciiTextConfig() : slideConfig.defaultNonAsciiTextConfig();
     }
 }

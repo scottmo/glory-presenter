@@ -28,12 +28,12 @@ final class AuthClient {
      * Creates an authorized Credential object.
      */
     public Credential getCredentials(NetHttpTransport httpTransport) throws IOException {
-        assert !Config.INSTANCE.get().getClientInfoKey().isEmpty() : "clientInfoKey is missing from config.json!";
+        assert !Config.get().clientInfoKey().isEmpty() : "clientInfoKey is missing from config.json!";
 
         // Load client secrets.
         GoogleClientSecrets clientSecrets;
         try {
-            byte[] credentials = Cryptor.decrypt(Config.INSTANCE.getRelativePath(Config.GOOGLE_API_CREDENTIALS_PATH), Config.INSTANCE.get().getClientInfoKey());
+            byte[] credentials = Cryptor.decrypt(Config.getRelativePath(Config.GOOGLE_API_CREDENTIALS_PATH), Config.get().clientInfoKey());
             clientSecrets = GoogleClientSecrets.load(GsonFactory.getDefaultInstance(), new InputStreamReader(new ByteArrayInputStream(credentials)));
         } catch (GeneralSecurityException | IOException e) {
             throw new RuntimeException("Unable to load encrypted Google API credentials! " + e.getMessage());
@@ -43,7 +43,7 @@ final class AuthClient {
         GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
                 httpTransport, GsonFactory.getDefaultInstance(), clientSecrets, SCOPES
         )
-                .setDataStoreFactory(new FileDataStoreFactory(new File(Config.INSTANCE.getRelativePath(TOKENS_DIR_PATH))))
+                .setDataStoreFactory(new FileDataStoreFactory(new File(Config.getRelativePath(TOKENS_DIR_PATH))))
                 .setAccessType("offline")
                 .build();
         LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(8888).build();
