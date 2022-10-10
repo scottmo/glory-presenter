@@ -17,8 +17,8 @@ import com.scottscmo.model.song.Section;
 import com.scottscmo.model.song.Song;
 import com.scottscmo.model.song.SongLoader;
 import com.scottscmo.util.StringUtils;
-import config.SlideConfig;
-import config.TextConfig;
+import com.scottscmo.config.SlideConfig;
+import com.scottscmo.config.TextConfig;
 import org.apache.commons.math3.util.Pair;
 
 import java.io.IOException;

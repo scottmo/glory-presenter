@@ -15,7 +15,7 @@ import java.util.*
 import javax.swing.*
 
 object FilePicker {
-    fun show(mode: String = "fileAndDirectory", dirPath: String = Config.get().dataDir,
+    fun show(mode: String = "fileAndDirectory", dirPath: String = Config.get().dataDir(),
              onSelected: (filePath: String) -> Unit) {
 
         if (mode != "filelist") {
@@ -96,7 +96,7 @@ object FilePicker {
         }
     }
 
-    private fun showSystemPicker(mode: String = "fileAndDirectory", defaultPath: String = Config.get().dataDir,
+    private fun showSystemPicker(mode: String = "fileAndDirectory", defaultPath: String = Config.get().dataDir(),
                                  onSelected: (filePath: String) -> Unit) {
         var startPath = Path.of(defaultPath).toFile()
         if (!startPath.isDirectory) {

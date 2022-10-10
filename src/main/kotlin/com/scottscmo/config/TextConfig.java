@@ -1,4 +1,4 @@
-package config;
+package com.scottscmo.config;
 
 public record TextConfig(
         String wordDelimiter,

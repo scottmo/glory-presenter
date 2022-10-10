@@ -13,11 +13,11 @@ class DataPathPicker {
 
     init {
         ui.apply {
-            text = BUTTON_TEXT_PREFIX + Path.of(Config.get().dataDir)
+            text = BUTTON_TEXT_PREFIX + Path.of(Config.get().dataDir())
             addActionListener { _ ->
                 FilePicker.show("directory") { newDataPath ->
                     text = BUTTON_TEXT_PREFIX + newDataPath
-                    Config.get().dataDir = newDataPath
+                    Config.get().dataDir(newDataPath)
                     Event.emit(Event.DATA_DIR, newDataPath)
                 }
             }

@@ -1,7 +1,7 @@
 package com.scottscmo;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import config.AppConfig;
+import com.scottscmo.config.AppConfig;
 
 import java.awt.*;
 import java.io.BufferedReader;
@@ -14,7 +14,7 @@ public final class Config {
     public static final String SONG_SLIDES_DIR = "songs_slide";
 
     public static final String GOOGLE_API_DIR = "google_api";
-    public static final String GOOGLE_API_CREDENTIALS_PATH = "${GOOGLE_API_DIR}/client.info";
+    public static final String GOOGLE_API_CREDENTIALS_PATH = GOOGLE_API_DIR + "/client.info";
 
     public static final String CONFIG_PATH = "./config.json";
 

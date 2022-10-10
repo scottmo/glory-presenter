@@ -32,12 +32,13 @@ class SettingsPanel : JPanel() {
             "credentialsFilePath" to FormInput("Credentials json", "file",
                 Config.getRelativePath("${Config.GOOGLE_API_DIR}/credentials.json")),
         )) {
-            require(Config.get().clientInfoKey.isNotEmpty()) { "clientInfoKey is missing from config.json!" }
+            require(Config.get().clientInfoKey().isNotEmpty()) { "clientInfoKey is missing from config.json!" }
 
             // encrypt credentials
             Cryptor.encryptFile(it["credentialsFilePath"],
                 Config.getRelativePath(Config.GOOGLE_API_CREDENTIALS_PATH),
-                Config.get().clientInfoKey)
+                Config.get().clientInfoKey()
+            )
 
             // remove existing token
             val storedToken = File(Config.getRelativePath("${Config.GOOGLE_API_DIR}/StoredCredential"))

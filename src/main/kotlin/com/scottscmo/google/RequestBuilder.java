@@ -3,9 +3,9 @@ package com.scottscmo.google;
 import com.google.api.services.slides.v1.model.*;
 import com.scottscmo.Config;
 import com.scottscmo.util.StringUtils;
-import config.ParagraphConfig;
-import config.SlideConfig;
-import config.TextConfig;
+import com.scottscmo.config.ParagraphConfig;
+import com.scottscmo.config.SlideConfig;
+import com.scottscmo.config.TextConfig;
 
 import java.util.ArrayList;
 import java.util.Collections;

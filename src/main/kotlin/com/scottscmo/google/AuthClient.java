@@ -28,8 +28,6 @@ final class AuthClient {
      * Creates an authorized Credential object.
      */
     public Credential getCredentials(NetHttpTransport httpTransport) throws IOException {
-        assert !Config.get().clientInfoKey().isEmpty() : "clientInfoKey is missing from config.json!";
-
         // Load client secrets.
         GoogleClientSecrets clientSecrets;
         try {
