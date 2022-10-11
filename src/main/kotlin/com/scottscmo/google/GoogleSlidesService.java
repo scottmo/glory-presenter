@@ -145,7 +145,7 @@ public final class GoogleSlidesService {
                 String groupName = bibleVersionToTextConfig.get(version);
                 TextConfig textConfig = slideConfig.textConfigs().get(groupName);
                 BibleVerse verse = bibleVerses.get(version).get(i);
-                List<String> verseTexts = StringUtils.INSTANCE.distributeTextToBlocks(
+                List<String> verseTexts = StringUtils.distributeTextToBlocks(
                         verse.getIndex() + " " + verse.getText(),
                         textConfig.numberOfCharactersPerLine(),
                         textConfig.numberOfLinesPerSlide());

@@ -2,6 +2,7 @@ package com.scottscmo.google;
 
 import com.google.api.services.slides.v1.model.*;
 import com.scottscmo.Config;
+import com.scottscmo.util.StringSegment;
 import com.scottscmo.util.StringUtils;
 import com.scottscmo.config.ParagraphConfig;
 import com.scottscmo.config.SlideConfig;
@@ -47,7 +48,7 @@ public final class RequestBuilder {
     private void setBaseFontForText(String pageElementId, TextRun textRun,
                                     Map<String, TextConfig> textConfigs, int startIndex) {
         Optional.ofNullable(textRun.getContent()).ifPresent(content -> {
-            StringUtils.INSTANCE.splitByCharset(content, true).forEach(contentSegment -> {
+            StringUtils.splitByCharset(content, true).forEach(contentSegment -> {
                 String textConfigName = getTextConfigName(contentSegment);
                 TextConfig textConfig = textConfigs.get(textConfigName);
                 requests.add(new Request()
@@ -55,8 +56,8 @@ public final class RequestBuilder {
                                 .setObjectId(pageElementId)
                                 .setFields("*")
                                 .setTextRange(Util.getTextRange(
-                                        startIndex + contentSegment.getStartIndex(),
-                                        startIndex + contentSegment.getEndIndex()
+                                        startIndex + contentSegment.startIndex(),
+                                        startIndex + contentSegment.endIndex()
                                 ))
                                 .setStyle(textRun.getStyle().clone()
                                         .setForegroundColor(new OptionalColor()
@@ -342,7 +343,7 @@ public final class RequestBuilder {
     /**
      * use to match slide configuration. convenient method for CJK languages.
      */
-    private String getTextConfigName(StringUtils.StringSegment segment) {
+    private String getTextConfigName(StringSegment segment) {
         SlideConfig slideConfig = Config.get().googleSlideConfig();
         return segment.isAscii() ? slideConfig.defaultAsciiTextConfig() : slideConfig.defaultNonAsciiTextConfig();
     }
