@@ -3,7 +3,7 @@ package com.scottscmo.ui.panels
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.scottscmo.Config
-import com.scottscmo.model.bible.BibleMetadata
+import com.scottscmo.bibleMetadata.BibleMetadata
 import com.scottscmo.model.bible.BibleModel
 import com.scottscmo.ui.components.Form
 import com.scottscmo.ui.components.FormInput

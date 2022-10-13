@@ -15,7 +15,7 @@ class SongFormatterPanel : JPanel() {
     private val transformButton = JButton("Transform")
     private val saveTransformedButton = JButton("Save as Slide-Format Song")
     private val outputTextArea = JTextArea(25, 45).apply {
-        font = Config.textAreaFont
+        font = Config.getTextAreaFont()
     }
 
     private val songSlideEditor = FileEditor(Config.SONG_SLIDES_DIR, "Select Stored Slide-Format Song")
@@ -60,7 +60,7 @@ class SongFormatterPanel : JPanel() {
 
         private fun handleTransformSong(serializedSong: String, maxLines: Int, outputTextArea: JTextArea) {
             KVMDConverter.parse(serializedSong)?.let { song ->
-                var transformedText = KVMDConverter.stringify(song, Config.get().googleSlideConfig.textConfigsOrder, maxLines)
+                var transformedText = KVMDConverter.stringify(song, Config.get().googleSlideConfig().textConfigsOrder, maxLines)
                 transformedText = transformedText.replace(SINGLE_LINE_VERSE, MULTI_LINE_VERSE_REPL)
 
                 outputTextArea.apply {

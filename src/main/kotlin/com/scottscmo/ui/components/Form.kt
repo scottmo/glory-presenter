@@ -1,5 +1,6 @@
 package com.scottscmo.ui.components
 
+import com.scottscmo.Config
 import com.scottscmo.ui.FilePicker
 import com.scottscmo.ui.OutputDisplay
 import net.miginfocom.swing.MigLayout
@@ -24,13 +25,13 @@ class Form(title: String, inputConfigs: Map<String, FormInput>, onSubmit: (form:
             add(JLabel(title).apply { font = Font(font.name, Font.BOLD, font.size + 2) }, "span")
 
             for ((k, v) in inputConfigs) {
-                if (v.type == "text") {
-                    val input = JTextField(v.defaultValue)
-                    inputs[k] = input
-                    add(JLabel(v.label))
-                    add(input)
-                } else if (listOf("file", "directory", "fileAndDirectory", "filelist").contains(v.type)) {
-                    val input = JTextField(v.defaultValue.ifEmpty { "select ${v.type}" }).apply {
+                // label
+                add(JLabel(v.label))
+
+                // input
+                val input: Component
+                if (listOf("file", "directory", "fileAndDirectory", "filelist").contains(v.type)) {
+                    input = JTextField(v.defaultValue.ifEmpty { "select ${v.type}" }).apply {
                         addMouseListener(object : MouseAdapter() {
                             override fun mouseReleased(me: MouseEvent) {
                                 FilePicker.show(v.type, v.defaultValue) { selectedPath ->
@@ -39,10 +40,15 @@ class Form(title: String, inputConfigs: Map<String, FormInput>, onSubmit: (form:
                             }
                         })
                     }
-                    inputs[k] = input
-                    add(JLabel(v.label))
-                    add(input)
+                } else if (v.type == "textarea") {
+                    input = JTextArea(v.height, v.width).apply {
+                        font = Config.getTextAreaFont()
+                    }
+                } else {
+                    input = JTextField(v.defaultValue)
                 }
+                inputs[k] = input
+                add(input)
             }
 
             add(submitBtn, "skip, tag apply")
@@ -57,6 +63,8 @@ class Form(title: String, inputConfigs: Map<String, FormInput>, onSubmit: (form:
         inputs[key]?.let {
             if (it is JTextField) {
                 return it.text
+            } else if (it is JTextArea) {
+                return it.text
             }
         }
         return ""
@@ -66,4 +74,7 @@ class Form(title: String, inputConfigs: Map<String, FormInput>, onSubmit: (form:
 data class FormInput(
     val label: String,
     val type: String = "text",
-    val defaultValue: String = "") {}
+    val defaultValue: String = "",
+    val height: Int = 10,
+    val width: Int = 10
+)
