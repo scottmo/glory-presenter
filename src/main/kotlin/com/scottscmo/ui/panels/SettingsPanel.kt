@@ -22,7 +22,7 @@ class SettingsPanel : JPanel() {
             add(configEditor.ui, "wrap")
             add(JButton("Re-Apply Configurations").apply {
                 addActionListener {
-                    Config.load()
+                    Config.get()
                 }
             })
         })

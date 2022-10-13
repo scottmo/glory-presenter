@@ -1,4 +1,4 @@
-package com.scottscmo.model.bible;
+package com.scottscmo.bibleMetadata;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -55,7 +55,4 @@ public class BibleMetadata {
     public static int getNumberOfBooks() {
         return bookInfoMap.size();
     }
-}
-
-record BookMetadata(List<Integer> count, int index) {
 }

@@ -26,8 +26,6 @@ public class BibleReference {
             refString = bibleReferenceStrParts[1];
         }
 
-        assert versions != null && !versions.isEmpty() : "BibleReference '%s' is missing bible versions".formatted(bibleReferenceStr);
-
         Matcher matcher = RE_VERSE_NOTATION.matcher(refString);
         if (matcher.find() && matcher.groupCount() == 2) {
             book = matcher.group(1).trim().replaceAll("\\s+", " ").toLowerCase();
@@ -54,10 +52,16 @@ public class BibleReference {
         return ranges;
     }
 
+    public String getRangesString() {
+        return this.ranges.stream()
+                .map(VerseRange::toString)
+                .collect(Collectors.joining(";"));
+    }
+
     @Override
     public String toString() {
         return this.ranges.isEmpty()
                 ? this.book
-                : this.book + " " + this.ranges.stream().map(Object::toString).collect(Collectors.joining(";"));
+                : this.book + " " + getRangesString();
     }
 }

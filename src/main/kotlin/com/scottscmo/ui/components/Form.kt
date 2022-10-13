@@ -42,7 +42,7 @@ class Form(title: String, inputConfigs: Map<String, FormInput>, onSubmit: (form:
                     }
                 } else if (v.type == "textarea") {
                     input = JTextArea(v.height, v.width).apply {
-                        font = Config.textAreaFont
+                        font = Config.getTextAreaFont()
                     }
                 } else {
                     input = JTextField(v.defaultValue)

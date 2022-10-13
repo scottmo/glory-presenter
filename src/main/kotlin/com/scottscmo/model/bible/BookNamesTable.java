@@ -1,5 +1,7 @@
 package com.scottscmo.model.bible;
 
+import com.scottscmo.bibleMetadata.BibleMetadata;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

@@ -133,9 +133,7 @@ public final class GoogleSlidesService {
                 .map(version -> bookNames.getOrDefault(version, ""))
                 .filter(version -> !version.isEmpty())
                 .collect(Collectors.joining("\n"));
-        String verses = bibleRef.getRanges().stream()
-                .map(VerseRange::toString)
-                .collect(Collectors.joining(";"));
+        String verses = bibleRef.getRangesString();
         String titleText = queriedBookNames + "\n" + verses;
         slideTexts.add(new Pair<>(bibleRef.getVersions().get(0), titleText));
 

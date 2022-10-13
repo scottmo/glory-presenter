@@ -29,7 +29,7 @@ class FileEditor(path: Path, filePickerLabel: String = path.toString(),
 
     private val filePicker = JButton(filePickerLabel)
     private val textArea = JTextArea(editorHeight, editorWidth).apply {
-        font = Config.textAreaFont
+        font = Config.getTextAreaFont()
     }
     private val saveButton = JButton("Save")
     private val reloadButton = JButton("Reload")

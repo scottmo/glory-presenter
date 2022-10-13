@@ -15,7 +15,7 @@ class SongFormatterPanel : JPanel() {
     private val transformButton = JButton("Transform")
     private val saveTransformedButton = JButton("Save as Slide-Format Song")
     private val outputTextArea = JTextArea(25, 45).apply {
-        font = Config.textAreaFont
+        font = Config.getTextAreaFont()
     }
 
     private val songSlideEditor = FileEditor(Config.SONG_SLIDES_DIR, "Select Stored Slide-Format Song")

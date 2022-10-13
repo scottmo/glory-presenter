@@ -1,5 +1,6 @@
 package com.scottscmo.model.bible;
 
+import com.scottscmo.bibleMetadata.BibleMetadata;
 import com.scottscmo.bibleReference.BibleReference;
 import com.scottscmo.bibleReference.VerseRange;
 
