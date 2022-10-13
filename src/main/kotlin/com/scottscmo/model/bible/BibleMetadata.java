@@ -22,6 +22,10 @@ public class BibleMetadata {
         }
     }
 
+    public static Map<String, BookMetadata> getBookInfoMap() {
+        return bookInfoMap;
+    }
+
     public static int getBookIndex(String id) {
         if (!Strings.isNullOrEmpty(id)) {
             BookMetadata bookMetadata = bookInfoMap.get(id);

@@ -14,8 +14,8 @@ object PPTXGenerators {
         val inputContent = Files.readString(Path.of(dataFilePath))
         val input = KVMDConverter.parse(inputContent)
 
-        input?.sections?.let { sections ->
-            val title = input.title
+        input?.sections()?.let { sections ->
+            val title = input.title()
             val outputFilePath = Path.of(outputDirPath, "$title.pptx").toString()
 
             // Duplicate slide to match number of records.
@@ -40,7 +40,7 @@ object PPTXGenerators {
             FileInputStream(outputFilePath).use { inStream ->
                 val ppt = XMLSlideShow(inStream)
                 ppt.slides.zip(sections).forEach { (slide, section) ->
-                    val values = section.text.entries.associate {
+                    val values = section.text().entries.associate {
                         "{${it.key}}" to it.value
                     }.toMutableMap()
                     values["{title}"] = title

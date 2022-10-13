@@ -68,7 +68,7 @@ class BookNamesTable {
     public int insert(String version, List<String> bookNames) throws SQLException {
         createTable();
 
-        int inserted = 0;
+        int inserted;
         String sql = "INSERT INTO %s (id, name, version) VALUES (?, ?, ?)".formatted(DB_NAME);
         try (Connection conn = BibleDB.connect()) {
             try (PreparedStatement stmt = conn.prepareStatement(sql)) {

@@ -31,7 +31,7 @@ object BibleSlidesGenerator {
     @Throws(IOException::class)
     fun generate(templatePath: String, destDir: String, versions: String, verses: String = "") {
         if (verses.isEmpty()) {
-            BibleMetadata.bookInfoMap.forEach {
+            BibleMetadata.getBookInfoMap().forEach {
                 for (i in it.value.count.indices) {
                     val chapter = it.key + " " + (i + 1)
                     insertBibleText(Config.getRelativePath(templatePath),

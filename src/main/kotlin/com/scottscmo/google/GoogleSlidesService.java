@@ -183,11 +183,11 @@ public final class GoogleSlidesService {
 
         // title
         String textBoxId = requestBuilder.createSlideWithFullText(slideIndex++);
-        requestBuilder.insertText(textBoxId, song.title, slideConfig.paragraph(), defaultTextConfig);
+        requestBuilder.insertText(textBoxId, song.title(), slideConfig.paragraph(), defaultTextConfig);
 
         // lyrics
-        for (String sectionName : song.order) {
-            Section section = song.getSection(sectionName);
+        for (String sectionName : song.order()) {
+            Section section = song.section(sectionName);
             assert section != null : "Unable to find section $sectionName";
 
             String slideId = requestBuilder.createSlide(slideIndex++);
@@ -195,7 +195,7 @@ public final class GoogleSlidesService {
             // section text
             String sectionTextBoxId = requestBuilder.getPlaceHolderId(slideId);
             requestBuilder.resizeToFullPage(sectionTextBoxId);
-            requestBuilder.insertText(sectionTextBoxId, section.text, slideConfig);
+            requestBuilder.insertText(sectionTextBoxId, section.text(), slideConfig);
 
             // footer
             String footerTitleBoxId = requestBuilder.createTextBox(slideId,
@@ -211,13 +211,13 @@ public final class GoogleSlidesService {
                     defaultTextConfig.fontStyles(),
                     defaultTextConfig.numberOfCharactersPerLine(),
                     defaultTextConfig.numberOfLinesPerSlide());
-            requestBuilder.insertText(footerTitleBoxId, song.title, slideConfig.paragraph(), footerTextConfig);
+            requestBuilder.insertText(footerTitleBoxId, song.title(), slideConfig.paragraph(), footerTextConfig);
         }
         updateSlides(presentationId, requestBuilder.build());
     }
 
     private void insertSong(String presentationId, String songTitle, int slideIndex) throws IOException {
-        Song song = SongLoader.INSTANCE.getSong(Config.getRelativePath(Config.SONG_SLIDES_DIR), songTitle);
+        Song song = SongLoader.getSong(Config.getRelativePath(Config.SONG_SLIDES_DIR), songTitle);
         if (song != null) {
             insertSong(presentationId, song, slideIndex);
         }
