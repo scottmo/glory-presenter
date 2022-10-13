@@ -10,7 +10,6 @@ import com.google.api.services.slides.v1.model.BatchUpdatePresentationRequest;
 import com.google.api.services.slides.v1.model.Page;
 import com.google.api.services.slides.v1.model.Request;
 import com.scottscmo.Config;
-import com.scottscmo.bibleReference.VerseRange;
 import com.scottscmo.model.bible.BibleModel;
 import com.scottscmo.bibleReference.BibleReference;
 import com.scottscmo.model.bible.BibleVerse;

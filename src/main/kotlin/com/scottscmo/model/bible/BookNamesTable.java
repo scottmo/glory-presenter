@@ -55,7 +55,7 @@ class BookNamesTable {
 
     public List<String> queryVersions() throws SQLException {
         List<String> versions = new ArrayList<>();
-        String sql = "SELECT DISTINCT version FROM $DB_NAME";
+        String sql = "SELECT DISTINCT version FROM %s".formatted(DB_NAME);
         try (Connection conn = BibleDB.connect()) {
             try (Statement stmt = conn.createStatement()) {
                 ResultSet res = stmt.executeQuery(sql);

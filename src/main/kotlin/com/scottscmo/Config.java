@@ -28,13 +28,17 @@ public final class Config {
 
     public static AppConfig get() {
         if (_config == null) {
-            try (BufferedReader bufferReader = Files.newBufferedReader((Path.of(CONFIG_PATH)))) {
-                _config = new ObjectMapper().readValue(bufferReader, AppConfig.class);
-            } catch (IOException e) {
-                throw new RuntimeException("Unable to load config file!");
-            }
+            reload();
         }
         return _config;
+    }
+
+    public static void reload() {
+        try (BufferedReader bufferReader = Files.newBufferedReader((Path.of(CONFIG_PATH)))) {
+            _config = new ObjectMapper().readValue(bufferReader, AppConfig.class);
+        } catch (IOException e) {
+            throw new RuntimeException("Unable to load config file!", e);
+        }
     }
 
     public static String getRelativePath(String fileName) throws IOException {

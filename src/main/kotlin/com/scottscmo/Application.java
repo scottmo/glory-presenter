@@ -1,14 +1,16 @@
 package com.scottscmo;
 
 import com.formdev.flatlaf.FlatLightLaf;
-import com.scottscmo.ui.OutputDisplay;
 import com.scottscmo.ui.components.DataPathPicker;
-import com.scottscmo.ui.panels.*;
+import com.scottscmo.ui.panels.BibleInfoPanel;
+import com.scottscmo.ui.panels.GSlidesPanel;
+import com.scottscmo.ui.panels.PPTXGeneratorsPanel;
+import com.scottscmo.ui.panels.SettingsPanel;
+import com.scottscmo.ui.panels.SongFormatterPanel;
 import net.miginfocom.swing.MigLayout;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.Arrays;
 
 public class Application extends JFrame {
 
@@ -40,15 +42,9 @@ public class Application extends JFrame {
     }
 
     public static void main(String[] args) {
+        Config.reload();
         FlatLightLaf.setup();
         SwingUtilities.invokeLater(() -> {
-            Thread.UncaughtExceptionHandler defaultHandler = Thread.getDefaultUncaughtExceptionHandler();
-            Thread.setDefaultUncaughtExceptionHandler((thread, e) -> {
-                defaultHandler.uncaughtException(thread, e);
-                // show uncaught error to user
-                OutputDisplay.INSTANCE.error(e.getMessage() + "\n" + Arrays.toString(e.getStackTrace()));
-            });
-
             _app = new Application();
             _app.setVisible(true);
         });
