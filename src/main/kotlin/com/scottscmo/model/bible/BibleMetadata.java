@@ -47,6 +47,10 @@ public class BibleMetadata {
                 .map(Map.Entry::getKey)
                 .toList();
     }
+
+    public static int getNumberOfBooks() {
+        return bookInfoMap.size();
+    }
 }
 
 record BookMetadata(List<Integer> count, int index) {

@@ -4,10 +4,7 @@ import com.scottscmo.model.Database;
 
 import java.io.IOException;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.function.Consumer;
 
 final class BibleDB {
     private static final Database db;
@@ -22,18 +19,6 @@ final class BibleDB {
 
     static Connection connect() throws SQLException {
         return db.connect();
-    }
-
-    static void useStatement(Consumer<Statement> run) throws SQLException {
-        try (Statement stmt = connect().createStatement()) {
-            run.accept(stmt);
-        }
-    }
-
-    static void usePrepareStatement(String sql, Consumer<PreparedStatement> run) throws SQLException {
-        try (PreparedStatement stmt = connect().prepareStatement(sql)) {
-            run.accept(stmt);
-        }
     }
 
     static boolean isEmpty() {
