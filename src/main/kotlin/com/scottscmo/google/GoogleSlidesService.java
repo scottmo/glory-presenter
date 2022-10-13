@@ -10,8 +10,9 @@ import com.google.api.services.slides.v1.model.BatchUpdatePresentationRequest;
 import com.google.api.services.slides.v1.model.Page;
 import com.google.api.services.slides.v1.model.Request;
 import com.scottscmo.Config;
+import com.scottscmo.bibleReference.VerseRange;
 import com.scottscmo.model.bible.BibleModel;
-import com.scottscmo.model.bible.BibleReference;
+import com.scottscmo.bibleReference.BibleReference;
 import com.scottscmo.model.bible.BibleVerse;
 import com.scottscmo.model.song.Section;
 import com.scottscmo.model.song.Song;
@@ -118,10 +119,10 @@ public final class GoogleSlidesService {
         Map<String, String> bibleVersionToTextConfig = slideConfig.bibleVersionToTextConfig();
 
         // query bible data
-        Map<String, String> bookNames = BibleModel.Companion.get().getBookNames(bibleRef.getBook());
+        Map<String, String> bookNames = BibleModel.get().getBookNames(bibleRef.getBook());
         assert bookNames != null : "${bibleRef.book} does not exist!";
 
-        Map<String, List<BibleVerse>> bibleVerses = BibleModel.Companion.get().getBibleVerses(bibleRef);
+        Map<String, List<BibleVerse>> bibleVerses = BibleModel.get().getBibleVerses(bibleRef);
         assert bibleRef.getVersions().stream().allMatch(bibleVerses::containsKey);
 
         // building slide texts (version, text)
@@ -133,7 +134,7 @@ public final class GoogleSlidesService {
                 .filter(version -> !version.isEmpty())
                 .collect(Collectors.joining("\n"));
         String verses = bibleRef.getRanges().stream()
-                .map(BibleReference.VerseRange::toString)
+                .map(VerseRange::toString)
                 .collect(Collectors.joining(";"));
         String titleText = queriedBookNames + "\n" + verses;
         slideTexts.add(new Pair<>(bibleRef.getVersions().get(0), titleText));
@@ -146,7 +147,7 @@ public final class GoogleSlidesService {
                 TextConfig textConfig = slideConfig.textConfigs().get(groupName);
                 BibleVerse verse = bibleVerses.get(version).get(i);
                 List<String> verseTexts = StringUtils.distributeTextToBlocks(
-                        verse.getIndex() + " " + verse.getText(),
+                        verse.index() + " " + verse.text(),
                         textConfig.numberOfCharactersPerLine(),
                         textConfig.numberOfLinesPerSlide());
                 for (String verseText : verseTexts) {

@@ -1,5 +1,8 @@
 package com.scottscmo.model.bible;
 
+import com.scottscmo.bibleReference.BibleReference;
+import com.scottscmo.bibleReference.VerseRange;
+
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -7,7 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-class BibleModel {
+public class BibleModel {
 
     private static final BibleModel bibleModel = new BibleModel();
     public static BibleModel get() {
@@ -46,7 +49,7 @@ class BibleModel {
             Map<String, List<BibleVerse>> bibleVerses = new HashMap<>();
             for (String version : versions) {
                 List<BibleVerse> verses = new ArrayList<>();
-                for (BibleReference.VerseRange range : ref.getRanges()) {
+                for (VerseRange range : ref.getRanges()) {
                     verses.addAll(bibleVerseTable.query(version, bookId, range.getChapter(), range.getVerses()));
                 }
                 bibleVerses.put(version, verses);

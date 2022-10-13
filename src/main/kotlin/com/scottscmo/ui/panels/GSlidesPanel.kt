@@ -3,7 +3,7 @@ package com.scottscmo.ui.panels
 import com.scottscmo.Config
 import com.scottscmo.google.Action
 import com.scottscmo.google.GoogleSlidesService
-import com.scottscmo.model.bible.BibleReference
+import com.scottscmo.bibleReference.BibleReference
 import com.scottscmo.model.song.converters.KVMDConverter
 import com.scottscmo.ui.components.Form
 import com.scottscmo.ui.components.FormInput
@@ -50,7 +50,8 @@ class GSlidesPanel : JPanel() {
             "verses"   to FormInput("Verses", "text", "john 1:2-5,7-8"),
             "versions" to FormInput("Bible Versions", "text", "cuv,niv"),
         )) {
-            val bibleRef = BibleReference("${it["versions"]} - ${it["verses"]}")
+            val bibleRef =
+                BibleReference("${it["versions"]} - ${it["verses"]}")
             googleService.insertBibleText(getPresentationId(), bibleRef, getInsertionIndex())
             "Bible slides have been successfully generated!"
         }.ui, "span, wrap")

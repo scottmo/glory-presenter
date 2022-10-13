@@ -1,6 +1,6 @@
 package bible
 
-import com.scottscmo.model.bible.BibleReference
+import com.scottscmo.bibleReference.BibleReference
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test

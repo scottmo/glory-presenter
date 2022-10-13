@@ -1,6 +1,6 @@
 package com.scottscmo.model.bible;
 
-record BibleVerse(
+public record BibleVerse(
     int bookIndex,
     int chapter,
     int index,

@@ -3,7 +3,7 @@ package com.scottscmo.ppt
 import com.scottscmo.Config
 import com.scottscmo.model.bible.BibleMetadata
 import com.scottscmo.model.bible.BibleModel
-import com.scottscmo.model.bible.BibleReference
+import com.scottscmo.bibleReference.BibleReference
 import org.apache.poi.xslf.usermodel.XMLSlideShow
 import org.apache.poi.xslf.usermodel.XSLFSlideLayout
 import java.io.FileInputStream
