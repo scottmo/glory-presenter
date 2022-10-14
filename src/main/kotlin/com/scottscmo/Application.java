@@ -1,7 +1,6 @@
 package com.scottscmo;
 
 import com.formdev.flatlaf.FlatLightLaf;
-import com.scottscmo.ui.components.DataPathPicker;
 import com.scottscmo.ui.panels.BibleInfoPanel;
 import com.scottscmo.ui.panels.GSlidesPanel;
 import com.scottscmo.ui.panels.PPTXGeneratorsPanel;
@@ -15,10 +14,14 @@ import java.awt.*;
 
 public class Application extends JFrame {
 
-    static Logger logger = Logger.getLogger(Application.class.getName());
+    private static final Logger logger = Logger.getLogger(Application.class.getName());
     private static Application _app;
     public static Application get() {
         return _app;
+    }
+
+    public static Logger getLogger() {
+        return logger;
     }
 
     public Application() {
@@ -28,9 +31,6 @@ public class Application extends JFrame {
 
         LayoutManager layout = new MigLayout("ins 0, wrap");
         getContentPane().setLayout(layout);
-
-        JComponent dataPathPicker = new DataPathPicker().getUi();
-        getContentPane().add(dataPathPicker);
 
         JTabbedPane tabs = new JTabbedPane();
         tabs.addTab("Bible", new BibleInfoPanel());
