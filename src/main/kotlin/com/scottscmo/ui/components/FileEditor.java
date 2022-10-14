@@ -26,7 +26,7 @@ public final class FileEditor {
     private final JButton reloadButton;
 
     public FileEditor(Path path, String filePickerLabel, int editorHeight, int editorWidth) throws IOException {
-        // ui
+        // view
         ui = new JPanel();
         saveButton = new JButton("Save");
         reloadButton = new JButton("Reload");
@@ -39,7 +39,7 @@ public final class FileEditor {
         ui.add(reloadButton);
         ui.add(saveButton);
 
-        // listeners
+        // controls
         boolean isFilePickerEnabled = Files.isDirectory(path);
         if (isFilePickerEnabled) {
             filePicker.addMouseListener(new MouseAdapter() {
@@ -48,7 +48,7 @@ public final class FileEditor {
                     FilePicker.show(FilePicker.SEARCHABLE_DIRECTORY, path.toString(), selectedPath -> {
                         filePath = selectedPath;
                         loadFileToTextArea(filePath, textArea);
-                        toggleReadWriteButtons(true);
+                        toggleButtons(true, saveButton, reloadButton);
                     });
                 }
             });
@@ -59,7 +59,7 @@ public final class FileEditor {
                 filePicker.setEnabled(false);
                 filePicker.setText(filePath);
                 loadFileToTextArea(filePath, textArea);
-                toggleReadWriteButtons(true);
+                toggleButtons(true, saveButton, reloadButton);
             });
         }
 
@@ -75,7 +75,7 @@ public final class FileEditor {
             loadFileToTextArea(filePath, textArea);
         });
 
-        toggleReadWriteButtons(false);
+        toggleButtons(false, saveButton, reloadButton);
     }
 
     public FileEditor(Path path, String filePickerLabel) throws IOException {
@@ -102,9 +102,10 @@ public final class FileEditor {
         return filePath;
     }
 
-    public void toggleReadWriteButtons(boolean isEnabled) {
-        saveButton.setEnabled(isEnabled);
-        reloadButton.setEnabled(isEnabled);
+    private static void toggleButtons(boolean isEnabled, JButton ... buttons) {
+        for (var button : buttons) {
+            button.setEnabled(isEnabled);
+        }
     }
 
     private static void loadFileToTextArea(String path, JTextArea textArea) {
