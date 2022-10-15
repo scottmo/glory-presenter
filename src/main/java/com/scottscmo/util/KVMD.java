@@ -92,7 +92,7 @@ public final class KVMD {
         if (!keyRegex.matcher(input).find()) return Collections.emptyMap();
 
         // find all the keys and recursively parse the values
-        Pattern currentLevelKeyRegex = Pattern.compile("(^|\n)%s{%d}\\s(.+)($|\n)".formatted(prefix, level));
+        Pattern currentLevelKeyRegex = Pattern.compile("(^|\n)" + prefix + "{" + level + "}\\s(.+)($|\n)");
         Matcher currentLevelKeyMatcher = currentLevelKeyRegex.matcher(input);
 
         List<String> keys = new ArrayList<>();
