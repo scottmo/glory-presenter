@@ -35,6 +35,8 @@ public final class FileEditor {
         filePicker = new JButton(filePickerLabel);
         textArea = new JTextArea(editorHeight, editorWidth);
 
+        textArea.setFont(Config.getTextAreaFont());
+
         ui.setLayout(new MigLayout("ins 0"));
         ui.add(filePicker, "wrap, span, growx");
         ui.add(new JScrollPane(textArea), "wrap, span, grow");
