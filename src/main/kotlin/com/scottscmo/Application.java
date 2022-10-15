@@ -7,21 +7,17 @@ import com.scottscmo.ui.panels.PPTXGeneratorsPanel;
 import com.scottscmo.ui.panels.SettingsPanel;
 import com.scottscmo.ui.panels.SongFormatterPanel;
 import net.miginfocom.swing.MigLayout;
-import org.apache.log4j.Logger;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JFrame;
+import javax.swing.JTabbedPane;
+import javax.swing.SwingUtilities;
+import java.awt.LayoutManager;
 
 public class Application extends JFrame {
 
-    private static final Logger logger = Logger.getLogger(Application.class.getName());
     private static Application _app;
     public static Application get() {
         return _app;
-    }
-
-    public static Logger getLogger() {
-        return logger;
     }
 
     public Application() {
@@ -45,8 +41,7 @@ public class Application extends JFrame {
 
     public static void main(String[] args) {
         Thread.setDefaultUncaughtExceptionHandler((Thread t, Throwable e) -> {
-            logger.error("Uncaught exception in thread: " + t.getName(), e);
-            e.printStackTrace();
+            AppLogger.error("Uncaught exception in thread: " + t.getName(), e);
         });
 
         Config.reload();

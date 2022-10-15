@@ -3,7 +3,7 @@ package com.scottscmo;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.scottscmo.config.AppConfig;
 
-import java.awt.*;
+import java.awt.Font;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -41,11 +41,15 @@ public final class Config {
         }
     }
 
-    public static String getRelativePath(String fileName) throws IOException {
-        return Path.of(get().dataDir(), fileName).toFile().getCanonicalPath();
+    public static String getRelativePath(String fileName) {
+        try {
+            return Path.of(get().dataDir(), fileName).toFile().getCanonicalPath();
+        } catch (IOException e) {
+            return "";
+        }
     }
 
-    public static String getOutputDir(String fileName) throws IOException {
+    public static String getOutputDir(String fileName) {
         return getRelativePath(Path.of(OUTPUT_DIR, fileName).toString());
     }
 }

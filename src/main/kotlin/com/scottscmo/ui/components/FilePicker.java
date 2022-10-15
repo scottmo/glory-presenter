@@ -1,11 +1,18 @@
-package com.scottscmo.ui;
+package com.scottscmo.ui.components;
 
 import com.scottscmo.Application;
 import com.scottscmo.Config;
 import net.miginfocom.swing.MigLayout;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JFileChooser;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JScrollPane;
+import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
+import java.awt.Dialog;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -23,7 +30,7 @@ public final class FilePicker {
     public static final int FILES = 0;
     public static final int DIRECTORIES = 1;
     public static final int FILES_AND_DIRECTORIES = 2;
-    public static final int SEARCHABLE_DIRECTORY = 3;
+    public static final int FILE_SEARCH = 3;
 
     private static String selectedFilePath = "";
 
@@ -33,7 +40,7 @@ public final class FilePicker {
 
     public static void show(int mode, String dirPath, Consumer<String> onSelected) {
 
-        if (mode != SEARCHABLE_DIRECTORY) {
+        if (mode != FILE_SEARCH) {
             showSystemPicker(mode, dirPath, onSelected);
             return;
         }

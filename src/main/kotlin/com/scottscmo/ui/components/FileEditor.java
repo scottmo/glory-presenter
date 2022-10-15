@@ -1,17 +1,20 @@
 package com.scottscmo.ui.components;
 
+import com.scottscmo.AppLogger;
 import com.scottscmo.Config;
-import com.scottscmo.ui.FilePicker;
-import com.scottscmo.ui.OutputDisplay;
 import net.miginfocom.swing.MigLayout;
 
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import javax.swing.*;
 
 public final class FileEditor {
     private static final int DEFAULT_HEIGHT = 25;
@@ -25,8 +28,7 @@ public final class FileEditor {
     private final JButton saveButton;
     private final JButton reloadButton;
 
-    public FileEditor(Path path, String filePickerLabel, int editorHeight, int editorWidth) throws IOException {
-        // view
+    public FileEditor(Path path, String filePickerLabel, int editorHeight, int editorWidth) {
         ui = new JPanel();
         saveButton = new JButton("Save");
         reloadButton = new JButton("Reload");
@@ -45,7 +47,7 @@ public final class FileEditor {
             filePicker.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseReleased(MouseEvent me) {
-                    FilePicker.show(FilePicker.SEARCHABLE_DIRECTORY, path.toString(), selectedPath -> {
+                    FilePicker.show(FilePicker.FILE_SEARCH, path.toString(), selectedPath -> {
                         filePath = selectedPath;
                         loadFileToTextArea(filePath, textArea);
                         toggleButtons(true, saveButton, reloadButton);
@@ -67,7 +69,7 @@ public final class FileEditor {
             try {
                 Files.writeString(Path.of(filePath), textArea.getText());
             } catch (IOException ioe) {
-                OutputDisplay.error("Unable to load " + filePath, ioe);
+                AppLogger.showError("Unable to load " + filePath, ioe);
             }
         });
 
@@ -114,7 +116,7 @@ public final class FileEditor {
             textArea.setText(content);
             textArea.setCaretPosition(0); // scroll to top
         } catch (IOException e) {
-            OutputDisplay.error("Unable to load " + path, e);
+            AppLogger.showError("Unable to load " + path, e);
         }
     }
 }
