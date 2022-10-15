@@ -1,5 +1,6 @@
 package com.scottscmo.ui.panels;
 
+import com.scottscmo.AppLogger;
 import com.scottscmo.Config;
 import com.scottscmo.ppt.BibleSlidesGenerator;
 import com.scottscmo.ppt.PPTXGenerators;
@@ -28,10 +29,11 @@ public final class PPTXGeneratorsPanel extends JPanel {
         ), form -> {
             try {
                 PPTXGenerators.generate(form.getValue(dataPathKey), form.getValue(templatePathKey), form.getValue(outputDirKey));
+                return "Slides have been successfully generated!";
             } catch (IOException e) {
-                throw new RuntimeException("Failed to generate slides!", e);
+                AppLogger.showError("Failed to generate slides!", e);
             }
-            return "Slides have been successfully generated!";
+            return null;
         });
 
         var versesKey = "verses";
@@ -44,10 +46,11 @@ public final class PPTXGeneratorsPanel extends JPanel {
         ), form -> {
             try {
                 BibleSlidesGenerator.generate(form.getValue(templatePathKey), form.getValue(outputDirKey), form.getValue(versionsKey), form.getValue(versesKey));
+                return "Bible slides have been successfully generated!";
             } catch (IOException e) {
-                throw new RuntimeException("Failed to generate slides!", e);
+                AppLogger.showError("Failed to generate slides!", e);
             }
-            return "Bible slides have been successfully generated!";
+            return null;
         });
 
         setLayout(new MigLayout());

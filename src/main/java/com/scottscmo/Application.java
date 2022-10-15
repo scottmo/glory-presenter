@@ -40,13 +40,13 @@ public class Application extends JFrame {
     }
 
     public static void main(String[] args) {
-        Thread.setDefaultUncaughtExceptionHandler((Thread t, Throwable e) -> {
-            AppLogger.error("Uncaught exception in thread: " + t.getName(), e);
-        });
-
         Config.reload();
         FlatLightLaf.setup();
         SwingUtilities.invokeLater(() -> {
+            Thread.setDefaultUncaughtExceptionHandler((Thread t, Throwable e) -> {
+                AppLogger.showError("Uncaught exception (see error.log): " + e.getMessage(), e);
+            });
+
             _app = new Application();
             _app.setVisible(true);
         });

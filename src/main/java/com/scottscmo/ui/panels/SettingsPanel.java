@@ -1,5 +1,6 @@
 package com.scottscmo.ui.panels;
 
+import com.scottscmo.AppLogger;
 import com.scottscmo.Config;
 import com.scottscmo.ui.components.FileEditor;
 import com.scottscmo.ui.components.Form;
@@ -54,9 +55,11 @@ public final class SettingsPanel extends JPanel {
                     Config.get().clientInfoKey()
             );
         } catch (GeneralSecurityException e) {
-            throw new RuntimeException("Failed to encrypt Google API key", e);
+            AppLogger.showError("Failed to encrypt Google API key", e);
+            return;
         } catch (IOException e) {
-            throw new RuntimeException("Failed to load Google API credentials", e);
+            AppLogger.showError("Failed to load Google API credentials", e);
+            return;
         }
 
         // remove existing token

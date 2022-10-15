@@ -43,11 +43,11 @@ public final class GSlidesPanel extends JPanel {
         // basic actions
         var setDefaultTitleTextBtn = new JButton("Set Default Title Text");
         add(setDefaultTitleTextBtn, "wrap");
-        setDefaultTitleTextBtn.addActionListener(e -> {
+        setDefaultTitleTextBtn.addActionListener(evt -> {
             try {
                 googleService.setDefaultTitleText(getPresentationId());
-            } catch (IOException ex) {
-                throw new RuntimeException(ex);
+            } catch (IOException e) {
+                AppLogger.showError("Action failed!", e);
             }
         });
 
@@ -57,7 +57,7 @@ public final class GSlidesPanel extends JPanel {
             try {
                 googleService.setBaseFont(getPresentationId());
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                AppLogger.showError("Action failed!", e);
             }
         });
 
@@ -69,10 +69,11 @@ public final class GSlidesPanel extends JPanel {
             var bibleRef = new BibleReference(form.getValue("versions") + " - " + form.getValue("verses"));
             try {
                 googleService.insertBibleText(getPresentationId(), bibleRef, getInsertionIndex());
+                return "Bible slides have been successfully generated!";
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                AppLogger.showError("Action failed!", e);
             }
-            return "Bible slides have been successfully generated!";
+            return null;
         });
         add(bibleSlidesGeneratorForm.getUI(), "span, wrap");
 
@@ -89,7 +90,7 @@ public final class GSlidesPanel extends JPanel {
             } catch (IOException e) {
                 AppLogger.showError("Unable to generate song slides!", e);
             }
-            return "Unable to generate song slides!";
+            return null;
         });
         add(songSlidesGeneratorForm.getUI(), "span, wrap");
 

@@ -57,7 +57,10 @@ public final class Form {
 
         // controls
         submitBtn.addActionListener(e -> {
-            AppLogger.show(onSubmit.apply(this));
+            String result = onSubmit.apply(this);
+            if (result != null) {
+                AppLogger.show(result);
+            }
         });
     }
 
