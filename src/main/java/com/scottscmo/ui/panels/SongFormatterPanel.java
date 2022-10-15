@@ -53,17 +53,13 @@ public final class SongFormatterPanel extends JPanel {
 
         // controls
         transformButton.addActionListener(e -> {
-            handleTransformSong(songEditor.getContent(), getSpinnerValue(maxLinesSpinnerInput), outputTextArea);
+            handleTransformSong(songEditor.getContent(), (Integer)maxLinesSpinnerInput.getValue(), outputTextArea);
         });
 
         saveTransformedButton.addActionListener(e -> {
             var filePath = Config.getRelativePath("%s/%s".formatted(Config.SONG_SLIDES_DIR, Path.of(songEditor.getPath()).getFileName()));
             handleSaveTransformed(filePath, outputTextArea.getText());
         });
-    }
-
-    private static int getSpinnerValue(JSpinner spinner) {
-        return Integer.parseInt((String) spinner.getValue());
     }
 
     private static final String SINGLE_LINE_VERSE = "/(\\s{4})(\\w+):\\s([^|][^-].+)/";
