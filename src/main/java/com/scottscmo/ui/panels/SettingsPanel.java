@@ -38,8 +38,9 @@ public final class SettingsPanel extends JPanel {
         configEditorContainer.setLayout(new MigLayout("ins 0"));
         configEditorContainer.add(configEditor.getUI(), "wrap");
         configEditorContainer.add(configReloadButton);
+        add(new BibleInfoPanel(), "wrap");
+        add(googleApiCredentialImportForm.getUI(), "wrap");
         add(configEditorContainer);
-        add(googleApiCredentialImportForm.getUI());
 
         // controls
         configReloadButton.addActionListener(e -> {

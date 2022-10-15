@@ -1,7 +1,6 @@
 package com.scottscmo;
 
 import com.formdev.flatlaf.FlatLightLaf;
-import com.scottscmo.ui.panels.BibleInfoPanel;
 import com.scottscmo.ui.panels.GSlidesPanel;
 import com.scottscmo.ui.panels.PPTXGeneratorsPanel;
 import com.scottscmo.ui.panels.SettingsPanel;
@@ -29,7 +28,6 @@ public class Application extends JFrame {
         getContentPane().setLayout(layout);
 
         JTabbedPane tabs = new JTabbedPane();
-        tabs.addTab("Bible", new BibleInfoPanel());
         tabs.addTab("Song Formatter", new SongFormatterPanel());
         tabs.addTab("PPTX Generators", new PPTXGeneratorsPanel());
         tabs.addTab("Google Slides", new GSlidesPanel());
