@@ -139,7 +139,7 @@ public final class KVMD {
 
         return Stream.of(namespace, metadataStr, contentStr)
                 .filter(s -> !s.isEmpty())
-                .collect(Collectors.joining("\n$SECTION_DELIMITER\n")) + "\n";
+                .collect(Collectors.joining("\n%s\n".formatted(SECTION_DELIMITER))) + "\n";
     }
 
     private static String stringifyMetadataValue(Object value) {
