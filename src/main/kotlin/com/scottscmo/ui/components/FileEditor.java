@@ -80,15 +80,7 @@ public final class FileEditor {
         toggleButtons(false, saveButton, reloadButton);
     }
 
-    public FileEditor(Path path, String filePickerLabel) throws IOException {
-        this(path, filePickerLabel, DEFAULT_HEIGHT, DEFAULT_WIDTH);
-    }
-
-    public FileEditor(String path, String filePickerLabel, int editorHeight, int editorWidth) throws IOException {
-        this(Path.of(Config.getRelativePath(path)), filePickerLabel, editorHeight, editorWidth);
-    }
-
-    public FileEditor(String path, String filePickerLabel) throws IOException {
+    public FileEditor(Path path, String filePickerLabel) {
         this(path, filePickerLabel, DEFAULT_HEIGHT, DEFAULT_WIDTH);
     }
 
