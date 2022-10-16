@@ -13,7 +13,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.security.GeneralSecurityException;
-import java.util.Map;
+import java.util.List;
 
 public final class SettingsPanel extends JPanel {
     public SettingsPanel() {
@@ -24,13 +24,13 @@ public final class SettingsPanel extends JPanel {
         // api importer
         var defaultCredentialsPath = Config.getRelativePath(Config.GOOGLE_API_DIR + "/credentials.json");
         var googleApiCredentialImportForm = new Form("Google API Credentials Importer",
-                Map.of(
-                        "credentialsFilePath", new FormInput("Credentials json", "file", defaultCredentialsPath)
-                ),
-                form -> {
-                    storeGoogleAPICredentials(form.getValue("credentialsFilePath"));
-                    return "Credentials imported! Please restart app.";
-                }
+            List.of(
+                new FormInput("credentialsFilePath", "Credentials json", "file", defaultCredentialsPath)
+            ),
+            form -> {
+                storeGoogleAPICredentials(form.getValue("credentialsFilePath"));
+                return "Credentials imported! Please restart app.";
+            }
         );
 
         setLayout(new MigLayout("", "[]10[]", "top"));
@@ -52,8 +52,8 @@ public final class SettingsPanel extends JPanel {
         // encrypt credentials
         try {
             Cryptor.encryptFile(credentialsFilePath,
-                    Config.getRelativePath(Config.GOOGLE_API_CREDENTIALS_PATH),
-                    Config.get().clientInfoKey()
+                Config.getRelativePath(Config.GOOGLE_API_CREDENTIALS_PATH),
+                Config.get().clientInfoKey()
             );
         } catch (GeneralSecurityException e) {
             AppLogger.showError("Failed to encrypt Google API key", e);

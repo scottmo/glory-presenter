@@ -16,6 +16,7 @@ import java.awt.Font;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -32,7 +33,7 @@ public final class Form {
 
     private final JPanel ui = new JPanel();
 
-    public Form(String title, Map<String, FormInput> inputConfigs, Function<Form, String> onSubmit) {
+    public Form(String title, List<FormInput> inputConfigs, Function<Form, String> onSubmit) {
         JLabel titleLabel = new JLabel(title);
         JButton submitBtn = new JButton("Submit");
 
@@ -42,14 +43,11 @@ public final class Form {
         ui.setLayout(new MigLayout("ins 0, wrap 2", "[100][100, left, fill, grow]"));
         ui.add(titleLabel, "span");
 
-        for (var configEntry : inputConfigs.entrySet()) {
-            String inputName = configEntry.getKey();
-            FormInput config = configEntry.getValue();
-
+        for (var config : inputConfigs) {
             ui.add(new JLabel(config.label()));
 
             JComponent input = buildInput(config);
-            inputs.put(inputName, input);
+            inputs.put(config.id(), input);
             ui.add(input);
         }
 

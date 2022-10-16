@@ -62,10 +62,10 @@ public final class GSlidesPanel extends JPanel {
         });
 
         // bible verses
-        var bibleSlidesGeneratorForm = new Form("Bible Slides Generator", Map.of(
-                "verses"   , new FormInput("Verses", "text", "john 1:2-5,7-8"),
-                "versions" , new FormInput("Bible Versions", "text", "cuv,niv")
-                ), form -> {
+        var bibleSlidesGeneratorForm = new Form("Bible Slides Generator", List.of(
+            new FormInput("verses", "Verses", "text", "john 1:2-5,7-8"),
+            new FormInput("versions", "Bible Versions", "text", "cuv,niv")
+        ), form -> {
             var bibleRef = new BibleReference(form.getValue("versions") + " - " + form.getValue("verses"));
             try {
                 googleService.insertBibleText(getPresentationId(), bibleRef, getInsertionIndex());
@@ -77,8 +77,8 @@ public final class GSlidesPanel extends JPanel {
         });
         add(bibleSlidesGeneratorForm.getUI(), "span, wrap");
 
-        var songSlidesGeneratorForm = new Form("Song Slides Generator", Map.of(
-                "song" , new FormInput("Song", "fileSearch", Config.getRelativePath(Config.SONG_SLIDES_DIR))
+        var songSlidesGeneratorForm = new Form("Song Slides Generator", List.of(
+            new FormInput("song", "Song", "fileSearch", Config.getRelativePath(Config.SONG_SLIDES_DIR))
         ), form -> {
             try {
                 var slideSong = Files.readString(Path.of(form.getValue("song")));
@@ -94,11 +94,11 @@ public final class GSlidesPanel extends JPanel {
         });
         add(songSlidesGeneratorForm.getUI(), "span, wrap");
 
-        var genericSlidesGeneratorForm = new Form("Generate from template", Map.of(
-                "title"      , new FormInput("Title", "text"),
-                "folderId"   , new FormInput("Folder ID", "text"),
-                "templateId" , new FormInput("Template ID", "text"),
-                "inserts"    , new FormInput("Inserts", "textarea")
+        var genericSlidesGeneratorForm = new Form("Generate from template", List.of(
+            new FormInput("title", "Title", "text"),
+            new FormInput("folderId", "Folder ID", "text"),
+            new FormInput("templateId", "Template ID", "text"),
+            new FormInput("inserts", "Inserts", "textarea")
         ), form -> {
             List<Action> inserts = parseSlideInserts(form.getValue("inserts"));
             String presentationId = googleService.copyPresentation(form.getValue("title"), form.getValue("folderId"), form.getValue("templateId"));

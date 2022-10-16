@@ -8,14 +8,13 @@ import com.scottscmo.model.bible.BibleModel;
 import com.scottscmo.ui.components.Form;
 import com.scottscmo.ui.components.FormInput;
 import net.miginfocom.swing.MigLayout;
+
+import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextArea;
 
 public final class BibleInfoPanel extends JPanel {
     public BibleInfoPanel() {
@@ -29,9 +28,9 @@ public final class BibleInfoPanel extends JPanel {
 
         var dataPathKey = "dataFilePath";
         var versionKey = "version";
-        var bibleImportForm = new Form("Bible Importer", Map.of(
-                dataPathKey, new FormInput("Input JSON", "file", Config.getRelativePath("bible.json")),
-                versionKey, new FormInput("Version", "text", "niv")
+        var bibleImportForm = new Form("Bible Importer", List.of(
+            new FormInput(dataPathKey, "Input JSON", "file", Config.getRelativePath("bible.json")),
+            new FormInput(versionKey, "Version", "text", "niv")
         ), (form) -> importBible(form.getValue(versionKey), form.getValue(dataPathKey)));
 
         setLayout(new MigLayout("", "left", "top"));
@@ -51,7 +50,8 @@ public final class BibleInfoPanel extends JPanel {
 
     private String importBible(String version, String bibleJSONPath) {
         try {
-            var bibleJsonTypeRef = new TypeReference<Map<String, List<List<String>>>>() {};
+            var bibleJsonTypeRef = new TypeReference<Map<String, List<List<String>>>>() {
+            };
             var bibleJson = new ObjectMapper().readValue(new File(bibleJSONPath), bibleJsonTypeRef);
             int insertedVerseCount = BibleModel.get().insert(bibleJson, version);
             return "Successfully inserted %d %s bible verses".formatted(insertedVerseCount, version);

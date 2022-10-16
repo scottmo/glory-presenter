@@ -8,9 +8,9 @@ import com.scottscmo.ui.components.Form;
 import com.scottscmo.ui.components.FormInput;
 import net.miginfocom.swing.MigLayout;
 
-import javax.swing.JPanel;
+import javax.swing.*;
 import java.io.IOException;
-import java.util.Map;
+import java.util.List;
 
 public final class PPTXGeneratorsPanel extends JPanel {
     public PPTXGeneratorsPanel() {
@@ -20,12 +20,12 @@ public final class PPTXGeneratorsPanel extends JPanel {
         var outputDirKey = "outputDirPath";
 
         // common field defaults
-        var outputDirDefault = new FormInput("Output Folder", "directory", Config.getRelativePath("../output"));
+        var outputDirDefault = new FormInput(outputDirKey, "Output Folder", "directory", Config.getRelativePath("../output"));
 
-        var pptGenerator = new Form("PPTX Generator", Map.of(
-                dataPathKey, new FormInput("Input File", "file", Config.getRelativePath(".")),
-                templatePathKey, new FormInput("Template File", "file", Config.getRelativePath(".")),
-                outputDirKey, outputDirDefault
+        var pptGenerator = new Form("PPTX Generator", List.of(
+            new FormInput(dataPathKey, "Input File", "file", Config.getRelativePath(".")),
+            new FormInput(templatePathKey, "Template File", "file", Config.getRelativePath(".")),
+            outputDirDefault
         ), form -> {
             try {
                 PPTXGenerators.generate(form.getValue(dataPathKey), form.getValue(templatePathKey), form.getValue(outputDirKey));
@@ -38,11 +38,11 @@ public final class PPTXGeneratorsPanel extends JPanel {
 
         var versesKey = "verses";
         var versionsKey = "versions";
-        var biblePPTGenerator = new Form("Bible Slides Generator", Map.of(
-                versesKey, new FormInput("Verses", "text", "john 1:2-5,7-8"),
-                versionsKey, new FormInput("Bible Versions", "text", "cuv,niv"),
-                templatePathKey, new FormInput("Template File", "file", Config.getRelativePath("template-bible.pptx")),
-                outputDirKey, outputDirDefault
+        var biblePPTGenerator = new Form("Bible Slides Generator", List.of(
+            new FormInput(versesKey, "Verses", "text", "john 1:2-5,7-8"),
+            new FormInput(versionsKey, "Bible Versions", "text", "cuv,niv"),
+            new FormInput(templatePathKey, "Template File", "file", Config.getRelativePath("template-bible.pptx")),
+            outputDirDefault
         ), form -> {
             try {
                 BibleSlidesGenerator.generate(form.getValue(templatePathKey), form.getValue(outputDirKey), form.getValue(versionsKey), form.getValue(versesKey));
