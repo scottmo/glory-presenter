@@ -1,5 +1,8 @@
 package com.scottscmo.google;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.api.services.slides.v1.model.Dimension;
 import com.google.api.services.slides.v1.model.OpaqueColor;
 import com.google.api.services.slides.v1.model.Page;
@@ -89,5 +92,11 @@ public final class Util {
                         .setRed(rgb.get(0))
                         .setGreen(rgb.get(1))
                         .setBlue(rgb.get(2)));
+    }
+
+    public static <T> T deepClone(T slideObject) throws JsonProcessingException {
+        // use serialization to clone
+        var typeRef = new TypeReference<T>() {};
+        return new ObjectMapper().readValue(slideObject.toString(), typeRef);
     }
 }

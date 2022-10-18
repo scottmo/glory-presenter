@@ -10,8 +10,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 public final class Config {
-    public static final String SONG_DIR = "songs";
-    public static final String SONG_SLIDES_DIR = "songs_slide";
+    public static final String CONTENTS_DIR = "contents";
+    public static final String CONTENTS_SLIDE_DIR = "contents_slide";
 
     public static final String GOOGLE_API_DIR = "google_api";
     public static final String GOOGLE_API_CREDENTIALS_PATH = GOOGLE_API_DIR + "/client.info";

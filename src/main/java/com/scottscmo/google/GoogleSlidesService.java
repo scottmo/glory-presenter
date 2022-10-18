@@ -10,15 +10,14 @@ import com.google.api.services.slides.v1.model.BatchUpdatePresentationRequest;
 import com.google.api.services.slides.v1.model.Page;
 import com.google.api.services.slides.v1.model.Request;
 import com.scottscmo.Config;
-import com.scottscmo.model.bible.BibleModel;
 import com.scottscmo.bibleReference.BibleReference;
-import com.scottscmo.model.bible.BibleVerse;
-import com.scottscmo.model.song.Section;
-import com.scottscmo.model.song.Song;
-import com.scottscmo.model.song.SongLoader;
-import com.scottscmo.util.StringUtils;
 import com.scottscmo.config.SlideConfig;
 import com.scottscmo.config.TextConfig;
+import com.scottscmo.model.bible.BibleModel;
+import com.scottscmo.model.bible.BibleVerse;
+import com.scottscmo.model.content.Content;
+import com.scottscmo.model.content.ContentUtil;
+import com.scottscmo.util.StringUtils;
 import org.apache.commons.math3.util.Pair;
 
 import java.io.IOException;
@@ -171,7 +170,7 @@ public final class GoogleSlidesService {
         updateSlides(presentationId, requestBuilder.build());
     }
 
-    public void insertSong(String presentationId, Song song, int slideInsertIndex) throws IOException {
+    public void insertSong(String presentationId, Content content, int slideInsertIndex) throws IOException {
         SlideConfig slideConfig = Config.get().googleSlideConfig();
         TextConfig defaultTextConfig = slideConfig.textConfigs().get(slideConfig.defaultTextConfig());
 
@@ -179,20 +178,22 @@ public final class GoogleSlidesService {
         int slideIndex = slideInsertIndex;
 
         // title
+        String joinedTitle = content.getJoinedTitle(slideConfig.textConfigsOrder());
         String textBoxId = requestBuilder.createSlideWithFullText(slideIndex++);
-        requestBuilder.insertText(textBoxId, song.title(), slideConfig.paragraph(), defaultTextConfig);
+        requestBuilder.insertText(textBoxId, content.getTitle(), slideConfig);
+        // requestBuilder.insertText(textBoxId, joinedTitle, slideConfig.paragraph(), defaultTextConfig);
 
         // lyrics
-        for (String sectionName : song.order()) {
-            Section section = song.section(sectionName);
-            assert section != null : "Unable to find section $sectionName";
+        for (String sectionName : content.getSectionOrder()) {
+            var section = content.getRawSection(sectionName);
+            assert section.isPresent() : "Unable to find section " + sectionName;
 
             String slideId = requestBuilder.createSlide(slideIndex++);
 
             // section text
             String sectionTextBoxId = requestBuilder.getPlaceHolderId(slideId);
             requestBuilder.resizeToFullPage(sectionTextBoxId);
-            requestBuilder.insertText(sectionTextBoxId, section.text(), slideConfig);
+            requestBuilder.insertText(sectionTextBoxId, section.get(), slideConfig);
 
             // footer
             String footerTitleBoxId = requestBuilder.createTextBox(slideId,
@@ -208,15 +209,15 @@ public final class GoogleSlidesService {
                     defaultTextConfig.fontStyles(),
                     defaultTextConfig.numberOfCharactersPerLine(),
                     defaultTextConfig.numberOfLinesPerSlide());
-            requestBuilder.insertText(footerTitleBoxId, song.title(), slideConfig.paragraph(), footerTextConfig);
+            requestBuilder.insertText(footerTitleBoxId, joinedTitle, slideConfig.paragraph(), footerTextConfig);
         }
         updateSlides(presentationId, requestBuilder.build());
     }
 
     private void insertSong(String presentationId, String songTitle, int slideIndex) throws IOException {
-        Song song = SongLoader.getSong(Config.getRelativePath(Config.SONG_SLIDES_DIR), songTitle);
-        if (song != null) {
-            insertSong(presentationId, song, slideIndex);
+        Content content = ContentUtil.parseFromFuzzySearch(Config.getRelativePath(Config.CONTENTS_SLIDE_DIR), songTitle);
+        if (content != null) {
+            insertSong(presentationId, content, slideIndex);
         }
     }
 

@@ -5,23 +5,18 @@ import com.scottscmo.Config;
 import com.scottscmo.bibleReference.BibleReference;
 import com.scottscmo.google.Action;
 import com.scottscmo.google.GoogleSlidesService;
-import com.scottscmo.model.song.converters.KVMDConverter;
+import com.scottscmo.model.content.ContentUtil;
 import com.scottscmo.ui.components.Form;
 import com.scottscmo.ui.components.FormInput;
 import net.miginfocom.swing.MigLayout;
 
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
+import javax.swing.*;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 public final class GSlidesPanel extends JPanel {
     private final JTextField slideUrlInput = new JTextField();
@@ -78,13 +73,12 @@ public final class GSlidesPanel extends JPanel {
         add(bibleSlidesGeneratorForm.getUI(), "span, wrap");
 
         var songSlidesGeneratorForm = new Form("Song Slides Generator", List.of(
-            new FormInput("song", "Song", "fileSearch", Config.getRelativePath(Config.SONG_SLIDES_DIR))
+            new FormInput("song", "Song", "fileSearch", Config.getRelativePath(Config.CONTENTS_SLIDE_DIR))
         ), form -> {
             try {
-                var slideSong = Files.readString(Path.of(form.getValue("song")));
-                var song = KVMDConverter.parse(slideSong);
-                if (song != null) {
-                    googleService.insertSong(getPresentationId(), song, getInsertionIndex());
+                var content = ContentUtil.parse(Path.of(form.getValue("song")).toFile());
+                if (content != null) {
+                    googleService.insertSong(getPresentationId(), content, getInsertionIndex());
                     return "Song slides have been successfully generated!";
                 }
             } catch (IOException e) {

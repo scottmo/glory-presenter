@@ -1,4 +1,4 @@
-package com.scottscmo.model.song;
+package com.scottscmo.model.content;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -17,10 +17,10 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public class DocumentUtil {
+public class ContentUtil {
     private static final ObjectMapper tomlMapper = new ObjectMapper(new TomlFactory());
     
-    public static Document parseFromFuzzySearch(String dataPath, String titleSubstring) {
+    public static Content parseFromFuzzySearch(String dataPath, String titleSubstring) {
         File[] files = new File(Path.of(dataPath).toString()).listFiles();
         if (files != null) {
             Optional<String> fileName = Arrays.stream(files)
@@ -40,15 +40,15 @@ public class DocumentUtil {
         return null;
     }
 
-    public static Document parse(File file) throws IOException {
-        return tomlMapper.readValue(file, Document.class);
+    public static Content parse(File file) throws IOException {
+        return tomlMapper.readValue(file, Content.class);
     }
 
-    public static Document parse(String content) throws IOException {
-        return tomlMapper.readValue(content, Document.class);
+    public static Content parse(String content) throws IOException {
+        return tomlMapper.readValue(content, Content.class);
     }
 
-    public static String stringify(Document doc) throws JsonProcessingException {
+    public static String stringify(Content doc) throws JsonProcessingException {
         return "[title]\n"
                 + tomlMapper.writeValueAsString(doc.getTitle())
                 + "\n[metadata]\n"
@@ -65,23 +65,23 @@ public class DocumentUtil {
                 .collect(Collectors.joining("\n"));
     }
 
-    public static String stringify(Document document, List<String> textGroups, int maxLines) throws JsonProcessingException {
-        List<Map<String, String>> transformedSectionTexts = getSectionTexts(document, textGroups, maxLines);
+    public static String stringify(Content content, List<String> textGroups, int maxLines) throws JsonProcessingException {
+        List<Map<String, String>> transformedSectionTexts = getSectionTexts(content, textGroups, maxLines);
         Map<String, Map<String, String>> transformedSections = new HashMap<>();
         for (int i = 0; i < transformedSectionTexts.size(); i++) {
             transformedSections.put("s" + i, transformedSectionTexts.get(i));
         }
-        document.setSections(transformedSections);
-        document.setSectionOrder(transformedSections.keySet().stream().toList());
-        dedupeSections(document);
-        return stringify(document);
+        content.setSections(transformedSections);
+        content.setSectionOrder(transformedSections.keySet().stream().toList());
+        dedupeSections(content);
+        return stringify(content);
     }
 
-    private static void dedupeSections(Document document) {
+    private static void dedupeSections(Content content) {
         List<String> newOrder = new ArrayList<>();
         Map<String, Map<String, String>> newSections = new HashMap<>();
         Map<String, String> visitedSections = new HashMap<>();
-        for (var section : document.getSections().entrySet()) {
+        for (var section : content.getSections().entrySet()) {
             // use section text as key and section number as value
             String sectionHash = section.getValue().entrySet().stream()
                     .map(text -> "%s=%s".formatted(text.getKey(), text.getValue()))
@@ -96,18 +96,20 @@ public class DocumentUtil {
                 visitedSections.put(sectionHash, section.getKey());
             }
         }
-        document.setSections(newSections);
-        document.setSectionOrder(newOrder);
+        content.setSections(newSections);
+        content.setSectionOrder(newOrder);
     }
 
-    private static Map<String, List<String>> getSectionTextsByGroup(Document Document, List<String> textGroups, int maxLines) {
+    private static Map<String, List<String>> getSectionTextsByGroup(Content Content, List<String> textGroups, int maxLines) {
         if (textGroups.isEmpty()) {
             return Collections.emptyMap();
         }
         Map<String, List<String>> data = new HashMap<>();
-        for (String sectionName : Document.getSectionOrder()) {
-            Optional<Map<String, List<String>>> section = Document.getSection(sectionName);
-            assert section.isPresent() :  "Unable to find section $sectionName";
+        for (String sectionName : Content.getSectionOrder()) {
+            Optional<Map<String, List<String>>> section = Content.getSection(sectionName);
+            if (section.isEmpty()) {
+                throw new RuntimeException("Unable to find section " + sectionName);
+            }
 
             // assuming all langs have same # of section lines
             int numSectionLines = getValueListSize(section.get());
@@ -134,8 +136,8 @@ public class DocumentUtil {
         return data;
     }
 
-    public static List<Map<String, String>> getSectionTexts(Document document, List<String> textGroups, int maxLines) {
-        Map<String, List<String>> distributedText = getSectionTextsByGroup(document, textGroups, maxLines);
+    public static List<Map<String, String>> getSectionTexts(Content content, List<String> textGroups, int maxLines) {
+        Map<String, List<String>> distributedText = getSectionTextsByGroup(content, textGroups, maxLines);
         int numSections = getValueListSize(distributedText);
         return IntStream.range(0, numSections)
                 .mapToObj(i -> textGroups.stream()

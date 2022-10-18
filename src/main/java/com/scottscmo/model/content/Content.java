@@ -1,4 +1,4 @@
-package com.scottscmo.model.song;
+package com.scottscmo.model.content;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -7,8 +7,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-public class Document {
+public class Content {
     private Map<String, String> title;
     private Map<String, String> metadata;
     private Map<String, Map<String, String>> sections;
@@ -17,16 +18,23 @@ public class Document {
         return title;
     }
 
-    public Document setTitle(Map<String, String> title) {
+    public Content setTitle(Map<String, String> title) {
         this.title = title;
         return this;
+    }
+
+    @JsonIgnore
+    public String getJoinedTitle(List<String> order) {
+        String index = this.getMetadata().getOrDefault("index", "");
+        return Stream.concat(Stream.of(index), order.stream().map(key -> this.getTitle().get(key)))
+                .collect(Collectors.joining(" "));
     }
 
     public Map<String, String> getMetadata() {
         return metadata;
     }
 
-    public Document setMetadata(Map<String, String> metadata) {
+    public Content setMetadata(Map<String, String> metadata) {
         this.metadata = metadata;
         return this;
     }
@@ -37,7 +45,7 @@ public class Document {
         return Arrays.stream(order.split(",")).map(String::trim).toList();
     }
 
-    public Document setSectionOrder(List<String> order) {
+    public Content setSectionOrder(List<String> order) {
         this.metadata.put("order", String.join(", ", order));
         return this;
     }
@@ -46,12 +54,12 @@ public class Document {
         return sections;
     }
 
-    public Document setSections(Map<String, Map<String, String>> sections) {
+    public Content setSections(Map<String, Map<String, String>> sections) {
         this.sections = sections;
         return this;
     }
 
-    private Optional<Map<String, String>> getRawSection(String name) {
+    public Optional<Map<String, String>> getRawSection(String name) {
         return this.sections.entrySet().stream()
                 .filter(section -> name.equals(section.getKey()))
                 .findFirst()

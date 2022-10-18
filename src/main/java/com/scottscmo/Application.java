@@ -42,7 +42,7 @@ public class Application extends JFrame {
         FlatLightLaf.setup();
         SwingUtilities.invokeLater(() -> {
             Thread.setDefaultUncaughtExceptionHandler((Thread t, Throwable e) -> {
-                AppLogger.showError("Uncaught exception (see error.log): " + e.getMessage(), e);
+                AppLogger.showError("Oops!: " + e.getMessage() + "(see error.log for details)", e);
             });
 
             _app = new Application();
