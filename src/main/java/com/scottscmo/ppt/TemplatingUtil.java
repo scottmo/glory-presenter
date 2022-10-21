@@ -9,8 +9,18 @@ import org.apache.poi.xslf.usermodel.XSLFTextShape;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 final class TemplatingUtil {
+
+    public static String getText(XSLFSlide slide) {
+        return slide.getShapes().stream()
+                .filter(s -> s instanceof XSLFTextShape)
+                .map(s -> ((XSLFTextShape)s).getTextParagraphs().stream()
+                    .map(XSLFTextParagraph::getText)
+                    .collect(Collectors.joining()))
+                .collect(Collectors.joining("\n"));
+    }
 
     public static void replaceText(XSLFSlide slide, Map<String, String> replacements) {
         slide.getShapes().stream()
@@ -28,20 +38,6 @@ final class TemplatingUtil {
                 }
             }
             setText(pp, text);
-        }
-
-    }
-
-    public static void replacePlaceholders(XSLFSlide slide, Map<String, String> replacements) {
-        for (var textShape : slide.getPlaceholders()) {
-            String text = textShape.getText();
-            for (var entry : replacements.entrySet()) {
-                if (text.contains(entry.getKey())) {
-                    text = text.replace(entry.getKey(), entry.getValue());
-                }
-            }
-            clearText(textShape);
-            appendText(textShape, text);
         }
     }
 
@@ -61,7 +57,9 @@ final class TemplatingUtil {
      * setText that handles "\n" properly
      */
     public static void setText(XSLFTextParagraph pp, String text) {
-        var baseTextRun = pp.getTextRuns().get(0);
+        var baseTextRun = pp.getTextRuns().isEmpty()
+                ? pp.addNewTextRun()
+                : pp.getTextRuns().get(0);
         String[] lines = text.split("\n");
         baseTextRun.setText(lines[0]);
         for (int i = 1; i < lines.length; i++) {
@@ -90,8 +88,23 @@ final class TemplatingUtil {
             }
         }
         var ppxml = pp.getXmlObject();
-        for (int i = ppxml.sizeOfBrArray(); i < 1; i++) {
-            ppxml.removeBr(i - 1);
+        if (ppxml.sizeOfBrArray() > 0) {
+            for (int i = ppxml.sizeOfBrArray() - 1; i >= 0; i--) {
+                ppxml.removeBr(i);
+            }
+        }
+    }
+
+    public static void replacePlaceholders(XSLFSlide slide, Map<String, String> replacements) {
+        for (var textShape : slide.getPlaceholders()) {
+            String text = textShape.getText();
+            for (var entry : replacements.entrySet()) {
+                if (text.contains(entry.getKey())) {
+                    text = text.replace(entry.getKey(), entry.getValue());
+                }
+            }
+            clearText(textShape);
+            appendText(textShape, text);
         }
     }
 
@@ -99,7 +112,7 @@ final class TemplatingUtil {
         replacePlaceholders(slide, Map.of(searchText, replacement));
     }
 
-    public static String findText(XSLFSlide slide, String searchText) {
+    public static String findPlaceholderText(XSLFSlide slide, String searchText) {
         for (var placeholder : slide.getPlaceholders()) {
             String text = placeholder.getText();
             if (text.contains(searchText)) {

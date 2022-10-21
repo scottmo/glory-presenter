@@ -25,10 +25,8 @@ class BookNamesTable {
                 PRIMARY KEY (name, version)
             )
         """.formatted(DB_NAME);
-        try (Connection conn = BibleDB.connect()) {
-            try (Statement stmt = conn.createStatement()) {
-                stmt.executeUpdate(sql);
-            }
+        try (Statement stmt = BibleDB.connect().createStatement()) {
+            stmt.executeUpdate(sql);
         }
     }
 
@@ -39,14 +37,12 @@ class BookNamesTable {
     public List<Map<String, String>> queryAll() throws SQLException {
         List<Map<String, String>> bookNames = new ArrayList<>(Collections.nCopies(BibleMetadata.getNumberOfBooks(), new HashMap<>()));
 
-        String sql = "SELECT * FROM $DB_NAME";
-        try (Connection conn = BibleDB.connect()) {
-            try (Statement stmt = conn.createStatement()) {
-                ResultSet res = stmt.executeQuery(sql);
-                while (res.next()) {
-                    bookNames.get(res.getInt("id"))
-                            .put(res.getString("version"), res.getString("name"));
-                }
+        String sql = "SELECT * FROM %s".formatted(DB_NAME);
+        try (Statement stmt = BibleDB.connect().createStatement()) {
+            ResultSet res = stmt.executeQuery(sql);
+            while (res.next()) {
+                bookNames.get(res.getInt("id"))
+                        .put(res.getString("version"), res.getString("name"));
             }
         }
 
@@ -56,12 +52,10 @@ class BookNamesTable {
     public List<String> queryVersions() throws SQLException {
         List<String> versions = new ArrayList<>();
         String sql = "SELECT DISTINCT version FROM %s".formatted(DB_NAME);
-        try (Connection conn = BibleDB.connect()) {
-            try (Statement stmt = conn.createStatement()) {
-                ResultSet res = stmt.executeQuery(sql);
-                while (res.next()) {
-                    versions.add(res.getString("version"));
-                }
+        try (Statement stmt = BibleDB.connect().createStatement()) {
+            ResultSet res = stmt.executeQuery(sql);
+            while (res.next()) {
+                versions.add(res.getString("version"));
             }
         }
         return versions;
@@ -72,18 +66,16 @@ class BookNamesTable {
 
         int inserted;
         String sql = "INSERT INTO %s (id, name, version) VALUES (?, ?, ?)".formatted(DB_NAME);
-        try (Connection conn = BibleDB.connect()) {
-            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-                for (int i = 0; i < bookNames.size(); i++) {
-                    stmt.setInt(1, i);
-                    stmt.setString(2, bookNames.get(i));
-                    stmt.setString(3, version);
-                    stmt.addBatch();
-                }
-                int[] res = stmt.executeBatch();
-                inserted = res.length;
-                System.out.printf("Inserted %d book names for version %s%n", inserted, version);
+        try (PreparedStatement stmt = BibleDB.connect().prepareStatement(sql)) {
+            for (int i = 0; i < bookNames.size(); i++) {
+                stmt.setInt(1, i);
+                stmt.setString(2, bookNames.get(i));
+                stmt.setString(3, version);
+                stmt.addBatch();
             }
+            int[] res = stmt.executeBatch();
+            inserted = res.length;
+            System.out.printf("Inserted %d book names for version %s%n", inserted, version);
         }
         return inserted;
     }

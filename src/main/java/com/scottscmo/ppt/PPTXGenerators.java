@@ -1,13 +1,20 @@
 package com.scottscmo.ppt;
 
+import com.google.common.base.Strings;
 import com.scottscmo.Config;
 import com.scottscmo.model.content.ContentUtil;
 import org.apache.poi.xslf.usermodel.XMLSlideShow;
+import org.apache.poi.xslf.usermodel.XSLFSlide;
 
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -61,6 +68,60 @@ public final class PPTXGenerators {
                 ppt.write(outStream);
             }
             ppt.close();
+        }
+    }
+
+    public static void generate(String baseTemplate, List<InsertAction> insertActions, String outputPath) throws IOException {
+        Path outputFile = Path.of(outputPath);
+        XMLSlideShow outputPPT;
+
+        if (baseTemplate != null) {
+            Files.copy(Path.of(baseTemplate), outputFile, StandardCopyOption.REPLACE_EXISTING);
+            try (var inStream = new FileInputStream(outputFile.toString())) {
+                // this could be an issue. not sure if can close instream early
+                outputPPT = new XMLSlideShow(inStream);
+            }
+        } else {
+            outputPPT = new XMLSlideShow();
+        }
+
+        for (var insertAction : insertActions) {
+            try (var inStream = new FileInputStream(insertAction.templatePath())) {
+                var templatePPT = new XMLSlideShow(inStream);
+                var templateSlides = templatePPT.getSlides();
+                var content = ContentUtil.parse(new File(insertAction.dataPath()));
+                var insertionIndex = Integer.parseInt(insertAction.insertIndex());
+
+                for (var parameters : insertAction.parameters()) {
+                    var templateSlide = templateSlides.get(parameters.templateIndex());
+                }
+            }
+        }
+
+        try (var outStream = new FileOutputStream(outputFile.toString())) {
+            outputPPT.write(outStream);
+        }
+        outputPPT.close();
+    }
+
+    public static void main(String[] args) {
+        try (var inStream = new FileInputStream(Config.getRelativePath("templates/template-hymn.pptx"))) {
+            var ppt = new XMLSlideShow(inStream);
+            var outputPPT = new XMLSlideShow();
+            var slide = outputPPT.createSlide();
+//            slide.importContent(ppt.getSlides().get(0));
+            TemplatingUtil.replaceText(slide, Map.of(
+                    "{metadata.index}", "321",
+                    "{title.zh}", "你好",
+                    "{title.en}", "hello"
+            ));
+            try (var outStream = new FileOutputStream(Config.getRelativePath("test.pptx"))) {
+                outputPPT.write(outStream);
+            }
+            outputPPT.close();
+            ppt.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 }

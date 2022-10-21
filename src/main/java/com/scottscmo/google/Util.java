@@ -86,6 +86,7 @@ public final class Util {
         List<Float> rgb = Arrays.stream(rgbString.split(","))
                 .map(String::trim)
                 .map(Float::parseFloat)
+                .map(v -> v / 255)
                 .toList();
         return new OpaqueColor()
                 .setRgbColor(new RgbColor()

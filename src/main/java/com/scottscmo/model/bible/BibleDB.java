@@ -8,6 +8,7 @@ import java.sql.SQLException;
 
 final class BibleDB {
     private static final Database db;
+    private static Connection conn;
 
     static {
         try {
@@ -18,7 +19,10 @@ final class BibleDB {
     }
 
     static Connection connect() throws SQLException {
-        return db.connect();
+        if (conn == null) {
+            conn = db.connect();
+        }
+        return conn;
     }
 
     static boolean isEmpty() {

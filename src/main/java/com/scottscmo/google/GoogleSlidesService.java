@@ -9,6 +9,7 @@ import com.google.api.services.slides.v1.Slides;
 import com.google.api.services.slides.v1.model.BatchUpdatePresentationRequest;
 import com.google.api.services.slides.v1.model.Page;
 import com.google.api.services.slides.v1.model.Request;
+import com.scottscmo.AppLogger;
 import com.scottscmo.Config;
 import com.scottscmo.bibleReference.BibleReference;
 import com.scottscmo.config.SlideConfig;
@@ -154,18 +155,20 @@ public final class GoogleSlidesService {
 
         // create slide update requests from slide texts
         RequestBuilder requestBuilder = new RequestBuilder();
-        slideTexts.stream()
-                .sorted(Collections.reverseOrder())
-                .forEachOrdered(verseText -> {
-                    String version = verseText.getKey();
-                    String text = verseText.getValue();
-                    String lang = bibleVersionToTextConfig.get(version);
-                    TextConfig textConfig = slideConfig.textConfigs().get(lang);
-                    assert textConfig != null : "No matching text config for $version version";
+        for (int i = slideTexts.size() - 1; i >= 0; i--) {
+            var verseText = slideTexts.get(i);
+            String version = verseText.getKey();
+            String text = verseText.getValue();
+            String lang = bibleVersionToTextConfig.get(version);
+            TextConfig textConfig = slideConfig.textConfigs().get(lang);
 
-                    String titleId = requestBuilder.createSlideWithFullText(slideIndex);
-                    requestBuilder.insertText(titleId, text, slideConfig.paragraph(), textConfig);
-                });
+            if (textConfig == null) {
+                throw new RuntimeException("No matching text config for %s version".formatted(version));
+            }
+
+            String titleId = requestBuilder.createSlideWithFullText(slideIndex);
+            requestBuilder.insertText(titleId, text, slideConfig.paragraph(), textConfig);
+        }
 
         updateSlides(presentationId, requestBuilder.build());
     }
@@ -191,6 +194,8 @@ public final class GoogleSlidesService {
             String slideId = requestBuilder.createSlide(slideIndex++);
 
             // section text
+            // trim texts since the toml format we use have new lines intentionally inserted for readability
+            section.get().forEach((key, value) -> section.get().put(key, value.trim()));
             String sectionTextBoxId = requestBuilder.getPlaceHolderId(slideId);
             requestBuilder.resizeToFullPage(sectionTextBoxId);
             requestBuilder.insertText(sectionTextBoxId, section.get(), slideConfig);
@@ -223,7 +228,8 @@ public final class GoogleSlidesService {
 
     public void generateSlides(String presentationId, List<Action> actions) {
         ArrayList<Action> failedActions = new ArrayList<>();
-        actions.stream().sorted(Collections.reverseOrder()).forEachOrdered(action -> {
+        for (int i = actions.size() - 1; i >= 0; i--) {
+            var action = actions.get(i);
             try {
                 if ("bible".equals(action.type())) {
                     insertBibleText(presentationId, new BibleReference(action.input()), action.index());
@@ -231,9 +237,10 @@ public final class GoogleSlidesService {
                     insertSong(presentationId, action.input(), action.index());
                 }
             } catch (Exception e) {
+                AppLogger.error("Failed to run " + action, e);
                 failedActions.add(action);
             }
-        });
+        }
         if (!failedActions.isEmpty()) {
             throw new RuntimeException("Failed to run these actions: " + failedActions);
         }

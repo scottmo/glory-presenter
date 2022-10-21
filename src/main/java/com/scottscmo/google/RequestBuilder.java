@@ -197,9 +197,12 @@ public final class RequestBuilder {
                 .sorted(Collections.reverseOrder())
                 .filter(textConfig::containsKey)
                 .toList();
-        for (int i = 0; i < textConfigsOrder.size(); i++) {
+        // run in reverse order since we insert by pushing text down
+        // doing it sequentially will require us to calculate the length of inserted text which can be inconsistent
+        // with new lines
+        for (int i = textConfigsOrder.size() - 1; i >= 0; i--) {
             String configName = textConfigsOrder.get(i);
-            String ln = i == 0 ? "" : "\n";
+            String ln = i == textConfigsOrder.size() - 1 ? "" : "\n";
             insertText(textBoxId, textConfig.get(configName) + ln,
                     slideConfig.paragraph(), slideConfig.textConfigs().get(configName));
         }

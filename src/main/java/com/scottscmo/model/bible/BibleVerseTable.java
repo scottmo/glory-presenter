@@ -24,10 +24,8 @@ class BibleVerseTable {
                 PRIMARY KEY(bookIndex, chapter, verse)
             )
         """.formatted(tableName);
-        try (Connection conn = BibleDB.connect()) {
-            try (Statement stmt = conn.createStatement()) {
-                stmt.executeUpdate(sql);
-            }
+        try (Statement stmt = BibleDB.connect().createStatement()) {
+            stmt.executeUpdate(sql);
         }
     }
 
@@ -52,18 +50,16 @@ class BibleVerseTable {
 
         int inserted;
         String sql = "INSERT INTO %s (bookIndex, chapter, verse, text) VALUES (?, ?, ?, ?)".formatted(tableName);
-        try (Connection conn = BibleDB.connect()) {
-            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-                for (BibleVerse bvt : verses) {
-                    stmt.setInt(1, bvt.bookIndex());
-                    stmt.setInt(2, bvt.chapter());
-                    stmt.setInt(3, bvt.index());
-                    stmt.setString(4, bvt.text());
-                    stmt.addBatch();
-                }
-                int[] rs = stmt.executeBatch();
-                inserted = rs.length;
+        try (PreparedStatement stmt = BibleDB.connect().prepareStatement(sql)) {
+            for (BibleVerse bvt : verses) {
+                stmt.setInt(1, bvt.bookIndex());
+                stmt.setInt(2, bvt.chapter());
+                stmt.setInt(3, bvt.index());
+                stmt.setString(4, bvt.text());
+                stmt.addBatch();
             }
+            int[] rs = stmt.executeBatch();
+            inserted = rs.length;
         }
         return inserted;
     }
@@ -77,20 +73,18 @@ class BibleVerseTable {
             String verseNumberPlaceholder = String.join(",", "?".repeat(verses.size()).split(""));
             sql += " AND verse IN (%s)".formatted(verseNumberPlaceholder);
         }
-        try (Connection conn = BibleDB.connect()) {
-            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-                stmt.setString(1, BibleMetadata.getBookIndex(bookId) + ".0"); // .0 because bookIndex was initially a string, TODO: FIX THIS
-                stmt.setInt(2, chapter);
-                for (int i = 0; i < verses.size(); i++) {
-                    stmt.setInt(3 + i, verses.get(i));
-                }
-                ResultSet rs = stmt.executeQuery();
+        try (PreparedStatement stmt = BibleDB.connect().prepareStatement(sql)) {
+            stmt.setString(1, BibleMetadata.getBookIndex(bookId) + ".0"); // .0 because bookIndex was initially a string, TODO: FIX THIS
+            stmt.setInt(2, chapter);
+            for (int i = 0; i < verses.size(); i++) {
+                stmt.setInt(3 + i, verses.get(i));
+            }
+            ResultSet rs = stmt.executeQuery();
 
-                while (rs.next()) {
-                    BibleVerse bvt = new BibleVerse(rs.getInt("bookIndex"), rs.getInt("chapter"),
-                            rs.getInt("verse"), rs.getString("text"));
-                    bibleVerses.add(bvt);
-                }
+            while (rs.next()) {
+                BibleVerse bvt = new BibleVerse(rs.getInt("bookIndex"), rs.getInt("chapter"),
+                        rs.getInt("verse"), rs.getString("text"));
+                bibleVerses.add(bvt);
             }
         }
         return bibleVerses;
