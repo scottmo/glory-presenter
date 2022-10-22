@@ -24,8 +24,4 @@ final class BibleDB {
         }
         return conn;
     }
-
-    static boolean isEmpty() {
-        return db.isEmpty();
-    }
 }
