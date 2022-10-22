@@ -24,7 +24,6 @@ import org.apache.commons.math3.util.Pair;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -184,7 +183,9 @@ public final class GoogleSlidesService {
         String joinedTitle = content.getJoinedTitle(slideConfig.textConfigsOrder());
         String textBoxId = requestBuilder.createSlideWithFullText(slideIndex++);
         requestBuilder.insertText(textBoxId, content.getTitle(), slideConfig);
-        // requestBuilder.insertText(textBoxId, joinedTitle, slideConfig.paragraph(), defaultTextConfig);
+        if (content.getMetadata().containsKey("index")) {
+            requestBuilder.insertText(textBoxId, content.getMetadata().get("index"), slideConfig.paragraph(), defaultTextConfig);
+        }
 
         // lyrics
         for (String sectionName : content.getSectionOrder()) {
