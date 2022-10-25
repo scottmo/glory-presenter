@@ -68,11 +68,14 @@ public class ContentUtil {
     public static String stringify(Content content, List<String> textGroups, int maxLines) throws JsonProcessingException {
         List<Map<String, String>> transformedSectionTexts = getSectionTexts(content, textGroups, maxLines);
         Map<String, Map<String, String>> transformedSections = new HashMap<>();
+        List<String> sectionOrder = new ArrayList<>();
         for (int i = 0; i < transformedSectionTexts.size(); i++) {
-            transformedSections.put("s" + i, transformedSectionTexts.get(i));
+            String key = "s" + i;
+            sectionOrder.add(key);
+            transformedSections.put(key, transformedSectionTexts.get(i));
         }
         content.setSections(transformedSections);
-        content.setSectionOrder(transformedSections.keySet().stream().toList());
+        content.setSectionOrder(sectionOrder);
         dedupeSections(content);
         return stringify(content);
     }
@@ -81,9 +84,10 @@ public class ContentUtil {
         List<String> newOrder = new ArrayList<>();
         Map<String, Map<String, String>> newSections = new HashMap<>();
         Map<String, String> visitedSections = new HashMap<>();
-        for (var section : content.getSections().entrySet()) {
+        for (String sectionName : content.getSectionOrder()) {
+            var section = content.getSections().get(sectionName);
             // use section text as key and section number as value
-            String sectionHash = section.getValue().entrySet().stream()
+            String sectionHash = section.entrySet().stream()
                     .map(text -> "%s=%s".formatted(text.getKey(), text.getValue()))
                     .collect(Collectors.joining("&"));
             if (visitedSections.containsKey(sectionHash)) {
@@ -91,9 +95,9 @@ public class ContentUtil {
                 newOrder.add(visitedSections.get(sectionHash));
             } else {
                 // unique sections
-                newOrder.add(section.getKey());
-                newSections.put(section.getKey(), section.getValue());
-                visitedSections.put(sectionHash, section.getKey());
+                newOrder.add(sectionName);
+                newSections.put(sectionName, section);
+                visitedSections.put(sectionHash, sectionName);
             }
         }
         content.setSections(newSections);

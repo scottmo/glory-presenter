@@ -56,15 +56,11 @@ public final class SongFormatterPanel extends JPanel {
         });
     }
 
-    private static final String SINGLE_LINE_VERSE = "/(\\s{4})(\\w+):\\s([^|][^-].+)/";
-    private static final String MULTI_LINE_VERSE_REPL = "$1$2: |-\n$1  $3";
     private static void handleTransformSong(String serializedSong, int maxLines, JTextArea outputTextArea) {
         try {
             var song = ContentUtil.parse(serializedSong);
             if (song != null) {
                 var transformedText = ContentUtil.stringify(song, Config.get().googleSlideConfig().textConfigsOrder(), maxLines);
-                transformedText = transformedText.replaceAll(SINGLE_LINE_VERSE, MULTI_LINE_VERSE_REPL);
-
                 outputTextArea.setText(transformedText);
                 outputTextArea.setCaretPosition(0); // scroll to top
             }
