@@ -1,26 +1,23 @@
 package com.scottmo.controllers;
 
+import com.scottmo.services.openLyrics.OpenLyrics;
+import com.scottmo.views.ViewUtil;
 import javafx.event.ActionEvent;
-import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.io.IOException;
-import java.util.Objects;
 
 public class SongViewerController {
-    @FXML
-    protected void onEditSong(ActionEvent event) throws IOException {
-        Stage stage = new Stage();
-        Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("/ui/verseEditor.fxml")));
-        stage.setScene(new Scene(root));
-        stage.setTitle("My modal window");
-        stage.initModality(Modality.WINDOW_MODAL);
-        stage.initOwner(((Node)event.getSource()).getScene().getWindow());
-        stage.show();
+    private static final String VERSE_EDITOR_FXML = "/ui/verseEditor.fxml";
+
+    public void onEditSong(ActionEvent event) throws IOException {
+        Stage verseEditorModal = ViewUtil.get().newModal("Edit Song", VERSE_EDITOR_FXML, ViewUtil.get().getOwnerWindow(event));
+        verseEditorModal.show();
+    }
+
+    public void onNewSong(ActionEvent event) throws IOException {
+        Stage verseEditorModal = ViewUtil.get().newModal("New Song", VERSE_EDITOR_FXML, ViewUtil.get().getOwnerWindow(event));
+        verseEditorModal.setUserData(new OpenLyrics());
+        verseEditorModal.show();
     }
 }

@@ -10,7 +10,10 @@
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
@@ -19,61 +22,61 @@
       fx:controller="com.scottmo.controllers.VerseEditorController">
     <TabPane tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
         <Tab text="Basic Info">
-            <VBox prefWidth="640.0">
+            <GridPane hgap="5.0" vgap="5.0">
+                <columnConstraints>
+                    <ColumnConstraints hgrow="SOMETIMES"/>
+                    <ColumnConstraints hgrow="ALWAYS"/>
+                    <ColumnConstraints fillWidth="false" hgrow="SOMETIMES"/>
+                </columnConstraints>
+                <rowConstraints>
+                    <RowConstraints vgrow="SOMETIMES"/>
+                    <RowConstraints valignment="TOP" vgrow="SOMETIMES"/>
+                    <RowConstraints vgrow="SOMETIMES"/>
+                </rowConstraints>
                 <padding>
                     <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
                 </padding>
-                <HBox prefWidth="640.0">
-                    <Label prefWidth="80.0" text="Title">
-                        <font>
-                            <Font size="14.0"/>
-                        </font>
-                        <HBox.margin>
-                            <Insets top="8.0"/>
-                        </HBox.margin>
-                    </Label>
-                    <TextField fx:id="titleInput" prefHeight="25.0" HBox.hgrow="ALWAYS"/>
-                </HBox>
-                <HBox prefWidth="200.0" VBox.vgrow="ALWAYS">
-                    <Label minWidth="-Infinity" prefHeight="17.0" prefWidth="80.0" text="Lyrics">
-                        <font>
-                            <Font size="14.0"/>
-                        </font>
-                        <HBox.margin>
-                            <Insets top="8.0"/>
-                        </HBox.margin>
-                    </Label>
-                    <ScrollPane fx:id="lyricsContainer" HBox.hgrow="ALWAYS"/>
-                    <VBox>
-                        <Button mnemonicParsing="false" onAction="#handleAddVerse" prefHeight="25.0" prefWidth="70.0"
-                                text="Add"/>
-                        <Button mnemonicParsing="false" prefHeight="25.0" prefWidth="70.0" text="Edit"/>
-                        <Button mnemonicParsing="false" prefHeight="25.0" prefWidth="70.0" text="Delete"/>
-                    </VBox>
-                </HBox>
-                <HBox prefWidth="200.0">
-                    <Label prefHeight="17.0" prefWidth="80.0" text="Verse Order">
-                        <font>
-                            <Font size="14.0"/>
-                        </font>
-                        <HBox.margin>
-                            <Insets top="8.0"/>
-                        </HBox.margin>
-                    </Label>
-                    <TextField fx:id="verseOrderInput" HBox.hgrow="ALWAYS"/>
-                    <ComboBox fx:id="verseOrderPicker" prefHeight="25.0" prefWidth="15.0"/>
-                </HBox>
-            </VBox>
+                <Label text="Title">
+                    <font>
+                        <Font size="14.0"/>
+                    </font>
+                </Label>
+                <TextField fx:id="titleInput" prefHeight="25.0" GridPane.columnIndex="1"
+                           GridPane.columnSpan="2147483647" GridPane.hgrow="ALWAYS"/>
+                <Label alignment="CENTER" minWidth="-Infinity" text="Lyrics" GridPane.rowIndex="1">
+                    <font>
+                        <Font size="14.0"/>
+                    </font>
+                </Label>
+                <ScrollPane fx:id="lyricsContainer" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS"
+                            GridPane.rowIndex="1" GridPane.vgrow="ALWAYS"/>
+                <VBox fillWidth="false" spacing="5.0" GridPane.columnIndex="2" GridPane.rowIndex="1">
+                    <Button mnemonicParsing="false" onAction="#onAddVerse" prefWidth="100.0" text="Add"/>
+                    <Button mnemonicParsing="false" onAction="#onEditVerse" prefWidth="100.0" text="Edit"/>
+                    <Button mnemonicParsing="false" onAction="#onDeleteVerse" prefWidth="100.0" text="Delete"/>
+                </VBox>
+                <Label text="Verse Order" GridPane.rowIndex="2">
+                    <font>
+                        <Font size="14.0"/>
+                    </font>
+                </Label>
+                <TextField fx:id="verseOrderInput" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS"
+                           GridPane.rowIndex="2"/>
+                <ComboBox fx:id="verseOrderPicker" prefWidth="100.0" GridPane.columnIndex="2" GridPane.rowIndex="2"/>
+            </GridPane>
         </Tab>
         <Tab text="Translations">
-            <VBox prefHeight="200.0" prefWidth="100.0">
-                <HBox prefHeight="11.0" prefWidth="640.0">
+            <VBox prefHeight="200.0" prefWidth="100.0" spacing="5.0">
+                <HBox prefHeight="11.0" prefWidth="640.0" spacing="5.0">
                     <Label contentDisplay="RIGHT" text="Language Code">
                         <graphic>
                             <TextField/>
                         </graphic>
                     </Label>
                     <Button mnemonicParsing="false" text="Add Translation"/>
+                    <VBox.margin>
+                        <Insets/>
+                    </VBox.margin>
                 </HBox>
                 <HBox prefWidth="640.0" VBox.vgrow="ALWAYS">
                     <ScrollPane prefHeight="200.0" prefWidth="200.0">
@@ -83,16 +86,19 @@
                         <Tab text="No Translations Yet"/>
                     </TabPane>
                 </HBox>
+                <padding>
+                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                </padding>
             </VBox>
         </Tab>
     </TabPane>
     <HBox alignment="TOP_RIGHT">
-        <Button mnemonicParsing="false" prefWidth="100.0" text="Cancel">
+        <Button mnemonicParsing="false" onAction="#onCancel" prefWidth="100.0" text="Cancel">
             <HBox.margin>
                 <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
             </HBox.margin>
         </Button>
-        <Button mnemonicParsing="false" prefWidth="100.0" text="Save">
+        <Button mnemonicParsing="false" onAction="#onSave" prefWidth="100.0" text="Save">
             <styleClass>
                 <String fx:value="button"/>
                 <String fx:value="accent"/>
