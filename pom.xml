@@ -4,19 +4,17 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.changenode</groupId>
-    <artifactId>maven-jpackage-template</artifactId>
+    <groupId>com.scottmo</groupId>
+    <artifactId>glory-presenter</artifactId>
     <version>1.1-SNAPSHOT</version>
 
-    <!-- This description text is included in the Windows installer by default, see windows-jpackage.txt -->
-    <description>Sample JavaFX Application</description>
+    <!-- included in the Windows installer by default, see windows-jpackage.txt -->
+    <description>A tool that automates powerpoint creation, a free alternative to the more modern worship service software.</description>
 
     <properties>
         <!-- Set this to the class with the main method for your application -->
-        <main-class>com.changenode.BaseApplication</main-class>
-        <!-- Change your app's name to something interesting... but you might want to avoid spaces
-        just to safe for compatibility across operating systems. -->
-        <app.name>TestApp</app.name>
+        <main-class>com.scottmo.App</main-class>
+        <app.name>GloryPresenter</app.name>
         <!-- This converts the build timestamp to a Windows-installer friendly version number (minute level resolution).
         Note that Maven generated timestamp is in UTC, not local time. For more information see:
          https://docs.microsoft.com/en-us/windows/win32/msi/productversion
@@ -39,9 +37,9 @@
         <!-- Replace this UUID with a custom one for your project. This ID is used by the Windows installer system
         to know that an installer is intended to replace/upgrade an earlier version. The easiest thing to do is
         grab a unique UUID via https://www.uuidgenerator.net -->
-        <windows.upgrade.uuid>aaaaaaaa-0000-aaaa-aaaa-aaaaaaaaaaaa</windows.upgrade.uuid>
+        <windows.upgrade.uuid>f24b338b-4c32-4159-9efa-7ec3671e8ec7</windows.upgrade.uuid>
         <!-- This is used to set many user-visible fields in the Windows Installer. See windows-jpackage.txt -->
-        <windows.vendor>Sample</windows.vendor>
+        <windows.vendor>scottmo</windows.vendor>
 
         <!-- Empty properties to skip signing by default. Set with the macos-sign Maven profile -->
         <macos.sign></macos.sign>
@@ -57,53 +55,54 @@
             <artifactId>atlantafx-base</artifactId>
             <version>1.1.0</version>
         </dependency>
+        <!-- pptx library -->
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi</artifactId>
-            <version>5.0.0</version>
+            <version>5.2.2</version>
         </dependency>
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi-ooxml</artifactId>
-            <version>5.0.0</version>
+            <version>5.2.2</version>
         </dependency>
+        <!-- json de/serializer -->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>2.13.1</version>
+            <version>2.13.4.2</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.dataformat</groupId>
             <artifactId>jackson-dataformat-toml</artifactId>
-            <version>2.12.5</version>
+            <version>2.13.4</version>
         </dependency>
+        <!-- for de/encoding google auth tokens -->
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
             <version>2.8.9</version>
         </dependency>
-        <dependency>
-            <groupId>com.miglayout</groupId>
-            <artifactId>miglayout</artifactId>
-            <version>3.7.4</version>
-        </dependency>
+        <!-- lite db -->
         <dependency>
             <groupId>org.xerial</groupId>
             <artifactId>sqlite-jdbc</artifactId>
-            <version>3.36.0.3</version>
+            <version>3.39.3.0</version>
         </dependency>
+        <!-- testing -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
-            <version>5.8.2</version>
+            <version>5.9.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.13.1</version>
+            <version>4.13.2</version>
             <scope>compile</scope>
         </dependency>
+        <!-- google apis -->
         <dependency>
             <groupId>com.google.api-client</groupId>
             <artifactId>google-api-client</artifactId>
@@ -124,6 +123,7 @@
             <artifactId>google-api-services-drive</artifactId>
             <version>v3-rev20220815-2.0.0</version>
         </dependency>
+        <!-- logger -->
         <dependency>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
