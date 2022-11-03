@@ -6,25 +6,30 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 
 public class Properties {
     private final Map<Locale, String> title = new HashMap<>();
     private String copyright;
     private List<String> verseOrder = new ArrayList<>();
-    private final List<String> authors = new ArrayList<>();;
+    private final List<String> authors = new ArrayList<>();
     private String publisher;
-    private final List<String> comments = new ArrayList<>();;
+    private final List<String> comments = new ArrayList<>();
 
-    public void addTitle(Locale locale, String title) {
+    public void setTitle(String title) {
+        setTitle(Locale.getDefault(), title);
+    }
+
+    public void setTitle(Locale locale, String title) {
         this.title.put(locale, title);
     }
 
-    public String getDefaultTitle() {
+    public String getTitle() {
         return this.title.get(Locale.getDefault());
     }
 
     public String getTitle(Locale locale) {
-        return this.title.get(locale) != null ? this.title.get(locale) : this.getDefaultTitle();
+        return this.title.get(locale) != null ? this.title.get(locale) : this.getTitle();
     }
 
     public List<Locale> getTitleLocales() {
@@ -69,7 +74,7 @@ public class Properties {
         return publisher;
     }
 
-    public void addVerse(String name) {
+    public void addVerseOrder(String name) {
         if (this.verseOrder == null) {
             this.verseOrder = new ArrayList<>();
         }
@@ -78,7 +83,7 @@ public class Properties {
     }
 
     public final void setVerseOrder(List<String> verseOrder) {
-        this.verseOrder = verseOrder;
+        this.verseOrder = Objects.requireNonNullElseGet(verseOrder, ArrayList::new);
     }
 
     public List<String> getVerseOrder() {

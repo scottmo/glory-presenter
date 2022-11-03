@@ -3,13 +3,18 @@ package com.scottmo.services.openLyrics;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 public class Verse {
     private String name;
-    private final List<String> lines = new ArrayList<>();
+    private List<String> lines = new ArrayList<>();
 
     public void addLine(String line) {
         this.lines.add(line);
+    }
+
+    public void setLines(List<String> lines) {
+        this.lines = Objects.requireNonNullElseGet(lines, ArrayList::new);
     }
 
     public List<String> getLines() {

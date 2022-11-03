@@ -78,7 +78,7 @@ class OpenLyricsSerializer {
         List<String> verseOrderList = song.getProperties().getVerseOrder();
         String verseOrderText = (verseOrderList != null && !verseOrderList.isEmpty())
                 ? String.join(" ", verseOrderList)
-                : song.getVerses().stream().map(Verse::getName).collect(Collectors.joining(" "));
+                : String.join(" ", song.getVerseNames());
 
         Element verseOrderElement = doc.createElement("verseOrder");
         verseOrderElement.appendChild(doc.createTextNode(verseOrderText.trim()));

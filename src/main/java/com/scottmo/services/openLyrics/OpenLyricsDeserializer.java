@@ -102,10 +102,10 @@ class OpenLyricsDeserializer {
                     locale = Locale.getDefault();
                 }
 
-                song.getProperties().addTitle(locale, titleNode.getChildNodes().item(0).getTextContent());
+                song.getProperties().setTitle(locale, titleNode.getChildNodes().item(0).getTextContent());
             }
         } else {
-            song.getProperties().addTitle(Locale.getDefault(), "Unknown Title");
+            song.getProperties().setTitle(Locale.getDefault(), "Unknown Title");
         }
     }
 
