@@ -139,7 +139,7 @@ class OpenLyricsDeserializer {
             Node textElement = textNodes.item(i);
             if (textElement.getNodeName().equalsIgnoreCase("br")) {
                 if (!textLine.isEmpty()) {
-                    verse.addLine(textLine);
+                    verse.addLine(textLine.trim());
                 }
                 textLine = "";
             } else if (textElement.getNodeType() == Node.TEXT_NODE) {
@@ -148,7 +148,7 @@ class OpenLyricsDeserializer {
         }
 
         if (!textLine.isEmpty()) {
-            verse.addLine(textLine);
+            verse.addLine(textLine.trim());
         }
 
         song.addVerse(locale, verse);
