@@ -21,6 +21,10 @@ public class Verse {
         return Collections.unmodifiableList(this.lines);
     }
 
+    public String getLinesAsString() {
+        return String.join("\n", this.lines);
+    }
+
     public void setName(String name) {
         this.name = name;
     }

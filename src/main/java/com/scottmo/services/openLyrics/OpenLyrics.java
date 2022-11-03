@@ -33,9 +33,6 @@ public class OpenLyrics {
     public List<Verse> getVerses() {
         List<Verse> verses = this.getVerses(Locale.getDefault());
         if (verses == null) {
-            verses = this.getVerses(new Locale("en", "US"));
-        }
-        if (verses == null) {
             Set<Locale> keySet = this.lyrics.keySet();
             if (!keySet.isEmpty()) {
                 Locale firstLocale = keySet.iterator().next();
