@@ -34,8 +34,9 @@ public class SongEditorController {
         if (Strings.isNotEmpty(song.getProperties().getTitle())) {
             titleInput.setText(song.getProperties().getTitle());
         }
-        if (!song.getProperties().getVerseOrder().isEmpty()) {
-            verseOrderInput.setText(String.join(" ", song.getProperties().getVerseOrder()));
+        List<String> verseOrder = song.getVerseOrder();
+        if (verseOrder != null && !verseOrder.isEmpty()) {
+            verseOrderInput.setText(String.join(" ", verseOrder));
         }
 
         List<Verse> verses = song.getVerses();
@@ -79,6 +80,9 @@ public class SongEditorController {
     public void onSave(ActionEvent event) {
         song.getProperties().setTitle(titleInput.getText());
         song.getProperties().setVerseOrder(Arrays.stream(verseOrderInput.getText().split(" ")).toList());
+    }
+
+    public void onAddVerseOrder(ActionEvent event) {
     }
 
     private Stage getStage() {

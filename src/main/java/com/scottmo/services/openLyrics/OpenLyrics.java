@@ -46,6 +46,14 @@ public class OpenLyrics {
         return getVerses().stream().map(Verse::getName).toList();
     }
 
+    public List<String> getVerseOrder() {
+        List<String> verseOrderList = getProperties().getVerseOrder();
+        if (verseOrderList != null && !verseOrderList.isEmpty()) {
+            return verseOrderList;
+        }
+        return getVerseNames();
+    }
+
     public void addVerse(Verse newVerse) {
         addVerse(Locale.getDefault(), newVerse);
     }
