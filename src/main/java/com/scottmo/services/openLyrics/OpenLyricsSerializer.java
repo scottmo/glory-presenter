@@ -17,7 +17,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.stream.Collectors;
 
 class OpenLyricsSerializer {
     String serialize(OpenLyrics song) {
@@ -75,11 +74,7 @@ class OpenLyricsSerializer {
     }
 
     private Element getVerseOrder(Document doc, OpenLyrics song) {
-        List<String> verseOrderList = song.getProperties().getVerseOrder();
-        String verseOrderText = (verseOrderList != null && !verseOrderList.isEmpty())
-                ? String.join(" ", verseOrderList)
-                : String.join(" ", song.getVerseNames());
-
+        String verseOrderText = String.join(" ", song.getVerseOrder());
         Element verseOrderElement = doc.createElement("verseOrder");
         verseOrderElement.appendChild(doc.createTextNode(verseOrderText.trim()));
         return verseOrderElement;
