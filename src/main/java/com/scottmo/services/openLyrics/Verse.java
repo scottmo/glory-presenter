@@ -9,6 +9,13 @@ public class Verse {
     private String name;
     private List<String> lines = new ArrayList<>();
 
+    public Verse() {}
+
+    public Verse(String name, List<String> lines) {
+        this.name = name;
+        this.lines = lines;
+    }
+
     public void addLine(String line) {
         this.lines.add(line);
     }

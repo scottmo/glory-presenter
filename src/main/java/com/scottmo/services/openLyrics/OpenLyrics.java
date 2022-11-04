@@ -54,6 +54,14 @@ public class OpenLyrics {
         return getVerseNames();
     }
 
+    public void setVerses(List<Verse> verses) {
+        setVerses(Locale.getDefault(), verses);
+    }
+
+    public void setVerses(Locale locale, List<Verse> verses) {
+        this.lyrics.put(locale, verses);
+    }
+
     public void addVerse(Verse newVerse) {
         addVerse(Locale.getDefault(), newVerse);
     }
