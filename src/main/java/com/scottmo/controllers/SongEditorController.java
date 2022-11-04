@@ -80,6 +80,10 @@ public class SongEditorController {
     public void onSave(ActionEvent event) {
         song.getProperties().setTitle(titleInput.getText());
         song.getProperties().setVerseOrder(Arrays.stream(verseOrderInput.getText().split(" ")).toList());
+        song.setVerses(lyricsContainer.getChildren().stream().map(node -> {
+            VerseEditor verseEditor = (VerseEditor)node;
+            return new Verse(verseEditor.getVerseName(), Arrays.stream(verseEditor.getVerseText().split("\n")).toList());
+        }).toList());
     }
 
     public void onAddVerseOrder(ActionEvent event) {
