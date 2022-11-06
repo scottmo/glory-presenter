@@ -13,7 +13,7 @@
 
     <properties>
         <!-- Set this to the class with the main method for your application -->
-        <main-class>com.scottmo.App</main-class>
+        <main-class>com.scottmo.app.App</main-class>
         <app.name>GloryPresenter</app.name>
         <!-- This converts the build timestamp to a Windows-installer friendly version number (minute level resolution).
         Note that Maven generated timestamp is in UTC, not local time. For more information see:

@@ -1,4 +1,4 @@
-package com.scottmo.services.bible.bibleReference;
+package com.scottmo.data.bibleReference;
 
 import java.util.Arrays;
 import java.util.List;

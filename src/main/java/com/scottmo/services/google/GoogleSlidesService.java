@@ -9,13 +9,14 @@ import com.google.api.services.slides.v1.Slides;
 import com.google.api.services.slides.v1.model.BatchUpdatePresentationRequest;
 import com.google.api.services.slides.v1.model.Page;
 import com.google.api.services.slides.v1.model.Request;
+import com.scottmo.services.ServiceSupplier;
 import com.scottmo.services.config.AppConfigProvider;
-import com.scottmo.services.bible.bibleReference.BibleReference;
+import com.scottmo.data.bibleReference.BibleReference;
 import com.scottmo.services.config.definitions.SlideConfig;
 import com.scottmo.services.config.definitions.TextConfig;
-import com.scottmo.services.bible.BibleModel;
+import com.scottmo.services.bible.BibleStore;
 import com.scottmo.services.bible.BibleVerse;
-import com.scottmo.services.content.Content;
+import com.scottmo.data.content.Content;
 import com.scottmo.services.content.ContentUtil;
 import com.scottmo.util.StringUtils;
 import org.apache.commons.math3.util.Pair;
@@ -25,10 +26,13 @@ import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public final class GoogleSlidesService {
     private static final String appName = "Glory Presenter";
+
+    private final Supplier<BibleStore> bibleStore = ServiceSupplier.getBibleStore();
 
     private Slides _slidesApi;
 
@@ -116,10 +120,10 @@ public final class GoogleSlidesService {
         Map<String, String> bibleVersionToTextConfig = slideConfig.bibleVersionToTextConfig();
 
         // query bible data
-        Map<String, String> bookNames = BibleModel.get().getBookNames(bibleRef.getBook());
+        Map<String, String> bookNames = bibleStore.get().getBookNames(bibleRef.getBook());
         assert bookNames != null : "${bibleRef.book} does not exist!";
 
-        Map<String, List<BibleVerse>> bibleVerses = BibleModel.get().getBibleVerses(bibleRef);
+        Map<String, List<BibleVerse>> bibleVerses = bibleStore.get().getBibleVerses(bibleRef);
         assert bibleRef.getVersions().stream().allMatch(bibleVerses::containsKey);
 
         // building slide texts (version, text)

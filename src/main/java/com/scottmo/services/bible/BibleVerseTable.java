@@ -1,7 +1,8 @@
 package com.scottmo.services.bible;
 
-import com.scottmo.services.bible.bibleMetadata.BibleMetadata;
+import com.scottmo.data.bibleMetadata.BibleMetadata;
 
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -12,6 +13,11 @@ import java.util.List;
 import java.util.Map;
 
 class BibleVerseTable {
+    private final Connection db;
+
+    public BibleVerseTable(Connection conn) {
+        this.db = conn;
+    }
 
     private void createTable(String tableName) throws SQLException {
         String sql = """
@@ -23,7 +29,7 @@ class BibleVerseTable {
                 PRIMARY KEY(bookIndex, chapter, verse)
             )
         """.formatted(tableName);
-        try (Statement stmt = BibleDB.connect().createStatement()) {
+        try (Statement stmt = db.createStatement()) {
             stmt.executeUpdate(sql);
         }
     }
@@ -49,7 +55,7 @@ class BibleVerseTable {
 
         int inserted;
         String sql = "INSERT INTO %s (bookIndex, chapter, verse, text) VALUES (?, ?, ?, ?)".formatted(tableName);
-        try (PreparedStatement stmt = BibleDB.connect().prepareStatement(sql)) {
+        try (PreparedStatement stmt = db.prepareStatement(sql)) {
             for (BibleVerse bvt : verses) {
                 stmt.setInt(1, bvt.bookIndex());
                 stmt.setInt(2, bvt.chapter());
@@ -72,7 +78,7 @@ class BibleVerseTable {
             String verseNumberPlaceholder = String.join(",", "?".repeat(verses.size()).split(""));
             sql += " AND verse IN (%s)".formatted(verseNumberPlaceholder);
         }
-        try (PreparedStatement stmt = BibleDB.connect().prepareStatement(sql)) {
+        try (PreparedStatement stmt = db.prepareStatement(sql)) {
             stmt.setString(1, BibleMetadata.getBookIndex(bookId) + ".0"); // .0 because bookIndex was initially a string, TODO: FIX THIS
             stmt.setInt(2, chapter);
             for (int i = 0; i < verses.size(); i++) {

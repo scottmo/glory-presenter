@@ -1,4 +1,4 @@
-package com.scottmo.views;
+package com.scottmo.app.views;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;

@@ -1,4 +1,4 @@
-package com.scottmo.services.openLyrics;
+package com.scottmo.data.openLyrics;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;

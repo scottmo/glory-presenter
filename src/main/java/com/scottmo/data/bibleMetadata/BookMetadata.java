@@ -1,4 +1,4 @@
-package com.scottmo.services.bible.bibleMetadata;
+package com.scottmo.data.bibleMetadata;
 
 import java.util.List;
 

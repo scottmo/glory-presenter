@@ -1,4 +1,4 @@
-package com.scottmo.services.openLyrics;
+package com.scottmo.data.openLyrics;
 
 import org.xml.sax.SAXException;
 

@@ -1,8 +1,7 @@
-package com.scottmo.bibleReference;
+package com.scottmo.data.bibleReference;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.scottmo.services.bible.bibleReference.BibleReference;
 import org.junit.Test;
 
 import java.util.List;

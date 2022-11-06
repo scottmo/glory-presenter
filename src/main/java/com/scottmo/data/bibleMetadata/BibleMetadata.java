@@ -1,4 +1,4 @@
-package com.scottmo.services.bible.bibleMetadata;
+package com.scottmo.data.bibleMetadata;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
