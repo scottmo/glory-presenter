@@ -1,4 +1,4 @@
-package com.scottmo.services.openLyrics;
+package com.scottmo.data.openLyrics;
 
 import java.util.ArrayList;
 import java.util.Collections;

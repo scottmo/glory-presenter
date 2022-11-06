@@ -1,4 +1,4 @@
-package com.scottmo.services.bible;
+package com.scottmo;
 
 import com.scottmo.services.config.AppConfigProvider;
 import com.scottmo.Event;

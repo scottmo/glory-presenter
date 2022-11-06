@@ -1,9 +1,12 @@
 package com.scottmo.services.bible;
 
-import com.scottmo.services.bible.bibleMetadata.BibleMetadata;
-import com.scottmo.services.bible.bibleReference.BibleReference;
-import com.scottmo.services.bible.bibleReference.VerseRange;
+import com.scottmo.data.bibleMetadata.BibleMetadata;
+import com.scottmo.data.bibleReference.BibleReference;
+import com.scottmo.data.bibleReference.VerseRange;
 
+import java.nio.file.Path;
+import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -11,16 +14,22 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class BibleModel {
+public class BibleStore {
+    private static final String DB_NAME = "bible";
 
-    private static final BibleModel bibleModel = new BibleModel();
-    public static BibleModel get() {
-        return bibleModel;
-    }
-
-    private final BibleVerseTable bibleVerseTable = new BibleVerseTable();
-    private final BookNamesTable bookNamesTable = new BookNamesTable();
+    private final BibleVerseTable bibleVerseTable;
+    private final BookNamesTable bookNamesTable;
     private List<Map<String, String>> bookNames = Collections.emptyList(); // cache
+
+    public BibleStore(Path storeLocation) {
+        try {
+            Connection conn = DriverManager.getConnection("jdbc:sqlite:" + storeLocation.resolve("%s.db".formatted(DB_NAME)));
+            bibleVerseTable = new BibleVerseTable(conn);
+            bookNamesTable = new BookNamesTable(conn);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     public int insert(Map<String, List<List<String>>> bible, String version) {
 
@@ -61,8 +70,12 @@ public class BibleModel {
         }
     }
 
-    public List<String> getAvailableVersions() throws SQLException {
-        return this.bookNamesTable.queryVersions();
+    public List<String> getAvailableVersions() {
+        try {
+            return this.bookNamesTable.queryVersions();
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to query available bible versions", e);
+        }
     }
 
     /**

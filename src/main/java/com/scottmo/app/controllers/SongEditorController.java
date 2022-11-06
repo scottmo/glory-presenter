@@ -1,8 +1,8 @@
-package com.scottmo.controllers;
+package com.scottmo.app.controllers;
 
-import com.scottmo.services.openLyrics.OpenLyrics;
-import com.scottmo.services.openLyrics.Verse;
-import com.scottmo.views.VerseEditor;
+import com.scottmo.data.openLyrics.OpenLyrics;
+import com.scottmo.data.openLyrics.Verse;
+import com.scottmo.app.views.VerseEditor;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.scene.control.ComboBox;
@@ -84,6 +84,8 @@ public class SongEditorController {
             VerseEditor verseEditor = (VerseEditor)node;
             return new Verse(verseEditor.getVerseName(), Arrays.stream(verseEditor.getVerseText().split("\n")).toList());
         }).toList());
+
+        getStage().close();
     }
 
     public void onAddVerseOrder(ActionEvent event) {

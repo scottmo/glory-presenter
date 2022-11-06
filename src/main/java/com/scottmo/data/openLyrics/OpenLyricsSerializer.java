@@ -1,4 +1,4 @@
-package com.scottmo.services.openLyrics;
+package com.scottmo.data.openLyrics;
 
 import org.apache.logging.log4j.util.Strings;
 import org.w3c.dom.Document;

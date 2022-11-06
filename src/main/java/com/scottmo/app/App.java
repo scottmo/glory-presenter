@@ -1,4 +1,4 @@
-package com.scottmo;
+package com.scottmo.app;
 
 import atlantafx.base.theme.PrimerLight;
 import com.scottmo.services.logging.AppLoggerProvider;

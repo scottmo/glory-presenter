@@ -1,4 +1,4 @@
-package com.scottmo.views;
+package com.scottmo.app.views;
 
 import javafx.beans.value.ChangeListener;
 import javafx.event.EventHandler;

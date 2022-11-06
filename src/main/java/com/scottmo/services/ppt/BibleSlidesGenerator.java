@@ -1,11 +1,12 @@
 package com.scottmo.services.ppt;
 
+import com.scottmo.services.ServiceSupplier;
 import com.scottmo.services.config.AppConfigProvider;
-import com.scottmo.services.bible.bibleMetadata.BibleMetadata;
-import com.scottmo.services.bible.BibleModel;
-import com.scottmo.services.bible.bibleReference.BibleReference;
+import com.scottmo.data.bibleMetadata.BibleMetadata;
+import com.scottmo.services.bible.BibleStore;
+import com.scottmo.data.bibleReference.BibleReference;
 import com.scottmo.services.bible.BibleVerse;
-import com.scottmo.services.bible.bibleMetadata.BookMetadata;
+import com.scottmo.data.bibleMetadata.BookMetadata;
 import org.apache.poi.xslf.usermodel.XMLSlideShow;
 import org.apache.poi.xslf.usermodel.XSLFSlideLayout;
 import java.io.FileInputStream;
@@ -14,13 +15,14 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 
 public final class BibleSlidesGenerator {
     private static final String TITLE_MASTER_KEY = "title";
     private static final String VERSE_MASTER_KEY_PREFIX = "verse";
     private static final String MAIN_LAYOUT_KEY = "main";
 
-    private static final BibleModel bibleModel = BibleModel.get();
+    private static final Supplier<BibleStore> bibleStore = ServiceSupplier.getBibleStore();
     
     private static void insertBibleText(String templateFilePath, String outputFilePath, String bibleReference) throws IOException {
         try (var inStream = new FileInputStream(templateFilePath)) {
@@ -61,8 +63,8 @@ public final class BibleSlidesGenerator {
     }
 
     private static void insertBibleText(XMLSlideShow ppt, BibleReference ref) {
-        Map<String, List<BibleVerse>> bibleVerses = bibleModel.getBibleVerses(ref);
-        Map<String, String> bookNames = bibleModel.getBookNames(ref.getBook());
+        Map<String, List<BibleVerse>> bibleVerses = bibleStore.get().getBibleVerses(ref);
+        Map<String, String> bookNames = bibleStore.get().getBookNames(ref.getBook());
         assert bookNames != null : "Unable to query book names with book ${ref.book}";
 
         // create title slide

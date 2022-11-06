@@ -1,7 +1,7 @@
-package com.scottmo.controllers;
+package com.scottmo.app.controllers;
 
-import com.scottmo.services.openLyrics.OpenLyrics;
-import com.scottmo.views.ViewUtil;
+import com.scottmo.data.openLyrics.OpenLyrics;
+import com.scottmo.app.views.ViewUtil;
 import javafx.event.ActionEvent;
 import javafx.stage.Stage;
 import org.xml.sax.SAXException;
