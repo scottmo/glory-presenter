@@ -10,7 +10,7 @@ import com.google.api.services.slides.v1.model.BatchUpdatePresentationRequest;
 import com.google.api.services.slides.v1.model.Page;
 import com.google.api.services.slides.v1.model.Request;
 import com.scottmo.services.ServiceSupplier;
-import com.scottmo.services.config.AppConfigProvider;
+import com.scottmo.services.config.AppContext;
 import com.scottmo.data.bibleReference.BibleReference;
 import com.scottmo.services.config.definitions.SlideConfig;
 import com.scottmo.services.config.definitions.TextConfig;
@@ -32,6 +32,7 @@ import java.util.stream.Collectors;
 public final class GoogleSlidesService {
     private static final String appName = "Glory Presenter";
 
+    private final AppContext appContext = ServiceSupplier.getAppContext();
     private final Supplier<BibleStore> bibleStore = ServiceSupplier.getBibleStore();
 
     private Slides _slidesApi;
@@ -110,13 +111,13 @@ public final class GoogleSlidesService {
         RequestBuilder requestBuilder = new RequestBuilder();
         List<Page> slides = getSlides(presentationId);
         slides.forEach(slide -> {
-            requestBuilder.setBaseFont(slide, AppConfigProvider.get().googleSlideConfig().textConfigs());
+            requestBuilder.setBaseFont(slide, appContext.getConfig().googleSlideConfig().textConfigs());
         });
         updateSlides(presentationId, requestBuilder.build());
     }
 
     public void insertBibleText(String presentationId, BibleReference bibleRef, int slideIndex) throws IOException {
-        SlideConfig slideConfig = AppConfigProvider.get().googleSlideConfig();
+        SlideConfig slideConfig = appContext.getConfig().googleSlideConfig();
         Map<String, String> bibleVersionToTextConfig = slideConfig.bibleVersionToTextConfig();
 
         // query bible data
@@ -176,7 +177,7 @@ public final class GoogleSlidesService {
     }
 
     public void insertSong(String presentationId, Content content, int slideInsertIndex) throws IOException {
-        SlideConfig slideConfig = AppConfigProvider.get().googleSlideConfig();
+        SlideConfig slideConfig = appContext.getConfig().googleSlideConfig();
         TextConfig defaultTextConfig = slideConfig.textConfigs().get(slideConfig.defaultTextConfig());
 
         RequestBuilder requestBuilder = new RequestBuilder();
@@ -224,7 +225,7 @@ public final class GoogleSlidesService {
     }
 
     private void insertSong(String presentationId, String songTitle, int slideIndex) throws IOException {
-        Content content = ContentUtil.parseFromFuzzySearch(AppConfigProvider.getRelativePath(AppConfigProvider.CONTENTS_SLIDE_DIR), songTitle);
+        Content content = ContentUtil.parseFromFuzzySearch(appContext.getRelativePath(AppContext.CONTENTS_SLIDE_DIR), songTitle);
         if (content != null) {
             insertSong(presentationId, content, slideIndex);
         }
