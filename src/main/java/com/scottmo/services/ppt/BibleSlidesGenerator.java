@@ -1,7 +1,7 @@
 package com.scottmo.services.ppt;
 
 import com.scottmo.services.ServiceSupplier;
-import com.scottmo.services.config.AppConfigProvider;
+import com.scottmo.services.config.AppContext;
 import com.scottmo.data.bibleMetadata.BibleMetadata;
 import com.scottmo.services.bible.BibleStore;
 import com.scottmo.data.bibleReference.BibleReference;
@@ -23,6 +23,7 @@ public final class BibleSlidesGenerator {
     private static final String MAIN_LAYOUT_KEY = "main";
 
     private static final Supplier<BibleStore> bibleStore = ServiceSupplier.getBibleStore();
+    private static final AppContext appContext = ServiceSupplier.getAppContext();
     
     private static void insertBibleText(String templateFilePath, String outputFilePath, String bibleReference) throws IOException {
         try (var inStream = new FileInputStream(templateFilePath)) {
@@ -43,14 +44,14 @@ public final class BibleSlidesGenerator {
                 BookMetadata bookMetadata = entry.getValue();
                 for (int i = 0; i < bookMetadata.count().size(); i++) {
                     String chapter = bookName + " " + (i + 1);
-                    insertBibleText(AppConfigProvider.getRelativePath(templatePath),
-                        AppConfigProvider.getRelativePath("%s/%s.pptx".formatted(destDir, chapter)), "%s - %s".formatted(versions, chapter));
+                    insertBibleText(appContext.getRelativePath(templatePath),
+                            appContext.getRelativePath("%s/%s.pptx".formatted(destDir, chapter)), "%s - %s".formatted(versions, chapter));
                 }
             }
         } else {
             String bibleReference = "%s - %s".formatted(versions, verses);
-            insertBibleText(AppConfigProvider.getRelativePath(templatePath),
-                AppConfigProvider.getRelativePath("%s/%s.pptx".formatted(destDir, bibleReference)), bibleReference);
+            insertBibleText(appContext.getRelativePath(templatePath),
+                    appContext.getRelativePath("%s/%s.pptx".formatted(destDir, bibleReference)), bibleReference);
         }
     }
 
