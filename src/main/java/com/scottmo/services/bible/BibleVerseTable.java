@@ -12,7 +12,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-class BibleVerseTable {
+final class BibleVerseTable {
     private final Connection db;
 
     public BibleVerseTable(Connection conn) {

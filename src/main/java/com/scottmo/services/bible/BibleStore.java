@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class BibleStore {
+public final class BibleStore {
     private static final String DB_NAME = "bible";
 
     private final BibleVerseTable bibleVerseTable;
