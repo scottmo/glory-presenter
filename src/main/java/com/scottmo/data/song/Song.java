@@ -1,28 +1,83 @@
-package com.scottmo.data.openLyrics;
+package com.scottmo.data.song;
 
-import org.xml.sax.SAXException;
-
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-public class OpenLyrics {
-    private static final OpenLyricsDeserializer reader = new OpenLyricsDeserializer();
-    private static final OpenLyricsSerializer writer = new OpenLyricsSerializer();
-
-    private final Properties properties = new Properties();
+public class Song {
+    private final Map<Locale, String> titles = new HashMap<>();
+    private final List<String> authors = new ArrayList<>();
+    private String publisher;
+    private String copyright;
+    private String comments;
+    private List<String> verseOrder = new ArrayList<>();
     private final Map<Locale, List<Verse>> lyrics = new HashMap<>();
 
-    public OpenLyrics() {}
+    public String getTitle() {
+        return this.titles.get(Locale.getDefault());
+    }
 
-    public static OpenLyrics of(String xmlSource) throws ParserConfigurationException, IOException, SAXException {
-        return reader.deserialize(xmlSource);
+    public String getTitle(Locale locale) {
+        return this.titles.get(locale) != null ? this.titles.get(locale) : this.getTitle();
+    }
+
+    public void setTitle(String title) {
+        setTitle(Locale.getDefault(), title);
+    }
+
+    public void setTitle(Locale locale, String title) {
+        this.titles.put(locale, title);
+    }
+
+    public List<Locale> getTitleLocales() {
+        List<Locale> locales = new ArrayList<>(this.titles.keySet());
+
+        if (!locales.contains(Locale.getDefault())) {
+            locales.add(Locale.getDefault());
+        }
+
+        return Collections.unmodifiableList(locales);
+    }
+
+    public List<String> getAuthors() {
+        return Collections.unmodifiableList(this.authors);
+    }
+
+    public void addAuthor(String author) {
+        this.authors.add(author);
+    }
+
+    public String getPublisher() {
+        return publisher;
+    }
+
+    public void setPublisher(String publisher) {
+        this.publisher = publisher;
+    }
+
+    public String getCopyright() {
+        return copyright;
+    }
+
+    public void setCopyright(String copyright) {
+        this.copyright = copyright;
+    }
+
+    public String getComments() {
+        return comments;
+    }
+
+    public void setComments(String comments) {
+        this.comments = comments;
+    }
+
+    public Map<Locale, List<Verse>> getLyrics() {
+        return lyrics;
     }
 
     public List<Verse> getVerses(Locale locale) {
@@ -43,15 +98,22 @@ public class OpenLyrics {
     }
 
     public List<String> getVerseNames() {
-        return getVerses().stream().map(Verse::getName).toList();
+        List<Verse> verses = getVerses();
+        if (verses != null) {
+            return getVerses().stream().map(Verse::getName).toList();
+        }
+        return Collections.emptyList();
     }
 
     public List<String> getVerseOrder() {
-        List<String> verseOrderList = getProperties().getVerseOrder();
-        if (verseOrderList != null && !verseOrderList.isEmpty()) {
-            return verseOrderList;
+        if (verseOrder != null && !verseOrder.isEmpty()) {
+            return verseOrder;
         }
         return getVerseNames();
+    }
+
+    public void setVerseOrder(List<String> verseOrder) {
+        this.verseOrder = verseOrder;
     }
 
     public void setVerses(List<Verse> verses) {
@@ -104,16 +166,7 @@ public class OpenLyrics {
         if (this.lyrics.containsKey(locale)) {
             Verse verse = this.lyrics.get(locale).get(index);
             verse.setName(verseName);
-            verse.setLines(lines);
+            verse.setText(String.join("\n", lines));
         }
-    }
-
-    public Properties getProperties() {
-        return properties;
-    }
-
-    @Override
-    public String toString() {
-        return writer.serialize(this);
     }
 }

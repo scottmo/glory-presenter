@@ -1,5 +1,7 @@
-package com.scottmo.data.openLyrics;
+package com.scottmo.services.songsImportExport;
 
+import com.scottmo.data.song.Song;
+import com.scottmo.data.song.Verse;
 import org.apache.logging.log4j.util.Strings;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -19,7 +21,7 @@ import java.util.List;
 import java.util.Locale;
 
 class OpenLyricsSerializer {
-    String serialize(OpenLyrics song) {
+    String serialize(Song song) {
         try {
             Document doc = createDocument(song);
             return stringifyDocument(doc);
@@ -37,7 +39,7 @@ class OpenLyricsSerializer {
         return writer.toString();
     }
 
-    private Document createDocument(OpenLyrics song) throws ParserConfigurationException {
+    private Document createDocument(Song song) throws ParserConfigurationException {
         Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
 
         Element songElement = doc.createElement("song");
@@ -52,7 +54,7 @@ class OpenLyricsSerializer {
         return doc;
     }
 
-    private Element getProperties(Document doc, OpenLyrics song) {
+    private Element getProperties(Document doc, Song song) {
         Element properties = doc.createElement("properties");
         properties.appendChild(getTitles(doc, song));
         properties.appendChild(getAuthors(doc, song));
@@ -64,46 +66,44 @@ class OpenLyricsSerializer {
         return properties;
     }
 
-    private Element getPublisher(Document doc, OpenLyrics song) {
+    private Element getPublisher(Document doc, Song song) {
         Element publisherElement = doc.createElement("publisher");
-        String publisher = song.getProperties().getPublisher();
+        String publisher = song.getPublisher();
         if (Strings.isNotEmpty(publisher)) {
             publisherElement.appendChild(doc.createTextNode(publisher));
         }
         return publisherElement;
     }
 
-    private Element getVerseOrder(Document doc, OpenLyrics song) {
+    private Element getVerseOrder(Document doc, Song song) {
         String verseOrderText = String.join(" ", song.getVerseOrder());
         Element verseOrderElement = doc.createElement("verseOrder");
         verseOrderElement.appendChild(doc.createTextNode(verseOrderText.trim()));
         return verseOrderElement;
     }
 
-    private Element getComments(Document doc, OpenLyrics song) {
+    private Element getComments(Document doc, Song song) {
         Element commentsBlockElement = doc.createElement("comments");
-        List<String> comments = song.getProperties().getComments();
-        if (comments != null && !comments.isEmpty()) {
-            for (String comment : comments) {
-                Element commentElement = doc.createElement("comment");
-                commentElement.appendChild(doc.createTextNode(comment));
-                commentsBlockElement.appendChild(commentElement);
-            }
+        String[] comments = song.getComments().split("\n");
+        for (String comment : comments) {
+            Element commentElement = doc.createElement("comment");
+            commentElement.appendChild(doc.createTextNode(comment));
+            commentsBlockElement.appendChild(commentElement);
         }
         return commentsBlockElement;
     }
 
-    private Element getCopyright(Document doc, OpenLyrics song) {
+    private Element getCopyright(Document doc, Song song) {
         Element copyrightElement = doc.createElement("copyright");
-        String copyright = song.getProperties().getCopyright();
+        String copyright = song.getCopyright();
         copyright = Strings.isNotEmpty(copyright) ? copyright : "Unknown";
         copyrightElement.appendChild(doc.createTextNode(copyright));
         return copyrightElement;
     }
 
-    private Element getAuthors(Document doc, OpenLyrics song) {
+    private Element getAuthors(Document doc, Song song) {
         Element authorsElement = doc.createElement("authors");
-        List<String> authors = song.getProperties().getAuthors();
+        List<String> authors = song.getAuthors();
         if (authors != null && !authors.isEmpty()) {
             for (String author : authors) {
                 Element authorElement = doc.createElement("author");
@@ -114,20 +114,20 @@ class OpenLyricsSerializer {
         return authorsElement;
     }
 
-    private Element getTitles(Document doc, OpenLyrics song) {
+    private Element getTitles(Document doc, Song song) {
         Element titlesElement = doc.createElement("titles");
-        List<Locale> titleLocales = song.getProperties().getTitleLocales();
+        List<Locale> titleLocales = song.getTitleLocales();
         for (Locale titleLocale : titleLocales) {
             Element titleElement = doc.createElement("title");
             titleElement.setAttribute("lang", titleLocale.getLanguage());
-            titleElement.appendChild(doc.createTextNode(song.getProperties().getTitle(titleLocale)));
+            titleElement.appendChild(doc.createTextNode(song.getTitle(titleLocale)));
             titlesElement.appendChild(titleElement);
         }
 
         return titlesElement;
     }
 
-    private Element getLyrics(Document doc, OpenLyrics song) {
+    private Element getLyrics(Document doc, Song song) {
         Element lyrics = doc.createElement("lyrics");
 
         for (Verse verse : song.getVerses()) {
@@ -139,12 +139,13 @@ class OpenLyricsSerializer {
             Element linesElement = doc.createElement("lines");
             verseElement.appendChild(linesElement);
 
-            for (int i = 0; i < verse.getLines().size(); i++) {
-                String line = verse.getLines().get(i);
+            String[] verseLines = verse.getText().split("\n");
+            for (int i = 0; i < verseLines.length; i++) {
+                String line = verseLines[i];
                 linesElement.appendChild(doc.createTextNode(line));
 
                 // Do not <br/> to the last line in the verse
-                if (i < verse.getLines().size() - 1) {
+                if (i < verseLines.length - 1) {
                     linesElement.appendChild(doc.createElement("br"));
                 }
             }
