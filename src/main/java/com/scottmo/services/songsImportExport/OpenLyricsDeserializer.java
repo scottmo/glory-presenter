@@ -1,5 +1,8 @@
-package com.scottmo.data.openLyrics;
+package com.scottmo.services.songsImportExport;
 
+import com.scottmo.data.song.Song;
+import com.scottmo.data.song.Verse;
+import org.apache.logging.log4j.util.Strings;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -11,22 +14,24 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 
 class OpenLyricsDeserializer {
-    OpenLyrics deserialize(String source)
+    Song deserialize(String source)
             throws ParserConfigurationException,
             SAXException,
             IOException {
-        OpenLyrics song = new OpenLyrics();
+        Song song = new Song();
         Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new InputSource(new StringReader(source)));
         parseProperties(doc, song);
         parseLyrics(doc, song);
         return song;
     }
 
-    private void parseProperties(Document doc, OpenLyrics song) {
+    private void parseProperties(Document doc, Song song) {
         NodeList prop = doc.getElementsByTagName("properties");
         if (prop != null && prop.getLength() > 0) {
             Element properties = (Element) prop.item(0);
@@ -39,54 +44,58 @@ class OpenLyricsDeserializer {
         }
     }
 
-    private void getCommentsProp(Element properties, OpenLyrics song) {
-        NodeList commentsNodeList = properties.getElementsByTagName("comments");
-        for (int i = 0; i < commentsNodeList.getLength(); i++) {
-            song.getProperties().addComment(commentsNodeList.item(i)
-                    .getChildNodes().item(0).getTextContent());
+    private String getTextContent(Node node) {
+        Node topNode = node.getChildNodes().item(0);
+        if (topNode != null && topNode.getTextContent() != null) {
+            return topNode.getTextContent();
         }
+        return "";
     }
 
-    private void getVerseOrderProp(Element properties, OpenLyrics song) {
+    private void getCommentsProp(Element properties, Song song) {
+        NodeList commentsNodeList = properties.getElementsByTagName("comments");
+        List<String> comments = new ArrayList<>();
+        for (int i = 0; i < commentsNodeList.getLength(); i++) {
+            comments.add(getTextContent(commentsNodeList.item(i)));
+        }
+        song.setComments(String.join("\n", comments));
+    }
+
+    private void getVerseOrderProp(Element properties, Song song) {
         NodeList verseOrderNodeList = properties.getElementsByTagName("verseOrder");
         if (verseOrderNodeList.getLength() > 0) {
-            song.getProperties().setVerseOrder(Arrays.asList(verseOrderNodeList.item(0)
-                    .getChildNodes().item(0).getTextContent().split("\\s+")));
+            song.setVerseOrder(Arrays.asList(getTextContent(verseOrderNodeList.item(0)).split("\\s+")));
         }
     }
 
-    private void getPublisherProp(Element properties, OpenLyrics song) {
+    private void getPublisherProp(Element properties, Song song) {
         NodeList publisherNodeList = properties.getElementsByTagName("publisher");
         if (publisherNodeList.getLength() > 0) {
-            song.getProperties().setPublisher(publisherNodeList.item(0)
-                    .getChildNodes().item(0).getTextContent());
+            song.setPublisher(getTextContent(publisherNodeList.item(0)));
         }
     }
 
-    private void getCopyrightProp(Element properties, OpenLyrics song) {
+    private void getCopyrightProp(Element properties, Song song) {
         NodeList copyrightNodeList = properties.getElementsByTagName("copyright");
         if (copyrightNodeList.getLength() > 0) {
-            song.getProperties().setCopyright(copyrightNodeList.item(0)
-                    .getChildNodes().item(0).getTextContent());
+            song.setCopyright(getTextContent(copyrightNodeList.item(0)));
         }
     }
 
-    private void getAuthorsProp(Element properties, OpenLyrics song) {
+    private void getAuthorsProp(Element properties, Song song) {
         NodeList authors = properties.getElementsByTagName("authors");
         if (authors.item(0) != null) {
             NodeList authorsList = ((Element) authors.item(0)).getElementsByTagName("author");
             for (int i = 0; i < authorsList.getLength(); i++) {
-                if((authorsList.item(i)).getChildNodes().item(0)!=null) {
-                    song.getProperties().addAuthor(authorsList.item(i)
-                            .getChildNodes().item(0).getTextContent());
+                String author = getTextContent(authorsList.item(i));
+                if (!Strings.isEmpty(author)) {
+                    song.addAuthor(author);
                 }
             }
-        } else {
-            song.getProperties().addAuthor("Unknown Author");
         }
     }
 
-    private void getTitlesProp(Element properties, OpenLyrics song) {
+    private void getTitlesProp(Element properties, Song song) {
         NodeList titles = properties.getElementsByTagName("titles");
         if (titles.item(0) != null) {
             NodeList titleList = ((Element) titles.item(0)).getElementsByTagName("title");
@@ -102,14 +111,14 @@ class OpenLyricsDeserializer {
                     locale = Locale.getDefault();
                 }
 
-                song.getProperties().setTitle(locale, titleNode.getChildNodes().item(0).getTextContent());
+                song.setTitle(locale, getTextContent(titleNode));
             }
         } else {
-            song.getProperties().setTitle(Locale.getDefault(), "Unknown Title");
+            song.setTitle(Locale.getDefault(), "Unknown Title");
         }
     }
 
-    private void parseLyrics(Document doc, OpenLyrics song) {
+    private void parseLyrics(Document doc, Song song) {
         NodeList lyricsNodes = doc.getElementsByTagName("lyrics");
         if (lyricsNodes != null && lyricsNodes.getLength() > 0) {
             NodeList verseNodes = lyricsNodes.item(0).getChildNodes();
@@ -121,25 +130,24 @@ class OpenLyricsDeserializer {
         }
     }
 
-    private void parseVerse(Element verseElement, OpenLyrics song) {
-        Locale locale = !verseElement.getAttribute("lang").equals("")
+    private void parseVerse(Element verseElement, Song song) {
+        Locale locale = Strings.isNotEmpty(verseElement.getAttribute("lang"))
                 ? new Locale(verseElement.getAttribute("lang"))
                 : Locale.getDefault();
 
-        Verse verse = new Verse();
-        verse.setName(verseElement.getAttribute("name"));
         Element linesNode = (Element) verseElement.getElementsByTagName("lines").item(0);
         if (linesNode == null) {
             throw new IllegalArgumentException("No lines in the verse.");
         }
         NodeList textNodes = linesNode.getChildNodes();
 
+        List<String> verseLines = new ArrayList<>();
         String textLine = "";
         for (int i = 0; i < textNodes.getLength(); i++) {
             Node textElement = textNodes.item(i);
             if (textElement.getNodeName().equalsIgnoreCase("br")) {
                 if (!textLine.isEmpty()) {
-                    verse.addLine(textLine.trim());
+                    verseLines.add(textLine.trim());
                 }
                 textLine = "";
             } else if (textElement.getNodeType() == Node.TEXT_NODE) {
@@ -148,9 +156,12 @@ class OpenLyricsDeserializer {
         }
 
         if (!textLine.isEmpty()) {
-            verse.addLine(textLine.trim());
+            verseLines.add(textLine.trim());
         }
 
+        Verse verse = new Verse();
+        verse.setName(verseElement.getAttribute("name"));
+        verse.setText(String.join("\n", verseLines));
         song.addVerse(locale, verse);
     }
 }
