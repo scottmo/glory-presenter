@@ -1,4 +1,4 @@
-package com.scottmo.services.content;
+package com.scottmo.data.content;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 

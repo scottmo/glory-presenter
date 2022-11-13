@@ -3,6 +3,7 @@ package com.scottmo.services.content;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.toml.TomlFactory;
+import com.scottmo.data.content.Content;
 
 import java.io.File;
 import java.io.IOException;

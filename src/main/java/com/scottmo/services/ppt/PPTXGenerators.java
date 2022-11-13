@@ -1,6 +1,7 @@
 package com.scottmo.services.ppt;
 
-import com.scottmo.services.config.AppConfigProvider;
+import com.scottmo.services.ServiceSupplier;
+import com.scottmo.services.config.AppContext;
 import com.scottmo.services.content.ContentUtil;
 import org.apache.poi.xslf.usermodel.XMLSlideShow;
 
@@ -17,6 +18,8 @@ import java.util.stream.Collectors;
 
 public final class PPTXGenerators {
 
+    private static final AppContext appContext = ServiceSupplier.getAppContext();
+
     public static void generate(String dataFilePath, String tmplFilePath, String outputDirPath) throws IOException {
         var content = ContentUtil.parse(Path.of(dataFilePath).toFile());
         if (content == null) return;
@@ -24,7 +27,7 @@ public final class PPTXGenerators {
         var sections = content.getSections();
         if (sections == null || sections.isEmpty()) return;
 
-        String title = content.getJoinedTitle(AppConfigProvider.get().googleSlideConfig().textConfigsOrder());
+        String title = content.getJoinedTitle(appContext.getConfig().googleSlideConfig().textConfigsOrder());
         String outputFilePath = Path.of(outputDirPath, title + ".pptx").toString();
 
         // Duplicate slide to match number of records.
@@ -102,7 +105,7 @@ public final class PPTXGenerators {
     }
 
     public static void main(String[] args) {
-        try (var inStream = new FileInputStream(AppConfigProvider.getRelativePath("templates/template-hymn.pptx"))) {
+        try (var inStream = new FileInputStream(appContext.getRelativePath("templates/template-hymn.pptx"))) {
             var ppt = new XMLSlideShow(inStream);
             var outputPPT = new XMLSlideShow();
             var slide = outputPPT.createSlide();
@@ -112,7 +115,7 @@ public final class PPTXGenerators {
                     "{title.zh}", "你好",
                     "{title.en}", "hello"
             ));
-            try (var outStream = new FileOutputStream(AppConfigProvider.getRelativePath("test.pptx"))) {
+            try (var outStream = new FileOutputStream(appContext.getRelativePath("test.pptx"))) {
                 outputPPT.write(outStream);
             }
             outputPPT.close();

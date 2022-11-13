@@ -1,7 +1,8 @@
 package com.scottmo.services.bible;
 
-import com.scottmo.services.bible.bibleMetadata.BibleMetadata;
+import com.scottmo.data.bibleMetadata.BibleMetadata;
 
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -12,8 +13,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-class BookNamesTable {
-    private static final String DB_NAME = "book_names";
+final class BookNamesTable {
+    private static final String TABLE_NAME = "book_names";
+
+    private final Connection db;
+
+    public BookNamesTable(Connection conn) {
+        this.db = conn;
+    }
 
     private void createTable() throws SQLException {
         String sql =  """
@@ -23,8 +30,8 @@ class BookNamesTable {
                 version VARCHAR(10) NOT NULL,
                 PRIMARY KEY (name, version)
             )
-        """.formatted(DB_NAME);
-        try (Statement stmt = BibleDB.connect().createStatement()) {
+        """.formatted(TABLE_NAME);
+        try (Statement stmt = db.createStatement()) {
             stmt.executeUpdate(sql);
         }
     }
@@ -36,8 +43,8 @@ class BookNamesTable {
     public List<Map<String, String>> queryAll() throws SQLException {
         List<Map<String, String>> bookNames = new ArrayList<>(Collections.nCopies(BibleMetadata.getNumberOfBooks(), new HashMap<>()));
 
-        String sql = "SELECT * FROM %s".formatted(DB_NAME);
-        try (Statement stmt = BibleDB.connect().createStatement()) {
+        String sql = "SELECT * FROM %s".formatted(TABLE_NAME);
+        try (Statement stmt = db.createStatement()) {
             ResultSet res = stmt.executeQuery(sql);
             while (res.next()) {
                 bookNames.get(res.getInt("id"))
@@ -50,8 +57,8 @@ class BookNamesTable {
 
     public List<String> queryVersions() throws SQLException {
         List<String> versions = new ArrayList<>();
-        String sql = "SELECT DISTINCT version FROM %s".formatted(DB_NAME);
-        try (Statement stmt = BibleDB.connect().createStatement()) {
+        String sql = "SELECT DISTINCT version FROM %s".formatted(TABLE_NAME);
+        try (Statement stmt = db.createStatement()) {
             ResultSet res = stmt.executeQuery(sql);
             while (res.next()) {
                 versions.add(res.getString("version"));
@@ -64,8 +71,8 @@ class BookNamesTable {
         createTable();
 
         int inserted;
-        String sql = "INSERT INTO %s (id, name, version) VALUES (?, ?, ?)".formatted(DB_NAME);
-        try (PreparedStatement stmt = BibleDB.connect().prepareStatement(sql)) {
+        String sql = "INSERT INTO %s (id, name, version) VALUES (?, ?, ?)".formatted(TABLE_NAME);
+        try (PreparedStatement stmt = db.prepareStatement(sql)) {
             for (int i = 0; i < bookNames.size(); i++) {
                 stmt.setInt(1, i);
                 stmt.setString(2, bookNames.get(i));
