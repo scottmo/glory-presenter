@@ -18,7 +18,7 @@ final class BookNamesTable {
 
     private final Connection db;
 
-    public BookNamesTable(Connection conn) {
+    BookNamesTable(Connection conn) {
         this.db = conn;
     }
 
@@ -40,7 +40,7 @@ final class BookNamesTable {
      * Retrieve list of book names for each version.
      * structure: [ bookIndex: { bibleVersion: bookName }, ...]
      */
-    public List<Map<String, String>> queryAll() throws SQLException {
+    List<Map<String, String>> queryAll() throws SQLException {
         List<Map<String, String>> bookNames = new ArrayList<>(Collections.nCopies(BibleMetadata.getNumberOfBooks(), new HashMap<>()));
 
         String sql = "SELECT * FROM %s".formatted(TABLE_NAME);
@@ -55,7 +55,7 @@ final class BookNamesTable {
         return bookNames;
     }
 
-    public List<String> queryVersions() throws SQLException {
+    List<String> queryVersions() throws SQLException {
         List<String> versions = new ArrayList<>();
         String sql = "SELECT DISTINCT version FROM %s".formatted(TABLE_NAME);
         try (Statement stmt = db.createStatement()) {
@@ -67,7 +67,7 @@ final class BookNamesTable {
         return versions;
     }
 
-    public int insert(String version, List<String> bookNames) throws SQLException {
+    int insert(String version, List<String> bookNames) throws SQLException {
         createTable();
 
         int inserted;
