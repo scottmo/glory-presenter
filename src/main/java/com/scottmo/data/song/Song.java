@@ -12,7 +12,7 @@ public class Song {
     private static final String DEFAULT_LOCALE = Locale.getDefault().toString();
 
     private final Map<String, String> titles = new HashMap<>();
-    private final List<String> authors = new ArrayList<>();
+    private List<String> authors = new ArrayList<>();
     private String publisher;
     private String copyright;
     private String songBook;
@@ -55,8 +55,8 @@ public class Song {
         return Collections.unmodifiableList(this.authors);
     }
 
-    public void addAuthor(String author) {
-        this.authors.add(author);
+    public void setAuthors(List<String> authors) {
+        this.authors = authors;
     }
 
     public String getPublisher() {
