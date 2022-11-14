@@ -3,6 +3,7 @@ package com.scottmo.services;
 import com.scottmo.services.bible.BibleStore;
 import com.scottmo.services.config.AppContext;
 import com.scottmo.services.security.CipherService;
+import com.scottmo.services.songsOpenLyrics.SongsOpenLyricsService;
 
 import java.nio.file.Path;
 import java.util.function.Supplier;
@@ -30,6 +31,16 @@ public class ServiceSupplier {
                 cipherService = new CipherService();
             }
             return cipherService;
+        };
+    }
+
+    private static SongsOpenLyricsService songsOpenLyricsService;
+    public static Supplier<SongsOpenLyricsService> getSongsOpenLyricsService() {
+        return () -> {
+            if (songsOpenLyricsService == null) {
+                songsOpenLyricsService = new SongsOpenLyricsService();
+            }
+            return songsOpenLyricsService;
         };
     }
 }
