@@ -37,10 +37,8 @@ public class SongsOpenLyricsService {
             }
             song.setComments(olsong.getProperties().getComments());
             song.setVerseOrder(olsong.getProperties().getVerseOrder());
-
-            for (OpenLyricsVerse verse : olsong.getVerses()) {
-                song.addVerse(verse.getLang(), new SongVerse(verse.getName(), verse.getLines()));
-            }
+            song.setVerses(olsong.getVerses().stream()
+                    .map(v -> new SongVerse(v.getName(), v.getLines(), v.getLang())).toList());
             return song;
         } catch (JsonProcessingException e) {
             throw new RuntimeException("Failed to load song from openLyrics format", e);
@@ -60,10 +58,10 @@ public class SongsOpenLyricsService {
             olsong.getProperties().setSongbooks(List.of(new OpenLyricsSongBook(song.getSongBook(), song.getEntry())));
             olsong.getProperties().setComments(song.getComments());
             olsong.getProperties().setVerseOrder(song.getVerseOrder());
+            olsong.setVerses(song.getVerses().stream()
+                    .map(v -> new OpenLyricsVerse(v.getName(), v.getLocale(), v.getText())).toList());
 
-            // FIXME verses
-
-            return xmlMapper.writeValueAsString(song);
+            return xmlMapper.writeValueAsString(olsong);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
