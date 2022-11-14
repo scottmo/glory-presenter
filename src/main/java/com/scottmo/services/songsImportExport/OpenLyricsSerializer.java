@@ -62,6 +62,7 @@ class OpenLyricsSerializer {
         properties.appendChild(getComments(doc, song));
         properties.appendChild(getVerseOrder(doc, song));
         properties.appendChild(getPublisher(doc, song));
+        properties.appendChild(getSongBook(doc, song));
 
         return properties;
     }
@@ -112,6 +113,19 @@ class OpenLyricsSerializer {
             }
         }
         return authorsElement;
+    }
+
+    private Element getSongBook(Document doc, Song song) {
+        Element songbooksElement = doc.createElement("songbooks");
+        String songbook = song.getSongBook();
+        String entry = song.getEntry();
+        if (Strings.isNotEmpty(songbook) && Strings.isNotEmpty(entry)) {
+            Element songbookElement = doc.createElement("songbook");
+            songbookElement.setAttribute("name", songbook);
+            songbookElement.setAttribute("entry", entry);
+            songbooksElement.appendChild(songbookElement);
+        }
+        return songbooksElement;
     }
 
     private Element getTitles(Document doc, Song song) {
