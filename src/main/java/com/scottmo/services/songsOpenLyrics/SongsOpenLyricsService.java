@@ -25,9 +25,7 @@ public class SongsOpenLyricsService {
             for (OpenLyricsTitle title : olsong.getProperties().getTitles()) {
                 song.setTitle(title.getLang(), title.getValue());
             }
-            for (String author : olsong.getProperties().getAuthors()) {
-                song.addAuthor(author);
-            }
+            song.setAuthors(olsong.getProperties().getAuthors());
             song.setCopyright(olsong.getProperties().getCopyright());
             song.setPublisher(olsong.getProperties().getPublisher());
             if (!olsong.getProperties().getSongbooks().isEmpty()) {
