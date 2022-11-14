@@ -10,7 +10,9 @@ import java.util.Map;
 import java.util.Set;
 
 public class Song {
-    private final Map<Locale, String> titles = new HashMap<>();
+    private static final String DEFAULT_LOCALE = Locale.getDefault().toString();
+
+    private final Map<String, String> titles = new HashMap<>();
     private final List<String> authors = new ArrayList<>();
     private String publisher;
     private String copyright;
@@ -18,30 +20,34 @@ public class Song {
     private String songBook;
     private String entry;
     private String comments;
-    private List<String> verseOrder = new ArrayList<>();
-    private final Map<Locale, List<Verse>> lyrics = new HashMap<>();
+    private String verseOrder;
+    private final Map<String, List<SongVerse>> lyrics = new HashMap<>();
 
     public String getTitle() {
-        return this.titles.get(Locale.getDefault());
+        return this.titles.getOrDefault(DEFAULT_LOCALE, "");
     }
 
-    public String getTitle(Locale locale) {
-        return this.titles.get(locale) != null ? this.titles.get(locale) : this.getTitle();
+    public String getTitle(String locale) {
+        String localeTitle = this.titles.get(locale);
+        return localeTitle != null ? localeTitle : this.getTitle();
     }
 
     public void setTitle(String title) {
-        setTitle(Locale.getDefault(), title);
+        setTitle(DEFAULT_LOCALE, title);
     }
 
-    public void setTitle(Locale locale, String title) {
+    public void setTitle(String locale, String title) {
+        if (locale == null) {
+            locale = DEFAULT_LOCALE;
+        }
         this.titles.put(locale, title);
     }
 
-    public List<Locale> getTitleLocales() {
-        List<Locale> locales = new ArrayList<>(this.titles.keySet());
+    public List<String> getTitleLocales() {
+        List<String> locales = new ArrayList<>(this.titles.keySet());
 
-        if (!locales.contains(Locale.getDefault())) {
-            locales.add(Locale.getDefault());
+        if (!locales.contains(DEFAULT_LOCALE)) {
+            locales.add(DEFAULT_LOCALE);
         }
 
         return Collections.unmodifiableList(locales);
@@ -95,21 +101,27 @@ public class Song {
         this.comments = comments;
     }
 
-    public Map<Locale, List<Verse>> getLyrics() {
-        return lyrics;
+    public List<String> getVerseLocales() {
+        List<String> locales = new ArrayList<>(this.lyrics.keySet());
+
+        if (!locales.contains(DEFAULT_LOCALE)) {
+            locales.add(DEFAULT_LOCALE);
+        }
+
+        return Collections.unmodifiableList(locales);
     }
 
-    public List<Verse> getVerses(Locale locale) {
-        List<Verse> verses = this.lyrics.get(locale);
-        return verses != null ? verses : this.lyrics.get(Locale.getDefault());
+    public List<SongVerse> getVerses(String locale) {
+        List<SongVerse> verses = this.lyrics.get(locale);
+        return verses != null ? verses : this.lyrics.get(DEFAULT_LOCALE);
     }
 
-    public List<Verse> getVerses() {
-        List<Verse> verses = this.getVerses(Locale.getDefault());
+    public List<SongVerse> getVerses() {
+        List<SongVerse> verses = this.getVerses(DEFAULT_LOCALE);
         if (verses == null) {
-            Set<Locale> keySet = this.lyrics.keySet();
+            Set<String> keySet = this.lyrics.keySet();
             if (!keySet.isEmpty()) {
-                Locale firstLocale = keySet.iterator().next();
+                String firstLocale = keySet.iterator().next();
                 verses = this.getVerses(firstLocale);
             }
         }
@@ -117,48 +129,52 @@ public class Song {
     }
 
     public List<String> getVerseNames() {
-        List<Verse> verses = getVerses();
+        List<SongVerse> verses = getVerses();
         if (verses != null) {
-            return getVerses().stream().map(Verse::getName).toList();
+            return getVerses().stream().map(SongVerse::getName).toList();
         }
         return Collections.emptyList();
     }
 
-    public List<String> getVerseOrder() {
+    public List<String> getVerseOrderList() {
         if (verseOrder != null && !verseOrder.isEmpty()) {
-            return verseOrder;
+            return Arrays.stream(verseOrder.split(" ")).toList();
         }
         return getVerseNames();
     }
 
-    public void setVerseOrder(List<String> verseOrder) {
+    public String getVerseOrder() {
+        return verseOrder;
+    }
+
+    public void setVerseOrder(String verseOrder) {
         this.verseOrder = verseOrder;
     }
 
-    public void setVerses(List<Verse> verses) {
-        setVerses(Locale.getDefault(), verses);
+    public void setVerses(List<SongVerse> verses) {
+        setVerses(DEFAULT_LOCALE, verses);
     }
 
-    public void setVerses(Locale locale, List<Verse> verses) {
+    public void setVerses(String locale, List<SongVerse> verses) {
         this.lyrics.put(locale, verses);
     }
 
-    public void addVerse(Verse newVerse) {
-        addVerse(Locale.getDefault(), newVerse);
+    public void addVerse(SongVerse newVerse) {
+        addVerse(DEFAULT_LOCALE, newVerse);
     }
 
-    public void addVerse(Locale locale, Verse newVerse) {
-        List<Verse> verses = this.lyrics.getOrDefault(locale, new ArrayList<>());
+    public void addVerse(String locale, SongVerse newVerse) {
+        List<SongVerse> verses = this.lyrics.getOrDefault(locale, new ArrayList<>());
         verses.add(newVerse);
         this.lyrics.put(locale, verses);
     }
 
-    public void addVerses(List<Verse> newVerses) {
-        addVerses(Locale.getDefault(), newVerses);
+    public void addVerses(List<SongVerse> newVerses) {
+        addVerses(DEFAULT_LOCALE, newVerses);
     }
 
-    public void addVerses(Locale locale, List<Verse> newVerses) {
-        List<Verse> verses = this.lyrics.getOrDefault(locale, new ArrayList<>());
+    public void addVerses(String locale, List<SongVerse> newVerses) {
+        List<SongVerse> verses = this.lyrics.getOrDefault(locale, new ArrayList<>());
         verses.addAll(newVerses);
         this.lyrics.put(locale, verses);
     }
@@ -174,16 +190,16 @@ public class Song {
     }
 
     public void updateVerse(int index, String verseName, String verseText) {
-        updateVerse(Locale.getDefault(), index, verseName, verseText);
+        updateVerse(DEFAULT_LOCALE, index, verseName, verseText);
     }
 
-    public void updateVerse(Locale locale, int index, String verseName, String verseText) {
+    public void updateVerse(String locale, int index, String verseName, String verseText) {
         updateVerse(locale, index, verseName, Arrays.stream(verseText.split("\n")).toList());
     }
 
-    public void updateVerse(Locale locale, int index, String verseName, List<String> lines) {
+    public void updateVerse(String locale, int index, String verseName, List<String> lines) {
         if (this.lyrics.containsKey(locale)) {
-            Verse verse = this.lyrics.get(locale).get(index);
+            SongVerse verse = this.lyrics.get(locale).get(index);
             verse.setName(verseName);
             verse.setText(String.join("\n", lines));
         }
