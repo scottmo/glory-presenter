@@ -41,6 +41,7 @@ class OpenLyricsDeserializer {
             getPublisherProp(properties, song);
             getVerseOrderProp(properties, song);
             getCommentsProp(properties, song);
+            getSongBookProp(properties, song);
         }
     }
 
@@ -50,6 +51,23 @@ class OpenLyricsDeserializer {
             return topNode.getTextContent();
         }
         return "";
+    }
+
+    private void getSongBookProp(Element properties, Song song) {
+        NodeList songbooks = properties.getElementsByTagName("songbooks");
+        if (songbooks.item(0) != null) {
+            NodeList songbookList = ((Element) songbooks.item(0)).getElementsByTagName("songbook");
+            for (int i = 0; i < songbookList.getLength(); i++) {
+                Element songbookNode = (Element) songbookList.item(i);
+                String songbook = songbookNode.getAttribute("name");
+                String entry = songbookNode.getAttribute("entry");
+                if (Strings.isNotEmpty(songbook) && Strings.isNotEmpty(entry)) {
+                    song.setSongBook(songbook);
+                    song.setEntry(entry);
+                    break; // only handle one songbook for now
+                }
+            }
+        }
     }
 
     private void getCommentsProp(Element properties, Song song) {

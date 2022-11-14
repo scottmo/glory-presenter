@@ -14,6 +14,9 @@ public class Song {
     private final List<String> authors = new ArrayList<>();
     private String publisher;
     private String copyright;
+
+    private String songBook;
+    private String entry;
     private String comments;
     private List<String> verseOrder = new ArrayList<>();
     private final Map<Locale, List<Verse>> lyrics = new HashMap<>();
@@ -66,6 +69,22 @@ public class Song {
 
     public void setCopyright(String copyright) {
         this.copyright = copyright;
+    }
+
+    public String getSongBook() {
+        return songBook;
+    }
+
+    public void setSongBook(String songBook) {
+        this.songBook = songBook;
+    }
+
+    public String getEntry() {
+        return entry;
+    }
+
+    public void setEntry(String entry) {
+        this.entry = entry;
     }
 
     public String getComments() {
