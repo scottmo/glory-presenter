@@ -1,5 +1,7 @@
 package com.scottmo.data.song;
 
+import java.util.Locale;
+
 public class SongVerse {
     private String name;
     private String text;
@@ -12,6 +14,10 @@ public class SongVerse {
         this.name = name;
         this.text = text;
         this.locale = locale;
+    }
+
+    public SongVerse(String name, String text) {
+        this(name, text, Locale.getDefault().toString());
     }
 
     public String getName() {
