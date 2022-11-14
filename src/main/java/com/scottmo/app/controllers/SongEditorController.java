@@ -34,9 +34,9 @@ public class SongEditorController {
         if (Strings.isNotEmpty(song.getTitle())) {
             titleInput.setText(song.getTitle());
         }
-        List<String> verseOrder = song.getVerseOrder();
+        String verseOrder = song.getVerseOrder();
         if (verseOrder != null && !verseOrder.isEmpty()) {
-            verseOrderInput.setText(String.join(" ", verseOrder));
+            verseOrderInput.setText(verseOrder);
         }
 
         List<SongVerse> verses = song.getVerses();
@@ -78,8 +78,9 @@ public class SongEditorController {
     }
 
     public void onSave(ActionEvent event) {
+        // TODO validations
         song.setTitle(titleInput.getText());
-        song.setVerseOrder(Arrays.stream(verseOrderInput.getText().split(" ")).toList());
+        song.setVerseOrder(verseOrderInput.getText());
         song.setVerses(lyricsContainer.getChildren().stream().map(node -> {
             VerseEditor verseEditor = (VerseEditor)node;
             return new SongVerse(verseEditor.getVerseName(), verseEditor.getVerseText());
