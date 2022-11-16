@@ -24,13 +24,29 @@ public final class SongStore {
         }
     }
 
+    public Song getSong(int songId) {
+        try {
+            Song song = songTable.getSong(songId);
+            var titles = songTitleTable.getTitles(songId);
+            titles.entrySet().stream().forEach(entry -> {
+                song.setTitle(entry.getKey(), entry.getValue());
+            });
+            var verses = songVerseTable.getVerses(songId);
+            song.setVerses(verses);
+            return song;
+        } catch (SQLException e) {
+            throw new RuntimeException("Unable to retrieve song from DB!", e);
+        }
+    }
+
     public boolean insert(Song song) {
         try {
-            long songId = songTable.insert(song);
+            int songId = songTable.insert(song);
+            songTitleTable.insert(songId, song);
+            songVerseTable.insert(songId, song);
+            return true;
         } catch (SQLException e) {
-
+            throw new RuntimeException("Unable to insert song to DB!", e);
         }
-
-        return false;
     }
 }

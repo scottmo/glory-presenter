@@ -48,7 +48,7 @@ final class SongTable {
         }
     }
 
-    Song getSong(long id) throws SQLException {
+    Song getSong(int id) throws SQLException {
         Song song = new Song();
 
         String sql = "SELECT * FROM %s WHERE id = ?".formatted(TABLE_NAME);
@@ -58,12 +58,9 @@ final class SongTable {
             if (res.next()) {
                 String authors = res.getString(FIELD_AUTHORS);
                 if (Strings.isNotEmpty(authors)) {
-                    Arrays.stream(authors.split(",")).forEach(song::addAuthor);
+                    song.setAuthors(Arrays.stream(authors.split(",")).toList());
                 }
-                String verseOrder = res.getString(FIELD_VERSEORDER);
-                if (Strings.isNotEmpty(verseOrder)) {
-                    song.setVerseOrder(Arrays.stream(verseOrder.split(",")).toList());
-                }
+                song.setVerseOrder(res.getString(FIELD_VERSEORDER));
                 song.setCopyright(res.getString(FIELD_COPYRIGHT));
                 song.setPublisher(res.getString(FIELD_PUBLISHER));
                 song.setSongBook(res.getString(FIELD_SONGBOOK));
@@ -75,7 +72,7 @@ final class SongTable {
         return song;
     }
 
-    long insert(Song song) throws SQLException {
+    int insert(Song song) throws SQLException {
         List<Pair<String, String>> nonEmptyFields = new ArrayList<>();
         if (!song.getAuthors().isEmpty()) {
             nonEmptyFields.add(new Pair<>(FIELD_AUTHORS, String.join(",", song.getAuthors())));
@@ -113,7 +110,7 @@ final class SongTable {
             // return song id
             ResultSet res = stmt.getGeneratedKeys();
             if (res.next()) {
-                return res.getLong(1);
+                return res.getInt(1);
             } else {
                 throw new RuntimeException("Failed to retrieve id from new song");
             }
