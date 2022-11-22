@@ -5,6 +5,7 @@ import com.healthmarketscience.sqlbuilder.InsertQuery;
 import com.healthmarketscience.sqlbuilder.SelectQuery;
 import com.scottmo.data.song.Song;
 import com.scottmo.data.song.SongVerse;
+import javafx.util.Pair;
 import org.apache.logging.log4j.util.Strings;
 
 import java.nio.file.Path;
@@ -32,6 +33,26 @@ public final class SongStore {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public List<Pair<Integer, String>> getSongTitles(String locale) {
+        List<Pair<Integer, String>> songTitles = new ArrayList<>();
+
+        try (var stmt = db.createStatement()) {
+            var res = stmt.executeQuery(new SelectQuery()
+                    .addAllTableColumns(schema.titles.table)
+                    .addCondition(BinaryCondition.equalTo(schema.titles.locale, locale))
+                    .validate().toString());
+            while (res.next()) {
+                Integer songId = res.getInt(schema.titles.songId.getName());
+                String title = res.getString(schema.titles.text.getName());
+                songTitles.add(new Pair<>(songId, title));
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Unable to retrieve song titles from DB!", e);
+        }
+
+        return songTitles;
     }
 
     public Song getSong(int songId) {
