@@ -1,6 +1,7 @@
 package com.scottscmo.model.content;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.google.common.base.Strings;
 
 import java.util.Arrays;
 import java.util.List;
@@ -27,6 +28,7 @@ public class Content {
     public String getJoinedTitle(List<String> order) {
         String index = this.getMetadata().getOrDefault("index", "");
         return Stream.concat(Stream.of(index), order.stream().map(key -> this.getTitle().get(key)))
+                .filter(s -> !Strings.isNullOrEmpty(s))
                 .collect(Collectors.joining(" "));
     }
 

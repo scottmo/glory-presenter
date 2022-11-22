@@ -184,7 +184,7 @@ public final class GoogleSlidesService {
         String textBoxId = requestBuilder.createSlideWithFullText(slideIndex++);
         requestBuilder.insertText(textBoxId, content.getTitle(), slideConfig);
         if (content.getMetadata().containsKey("index")) {
-            requestBuilder.insertText(textBoxId, content.getMetadata().get("index"), slideConfig.paragraph(), defaultTextConfig);
+            requestBuilder.insertText(textBoxId, content.getMetadata().get("index") + " ", slideConfig.paragraph(), defaultTextConfig);
         }
 
         // lyrics
