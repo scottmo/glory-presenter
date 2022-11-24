@@ -11,6 +11,8 @@ import java.util.Map;
 public class Song {
     private static final String DEFAULT_LOCALE = Locale.getDefault().toString();
 
+    private int id = -1;
+
     private final Map<String, String> titles = new HashMap<>();
     private List<String> authors = new ArrayList<>();
     private String publisher;
@@ -20,6 +22,16 @@ public class Song {
     private String comments;
     private String verseOrder;
     private List<SongVerse> verses = new ArrayList<>();
+
+    public Song() {}
+
+    public Song(int id) {
+        this.id = id;
+    }
+
+    public int getId() {
+        return id;
+    }
 
     public String getTitle() {
         return this.titles.getOrDefault(DEFAULT_LOCALE, "");
