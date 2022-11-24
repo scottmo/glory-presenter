@@ -6,6 +6,7 @@ import com.healthmarketscience.sqlbuilder.SelectQuery;
 import com.healthmarketscience.sqlbuilder.UpdateQuery;
 import com.scottmo.data.song.Song;
 import com.scottmo.data.song.SongVerse;
+import com.scottmo.services.Service;
 import javafx.util.Pair;
 import org.apache.logging.log4j.util.Strings;
 
@@ -18,7 +19,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public final class SongStore {
+public final class SongStore implements Service {
     private static final String DB_NAME = "songs";
     private final SongSchema schema = new SongSchema();
     private final Connection db;

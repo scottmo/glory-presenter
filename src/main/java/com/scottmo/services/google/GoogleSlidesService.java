@@ -33,7 +33,7 @@ public final class GoogleSlidesService {
     private static final String appName = "Glory Presenter";
 
     private final AppContext appContext = ServiceSupplier.getAppContext();
-    private final Supplier<BibleStore> bibleStore = ServiceSupplier.getBibleStore();
+    private final Supplier<BibleStore> bibleStore = ServiceSupplier.get(BibleStore.class);
 
     private Slides _slidesApi;
 

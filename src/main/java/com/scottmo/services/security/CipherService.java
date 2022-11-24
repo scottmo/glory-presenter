@@ -1,5 +1,7 @@
 package com.scottmo.services.security;
 
+import com.scottmo.services.Service;
+
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -13,7 +15,7 @@ import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.PBEParameterSpec;
 
-public final class CipherService {
+public final class CipherService implements Service {
     private static final String algorithm = "PBEWithMD5AndTripleDES";
 
     private Cipher cipher(String password, byte[] salt, int mode) throws GeneralSecurityException {
