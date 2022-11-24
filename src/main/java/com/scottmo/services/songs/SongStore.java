@@ -3,6 +3,7 @@ package com.scottmo.services.songs;
 import com.healthmarketscience.sqlbuilder.BinaryCondition;
 import com.healthmarketscience.sqlbuilder.InsertQuery;
 import com.healthmarketscience.sqlbuilder.SelectQuery;
+import com.healthmarketscience.sqlbuilder.UpdateQuery;
 import com.scottmo.data.song.Song;
 import com.scottmo.data.song.SongVerse;
 import javafx.util.Pair;
@@ -103,7 +104,14 @@ public final class SongStore {
         return song;
     }
 
-    public boolean insert(Song song) {
+    public boolean upsert(Song song) {
+        if (song.getId() == -1) {
+            return insert(song);
+        }
+        return update(song);
+    }
+
+    private boolean insert(Song song) {
         int songId;
         try {
             InsertQuery sql = new InsertQuery(schema.song.table);
@@ -163,7 +171,7 @@ public final class SongStore {
 
                     stmt.addBatch();
                 }
-                stmt.executeUpdate();
+                stmt.executeBatch();
             }
 
             sql = new InsertQuery(schema.verses)
@@ -178,10 +186,63 @@ public final class SongStore {
 
                     stmt.addBatch();
                 }
-                stmt.executeUpdate();
+                stmt.executeBatch();
             }
         } catch (SQLException e) {
             throw new RuntimeException("Unable to insert song to DB!", e);
+        }
+        return true;
+    }
+
+    private boolean update(Song song) {
+        try (var stmt = db.createStatement()) {
+            UpdateQuery sql = new UpdateQuery(schema.song.table);
+            sql.addCondition(BinaryCondition.equalTo(schema.song.id, song.getId()));
+            if (!song.getAuthors().isEmpty()) {
+                sql.addSetClause(schema.song.authors, song.getAuthors());
+            }
+            if (Strings.isNotEmpty(song.getCopyright())) {
+                sql.addSetClause(schema.song.copyright, song.getCopyright());
+            }
+            if (Strings.isNotEmpty(song.getPublisher())) {
+                sql.addSetClause(schema.song.publisher, song.getPublisher());
+            }
+            if (Strings.isNotEmpty(song.getSongBook())) {
+                sql.addSetClause(schema.song.songbook, song.getSongBook());
+            }
+            if (Strings.isNotEmpty(song.getEntry())) {
+                sql.addSetClause(schema.song.entry, song.getEntry());
+            }
+            if (Strings.isNotEmpty(song.getComments())) {
+                sql.addSetClause(schema.song.comments, song.getComments());
+            }
+            if (Strings.isNotEmpty(song.getVerseOrder())) {
+                sql.addSetClause(schema.song.verseOrder, song.getVerseOrder());
+            }
+            sql.validate();
+            stmt.addBatch(sql.toString());
+
+            for (String locale : song.getTitleLocales()) {
+                sql = new UpdateQuery(schema.titles)
+                        .addCondition(BinaryCondition.equalTo(schema.titles.songId, song.getId()))
+                        .addSetClause(schema.titles.locale, locale)
+                        .addSetClause(schema.titles.text, song.getTitle(locale))
+                        .validate();
+                stmt.addBatch(sql.toString());
+            }
+
+            for (SongVerse verse : song.getVerses()) {
+                sql = new UpdateQuery(schema.verses)
+                        .addCondition(BinaryCondition.equalTo(schema.verses.songId, song.getId()))
+                        .addSetClause(schema.verses.name, verse.getName())
+                        .addSetClause(schema.verses.text, verse.getText())
+                        .addSetClause(schema.verses.locale, verse.getLocale())
+                        .validate();
+                stmt.addBatch(sql.toString());
+            }
+            stmt.executeBatch();
+        } catch (SQLException e) {
+            throw new RuntimeException("Unable to update song!", e);
         }
         return true;
     }
