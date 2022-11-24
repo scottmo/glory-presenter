@@ -3,6 +3,7 @@ package com.scottmo.services.bible;
 import com.scottmo.data.bibleMetadata.BibleMetadata;
 import com.scottmo.data.bibleReference.BibleReference;
 import com.scottmo.data.bibleReference.VerseRange;
+import com.scottmo.services.Service;
 
 import java.nio.file.Path;
 import java.sql.Connection;
@@ -14,7 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public final class BibleStore {
+public final class BibleStore implements Service {
     private static final String DB_NAME = "bible";
 
     private final BibleVerseTable bibleVerseTable;

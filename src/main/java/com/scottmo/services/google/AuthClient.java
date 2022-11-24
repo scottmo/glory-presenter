@@ -27,7 +27,7 @@ final class AuthClient {
     private static final List<String> SCOPES = List.of(SlidesScopes.PRESENTATIONS, DriveScopes.DRIVE);
 
     private final AppContext appContext = ServiceSupplier.getAppContext();
-    private final Supplier<CipherService> cipherService = ServiceSupplier.getCipherService();
+    private final Supplier<CipherService> cipherService = ServiceSupplier.get(CipherService.class);
 
     /**
      * Creates an authorized Credential object.
