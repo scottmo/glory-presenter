@@ -3,6 +3,7 @@ package com.scottmo.services;
 import com.scottmo.services.bible.BibleStore;
 import com.scottmo.services.config.AppContext;
 import com.scottmo.services.security.CipherService;
+import com.scottmo.services.songs.SongStore;
 import com.scottmo.services.songsOpenLyrics.SongsOpenLyricsService;
 
 import java.nio.file.Path;
@@ -21,6 +22,16 @@ public class ServiceSupplier {
                 bibleStore = new BibleStore(Path.of(appContext.getConfig().dataDir()));
             }
             return bibleStore;
+        };
+    }
+
+    private static SongStore songStore;
+    public static Supplier<SongStore> getSongStore() {
+        return () -> {
+            if (songStore == null) {
+                songStore = new SongStore(Path.of(appContext.getConfig().dataDir()));
+            }
+            return songStore;
         };
     }
 
