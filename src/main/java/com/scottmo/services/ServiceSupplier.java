@@ -3,6 +3,7 @@ package com.scottmo.services;
 import com.scottmo.services.bible.BibleStore;
 import com.scottmo.services.config.AppContext;
 import com.scottmo.services.security.CipherService;
+import com.scottmo.services.logging.AppLoggerService;
 import com.scottmo.services.songs.SongStore;
 import com.scottmo.services.songsOpenLyrics.SongsOpenLyricsService;
 
@@ -26,6 +27,9 @@ public class ServiceSupplier {
                 return (T) services.get(clazz);
             }
 
+            if (clazz == AppLoggerService.class) {
+                service = new AppLoggerService();
+            }
             if (clazz == BibleStore.class) {
                 service = new BibleStore(Path.of(appContext.getConfig().dataDir()));
             }
