@@ -4,6 +4,7 @@ import com.scottmo.data.bibleMetadata.BibleMetadata;
 import com.scottmo.data.bibleReference.BibleReference;
 import com.scottmo.data.bibleReference.VerseRange;
 import com.scottmo.services.Service;
+import com.scottmo.services.ServiceSupplier;
 
 import java.nio.file.Path;
 import java.sql.Connection;
@@ -21,6 +22,10 @@ public final class BibleStore implements Service {
     private final BibleVerseTable bibleVerseTable;
     private final BookNamesTable bookNamesTable;
     private List<Map<String, String>> bookNames = Collections.emptyList(); // cache
+
+    public BibleStore() {
+        this(Path.of(ServiceSupplier.getAppContext().getConfig().dataDir()));
+    }
 
     public BibleStore(Path storeLocation) {
         try {
