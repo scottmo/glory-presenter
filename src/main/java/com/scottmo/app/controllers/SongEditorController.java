@@ -1,8 +1,8 @@
 package com.scottmo.app.controllers;
 
-import com.scottmo.data.openLyrics.OpenLyrics;
-import com.scottmo.data.openLyrics.Verse;
 import com.scottmo.app.views.VerseEditor;
+import com.scottmo.data.song.Song;
+import com.scottmo.data.song.SongVerse;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.scene.control.ComboBox;
@@ -20,7 +20,7 @@ public class SongEditorController {
     public TextField verseOrderInput;
     public ComboBox<String> verseOrderPicker;
 
-    private OpenLyrics song;
+    private Song song;
 
     private VerseEditor selectedVerse;
 
@@ -29,26 +29,26 @@ public class SongEditorController {
     }
 
     private void populateForm() {
-        song = (OpenLyrics) getStage().getUserData();
+        song = (Song) getStage().getUserData();
 
-        if (Strings.isNotEmpty(song.getProperties().getTitle())) {
-            titleInput.setText(song.getProperties().getTitle());
+        if (Strings.isNotEmpty(song.getTitle())) {
+            titleInput.setText(song.getTitle());
         }
-        List<String> verseOrder = song.getVerseOrder();
+        String verseOrder = song.getVerseOrder();
         if (verseOrder != null && !verseOrder.isEmpty()) {
-            verseOrderInput.setText(String.join(" ", verseOrder));
+            verseOrderInput.setText(verseOrder);
         }
 
-        List<Verse> verses = song.getVerses();
+        List<SongVerse> verses = song.getVerses();
 
         verseOrderPicker.getItems().add("Add");
         verseOrderPicker.getSelectionModel().selectFirst();
-        for (Verse verse : verses) {
+        for (SongVerse verse : verses) {
             verseOrderPicker.getItems().add(verse.getName());
         }
 
-        for (Verse verse : verses) {
-            createVerseInput(verse.getName(), verse.getLinesAsString(), false);
+        for (SongVerse verse : verses) {
+            createVerseInput(verse.getName(), verse.getText(), false);
         }
     }
 
@@ -78,11 +78,12 @@ public class SongEditorController {
     }
 
     public void onSave(ActionEvent event) {
-        song.getProperties().setTitle(titleInput.getText());
-        song.getProperties().setVerseOrder(Arrays.stream(verseOrderInput.getText().split(" ")).toList());
+        // TODO validations
+        song.setTitle(titleInput.getText());
+        song.setVerseOrder(verseOrderInput.getText());
         song.setVerses(lyricsContainer.getChildren().stream().map(node -> {
             VerseEditor verseEditor = (VerseEditor)node;
-            return new Verse(verseEditor.getVerseName(), Arrays.stream(verseEditor.getVerseText().split("\n")).toList());
+            return new SongVerse(verseEditor.getVerseName(), verseEditor.getVerseText());
         }).toList());
 
         getStage().close();

@@ -15,11 +15,11 @@ import java.util.Map;
 final class BibleVerseTable {
     private final Connection db;
 
-    public BibleVerseTable(Connection conn) {
+    BibleVerseTable(Connection conn) {
         this.db = conn;
     }
 
-    private void createTable(String tableName) throws SQLException {
+    void createTable(String tableName) throws SQLException {
         String sql = """
             CREATE TABLE IF NOT EXISTS %s (
                 bookIndex INTEGER NOT NULL,
@@ -38,7 +38,7 @@ final class BibleVerseTable {
         return "bible_" + version;
     }
 
-    public int insert(String version, Map<String, List<List<String>>> bible) throws SQLException {
+    int insert(String version, Map<String, List<List<String>>> bible) throws SQLException {
         List<BibleVerse> verses = new ArrayList<>();
         for (String book : bible.keySet()) {
             int bookIndex = BibleMetadata.getBookIndex(book);
@@ -69,7 +69,7 @@ final class BibleVerseTable {
         return inserted;
     }
 
-    public List<BibleVerse> query(String version, String bookId, int chapter, List<Integer> verses) throws SQLException {
+    List<BibleVerse> query(String version, String bookId, int chapter, List<Integer> verses) throws SQLException {
         List<BibleVerse> bibleVerses = new ArrayList<>();
 
         String tableName = getTableName(version);
@@ -95,7 +95,7 @@ final class BibleVerseTable {
         return bibleVerses;
     }
 
-    public List<BibleVerse> query(String version, String bookId, int chapter) throws SQLException {
+    List<BibleVerse> query(String version, String bookId, int chapter) throws SQLException {
         return query(version, bookId, chapter, Collections.emptyList());
     }
 }

@@ -3,8 +3,12 @@ package com.scottmo.services;
 import com.scottmo.services.bible.BibleStore;
 import com.scottmo.services.config.AppContext;
 import com.scottmo.services.security.CipherService;
+import com.scottmo.services.songs.SongStore;
+import com.scottmo.services.songsOpenLyrics.SongsOpenLyricsService;
 
 import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Supplier;
 
 public class ServiceSupplier {
@@ -13,23 +17,32 @@ public class ServiceSupplier {
         return appContext;
     }
 
-    private static BibleStore bibleStore;
-    public static Supplier<BibleStore> getBibleStore() {
-        return () -> {
-            if (bibleStore == null) {
-                bibleStore = new BibleStore(Path.of(appContext.getConfig().dataDir()));
-            }
-            return bibleStore;
-        };
-    }
+    private static final Map<Class<?>, Object> services = new HashMap<>();
 
-    private static CipherService cipherService;
-    public static Supplier<CipherService> getCipherService() {
+    public static <T extends Service> Supplier<T> get(Class<T> clazz) {
         return () -> {
-            if (cipherService == null) {
-                cipherService = new CipherService();
+            Service service = null;
+            if (services.containsKey(clazz)) {
+                return (T) services.get(clazz);
             }
-            return cipherService;
+
+            if (clazz == BibleStore.class) {
+                service = new BibleStore(Path.of(appContext.getConfig().dataDir()));
+            }
+            if (clazz == SongStore.class) {
+                service = new SongStore(Path.of(appContext.getConfig().dataDir()));
+            }
+            if (clazz == CipherService.class) {
+                service = new CipherService();
+            }
+            if (clazz == SongsOpenLyricsService.class) {
+                service = new SongsOpenLyricsService();
+            }
+            if (service != null) {
+                services.put(clazz, service);
+                return (T) service;
+            }
+            return null;
         };
     }
 }

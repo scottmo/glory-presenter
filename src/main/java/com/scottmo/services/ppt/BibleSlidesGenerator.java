@@ -22,7 +22,7 @@ public final class BibleSlidesGenerator {
     private static final String VERSE_MASTER_KEY_PREFIX = "verse";
     private static final String MAIN_LAYOUT_KEY = "main";
 
-    private static final Supplier<BibleStore> bibleStore = ServiceSupplier.getBibleStore();
+    private static final Supplier<BibleStore> bibleStore = ServiceSupplier.get(BibleStore.class);
     private static final AppContext appContext = ServiceSupplier.getAppContext();
     
     private static void insertBibleText(String templateFilePath, String outputFilePath, String bibleReference) throws IOException {

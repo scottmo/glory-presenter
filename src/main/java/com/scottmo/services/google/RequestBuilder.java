@@ -1,6 +1,7 @@
 package com.scottmo.services.google;
 
 import com.google.api.services.slides.v1.model.*;
+import com.scottmo.services.ServiceSupplier;
 import com.scottmo.services.config.AppContext;
 import com.scottmo.util.StringSegment;
 import com.scottmo.util.StringUtils;
@@ -19,6 +20,8 @@ public final class RequestBuilder {
     public static final String ID_SHAPE_PREFIX = "o";
     public static final String ID_SLIDE_PREFIX = "s";
     public static final String ID_PLACEHOLDER_PREFIX = "p";
+
+    private final AppContext appContext = ServiceSupplier.getAppContext();
 
     private final List<Request> requests = new ArrayList<>();
 
@@ -347,7 +350,7 @@ public final class RequestBuilder {
      * use to match slide configuration. convenient method for CJK languages.
      */
     private String getTextConfigName(StringSegment segment) {
-        SlideConfig slideConfig = AppContext.getConfig().googleSlideConfig();
+        SlideConfig slideConfig = appContext.getConfig().googleSlideConfig();
         return segment.isAscii() ? slideConfig.defaultAsciiTextConfig() : slideConfig.defaultNonAsciiTextConfig();
     }
 }
