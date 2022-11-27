@@ -20,6 +20,7 @@ public class ServiceSupplier {
 
     private static final Map<Class<?>, Object> services = new HashMap<>();
 
+    @SuppressWarnings("unchecked")
     public static <T extends Service> Supplier<T> get(Class<T> clazz) {
         return () -> {
             Service service = null;
