@@ -6,9 +6,6 @@
 			"version": "none",
 			"installMaven": "true",
 			"installGradle": "false"
-		},
-		"ghcr.io/devcontainers/features/node:1": {
-			"version": "18"
 		}
 	}
 }
