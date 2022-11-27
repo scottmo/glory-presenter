@@ -1,7 +1,7 @@
 package com.scottmo.app;
 
 import atlantafx.base.theme.PrimerLight;
-import com.scottmo.services.logging.AppLoggerProvider;
+import com.scottmo.services.logging.AppLoggerService;
 import com.scottmo.services.logging.AppLogger;
 import javafx.application.Application;
 import javafx.fxml.FXML;
@@ -21,6 +21,8 @@ public class App extends Application implements AppLogger {
     private static final int DEFAULT_HEIGHT = 600;
 
     private static final Logger logger = Logger.getLogger(App.class.getName());
+
+    private final Supplier<AppLoggerService> appLoggerService = ServiceSupplier.get(AppLoggerService.class);
 
     @FXML
     private Label statusLabel;
@@ -47,7 +49,7 @@ public class App extends Application implements AppLogger {
         Thread.setDefaultUncaughtExceptionHandler((Thread t, Throwable e) -> {
             error("Oops!: " + e.getMessage() + "(see error.log for details)", e);
         });
-        AppLoggerProvider.registerLogger(this);
+        appLoggerService.get().registerLogger(this);
 
         Application.setUserAgentStylesheet(new PrimerLight().getUserAgentStylesheet());
         Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("/ui/main.fxml")));
