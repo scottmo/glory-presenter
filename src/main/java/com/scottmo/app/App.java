@@ -2,6 +2,7 @@ package com.scottmo.app;
 
 import atlantafx.base.theme.PrimerLight;
 import com.scottmo.services.logging.AppLoggerService;
+import com.scottmo.services.ServiceSupplier;
 import com.scottmo.services.logging.AppLogger;
 import javafx.application.Application;
 import javafx.fxml.FXML;
@@ -14,6 +15,7 @@ import org.apache.log4j.Logger;
 
 import java.io.IOException;
 import java.util.Objects;
+import java.util.function.Supplier;
 
 public class App extends Application implements AppLogger {
     private static final String APP_NAME = "Glory Presenter";
