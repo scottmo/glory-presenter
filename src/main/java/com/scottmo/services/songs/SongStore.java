@@ -7,6 +7,8 @@ import com.healthmarketscience.sqlbuilder.UpdateQuery;
 import com.scottmo.data.song.Song;
 import com.scottmo.data.song.SongVerse;
 import com.scottmo.services.Service;
+import com.scottmo.services.ServiceSupplier;
+
 import javafx.util.Pair;
 import org.apache.logging.log4j.util.Strings;
 
@@ -23,6 +25,10 @@ public final class SongStore implements Service {
     private static final String DB_NAME = "songs";
     private final SongSchema schema = new SongSchema();
     private final Connection db;
+
+    public SongStore() {
+        this(Path.of(ServiceSupplier.getAppContext().getConfig().dataDir()));
+    }
 
     public SongStore(Path storeLocation) {
         try {

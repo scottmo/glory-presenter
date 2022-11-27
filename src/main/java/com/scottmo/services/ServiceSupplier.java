@@ -1,13 +1,7 @@
 package com.scottmo.services;
 
-import com.scottmo.services.bible.BibleStore;
 import com.scottmo.services.config.AppContext;
-import com.scottmo.services.security.CipherService;
-import com.scottmo.services.logging.AppLoggerService;
-import com.scottmo.services.songs.SongStore;
-import com.scottmo.services.songsOpenLyrics.SongsOpenLyricsService;
 
-import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
@@ -27,21 +21,10 @@ public class ServiceSupplier {
             if (services.containsKey(clazz)) {
                 return (T) services.get(clazz);
             }
-
-            if (clazz == AppLoggerService.class) {
-                service = new AppLoggerService();
-            }
-            if (clazz == BibleStore.class) {
-                service = new BibleStore(Path.of(appContext.getConfig().dataDir()));
-            }
-            if (clazz == SongStore.class) {
-                service = new SongStore(Path.of(appContext.getConfig().dataDir()));
-            }
-            if (clazz == CipherService.class) {
-                service = new CipherService();
-            }
-            if (clazz == SongsOpenLyricsService.class) {
-                service = new SongsOpenLyricsService();
+            try {
+                service = clazz.getDeclaredConstructor().newInstance();
+            } catch (Exception e) {
+                throw new RuntimeException("Service needs to implement a default constructor", e);
             }
             if (service != null) {
                 services.put(clazz, service);
