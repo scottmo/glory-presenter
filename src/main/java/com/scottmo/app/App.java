@@ -1,5 +1,7 @@
 package com.scottmo.app;
 
+import static com.scottmo.services.config.Constants.APP_NAME;
+
 import atlantafx.base.theme.PrimerLight;
 import com.scottmo.services.logging.AppLoggerService;
 import com.scottmo.services.ServiceSupplier;
@@ -18,7 +20,6 @@ import java.util.Objects;
 import java.util.function.Supplier;
 
 public class App extends Application implements AppLogger {
-    private static final String APP_NAME = "Glory Presenter";
     private static final int DEFAULT_WIDTH = 900;
     private static final int DEFAULT_HEIGHT = 600;
 
