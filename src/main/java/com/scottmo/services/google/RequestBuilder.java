@@ -2,12 +2,12 @@ package com.scottmo.services.google;
 
 import com.google.api.services.slides.v1.model.*;
 import com.scottmo.services.ServiceSupplier;
-import com.scottmo.services.config.AppContext;
+import com.scottmo.config.AppContext;
 import com.scottmo.util.StringSegment;
 import com.scottmo.util.StringUtils;
-import com.scottmo.services.config.definitions.ParagraphConfig;
-import com.scottmo.services.config.definitions.SlideConfig;
-import com.scottmo.services.config.definitions.TextConfig;
+import com.scottmo.config.definitions.ParagraphConfig;
+import com.scottmo.config.definitions.SlideConfig;
+import com.scottmo.config.definitions.TextConfig;
 
 import java.util.ArrayList;
 import java.util.Collections;

@@ -112,10 +112,10 @@ public final class SongStore implements Service {
     }
 
     public boolean upsert(Song song) {
-        if (song.getId() == -1) {
-            return insert(song);
+        if (song.getId() > -1) {
+            return update(song);
         }
-        return update(song);
+        return insert(song);
     }
 
     private boolean insert(Song song) {

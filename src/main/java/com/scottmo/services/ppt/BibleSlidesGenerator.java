@@ -1,7 +1,7 @@
 package com.scottmo.services.ppt;
 
 import com.scottmo.services.ServiceSupplier;
-import com.scottmo.services.config.AppContext;
+import com.scottmo.config.AppContext;
 import com.scottmo.data.bibleMetadata.BibleMetadata;
 import com.scottmo.services.bible.BibleStore;
 import com.scottmo.data.bibleReference.BibleReference;
