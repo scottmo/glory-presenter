@@ -1,4 +1,4 @@
-package com.scottmo.services.songsOpenLyrics.model;
+package com.scottmo.services.songs.openLyrics.model;
 
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;

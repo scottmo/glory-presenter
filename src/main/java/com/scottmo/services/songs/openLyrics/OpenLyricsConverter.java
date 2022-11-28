@@ -1,18 +1,17 @@
-package com.scottmo.services.songsOpenLyrics;
+package com.scottmo.services.songs.openLyrics;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.scottmo.data.song.Song;
 import com.scottmo.data.song.SongVerse;
-import com.scottmo.services.Service;
-import com.scottmo.services.songsOpenLyrics.model.OpenLyricsSong;
-import com.scottmo.services.songsOpenLyrics.model.OpenLyricsSongBook;
-import com.scottmo.services.songsOpenLyrics.model.OpenLyricsTitle;
-import com.scottmo.services.songsOpenLyrics.model.OpenLyricsVerse;
+import com.scottmo.services.songs.openLyrics.model.OpenLyricsSong;
+import com.scottmo.services.songs.openLyrics.model.OpenLyricsSongBook;
+import com.scottmo.services.songs.openLyrics.model.OpenLyricsTitle;
+import com.scottmo.services.songs.openLyrics.model.OpenLyricsVerse;
 
 import java.util.List;
 
-public class SongsOpenLyricsService implements Service {
+public class OpenLyricsConverter {
     XmlMapper xmlMapper = new XmlMapper();
 
     public Song deserialize(String sourceXML) {
