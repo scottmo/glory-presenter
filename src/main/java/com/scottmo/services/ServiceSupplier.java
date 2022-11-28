@@ -1,6 +1,6 @@
 package com.scottmo.services;
 
-import com.scottmo.services.config.AppContext;
+import com.scottmo.config.AppContext;
 
 import java.util.HashMap;
 import java.util.Map;

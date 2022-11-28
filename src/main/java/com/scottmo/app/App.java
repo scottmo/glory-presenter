@@ -1,6 +1,6 @@
 package com.scottmo.app;
 
-import static com.scottmo.services.config.Constants.APP_NAME;
+import static com.scottmo.config.Constants.APP_NAME;
 
 import atlantafx.base.theme.PrimerLight;
 import com.scottmo.services.logging.AppLoggerService;

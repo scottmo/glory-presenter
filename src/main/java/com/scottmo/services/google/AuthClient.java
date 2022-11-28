@@ -11,7 +11,7 @@ import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.drive.DriveScopes;
 import com.google.api.services.slides.v1.SlidesScopes;
 import com.scottmo.services.ServiceSupplier;
-import com.scottmo.services.config.AppContext;
+import com.scottmo.config.AppContext;
 import com.scottmo.services.security.CipherService;
 
 import java.io.ByteArrayInputStream;

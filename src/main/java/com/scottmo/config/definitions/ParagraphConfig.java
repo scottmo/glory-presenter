@@ -1,4 +1,4 @@
-package com.scottmo.services.config.definitions;
+package com.scottmo.config.definitions;
 
 public record ParagraphConfig(
         String alignment,

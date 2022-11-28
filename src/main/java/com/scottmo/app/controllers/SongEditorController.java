@@ -3,6 +3,8 @@ package com.scottmo.app.controllers;
 import com.scottmo.app.views.VerseEditor;
 import com.scottmo.data.song.Song;
 import com.scottmo.data.song.SongVerse;
+import com.scottmo.services.ServiceSupplier;
+import com.scottmo.services.songs.SongStore;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.scene.control.ComboBox;
@@ -11,10 +13,12 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.apache.logging.log4j.util.Strings;
 
-import java.util.Arrays;
 import java.util.List;
+import java.util.function.Supplier;
 
 public class SongEditorController {
+    private Supplier<SongStore> songStore = ServiceSupplier.get(SongStore.class);
+
     public TextField titleInput;
     public VBox lyricsContainer;
     public TextField verseOrderInput;
@@ -85,6 +89,8 @@ public class SongEditorController {
             VerseEditor verseEditor = (VerseEditor)node;
             return new SongVerse(verseEditor.getVerseName(), verseEditor.getVerseText());
         }).toList());
+
+        songStore.get().upsert(song);
 
         getStage().close();
     }

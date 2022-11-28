@@ -1,4 +1,4 @@
-package com.scottmo.services.config.definitions;
+package com.scottmo.config.definitions;
 
 import java.util.List;
 import java.util.Map;

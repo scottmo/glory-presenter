@@ -1,7 +1,7 @@
-package com.scottmo.services.config;
+package com.scottmo.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.scottmo.services.config.definitions.AppConfig;
+import com.scottmo.config.definitions.AppConfig;
 
 import java.io.BufferedReader;
 import java.io.IOException;
