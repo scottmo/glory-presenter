@@ -1,4 +1,4 @@
-package com.scottmo.services.songs;
+package com.scottmo.services.songs.store;
 
 import com.healthmarketscience.sqlbuilder.BinaryCondition;
 import com.healthmarketscience.sqlbuilder.InsertQuery;
@@ -6,8 +6,6 @@ import com.healthmarketscience.sqlbuilder.SelectQuery;
 import com.healthmarketscience.sqlbuilder.UpdateQuery;
 import com.scottmo.data.song.Song;
 import com.scottmo.data.song.SongVerse;
-import com.scottmo.services.Service;
-import com.scottmo.services.ServiceSupplier;
 
 import javafx.util.Pair;
 import org.apache.logging.log4j.util.Strings;
@@ -21,14 +19,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public final class SongStore implements Service {
+public final class SongStore {
     private static final String DB_NAME = "songs";
     private final SongSchema schema = new SongSchema();
     private final Connection db;
-
-    public SongStore() {
-        this(Path.of(ServiceSupplier.getAppContext().getConfig().dataDir()));
-    }
 
     public SongStore(Path storeLocation) {
         try {
@@ -43,7 +37,7 @@ public final class SongStore implements Service {
         }
     }
 
-    public List<Pair<Integer, String>> getSongTitles(String locale) {
+    public List<Pair<Integer, String>> getTitles(String locale) {
         List<Pair<Integer, String>> songTitles = new ArrayList<>();
 
         try (var stmt = db.createStatement()) {
@@ -63,7 +57,7 @@ public final class SongStore implements Service {
         return songTitles;
     }
 
-    public Song getSong(int songId) {
+    public Song get(int songId) {
         Song song = new Song();
         try (var stmt = db.createStatement()) {
             ResultSet res = stmt.executeQuery(new SelectQuery()
@@ -111,7 +105,7 @@ public final class SongStore implements Service {
         return song;
     }
 
-    public boolean upsert(Song song) {
+    public boolean store(Song song) {
         if (song.getId() > -1) {
             return update(song);
         }

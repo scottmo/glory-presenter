@@ -4,7 +4,7 @@ import com.scottmo.app.views.VerseEditor;
 import com.scottmo.data.song.Song;
 import com.scottmo.data.song.SongVerse;
 import com.scottmo.services.ServiceSupplier;
-import com.scottmo.services.songs.SongStore;
+import com.scottmo.services.songs.SongService;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.scene.control.ComboBox;
@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.function.Supplier;
 
 public class SongEditorController {
-    private Supplier<SongStore> songStore = ServiceSupplier.get(SongStore.class);
+    private Supplier<SongService> songService = ServiceSupplier.get(SongService.class);
 
     public TextField titleInput;
     public VBox lyricsContainer;
@@ -90,7 +90,7 @@ public class SongEditorController {
             return new SongVerse(verseEditor.getVerseName(), verseEditor.getVerseText());
         }).toList());
 
-        songStore.get().upsert(song);
+        songService.get().getStore().store(song);
 
         getStage().close();
     }

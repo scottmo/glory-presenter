@@ -1,4 +1,4 @@
-package com.scottmo.services.songs;
+package com.scottmo.services.songs.store;
 
 import com.healthmarketscience.sqlbuilder.CreateTableQuery;
 import com.healthmarketscience.sqlbuilder.custom.mysql.MysObjects;
