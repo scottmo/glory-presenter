@@ -18,6 +18,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 public final class SongStore {
     private static final String DB_NAME = "songs";
@@ -38,6 +39,10 @@ public final class SongStore {
     }
 
     public List<Pair<Integer, String>> getTitles(String locale) {
+        if (locale == null) locale = Locale.getDefault().toString();
+
+        locale = locale.replace("_", "-").toLowerCase(); // normalize locale format
+
         List<Pair<Integer, String>> songTitles = new ArrayList<>();
 
         try (var stmt = db.createStatement()) {
@@ -161,7 +166,7 @@ public final class SongStore {
                 }
             }
 
-            sql = new InsertQuery(schema.titles)
+            sql = new InsertQuery(schema.titles.table)
                     .addPreparedColumns(schema.titles.songId, schema.titles.locale, schema.titles.text);
             sql.validate();
             try (var stmt = db.prepareStatement(sql.toString())) {
@@ -175,7 +180,7 @@ public final class SongStore {
                 stmt.executeBatch();
             }
 
-            sql = new InsertQuery(schema.verses)
+            sql = new InsertQuery(schema.verses.table)
                     .addPreparedColumns(schema.verses.songId, schema.verses.name, schema.verses.text, schema.verses.locale);
             sql.validate();
             try (var stmt = db.prepareStatement(sql.toString())) {
@@ -224,7 +229,7 @@ public final class SongStore {
             stmt.addBatch(sql.toString());
 
             for (String locale : song.getTitleLocales()) {
-                sql = new UpdateQuery(schema.titles)
+                sql = new UpdateQuery(schema.titles.table)
                         .addCondition(BinaryCondition.equalTo(schema.titles.songId, song.getId()))
                         .addSetClause(schema.titles.locale, locale)
                         .addSetClause(schema.titles.text, song.getTitle(locale))
@@ -233,7 +238,7 @@ public final class SongStore {
             }
 
             for (SongVerse verse : song.getVerses()) {
-                sql = new UpdateQuery(schema.verses)
+                sql = new UpdateQuery(schema.verses.table)
                         .addCondition(BinaryCondition.equalTo(schema.verses.songId, song.getId()))
                         .addSetClause(schema.verses.name, verse.getName())
                         .addSetClause(schema.verses.text, verse.getText())
