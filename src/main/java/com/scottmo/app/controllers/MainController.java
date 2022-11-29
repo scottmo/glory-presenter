@@ -10,11 +10,11 @@ import javafx.scene.control.Label;
 public class MainController {
 
     @FXML
-    public Label statusLabel;
+    private Label statusLabel;
     // menu
     private boolean isDark;
     @FXML
-    public void onToggleDarkMode(ActionEvent actionEvent) {
+    private void onToggleDarkMode(ActionEvent actionEvent) {
         if (isDark) {
             Application.setUserAgentStylesheet(new PrimerLight().getUserAgentStylesheet());
         } else {

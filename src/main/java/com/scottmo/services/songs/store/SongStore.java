@@ -1,6 +1,7 @@
 package com.scottmo.services.songs.store;
 
 import com.healthmarketscience.sqlbuilder.BinaryCondition;
+import com.healthmarketscience.sqlbuilder.DeleteQuery;
 import com.healthmarketscience.sqlbuilder.InsertQuery;
 import com.healthmarketscience.sqlbuilder.SelectQuery;
 import com.healthmarketscience.sqlbuilder.UpdateQuery;
@@ -249,6 +250,18 @@ public final class SongStore {
             stmt.executeBatch();
         } catch (SQLException e) {
             throw new RuntimeException("Unable to update song!", e);
+        }
+        return true;
+    }
+
+    public boolean delete(int songId) {
+        var sql = new DeleteQuery(schema.song.table)
+                .addCondition(BinaryCondition.equalTo(schema.song.id, songId))
+                .validate().toString();
+        try (var stmt = db.createStatement()) {
+            stmt.executeUpdate(sql);
+        } catch (SQLException e) {
+            throw new RuntimeException("Unable to delete song!", e);
         }
         return true;
     }
