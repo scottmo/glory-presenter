@@ -7,6 +7,7 @@ import com.scottmo.services.ServiceSupplier;
 import com.scottmo.services.songs.SongService;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
@@ -19,16 +20,21 @@ import java.util.function.Supplier;
 public class SongEditorController {
     private Supplier<SongService> songService = ServiceSupplier.get(SongService.class);
 
-    public TextField titleInput;
-    public VBox lyricsContainer;
-    public TextField verseOrderInput;
-    public ComboBox<String> verseOrderPicker;
+    @FXML
+    private TextField titleInput;
+    @FXML
+    private VBox lyricsContainer;
+    @FXML
+    private TextField verseOrderInput;
+    @FXML
+    private ComboBox<String> verseOrderPicker;
 
     private Song song;
 
     private VerseEditor selectedVerse;
 
-    public void initialize() {
+    @FXML
+    private void initialize() {
         Platform.runLater(this::populateForm);
     }
 
@@ -56,14 +62,16 @@ public class SongEditorController {
         }
     }
 
-    public void onAddVerse(ActionEvent event) {
+    @FXML
+    private void onAddVerse(ActionEvent event) {
         lyricsContainer.getChildren().forEach(node -> {
             ((VerseEditor)node).setEditable(false);
         });
         createVerseInput("new", "", true);
     }
 
-    public void onEditVerse(ActionEvent event) {
+    @FXML
+    private void onEditVerse(ActionEvent event) {
         lyricsContainer.getChildren().forEach(node -> {
             ((VerseEditor)node).setEditable(false);
         });
@@ -72,16 +80,19 @@ public class SongEditorController {
         }
     }
 
-    public void onDeleteVerse(ActionEvent event) {
+    @FXML
+    private void onDeleteVerse(ActionEvent event) {
         this.lyricsContainer.getChildren().remove(selectedVerse);
         selectedVerse = null;
     }
 
-    public void onCancel(ActionEvent event) {
+    @FXML
+    private void onCancel(ActionEvent event) {
         getStage().close();
     }
 
-    public void onSave(ActionEvent event) {
+    @FXML
+    private void onSave(ActionEvent event) {
         // TODO validations
         song.setTitle(titleInput.getText());
         song.setVerseOrder(verseOrderInput.getText());
@@ -95,7 +106,8 @@ public class SongEditorController {
         getStage().close();
     }
 
-    public void onAddVerseOrder(ActionEvent event) {
+    @FXML
+    private void onAddVerseOrder(ActionEvent event) {
     }
 
     private Stage getStage() {
