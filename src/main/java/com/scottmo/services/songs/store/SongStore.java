@@ -171,7 +171,7 @@ public final class SongStore {
                     .addPreparedColumns(schema.titles.songId, schema.titles.locale, schema.titles.text);
             sql.validate();
             try (var stmt = db.prepareStatement(sql.toString())) {
-                for (String locale : song.getTitleLocales()) {
+                for (String locale : song.getLocales()) {
                     stmt.setInt(1, songId);
                     stmt.setString(2, locale);
                     stmt.setString(3, song.getTitle(locale));
@@ -229,7 +229,7 @@ public final class SongStore {
             sql.validate();
             stmt.addBatch(sql.toString());
 
-            for (String locale : song.getTitleLocales()) {
+            for (String locale : song.getLocales()) {
                 sql = new UpdateQuery(schema.titles.table)
                         .addCondition(BinaryCondition.equalTo(schema.titles.songId, song.getId()))
                         .addSetClause(schema.titles.locale, locale)

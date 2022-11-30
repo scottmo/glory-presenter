@@ -5,12 +5,11 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
-public class Song {
-    private static final String DEFAULT_LOCALE = Locale.getDefault().toString();
+import static com.scottmo.config.Constants.PRIMARY_LOCALE;
 
+public class Song {
     private int id = -1;
 
     private final Map<String, String> titles = new HashMap<>();
@@ -33,33 +32,39 @@ public class Song {
         return id;
     }
 
+    /**
+     * @return primary locale used in this song. If no locale or default locale is present, default locale
+     * is the primary one, otherwise the first locale available.
+     */
+    public String getPrimaryLocale() {
+        List<String> locales = this.getLocales();
+        if (locales.isEmpty() || locales.contains(PRIMARY_LOCALE)) {
+            return PRIMARY_LOCALE;
+        }
+        return locales.get(0);
+    }
+
     public String getTitle() {
-        return this.titles.getOrDefault(DEFAULT_LOCALE, "");
+        return this.titles.get(getPrimaryLocale());
     }
 
     public String getTitle(String locale) {
-        String localeTitle = this.titles.get(locale);
-        return localeTitle != null ? localeTitle : this.getTitle();
+        return this.titles.getOrDefault(locale, this.getTitle());
     }
 
     public void setTitle(String title) {
-        setTitle(DEFAULT_LOCALE, title);
+        setTitle(getPrimaryLocale(), title);
     }
 
     public void setTitle(String locale, String title) {
         if (locale == null) {
-            locale = DEFAULT_LOCALE;
+            locale = getPrimaryLocale();
         }
         this.titles.put(locale, title);
     }
 
-    public List<String> getTitleLocales() {
+    public List<String> getLocales() {
         List<String> locales = new ArrayList<>(this.titles.keySet());
-
-        if (!locales.contains(DEFAULT_LOCALE)) {
-            locales.add(DEFAULT_LOCALE);
-        }
-
         return Collections.unmodifiableList(locales);
     }
 
@@ -111,13 +116,6 @@ public class Song {
         this.comments = comments;
     }
 
-    public List<String> getVerseLocales() {
-        return verses.stream()
-                .map(SongVerse::getLocale)
-                .distinct()
-                .toList();
-    }
-
     public List<SongVerse> getVerses(String locale) {
         return verses.stream()
                 .filter(verse -> verse.getLocale().equals(locale))
@@ -125,12 +123,9 @@ public class Song {
     }
 
     public List<SongVerse> getVerses() {
-        List<SongVerse> verses = this.getVerses(DEFAULT_LOCALE);
+        List<SongVerse> verses = this.getVerses(PRIMARY_LOCALE);
         if (verses.isEmpty()) {
-            List<String> locales = getVerseLocales();
-            if (!locales.isEmpty()) {
-                return this.getVerses(locales.get(0));
-            }
+            return this.getVerses(getPrimaryLocale());
         }
         return verses;
     }
