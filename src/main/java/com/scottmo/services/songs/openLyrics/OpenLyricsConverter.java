@@ -46,7 +46,7 @@ public class OpenLyricsConverter {
     public String serialize(Song song) {
         try {
             OpenLyricsSong olsong = new OpenLyricsSong();
-            var titles = song.getTitleLocales().stream()
+            var titles = song.getLocales().stream()
                     .map(locale -> new OpenLyricsTitle(locale, song.getTitle(locale)))
                     .toList();
             olsong.getProperties().setTitles(titles);
