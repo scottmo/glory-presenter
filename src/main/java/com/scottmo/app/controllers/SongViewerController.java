@@ -27,12 +27,11 @@ import static com.scottmo.config.Constants.SECONDARY_LOCALE;
 public class SongViewerController {
     private static final String VERSE_EDITOR_FXML = "/ui/songEditor.fxml";
 
-    private Supplier<SongService> songService = ServiceSupplier.get(SongService.class);
+    private final Supplier<SongService> songService = ServiceSupplier.get(SongService.class);
+    private final Map<String, Integer> songIdsMap = new HashMap<>();
 
     @FXML
     private ListView<String> songList;
-
-    private Map<String, Integer> songIdsMap = new HashMap<>();
 
     @FXML
     private void initialize() {
@@ -53,7 +52,7 @@ public class SongViewerController {
     }
 
     @FXML
-    private void onEditSong(ActionEvent event) throws IOException, ParserConfigurationException, SAXException {
+    private void onEditSong(ActionEvent event) throws IOException {
         Stage verseEditorModal = ViewUtil.get().newModal("Edit Song", VERSE_EDITOR_FXML, ViewUtil.get().getOwnerWindow(event));
         Song song = songService.get().getStore().get(getSelectedSongId());
         verseEditorModal.setUserData(song);
@@ -69,7 +68,8 @@ public class SongViewerController {
 
     @FXML
     private void onDeleteSong(ActionEvent event) {
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Delete [" + getSelectedSong() + "] ?", ButtonType.YES, ButtonType.CANCEL);
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Delete [" + getSelectedSong() + "] ?",
+                ButtonType.YES, ButtonType.CANCEL);
         alert.showAndWait();
         if (alert.getResult() == ButtonType.YES) {
             songService.get().getStore().delete(getSelectedSongId());
