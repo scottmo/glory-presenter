@@ -6,11 +6,9 @@
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
@@ -18,58 +16,18 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.scottmo.app.controllers.SongEditorController">
-    <TabPane tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
-        <Tab text="Basic Info">
-            <GridPane hgap="10.0" vgap="10.0">
-                <columnConstraints>
-                    <ColumnConstraints prefWidth="90.0" />
-                    <ColumnConstraints hgrow="ALWAYS" maxWidth="690.3333435058594" minWidth="672.3333435058594" prefWidth="675.6666870117188" />
-                    <ColumnConstraints />
-                </columnConstraints>
-                <rowConstraints>
-                    <RowConstraints vgrow="SOMETIMES" />
-                    <RowConstraints valignment="TOP" vgrow="SOMETIMES" />
-                    <RowConstraints vgrow="SOMETIMES" />
-                </rowConstraints>
-                <padding>
-                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                </padding>
-                <Label text="Title">
-                    <font>
-                        <Font size="14.0" />
-                    </font>
-                </Label>
-                <TextField fx:id="titleInput" prefHeight="25.0" GridPane.columnIndex="1" GridPane.columnSpan="2147483647" GridPane.hgrow="ALWAYS" />
-                <Label alignment="CENTER" minWidth="-Infinity" text="Lyrics" GridPane.rowIndex="1">
-                    <font>
-                        <Font size="14.0" />
-                    </font>
-                </Label>
-                <ScrollPane hbarPolicy="NEVER" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" GridPane.vgrow="ALWAYS">
-                    <VBox fx:id="lyricsContainer" prefHeight="0.0" prefWidth="665.0" />
-                </ScrollPane>
-                <VBox fillWidth="false" spacing="5.0" GridPane.columnIndex="2" GridPane.rowIndex="1">
-                    <Button mnemonicParsing="false" onAction="#onAddVerse" prefWidth="100.0" text="Add" />
-                    <Button mnemonicParsing="false" onAction="#onEditVerse" prefWidth="100.0" text="Edit" />
-                    <Button mnemonicParsing="false" onAction="#onDeleteVerse" prefWidth="100.0" text="Delete" />
-                </VBox>
-                <Label text="Verse Order" GridPane.rowIndex="2">
-                    <font>
-                        <Font size="14.0" />
-                    </font>
-                </Label>
-                <TextField fx:id="verseOrderInput" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="2" />
-                <ComboBox fx:id="verseOrderPicker" prefWidth="100.0" GridPane.columnIndex="2" GridPane.rowIndex="2" />
-            </GridPane>
-        </Tab>
-        <Tab text="Details">
+<VBox prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.scottmo.app.controllers.SongEditorController">
+    <ScrollPane VBox.vgrow="ALWAYS">
+        <VBox>
+            <TabPane fx:id="titleLyricsTabs" prefHeight="390.0" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS" />
             <GridPane hgap="10.0" vgap="10.0">
                 <columnConstraints>
                     <ColumnConstraints hgrow="SOMETIMES" />
                     <ColumnConstraints hgrow="ALWAYS" />
+                    <ColumnConstraints minWidth="10.0" prefWidth="100.0" />
                 </columnConstraints>
                 <rowConstraints>
+                    <RowConstraints minHeight="10.0" prefHeight="30.0" />
                     <RowConstraints minHeight="10.0" prefHeight="30.0" />
                     <RowConstraints minHeight="10.0" prefHeight="30.0" />
                     <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
@@ -77,41 +35,22 @@
                 <padding>
                     <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                 </padding>
-                <Label text="Copyright" />
-                <TextField GridPane.columnIndex="1" />
-                <TextArea GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                <Label text="Comments" GridPane.rowIndex="2" />
-                <Label layoutX="10.0" layoutY="85.0" text="Publisher" GridPane.rowIndex="1" />
-                <TextField layoutX="460.0" layoutY="77.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                <Label text="Copyright" GridPane.rowIndex="1" />
+                <TextField GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="1" />
+                <TextArea GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="3" />
+                <Label text="Comments" GridPane.rowIndex="3" />
+                <Label layoutX="10.0" layoutY="85.0" text="Publisher" GridPane.rowIndex="2" />
+                <TextField layoutX="460.0" layoutY="77.0" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="2" />
+                <Label text="Verse Order">
+                    <font>
+                        <Font size="14.0" />
+                    </font>
+                </Label>
+                <TextField fx:id="verseOrderInput" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" />
+                <ComboBox fx:id="verseOrderPicker" prefWidth="100.0" GridPane.columnIndex="2" />
             </GridPane>
-        </Tab>
-        <Tab text="Translations">
-            <VBox prefHeight="200.0" prefWidth="100.0" spacing="5.0">
-                <HBox prefHeight="11.0" prefWidth="640.0" spacing="5.0">
-                    <Label contentDisplay="RIGHT" text="Language Code">
-                        <graphic>
-                            <TextField />
-                        </graphic>
-                    </Label>
-                    <Button mnemonicParsing="false" text="Add Translation" />
-                    <VBox.margin>
-                        <Insets />
-                    </VBox.margin>
-                </HBox>
-                <HBox prefWidth="640.0" VBox.vgrow="ALWAYS">
-                    <ScrollPane prefHeight="200.0" prefWidth="200.0">
-                        <AnchorPane minHeight="0.0" minWidth="0.0" />
-                    </ScrollPane>
-                    <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" HBox.hgrow="ALWAYS">
-                        <Tab text="No Translations Yet" />
-                    </TabPane>
-                </HBox>
-                <padding>
-                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                </padding>
-            </VBox>
-        </Tab>
-    </TabPane>
+        </VBox>
+    </ScrollPane>
     <HBox alignment="TOP_RIGHT">
         <Button mnemonicParsing="false" onAction="#onCancel" prefWidth="100.0" text="Cancel">
             <HBox.margin>
