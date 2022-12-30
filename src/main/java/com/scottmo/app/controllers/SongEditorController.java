@@ -5,6 +5,7 @@ import com.scottmo.data.song.Song;
 import com.scottmo.data.song.SongVerse;
 import com.scottmo.services.ServiceSupplier;
 import com.scottmo.services.songs.SongService;
+import com.scottmo.util.LocaleUtil;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -12,10 +13,12 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextInputDialog;
 import javafx.stage.Stage;
 import javafx.util.Pair;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,7 +31,9 @@ public class SongEditorController {
 
     private Song song;
 
-    public TabPane titleLyricsTabs;
+    @FXML
+    private TabPane titleLyricsTabs;
+    private int lastSelectedLocaleTab;
 
     @FXML
     private TextField verseOrderInput;
@@ -54,17 +59,53 @@ public class SongEditorController {
             verseOrderPicker.getItems().add(verse.getName());
         }
 
+        // new tab button
+        Tab addTranslationTab = new Tab("+");
+        titleLyricsTabs.getTabs().add(addTranslationTab);
+        // existing locales
         for (String locale : song.getLocales()) {
             List<Pair<String, String>> verses = song.getVerses(locale).stream()
                     .map(verse -> new Pair<>(verse.getName(), verse.getText()))
                     .toList();
-            TileLyricsEditor lyricsEditor = new TileLyricsEditor(song.getTitle(locale), verses);
-            lyricsEditorMap.put(locale, lyricsEditor);
-
-            Tab lyricsTab = new Tab(locale);
-            lyricsTab.setContent(lyricsEditor);
-            titleLyricsTabs.getTabs().add(lyricsTab);
+            addTitleLyricsEditorTab(locale, song.getTitle(locale), verses);
         }
+        // start with the first tab
+        titleLyricsTabs.getSelectionModel().selectFirst();
+
+        // needs to be added last since when it is initialized, it's the first tab
+        // and selection is triggered
+        addTranslationTab.setOnSelectionChanged(event -> {
+            if (!addTranslationTab.isSelected()) return;
+
+            TextInputDialog td = new TextInputDialog();
+            td.setHeaderText("Enter new locale");
+            td.showAndWait();
+            String newLocale = td.getResult();
+            if (newLocale != null) {
+                newLocale = LocaleUtil.normalize(newLocale);
+                addTitleLyricsEditorTab(newLocale);
+            } else {
+                titleLyricsTabs.getSelectionModel().select(lastSelectedLocaleTab);
+            }
+        });
+    }
+
+    private void addTitleLyricsEditorTab(String locale) {
+        addTitleLyricsEditorTab(locale, "", Collections.emptyList());
+        // select the new tab since we're adding a brand new one and not existing
+        // previous should be the new tab
+        titleLyricsTabs.getSelectionModel().selectPrevious();
+    }
+
+    private void addTitleLyricsEditorTab(String locale, String title, List<Pair<String, String>> verses) {
+        TileLyricsEditor lyricsEditor = new TileLyricsEditor(title, verses);
+        lyricsEditorMap.put(locale, lyricsEditor);
+
+        int index = titleLyricsTabs.getTabs().size() - 1;
+        Tab lyricsTab = new Tab(locale);
+        lyricsTab.setOnSelectionChanged(event -> lastSelectedLocaleTab = index);
+        lyricsTab.setContent(lyricsEditor);
+        titleLyricsTabs.getTabs().add(index, lyricsTab);
     }
 
     @FXML
