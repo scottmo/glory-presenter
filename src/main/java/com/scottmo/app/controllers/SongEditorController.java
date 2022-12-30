@@ -10,10 +10,12 @@ import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputDialog;
+import javafx.scene.input.MouseButton;
 import javafx.stage.Stage;
 import javafx.util.Pair;
 
@@ -77,10 +79,7 @@ public class SongEditorController {
         addTranslationTab.setOnSelectionChanged(event -> {
             if (!addTranslationTab.isSelected()) return;
 
-            TextInputDialog td = new TextInputDialog();
-            td.setHeaderText("Enter new locale");
-            td.showAndWait();
-            String newLocale = td.getResult();
+            String newLocale = askForNewLocale();
             if (newLocale != null) {
                 newLocale = LocaleUtil.normalize(newLocale);
                 addTitleLyricsEditorTab(newLocale);
@@ -102,10 +101,32 @@ public class SongEditorController {
         lyricsEditorMap.put(locale, lyricsEditor);
 
         int index = titleLyricsTabs.getTabs().size() - 1;
-        Tab lyricsTab = new Tab(locale);
+        Tab lyricsTab = new Tab();
+        Label label = new Label(locale);
+        lyricsTab.setGraphic(label); // using a label to capture click event later
         lyricsTab.setOnSelectionChanged(event -> lastSelectedLocaleTab = index);
         lyricsTab.setContent(lyricsEditor);
         titleLyricsTabs.getTabs().add(index, lyricsTab);
+
+        label.setOnMouseClicked(event -> {
+            // on double click, change locale
+            if (event.getButton().equals(MouseButton.PRIMARY) && event.getClickCount() == 2) {
+                String newLocale = askForNewLocale();
+                if (newLocale != null) {
+                    String currentLocale = label.getText();
+                    label.setText(newLocale);
+                    lyricsEditorMap.remove(currentLocale);
+                    lyricsEditorMap.put(newLocale, lyricsEditor);
+                }
+            }
+        });
+    }
+
+    private String askForNewLocale() {
+        TextInputDialog td = new TextInputDialog();
+        td.setHeaderText("Enter new locale");
+        td.showAndWait();
+        return td.getResult();
     }
 
     @FXML
