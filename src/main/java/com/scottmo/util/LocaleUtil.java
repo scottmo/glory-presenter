@@ -7,6 +7,8 @@ public class LocaleUtil {
 
     public static String normalize(String locale) {
         if (locale == null) return null;
-        return locale.replace("-", "_").toLowerCase();
+        return locale.replace("-", "_")
+                .replace(" ", "")
+                .toLowerCase().trim();
     }
 }
