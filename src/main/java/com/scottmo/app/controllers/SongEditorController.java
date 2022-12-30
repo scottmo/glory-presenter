@@ -90,7 +90,11 @@ public class SongEditorController {
     }
 
     private void addTitleLyricsEditorTab(String locale) {
-        addTitleLyricsEditorTab(locale, "", Collections.emptyList());
+        // add existing verse names for new locales
+        List<Pair<String, String>> verses = song.getVerses().stream()
+                .map(verse -> new Pair<>(verse.getName(), ""))
+                .toList();
+        addTitleLyricsEditorTab(locale, "", verses);
         // select the new tab since we're adding a brand new one and not existing
         // previous should be the new tab
         titleLyricsTabs.getSelectionModel().selectPrevious();
