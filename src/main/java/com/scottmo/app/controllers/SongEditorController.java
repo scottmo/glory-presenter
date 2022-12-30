@@ -9,6 +9,7 @@ import com.scottmo.util.LocaleUtil;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
@@ -50,6 +51,8 @@ public class SongEditorController {
     private void populateForm() {
         song = (Song) getStage().getUserData();
 
+        setupTitleLyricsTabs();
+
         String verseOrder = song.getVerseOrder();
         if (verseOrder != null && !verseOrder.isEmpty()) {
             verseOrderInput.setText(verseOrder);
@@ -60,7 +63,9 @@ public class SongEditorController {
         for (SongVerse verse : song.getVerses()) {
             verseOrderPicker.getItems().add(verse.getName());
         }
+    }
 
+    private void setupTitleLyricsTabs() {
         // new tab button
         Tab addTranslationTab = new Tab("+");
         titleLyricsTabs.getTabs().add(addTranslationTab);
@@ -71,6 +76,7 @@ public class SongEditorController {
                     .toList();
             addTitleLyricsEditorTab(locale, song.getTitle(locale), verses);
         }
+
         // start with the first tab
         titleLyricsTabs.getSelectionModel().selectFirst();
 
@@ -79,14 +85,28 @@ public class SongEditorController {
         addTranslationTab.setOnSelectionChanged(event -> {
             if (!addTranslationTab.isSelected()) return;
 
-            String newLocale = askForNewLocale();
-            if (newLocale != null) {
-                newLocale = LocaleUtil.normalize(newLocale);
-                addTitleLyricsEditorTab(newLocale);
-            } else {
+            String newLocale = addTitleLyricsEditorTab();
+            if (newLocale == null) {
                 titleLyricsTabs.getSelectionModel().select(lastSelectedLocaleTab);
             }
         });
+
+        // brand new song
+        if (titleLyricsTabs.getTabs().size() == 1) {
+            String newLocale = addTitleLyricsEditorTab();
+            if (newLocale == null) {
+                getStage().close();
+            }
+        }
+    }
+
+    private String addTitleLyricsEditorTab() {
+        String newLocale = askForNewLocale();
+        if (newLocale != null) {
+            newLocale = LocaleUtil.normalize(newLocale);
+            addTitleLyricsEditorTab(newLocale);
+        }
+        return newLocale;
     }
 
     private void addTitleLyricsEditorTab(String locale) {
@@ -127,10 +147,10 @@ public class SongEditorController {
     }
 
     private String askForNewLocale() {
-        TextInputDialog td = new TextInputDialog();
-        td.setHeaderText("Enter new locale");
-        td.showAndWait();
-        return td.getResult();
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setHeaderText("Enter new locale");
+        dialog.showAndWait();
+        return dialog.getResult();
     }
 
     @FXML
