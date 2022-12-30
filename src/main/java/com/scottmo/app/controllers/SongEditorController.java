@@ -1,6 +1,6 @@
 package com.scottmo.app.controllers;
 
-import com.scottmo.app.views.VerseEditor;
+import com.scottmo.app.views.TileLyricsEditor;
 import com.scottmo.data.song.Song;
 import com.scottmo.data.song.SongVerse;
 import com.scottmo.services.ServiceSupplier;
@@ -9,29 +9,31 @@ import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import org.apache.logging.log4j.util.Strings;
+import javafx.util.Pair;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Supplier;
 
 public class SongEditorController {
-    private Supplier<SongService> songService = ServiceSupplier.get(SongService.class);
+    private final Supplier<SongService> songService = ServiceSupplier.get(SongService.class);
 
-    @FXML
-    private TextField titleInput;
-    @FXML
-    private VBox lyricsContainer;
+    private final Map<String, TileLyricsEditor> lyricsEditorMap = new HashMap<>();
+
+    private Song song;
+
+    public TabPane titleLyricsTabs;
+
     @FXML
     private TextField verseOrderInput;
     @FXML
     private ComboBox<String> verseOrderPicker;
-
-    private Song song;
-
-    private VerseEditor selectedVerse;
 
     @FXML
     private void initialize() {
@@ -41,49 +43,28 @@ public class SongEditorController {
     private void populateForm() {
         song = (Song) getStage().getUserData();
 
-        if (Strings.isNotEmpty(song.getTitle())) {
-            titleInput.setText(song.getTitle());
-        }
         String verseOrder = song.getVerseOrder();
         if (verseOrder != null && !verseOrder.isEmpty()) {
             verseOrderInput.setText(verseOrder);
         }
 
-        List<SongVerse> verses = song.getVerses();
-
         verseOrderPicker.getItems().add("Add");
         verseOrderPicker.getSelectionModel().selectFirst();
-        for (SongVerse verse : verses) {
+        for (SongVerse verse : song.getVerses()) {
             verseOrderPicker.getItems().add(verse.getName());
         }
 
-        for (SongVerse verse : verses) {
-            createVerseInput(verse.getName(), verse.getText(), false);
+        for (String locale : song.getLocales()) {
+            List<Pair<String, String>> verses = song.getVerses(locale).stream()
+                    .map(verse -> new Pair<>(verse.getName(), verse.getText()))
+                    .toList();
+            TileLyricsEditor lyricsEditor = new TileLyricsEditor(song.getTitle(locale), verses);
+            lyricsEditorMap.put(locale, lyricsEditor);
+
+            Tab lyricsTab = new Tab(locale);
+            lyricsTab.setContent(lyricsEditor);
+            titleLyricsTabs.getTabs().add(lyricsTab);
         }
-    }
-
-    @FXML
-    private void onAddVerse(ActionEvent event) {
-        lyricsContainer.getChildren().forEach(node -> {
-            ((VerseEditor)node).setEditable(false);
-        });
-        createVerseInput("new", "", true);
-    }
-
-    @FXML
-    private void onEditVerse(ActionEvent event) {
-        lyricsContainer.getChildren().forEach(node -> {
-            ((VerseEditor)node).setEditable(false);
-        });
-        if (selectedVerse != null) {
-            selectedVerse.setEditable(true);
-        }
-    }
-
-    @FXML
-    private void onDeleteVerse(ActionEvent event) {
-        this.lyricsContainer.getChildren().remove(selectedVerse);
-        selectedVerse = null;
     }
 
     @FXML
@@ -94,12 +75,19 @@ public class SongEditorController {
     @FXML
     private void onSave(ActionEvent event) {
         // TODO validations
-        song.setTitle(titleInput.getText());
         song.setVerseOrder(verseOrderInput.getText());
-        song.setVerses(lyricsContainer.getChildren().stream().map(node -> {
-            VerseEditor verseEditor = (VerseEditor)node;
-            return new SongVerse(verseEditor.getVerseName(), verseEditor.getVerseText());
-        }).toList());
+
+        lyricsEditorMap.forEach((locale, lyricsEditor) -> {
+            song.setTitle(locale, lyricsEditor.getTitle());
+        });
+
+        List<SongVerse> verses = new ArrayList<>();
+        lyricsEditorMap.forEach((locale, lyricsEditor) -> {
+            lyricsEditor.getVerses().forEach(verseNameAndText -> {
+                verses.add(new SongVerse(locale, verseNameAndText.getKey(), verseNameAndText.getValue()));
+            });
+        });
+        song.setVerses(verses);
 
         songService.get().getStore().store(song);
 
@@ -111,18 +99,7 @@ public class SongEditorController {
     }
 
     private Stage getStage() {
-        return (Stage) titleInput.getScene().getWindow();
+        return (Stage) verseOrderInput.getScene().getWindow();
     }
 
-    private void createVerseInput(String verseName, String verseText, boolean isEditable) {
-        VerseEditor verseEditor = new VerseEditor(verseName, verseText);
-        verseEditor.setOnFocus(() -> {
-            selectedVerse = verseEditor;
-        });
-        lyricsContainer.getChildren().add(verseEditor);
-        verseEditor.setEditable(isEditable);
-        if (isEditable) {
-            selectedVerse = verseEditor;
-        }
-    }
 }

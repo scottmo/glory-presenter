@@ -8,6 +8,7 @@ import com.healthmarketscience.sqlbuilder.UpdateQuery;
 import com.scottmo.data.song.Song;
 import com.scottmo.data.song.SongVerse;
 
+import com.scottmo.util.LocaleUtil;
 import javafx.util.Pair;
 import org.apache.logging.log4j.util.Strings;
 
@@ -20,6 +21,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+
+import static com.scottmo.config.Constants.PRIMARY_LOCALE;
 
 public final class SongStore {
     private static final String DB_NAME = "songs";
@@ -40,9 +43,7 @@ public final class SongStore {
     }
 
     public List<Pair<Integer, String>> getTitles(String locale) {
-        if (locale == null) locale = Locale.getDefault().toString();
-
-        locale = locale.replace("_", "-").toLowerCase(); // normalize locale format
+        if (locale == null) locale = PRIMARY_LOCALE;
 
         List<Pair<Integer, String>> songTitles = new ArrayList<>();
 

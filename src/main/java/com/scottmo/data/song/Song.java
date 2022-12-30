@@ -1,5 +1,7 @@
 package com.scottmo.data.song;
 
+import com.scottmo.util.LocaleUtil;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -49,6 +51,7 @@ public class Song {
     }
 
     public String getTitle(String locale) {
+        locale = LocaleUtil.normalize(locale);
         return this.titles.getOrDefault(locale, this.getTitle());
     }
 
@@ -59,6 +62,8 @@ public class Song {
     public void setTitle(String locale, String title) {
         if (locale == null) {
             locale = getPrimaryLocale();
+        } else {
+            locale = LocaleUtil.normalize(locale);
         }
         this.titles.put(locale, title);
     }
