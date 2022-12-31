@@ -14,6 +14,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.input.MouseButton;
@@ -26,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 public class SongEditorController {
     private final Supplier<SongService> songService = ServiceSupplier.get(SongService.class);
@@ -39,9 +41,21 @@ public class SongEditorController {
     private int lastSelectedLocaleTab;
 
     @FXML
+    private TextField authorsInput;
+    @FXML
+    private TextField songbookInput;
+    @FXML
+    private TextField songbookEntryInput;
+    @FXML
     private TextField verseOrderInput;
     @FXML
     private ComboBox<String> verseOrderPicker;
+    @FXML
+    private TextField copyrightInput;
+    @FXML
+    private TextArea commentsInput;
+    @FXML
+    private TextField publisherInput;
 
     @FXML
     private void initialize() {
@@ -63,6 +77,13 @@ public class SongEditorController {
         for (SongVerse verse : song.getVerses()) {
             verseOrderPicker.getItems().add(verse.getName());
         }
+
+        authorsInput.setText(String.join(", ", song.getAuthors()));
+        songbookInput.setText(song.getSongBook());
+        songbookEntryInput.setText(song.getEntry());
+        copyrightInput.setText(song.getComments());
+        commentsInput.setText(song.getComments());
+        publisherInput.setText(song.getPublisher());
     }
 
     private void setupTitleLyricsTabs() {

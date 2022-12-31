@@ -17,9 +17,8 @@
 <?import javafx.scene.text.Font?>
 
 <VBox prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.scottmo.app.controllers.SongEditorController">
-    <ScrollPane VBox.vgrow="ALWAYS">
+    <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS">
         <VBox>
-            <TabPane fx:id="titleLyricsTabs" prefHeight="390.0" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS" />
             <GridPane hgap="10.0" vgap="10.0">
                 <columnConstraints>
                     <ColumnConstraints hgrow="SOMETIMES" />
@@ -27,28 +26,47 @@
                     <ColumnConstraints minWidth="10.0" prefWidth="100.0" />
                 </columnConstraints>
                 <rowConstraints>
+               <RowConstraints minHeight="10.0" prefHeight="30.0" />
+               <RowConstraints minHeight="10.0" prefHeight="30.0" />
                     <RowConstraints minHeight="10.0" prefHeight="30.0" />
                     <RowConstraints minHeight="10.0" prefHeight="30.0" />
+                    <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
                     <RowConstraints minHeight="10.0" prefHeight="30.0" />
-                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                 </rowConstraints>
-                <padding>
-                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                </padding>
-                <Label text="Copyright" GridPane.rowIndex="1" />
-                <TextField GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="1" />
-                <TextArea GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="3" />
-                <Label text="Comments" GridPane.rowIndex="3" />
+                <Label text="Copyright" GridPane.rowIndex="3" />
+                <TextField fx:id="copyrightInput" GridPane.columnIndex="1" GridPane.columnSpan="2147483647" GridPane.rowIndex="3" />
+                <TextArea fx:id="commentsInput" prefHeight="100.0" GridPane.columnIndex="1" GridPane.columnSpan="2147483647" GridPane.rowIndex="4" />
+                <Label text="Comments" GridPane.rowIndex="4" />
                 <Label layoutX="10.0" layoutY="85.0" text="Publisher" GridPane.rowIndex="2" />
-                <TextField layoutX="460.0" layoutY="77.0" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="2" />
-                <Label text="Verse Order">
+                <TextField fx:id="publisherInput" layoutX="460.0" layoutY="77.0" GridPane.columnIndex="1" GridPane.columnSpan="2147483647" GridPane.rowIndex="2" />
+                <Label text="Verse Order" GridPane.rowIndex="5">
                     <font>
                         <Font size="14.0" />
                     </font>
                 </Label>
-                <TextField fx:id="verseOrderInput" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" />
-                <ComboBox fx:id="verseOrderPicker" prefWidth="100.0" GridPane.columnIndex="2" />
+                <TextField fx:id="verseOrderInput" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="5" />
+                <ComboBox fx:id="verseOrderPicker" prefWidth="100.0" GridPane.columnIndex="2" GridPane.rowIndex="5" />
+            <Label text="Song Book" GridPane.rowIndex="1" />
+            <Label text="Authors" />
+            <TextField fx:id="songbookInput" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <TextField fx:id="authorsInput" GridPane.columnIndex="1" GridPane.columnSpan="2147483647" />
+                <HBox prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="2" GridPane.rowIndex="1">
+                    <Label alignment="CENTER" text="#" textAlignment="CENTER">
+                  <padding>
+                     <Insets bottom="5.0" right="5.0" top="5.0" />
+                  </padding></Label>
+                    <TextField fx:id="songbookEntryInput" />
+                </HBox>
             </GridPane>
+         <Label text="Multilingual Fields:">
+            <padding>
+               <Insets bottom="10.0" top="10.0" />
+            </padding>
+         </Label>
+            <TabPane fx:id="titleLyricsTabs" prefHeight="390.0" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS" />
+         <padding>
+            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+         </padding>
         </VBox>
     </ScrollPane>
     <HBox alignment="TOP_RIGHT">
