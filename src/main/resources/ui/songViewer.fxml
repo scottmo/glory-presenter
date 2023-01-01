@@ -25,7 +25,7 @@
         <Button mnemonicParsing="false" onAction="#onEditSong" prefWidth="100.0" text="Edit" />
         <Button mnemonicParsing="false" onAction="#onDeleteSong" prefWidth="100.0" text="Delete" />
     </VBox>
-   <ListView fx:id="songList" prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="1" />
+   <ListView fx:id="songList" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" GridPane.vgrow="ALWAYS" />
    <padding>
       <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
    </padding>
