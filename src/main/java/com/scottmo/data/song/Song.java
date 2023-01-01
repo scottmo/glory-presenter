@@ -16,12 +16,12 @@ public class Song {
 
     private final Map<String, String> titles = new HashMap<>();
     private List<String> authors = new ArrayList<>();
-    private String publisher;
-    private String copyright;
-    private String songBook;
-    private String entry;
-    private String comments;
-    private String verseOrder;
+    private String publisher = "";
+    private String copyright = "";
+    private String songBook = "";
+    private String entry = "";
+    private String comments = "";
+    private String verseOrder = "";
     private List<SongVerse> verses = new ArrayList<>();
 
     public Song() {}
@@ -65,7 +65,7 @@ public class Song {
         } else {
             locale = LocaleUtil.normalize(locale);
         }
-        this.titles.put(locale, title);
+        this.titles.put(locale, normalize(title));
     }
 
     public List<String> getLocales() {
@@ -86,7 +86,7 @@ public class Song {
     }
 
     public void setPublisher(String publisher) {
-        this.publisher = publisher;
+        this.publisher = normalize(publisher);
     }
 
     public String getCopyright() {
@@ -94,7 +94,7 @@ public class Song {
     }
 
     public void setCopyright(String copyright) {
-        this.copyright = copyright;
+        this.copyright = normalize(copyright);
     }
 
     public String getSongBook() {
@@ -102,7 +102,7 @@ public class Song {
     }
 
     public void setSongBook(String songBook) {
-        this.songBook = songBook;
+        this.songBook = normalize(songBook);
     }
 
     public String getEntry() {
@@ -110,7 +110,7 @@ public class Song {
     }
 
     public void setEntry(String entry) {
-        this.entry = entry;
+        this.entry = normalize(entry);
     }
 
     public String getComments() {
@@ -118,7 +118,7 @@ public class Song {
     }
 
     public void setComments(String comments) {
-        this.comments = comments;
+        this.comments = normalize(comments);
     }
 
     public List<SongVerse> getVerses(String locale) {
@@ -155,10 +155,14 @@ public class Song {
     }
 
     public void setVerseOrder(String verseOrder) {
-        this.verseOrder = verseOrder;
+        this.verseOrder = normalize(verseOrder);
     }
 
     public void setVerses(List<SongVerse> verses) {
         this.verses = verses;
+    }
+
+    private String normalize(String str) {
+        return str == null ? "" : str.trim();
     }
 }

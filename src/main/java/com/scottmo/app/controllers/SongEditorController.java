@@ -32,7 +32,7 @@ public class SongEditorController {
 
     private final Map<String, TileLyricsEditor> lyricsEditorMap = new HashMap<>();
 
-    private Song song;
+    private int songId;
 
     @FXML
     private TabPane titleLyricsTabs;
@@ -61,9 +61,11 @@ public class SongEditorController {
     }
 
     private void populateForm() {
-        song = (Song) getStage().getUserData();
+        Song song = (Song) getStage().getUserData();
 
-        setupTitleLyricsTabs();
+        songId = song.getId();
+
+        setupTitleLyricsTabs(song);
 
         String verseOrder = song.getVerseOrder();
         if (verseOrder != null && !verseOrder.isEmpty()) {
@@ -84,7 +86,7 @@ public class SongEditorController {
         publisherInput.setText(song.getPublisher());
     }
 
-    private void setupTitleLyricsTabs() {
+    private void setupTitleLyricsTabs(Song song) {
         // new tab button
         Tab addTranslationTab = new Tab("+");
         titleLyricsTabs.getTabs().add(addTranslationTab);
@@ -104,7 +106,7 @@ public class SongEditorController {
         addTranslationTab.setOnSelectionChanged(event -> {
             if (!addTranslationTab.isSelected()) return;
 
-            String newLocale = addTitleLyricsEditorTab();
+            String newLocale = addTitleLyricsEditorTab(song);
             if (newLocale == null) {
                 titleLyricsTabs.getSelectionModel().select(lastSelectedLocaleTab);
             }
@@ -112,23 +114,23 @@ public class SongEditorController {
 
         // brand new song
         if (titleLyricsTabs.getTabs().size() == 1) {
-            String newLocale = addTitleLyricsEditorTab();
+            String newLocale = addTitleLyricsEditorTab(song);
             if (newLocale == null) {
                 getStage().close();
             }
         }
     }
 
-    private String addTitleLyricsEditorTab() {
+    private String addTitleLyricsEditorTab(Song song) {
         String newLocale = askForNewLocale();
         if (newLocale != null) {
             newLocale = LocaleUtil.normalize(newLocale);
-            addTitleLyricsEditorTab(newLocale);
+            addTitleLyricsEditorTab(song, newLocale);
         }
         return newLocale;
     }
 
-    private void addTitleLyricsEditorTab(String locale) {
+    private void addTitleLyricsEditorTab(Song song, String locale) {
         // add existing verse names for new locales
         List<Pair<String, String>> verses = song.getVerses().stream()
                 .map(verse -> new Pair<>(verse.getName(), ""))
@@ -188,14 +190,14 @@ public class SongEditorController {
     }
 
     private Song extractForm() {
-        Song song = new Song();
+        Song song = new Song(songId);
         song.setAuthors(Arrays.stream(authorsInput.getText().split(",")).map(String::trim).toList());
-        song.setSongBook(songbookInput.getText().trim());
-        song.setEntry(songbookEntryInput.getText().trim());
-        song.setCopyright(copyrightInput.getText().trim());
-        song.setComments(commentsInput.getText().trim());
-        song.setPublisher(publisherInput.getText().trim());
-        song.setVerseOrder(verseOrderInput.getText().trim());
+        song.setSongBook(songbookInput.getText());
+        song.setEntry(songbookEntryInput.getText());
+        song.setCopyright(copyrightInput.getText());
+        song.setComments(commentsInput.getText());
+        song.setPublisher(publisherInput.getText());
+        song.setVerseOrder(verseOrderInput.getText());
 
         lyricsEditorMap.forEach((locale, lyricsEditor) -> {
             song.setTitle(locale, lyricsEditor.getTitle());
@@ -204,7 +206,7 @@ public class SongEditorController {
         List<SongVerse> verses = new ArrayList<>();
         lyricsEditorMap.forEach((locale, lyricsEditor) -> {
             lyricsEditor.getVerses().forEach(verseNameAndText -> {
-                verses.add(new SongVerse(locale, verseNameAndText.getKey(), verseNameAndText.getValue()));
+                verses.add(new SongVerse(verseNameAndText.getKey(), verseNameAndText.getValue(), locale));
             });
         });
         song.setVerses(verses);
