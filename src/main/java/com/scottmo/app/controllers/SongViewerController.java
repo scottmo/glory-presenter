@@ -10,13 +10,10 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ListView;
 import javafx.stage.Stage;
-import org.xml.sax.SAXException;
 
-import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -36,12 +33,13 @@ public class SongViewerController {
 
     @FXML
     private void initialize() {
-        Platform.runLater(this::initSongList);
+        Platform.runLater(this::refreshSongList);
     }
 
-    private void initSongList() {
+    private void refreshSongList() {
         Map<Integer, String> titles = getSongTitles();
         // build invert lookup map
+        songIdsMap.clear();
         for (var entry : titles.entrySet()) {
             if (songIdsMap.containsKey(entry.getValue())) continue;
             songIdsMap.put(entry.getValue(), entry.getKey());
@@ -70,7 +68,8 @@ public class SongViewerController {
     private void onNewSong(ActionEvent event) throws IOException {
         Stage verseEditorModal = ViewUtil.get().newModal("New Song", VERSE_EDITOR_FXML, ViewUtil.get().getOwnerWindow(event));
         verseEditorModal.setUserData(new Song());
-        verseEditorModal.show();
+        verseEditorModal.showAndWait();
+        refreshSongList();
     }
 
     @FXML
@@ -83,6 +82,7 @@ public class SongViewerController {
         if (alert.getResult() == ButtonType.YES) {
             songService.get().getStore().delete(getSelectedSongId());
         }
+        refreshSongList();
     }
 
     private String getSelectedSong() {
