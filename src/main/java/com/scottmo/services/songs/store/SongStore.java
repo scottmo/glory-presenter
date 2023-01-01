@@ -63,7 +63,7 @@ public final class SongStore {
     }
 
     public Song get(int songId) {
-        Song song = new Song();
+        Song song = new Song(songId);
         try (var stmt = db.createStatement()) {
             ResultSet res = stmt.executeQuery(new SelectQuery()
                     .addAllTableColumns(schema.song.table)
