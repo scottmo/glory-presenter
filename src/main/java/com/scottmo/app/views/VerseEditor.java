@@ -58,11 +58,11 @@ public class VerseEditor extends HBox {
     }
 
     public String getVerseName() {
-        return verseNameInput.getText();
+        return verseNameInput.getText().trim();
     }
 
     public String getVerseText() {
-        return verseTextInput.getText();
+        return verseTextInput.getText().trim();
     }
 
     public void setEditable(boolean isEditable) {
