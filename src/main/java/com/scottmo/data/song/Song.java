@@ -128,10 +128,6 @@ public class Song {
     }
 
     public List<SongVerse> getVerses() {
-        List<SongVerse> verses = this.getVerses(PRIMARY_LOCALE);
-        if (verses.isEmpty()) {
-            return this.getVerses(getPrimaryLocale());
-        }
         return verses;
     }
 
