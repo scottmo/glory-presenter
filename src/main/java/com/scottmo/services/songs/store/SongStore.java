@@ -8,7 +8,6 @@ import com.healthmarketscience.sqlbuilder.UpdateQuery;
 import com.scottmo.data.song.Song;
 import com.scottmo.data.song.SongVerse;
 
-import com.scottmo.util.LocaleUtil;
 import javafx.util.Pair;
 import org.apache.logging.log4j.util.Strings;
 
@@ -20,7 +19,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
 
 import static com.scottmo.config.Constants.PRIMARY_LOCALE;
 
@@ -114,7 +112,10 @@ public final class SongStore {
 
     public boolean store(Song song) {
         if (song.getId() > -1) {
-            return update(song);
+            // return update(song);
+            // for update, for now we just remove the song and reinsert it
+            // since titles and verses are very hard to update
+            delete(song.getId());
         }
         return insert(song);
     }
@@ -248,6 +249,7 @@ public final class SongStore {
                         .validate();
                 stmt.addBatch(sql.toString());
             }
+
             stmt.executeBatch();
         } catch (SQLException e) {
             throw new RuntimeException("Unable to update song!", e);
@@ -256,11 +258,20 @@ public final class SongStore {
     }
 
     public boolean delete(int songId) {
-        var sql = new DeleteQuery(schema.song.table)
+        var deleteSong = new DeleteQuery(schema.song.table)
                 .addCondition(BinaryCondition.equalTo(schema.song.id, songId))
                 .validate().toString();
+        var deleteTitles = new DeleteQuery(schema.titles.table)
+                .addCondition(BinaryCondition.equalTo(schema.titles.songId, songId))
+                .validate().toString();
+        var deleteVerses = new DeleteQuery(schema.verses.table)
+                .addCondition(BinaryCondition.equalTo(schema.verses.songId, songId))
+                .validate().toString();
         try (var stmt = db.createStatement()) {
-            stmt.executeUpdate(sql);
+            stmt.addBatch(deleteTitles);
+            stmt.addBatch(deleteVerses);
+            stmt.addBatch(deleteSong);
+            stmt.executeBatch();
         } catch (SQLException e) {
             throw new RuntimeException("Unable to delete song!", e);
         }
