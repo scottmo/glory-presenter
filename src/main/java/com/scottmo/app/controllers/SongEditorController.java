@@ -81,7 +81,7 @@ public class SongEditorController {
         authorsInput.setText(String.join(", ", song.getAuthors()));
         songbookInput.setText(song.getSongBook());
         songbookEntryInput.setText(song.getEntry());
-        copyrightInput.setText(song.getComments());
+        copyrightInput.setText(song.getCopyright());
         commentsInput.setText(song.getComments());
         publisherInput.setText(song.getPublisher());
     }
