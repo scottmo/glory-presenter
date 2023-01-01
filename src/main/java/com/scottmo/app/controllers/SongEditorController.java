@@ -9,7 +9,6 @@ import com.scottmo.util.LocaleUtil;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
@@ -22,12 +21,11 @@ import javafx.stage.Stage;
 import javafx.util.Pair;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 public class SongEditorController {
     private final Supplier<SongService> songService = ServiceSupplier.get(SongService.class);
@@ -182,7 +180,22 @@ public class SongEditorController {
     @FXML
     private void onSave(ActionEvent event) {
         // TODO validations
-        song.setVerseOrder(verseOrderInput.getText());
+        Song song = extractForm();
+
+        songService.get().getStore().store(song);
+
+        getStage().close();
+    }
+
+    private Song extractForm() {
+        Song song = new Song();
+        song.setAuthors(Arrays.stream(authorsInput.getText().split(",")).map(String::trim).toList());
+        song.setSongBook(songbookInput.getText().trim());
+        song.setEntry(songbookEntryInput.getText().trim());
+        song.setCopyright(copyrightInput.getText().trim());
+        song.setComments(commentsInput.getText().trim());
+        song.setPublisher(publisherInput.getText().trim());
+        song.setVerseOrder(verseOrderInput.getText().trim());
 
         lyricsEditorMap.forEach((locale, lyricsEditor) -> {
             song.setTitle(locale, lyricsEditor.getTitle());
@@ -196,9 +209,7 @@ public class SongEditorController {
         });
         song.setVerses(verses);
 
-        songService.get().getStore().store(song);
-
-        getStage().close();
+        return song;
     }
 
     @FXML
