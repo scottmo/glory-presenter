@@ -74,7 +74,7 @@ public class TileLyricsEditor extends GridPane {
     }
 
     public String getTitle() {
-        return titleInput.getText().trim();
+        return titleInput.getText();
     }
 
     public List<Pair<String, String>> getVerses() {
