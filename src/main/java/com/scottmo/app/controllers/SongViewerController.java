@@ -10,6 +10,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ListView;
 import javafx.stage.Stage;
@@ -49,10 +50,16 @@ public class SongViewerController {
         ObservableList<String> items = FXCollections.observableArrayList();
         items.addAll(titles.values());
         songList.setItems(items);
+
+        if (items.size() > 0) {
+            songList.getSelectionModel().selectFirst();
+        }
     }
 
     @FXML
     private void onEditSong(ActionEvent event) throws IOException {
+        if (songList.getItems().size() == 0) return;
+
         Stage verseEditorModal = ViewUtil.get().newModal("Edit Song", VERSE_EDITOR_FXML, ViewUtil.get().getOwnerWindow(event));
         Song song = songService.get().getStore().get(getSelectedSongId());
         verseEditorModal.setUserData(song);
@@ -68,6 +75,8 @@ public class SongViewerController {
 
     @FXML
     private void onDeleteSong(ActionEvent event) {
+        if (songList.getItems().size() == 0) return;
+
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Delete [" + getSelectedSong() + "] ?",
                 ButtonType.YES, ButtonType.CANCEL);
         alert.showAndWait();
