@@ -12,6 +12,10 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ListView;
+import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -27,7 +31,10 @@ public class SongViewerController {
 
     private final Supplier<SongService> songService = ServiceSupplier.get(SongService.class);
     private final Map<String, Integer> songIdsMap = new HashMap<>();
+    private ObservableList<String> items;
 
+    @FXML
+    private TextField searchInput;
     @FXML
     private ListView<String> songList;
 
@@ -45,12 +52,27 @@ public class SongViewerController {
             songIdsMap.put(entry.getValue(), entry.getKey());
         }
 
-        ObservableList<String> items = FXCollections.observableArrayList();
+        items = FXCollections.observableArrayList();
         items.addAll(titles.values());
         songList.setItems(items);
 
         if (items.size() > 0) {
             songList.getSelectionModel().selectFirst();
+        }
+    }
+
+    @FXML
+    private void onSearchSong(KeyEvent keyEvent) {
+        if (keyEvent.getCode().equals(KeyCode.ENTER)) {
+            if (searchInput.getText().isEmpty()) {
+                // restore list when empty
+                songList.setItems(items);
+            } else {
+                // search ignore case
+                var filteredItems = items.filtered(item ->
+                        item.toLowerCase().contains(searchInput.getText().toLowerCase()));
+                songList.setItems(filteredItems);
+            }
         }
     }
 

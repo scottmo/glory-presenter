@@ -18,8 +18,7 @@
         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
         <RowConstraints minHeight="10.0" vgrow="ALWAYS" />
     </rowConstraints>
-    <TextField />
-    <VBox />
+    <TextField fx:id="searchInput" onKeyPressed="#onSearchSong" GridPane.columnSpan="2" />
     <VBox GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1">
         <Button mnemonicParsing="false" onAction="#onNewSong" prefWidth="100.0" text="New" />
         <Button mnemonicParsing="false" onAction="#onEditSong" prefWidth="100.0" text="Edit" />
