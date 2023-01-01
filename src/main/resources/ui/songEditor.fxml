@@ -63,7 +63,7 @@
                <Insets bottom="10.0" top="10.0" />
             </padding>
          </Label>
-            <TabPane fx:id="titleLyricsTabs" prefHeight="390.0" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS" />
+            <TabPane fx:id="titleLyricsTabs" prefHeight="390.0" VBox.vgrow="ALWAYS" />
          <padding>
             <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
          </padding>

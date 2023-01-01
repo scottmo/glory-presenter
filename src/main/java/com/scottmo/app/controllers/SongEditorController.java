@@ -9,6 +9,8 @@ import com.scottmo.util.LocaleUtil;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
@@ -147,19 +149,28 @@ public class SongEditorController {
 
         int index = titleLyricsTabs.getTabs().size() - 1;
         Tab lyricsTab = new Tab();
-        Label label = new Label(locale);
-        lyricsTab.setGraphic(label); // using a label to capture click event later
+        Label localeLabel = new Label(locale);
+        lyricsTab.setGraphic(localeLabel); // using a label to capture click event later
         lyricsTab.setOnSelectionChanged(event -> lastSelectedLocaleTab = index);
+        lyricsTab.setOnCloseRequest(event -> {
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setHeaderText("Delete locale?");
+            alert.showAndWait();
+            if (alert.getResult() == ButtonType.CANCEL) {
+                event.consume(); // stop propagation
+            }
+        });
+        lyricsTab.setOnClosed(event -> lyricsEditorMap.remove(localeLabel.getText()));
         lyricsTab.setContent(lyricsEditor);
         titleLyricsTabs.getTabs().add(index, lyricsTab);
 
-        label.setOnMouseClicked(event -> {
+        localeLabel.setOnMouseClicked(event -> {
             // on double click, change locale
             if (event.getButton().equals(MouseButton.PRIMARY) && event.getClickCount() == 2) {
                 String newLocale = askForNewLocale();
                 if (newLocale != null) {
-                    String currentLocale = label.getText();
-                    label.setText(newLocale);
+                    String currentLocale = localeLabel.getText();
+                    localeLabel.setText(newLocale);
                     lyricsEditorMap.remove(currentLocale);
                     lyricsEditorMap.put(newLocale, lyricsEditor);
                 }
