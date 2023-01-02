@@ -9,7 +9,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<GridPane xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.scottmo.app.controllers.SongViewerController">
+<GridPane hgap="5.0" vgap="5.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.scottmo.app.controllers.SongViewerController">
     <columnConstraints>
         <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" />
         <ColumnConstraints hgrow="NEVER" minWidth="10.0" prefWidth="100.0" />
@@ -24,7 +24,7 @@
         <Button mnemonicParsing="false" onAction="#onEditSong" prefWidth="100.0" text="Edit" />
         <Button mnemonicParsing="false" onAction="#onDeleteSong" prefWidth="100.0" text="Delete" />
     </VBox>
-   <ListView fx:id="songList" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" GridPane.vgrow="ALWAYS" />
+   <ListView fx:id="songList" prefWidth="800.0" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" GridPane.vgrow="ALWAYS" />
    <padding>
       <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
    </padding>
