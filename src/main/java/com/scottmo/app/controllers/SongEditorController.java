@@ -13,6 +13,8 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuButton;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TextArea;
@@ -21,15 +23,20 @@ import javafx.scene.control.TextInputDialog;
 import javafx.scene.input.MouseButton;
 import javafx.stage.Stage;
 import javafx.util.Pair;
+import org.apache.logging.log4j.util.Strings;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Supplier;
 
 public class SongEditorController {
+    private static final String VERSE_ORDER_PICKER_LABEL = "Add";
+
     private final Supplier<SongService> songService = ServiceSupplier.get(SongService.class);
 
     private final Map<String, TileLyricsEditor> lyricsEditorMap = new HashMap<>();
@@ -49,7 +56,7 @@ public class SongEditorController {
     @FXML
     private TextField verseOrderInput;
     @FXML
-    private ComboBox<String> verseOrderPicker;
+    private MenuButton verseOrderPicker;
     @FXML
     private TextField copyrightInput;
     @FXML
@@ -74,11 +81,11 @@ public class SongEditorController {
             verseOrderInput.setText(verseOrder);
         }
 
-        verseOrderPicker.getItems().add("Add");
-        verseOrderPicker.getSelectionModel().selectFirst();
-        for (SongVerse verse : song.getVerses()) {
-            verseOrderPicker.getItems().add(verse.getName());
-        }
+        refreshVerseOrderList();
+        // TODO: optimize this instead of re-init every click
+        verseOrderPicker.setOnMousePressed(event -> {
+            refreshVerseOrderList();
+        });
 
         authorsInput.setText(String.join(", ", song.getAuthors()));
         songbookInput.setText(song.getSongBook());
@@ -86,6 +93,30 @@ public class SongEditorController {
         copyrightInput.setText(song.getCopyright());
         commentsInput.setText(song.getComments());
         publisherInput.setText(song.getPublisher());
+    }
+
+    private void refreshVerseOrderList() {
+        var verseOptions = verseOrderPicker.getItems();
+        verseOptions.clear();
+
+        getVerseNames().forEach(verseName -> {
+            MenuItem item = new MenuItem(verseName);
+            item.setOnAction(this::onAddVerseOrder);
+            verseOptions.add(item);
+        });
+    }
+
+    private List<String> getVerseNames() {
+        List<String> verseNames = new ArrayList<>();
+        lyricsEditorMap.forEach((locale, lyricsEditor) -> {
+            lyricsEditor.getVerses().forEach(verseNameAndText -> {
+                String verseName = verseNameAndText.getKey();
+                if (!verseNames.contains(verseName)) {
+                    verseNames.add(verseName);
+                }
+            });
+        });
+        return verseNames;
     }
 
     private void setupTitleLyricsTabs(Song song) {
@@ -225,8 +256,11 @@ public class SongEditorController {
         return song;
     }
 
-    @FXML
     private void onAddVerseOrder(ActionEvent event) {
+        String verseName = ((MenuItem)event.getSource()).getText();
+        String verseOrder = verseOrderInput.getText();
+        String newVerseOrder = String.join(", ", verseOrder, verseName);
+        verseOrderInput.setText(newVerseOrder);
     }
 
     private Stage getStage() {

@@ -3,8 +3,8 @@
 <?import java.lang.String?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.MenuButton?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.TextArea?>
@@ -45,7 +45,7 @@
                     </font>
                 </Label>
                 <TextField fx:id="verseOrderInput" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="5" />
-                <ComboBox fx:id="verseOrderPicker" prefWidth="100.0" GridPane.columnIndex="2" GridPane.rowIndex="5" />
+                <MenuButton fx:id="verseOrderPicker" prefWidth="100.0" text="Add" GridPane.columnIndex="2" GridPane.rowIndex="5" />
             <Label text="Song Book" GridPane.rowIndex="1" />
             <Label text="Authors" />
             <TextField fx:id="songbookInput" GridPane.columnIndex="1" GridPane.rowIndex="1" />
