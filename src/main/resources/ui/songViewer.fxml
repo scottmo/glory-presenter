@@ -2,6 +2,7 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.ColumnConstraints?>
@@ -18,13 +19,14 @@
         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
         <RowConstraints minHeight="10.0" vgrow="ALWAYS" />
     </rowConstraints>
-    <TextField fx:id="searchInput" onKeyPressed="#onSearchSong" GridPane.columnSpan="2" />
+    <TextField fx:id="searchInput" onKeyPressed="#onSearchSong" />
     <VBox GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1">
         <Button mnemonicParsing="false" onAction="#onNewSong" prefWidth="100.0" text="New" />
         <Button mnemonicParsing="false" onAction="#onEditSong" prefWidth="100.0" text="Edit" />
         <Button mnemonicParsing="false" onAction="#onDeleteSong" prefWidth="100.0" text="Delete" />
     </VBox>
    <ListView fx:id="songList" prefWidth="800.0" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" GridPane.vgrow="ALWAYS" />
+   <Label alignment="CENTER" prefHeight="17.0" prefWidth="100.0" text="ENTER to Search" GridPane.columnIndex="1" />
    <padding>
       <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
    </padding>
