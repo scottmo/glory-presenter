@@ -1,6 +1,7 @@
 package com.scottmo.util;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -146,5 +147,28 @@ public final class StringUtils {
         }
         return slideTexts;
     }
-}
 
+    public static String trim(String str) {
+        return str == null ? "" : str.trim();
+    }
+
+    public static String normalizeListString(String str) {
+        return normalizeListString(str, false);
+    }
+
+    public static String normalizeListString(String str, boolean isCompact) {
+        String sep = ",";
+        String finalSep = isCompact ? sep : sep + " ";
+        return str == null
+                ? ""
+                : Arrays.stream(str.split(sep)).map(String::trim).collect(Collectors.joining(finalSep));
+    }
+
+    public static List<String> split(String str) {
+        return split(str, ",");
+    }
+
+    public static List<String> split(String str, String sep) {
+        return Arrays.stream(str.split(sep)).map(String::trim).toList();
+    }
+}
