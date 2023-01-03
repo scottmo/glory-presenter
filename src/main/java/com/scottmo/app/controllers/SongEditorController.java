@@ -8,7 +8,6 @@ import com.scottmo.services.songs.SongService;
 import com.scottmo.util.LocaleUtil;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
-import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
@@ -37,29 +36,19 @@ public class SongEditorController {
 
     private int songId;
 
-    @FXML
-    private TabPane titleLyricsTabs;
+    public TabPane titleLyricsTabs;
     private int lastSelectedLocaleTab;
 
-    @FXML
-    private TextField authorsInput;
-    @FXML
-    private TextField songbookInput;
-    @FXML
-    private TextField songbookEntryInput;
-    @FXML
-    private TextField verseOrderInput;
-    @FXML
-    private MenuButton verseOrderPicker;
-    @FXML
-    private TextField copyrightInput;
-    @FXML
-    private TextArea commentsInput;
-    @FXML
-    private TextField publisherInput;
+    public TextField authorsInput;
+    public TextField songbookInput;
+    public TextField songbookEntryInput;
+    public TextField verseOrderInput;
+    public MenuButton verseOrderPicker;
+    public TextField copyrightInput;
+    public TextArea commentsInput;
+    public TextField publisherInput;
 
-    @FXML
-    private void initialize() {
+    public void initialize() {
         Platform.runLater(this::populateForm);
     }
 
@@ -210,13 +199,11 @@ public class SongEditorController {
         return dialog.getResult();
     }
 
-    @FXML
-    private void onCancel(ActionEvent event) {
+    public void onCancel(ActionEvent event) {
         getStage().close();
     }
 
-    @FXML
-    private void onSave(ActionEvent event) {
+    public void onSave(ActionEvent event) {
         // TODO validations
         Song song = extractForm();
 

@@ -4,12 +4,11 @@ import atlantafx.base.theme.PrimerDark;
 import atlantafx.base.theme.PrimerLight;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
-import javafx.fxml.FXML;
 
 public class MenuController {
     private boolean isDark;
-    @FXML
-    private void onToggleDarkMode(ActionEvent event) {
+
+    public void onToggleDarkMode(ActionEvent event) {
         if (isDark) {
             Application.setUserAgentStylesheet(new PrimerLight().getUserAgentStylesheet());
         } else {
