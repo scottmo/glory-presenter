@@ -8,14 +8,12 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -33,13 +31,10 @@ public class SongViewerController {
     private final Map<String, Integer> songIdsMap = new HashMap<>();
     private ObservableList<String> items;
 
-    @FXML
-    private TextField searchInput;
-    @FXML
-    private ListView<String> songList;
+    public TextField searchInput;
+    public ListView<String> songList;
 
-    @FXML
-    private void initialize() {
+    public void initialize() {
         Platform.runLater(this::refreshSongList);
     }
 
@@ -61,8 +56,7 @@ public class SongViewerController {
         }
     }
 
-    @FXML
-    private void onSearchSong(KeyEvent keyEvent) {
+    public void onSearchSong(KeyEvent keyEvent) {
         if (keyEvent.getCode().equals(KeyCode.ENTER)) {
             if (searchInput.getText().isEmpty()) {
                 // restore list when empty
@@ -76,8 +70,7 @@ public class SongViewerController {
         }
     }
 
-    @FXML
-    private void onEditSong(ActionEvent event) throws IOException {
+    public void onEditSong(ActionEvent event) throws IOException {
         if (songList.getItems().size() == 0) return;
 
         Stage verseEditorModal = ViewUtil.get().newModal("Edit Song", VERSE_EDITOR_FXML, ViewUtil.get().getOwnerWindow(event));
@@ -86,16 +79,14 @@ public class SongViewerController {
         verseEditorModal.show();
     }
 
-    @FXML
-    private void onNewSong(ActionEvent event) throws IOException {
+    public void onNewSong(ActionEvent event) throws IOException {
         Stage verseEditorModal = ViewUtil.get().newModal("New Song", VERSE_EDITOR_FXML, ViewUtil.get().getOwnerWindow(event));
         verseEditorModal.setUserData(new Song());
         verseEditorModal.showAndWait();
         refreshSongList();
     }
 
-    @FXML
-    private void onDeleteSong(ActionEvent event) {
+    public void onDeleteSong(ActionEvent event) {
         if (songList.getItems().size() == 0) return;
 
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Delete [" + getSelectedSong() + "] ?",

@@ -1,13 +1,10 @@
 package com.scottmo.app;
 
-import static com.scottmo.config.Constants.APP_NAME;
-
 import atlantafx.base.theme.PrimerLight;
-import com.scottmo.services.logging.AppLoggerService;
 import com.scottmo.services.ServiceSupplier;
 import com.scottmo.services.logging.AppLogger;
+import com.scottmo.services.logging.AppLoggerService;
 import javafx.application.Application;
-import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -19,6 +16,8 @@ import java.io.IOException;
 import java.util.Objects;
 import java.util.function.Supplier;
 
+import static com.scottmo.config.Constants.APP_NAME;
+
 public class App extends Application implements AppLogger {
     private static final int DEFAULT_WIDTH = 900;
     private static final int DEFAULT_HEIGHT = 600;
@@ -27,8 +26,7 @@ public class App extends Application implements AppLogger {
 
     private final Supplier<AppLoggerService> appLoggerService = ServiceSupplier.get(AppLoggerService.class);
 
-    @FXML
-    private Label statusLabel;
+    public Label statusLabel;
 
     @Override
     public void info(String msg) {
