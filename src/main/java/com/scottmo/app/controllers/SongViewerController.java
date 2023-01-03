@@ -21,8 +21,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
 
-import static com.scottmo.config.Constants.PRIMARY_LOCALE;
-import static com.scottmo.config.Constants.SECONDARY_LOCALE;
+import static com.scottmo.config.AppContext.PRIMARY_LOCALE;
+import static com.scottmo.config.AppContext.SECONDARY_LOCALE;
 
 public class SongViewerController {
     private static final String VERSE_EDITOR_FXML = "/ui/songEditor.fxml";

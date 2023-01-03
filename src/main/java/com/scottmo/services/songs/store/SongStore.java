@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.scottmo.config.Constants.PRIMARY_LOCALE;
+import static com.scottmo.config.AppContext.PRIMARY_LOCALE;
 
 public final class SongStore {
     private static final String DB_NAME = "songs";

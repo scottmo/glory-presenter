@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.scottmo.config.Constants.PRIMARY_LOCALE;
+import static com.scottmo.config.AppContext.PRIMARY_LOCALE;
 
 public class Song {
     private int id = -1;
