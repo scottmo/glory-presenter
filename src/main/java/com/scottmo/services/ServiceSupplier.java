@@ -17,7 +17,7 @@ public class ServiceSupplier {
     @SuppressWarnings("unchecked")
     public static <T extends Service> Supplier<T> get(Class<T> clazz) {
         return () -> {
-            Service service = null;
+            T service;
             if (services.containsKey(clazz)) {
                 return (T) services.get(clazz);
             }
@@ -26,11 +26,8 @@ public class ServiceSupplier {
             } catch (Exception e) {
                 throw new RuntimeException("Service needs to implement a default constructor", e);
             }
-            if (service != null) {
-                services.put(clazz, service);
-                return (T) service;
-            }
-            return null;
+            services.put(clazz, service);
+            return service;
         };
     }
 }
