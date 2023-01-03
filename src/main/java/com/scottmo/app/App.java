@@ -16,11 +16,9 @@ import java.io.IOException;
 import java.util.Objects;
 import java.util.function.Supplier;
 
-import static com.scottmo.config.AppContext.APP_NAME;
+import static com.scottmo.config.AppContext.*;
 
 public class App extends Application implements AppLogger {
-    private static final int DEFAULT_WIDTH = 900;
-    private static final int DEFAULT_HEIGHT = 600;
 
     private static final Logger logger = Logger.getLogger(App.class.getName());
 
@@ -56,7 +54,7 @@ public class App extends Application implements AppLogger {
         Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("/ui/main.fxml")));
 
         stage.setTitle(APP_NAME);
-        stage.setScene(new Scene(root, DEFAULT_WIDTH, DEFAULT_HEIGHT));
+        stage.setScene(new Scene(root, APP_WIDTH, APP_HEIGHT));
         stage.show();
         // put window to front to avoid it to be hidden behind others.
         stage.setAlwaysOnTop(true);

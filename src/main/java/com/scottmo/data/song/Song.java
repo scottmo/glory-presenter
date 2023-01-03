@@ -1,9 +1,9 @@
 package com.scottmo.data.song;
 
 import com.scottmo.util.LocaleUtil;
+import com.scottmo.util.StringUtils;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -65,7 +65,7 @@ public class Song {
         } else {
             locale = LocaleUtil.normalize(locale);
         }
-        this.titles.put(locale, normalize(title));
+        this.titles.put(locale, StringUtils.trim(title));
     }
 
     public List<String> getLocales() {
@@ -86,7 +86,7 @@ public class Song {
     }
 
     public void setPublisher(String publisher) {
-        this.publisher = normalize(publisher);
+        this.publisher = StringUtils.trim(publisher);
     }
 
     public String getCopyright() {
@@ -94,7 +94,7 @@ public class Song {
     }
 
     public void setCopyright(String copyright) {
-        this.copyright = normalize(copyright);
+        this.copyright = StringUtils.trim(copyright);
     }
 
     public String getSongBook() {
@@ -102,7 +102,7 @@ public class Song {
     }
 
     public void setSongBook(String songBook) {
-        this.songBook = normalize(songBook);
+        this.songBook = StringUtils.trim(songBook);
     }
 
     public String getEntry() {
@@ -110,7 +110,7 @@ public class Song {
     }
 
     public void setEntry(String entry) {
-        this.entry = normalize(entry);
+        this.entry = StringUtils.trim(entry);
     }
 
     public String getComments() {
@@ -118,7 +118,7 @@ public class Song {
     }
 
     public void setComments(String comments) {
-        this.comments = normalize(comments);
+        this.comments = StringUtils.trim(comments);
     }
 
     public List<SongVerse> getVerses(String locale) {
@@ -139,26 +139,15 @@ public class Song {
         return Collections.emptyList();
     }
 
-    public List<String> getVerseOrderList() {
-        if (verseOrder != null && !verseOrder.isEmpty()) {
-            return Arrays.stream(verseOrder.split(" ")).toList();
-        }
-        return getVerseNames();
-    }
-
     public String getVerseOrder() {
         return verseOrder;
     }
 
     public void setVerseOrder(String verseOrder) {
-        this.verseOrder = normalize(verseOrder);
+        this.verseOrder = StringUtils.normalizeListString(verseOrder, true);
     }
 
     public void setVerses(List<SongVerse> verses) {
         this.verses = verses;
-    }
-
-    private String normalize(String str) {
-        return str == null ? "" : str.trim();
     }
 }

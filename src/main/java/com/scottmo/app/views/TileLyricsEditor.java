@@ -1,5 +1,6 @@
 package com.scottmo.app.views;
 
+import com.scottmo.app.Labels;
 import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.VPos;
@@ -26,7 +27,7 @@ public class TileLyricsEditor extends GridPane {
 
         setLayoutProperties();
 
-        addLabel("Title", 0, 0);
+        addLabel(Labels.LABEL_SONG_TITLE, 0, 0);
         titleInput = new TextField();
         {
             titleInput.setPrefHeight(25);
@@ -37,7 +38,7 @@ public class TileLyricsEditor extends GridPane {
             titleInput.setText(title);
         }
 
-        addLabel("Lyrics", 0, 1);
+        addLabel(Labels.LABEL_SONG_LYRICS, 0, 1);
 
         lyricsContainer = new VBox();
         {
@@ -59,13 +60,13 @@ public class TileLyricsEditor extends GridPane {
             add(actionsBox, 2, 1);
             setValignment(actionsBox, VPos.TOP);
 
-            Button addButton = new Button("Add");
+            Button addButton = new Button(Labels.BTN_ADD_VERSE);
             addButton.setOnAction(this::onAddVerse);
             addButton.setPrefWidth(100);
-            Button editButton = new Button("Edit");
+            Button editButton = new Button(Labels.BTN_EDIT_VERSE);
             editButton.setOnAction(this::onEditVerse);
             editButton.setPrefWidth(100);
-            Button deleteButton = new Button("Delete");
+            Button deleteButton = new Button(Labels.BTN_DELETE_VERSE);
             deleteButton.setOnAction(this::onDeleteVerse);
             deleteButton.setPrefWidth(100);
 

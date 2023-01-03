@@ -12,6 +12,9 @@ import java.nio.file.Path;
 public final class AppContext {
     public static final String APP_NAME = "Glory Presenter";
 
+    public static final int APP_WIDTH = 900;
+    public static final int APP_HEIGHT = 600;
+
     // TODO: make this configurable
     public static final String PRIMARY_LOCALE = LocaleUtil.DEFAULT_LOCALE;
     public static final String SECONDARY_LOCALE = LocaleUtil.normalize("zh_CN");

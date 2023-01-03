@@ -1,11 +1,13 @@
 package com.scottmo.app.controllers;
 
+import com.scottmo.app.Labels;
 import com.scottmo.app.views.TileLyricsEditor;
 import com.scottmo.data.song.Song;
 import com.scottmo.data.song.SongVerse;
 import com.scottmo.services.ServiceSupplier;
 import com.scottmo.services.songs.SongService;
 import com.scottmo.util.LocaleUtil;
+import com.scottmo.util.StringUtils;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Alert;
@@ -23,7 +25,6 @@ import javafx.stage.Stage;
 import javafx.util.Pair;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -104,7 +105,7 @@ public class SongEditorController {
 
     private void setupTitleLyricsTabs(Song song) {
         // new tab button
-        Tab addTranslationTab = new Tab("+");
+        Tab addTranslationTab = new Tab(Labels.TAB_ADD_LOCALE);
         titleLyricsTabs.getTabs().add(addTranslationTab);
         // existing locales
         for (String locale : song.getLocales()) {
@@ -168,7 +169,7 @@ public class SongEditorController {
         lyricsTab.setOnSelectionChanged(event -> lastSelectedLocaleTab = index);
         lyricsTab.setOnCloseRequest(event -> {
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-            alert.setHeaderText("Delete locale?");
+            alert.setHeaderText(Labels.DIALOG_DELETE_LOCALE);
             alert.showAndWait();
             if (alert.getResult() == ButtonType.CANCEL) {
                 event.consume(); // stop propagation
@@ -194,7 +195,7 @@ public class SongEditorController {
 
     private String askForNewLocale() {
         TextInputDialog dialog = new TextInputDialog();
-        dialog.setHeaderText("Enter new locale");
+        dialog.setHeaderText(Labels.DIALOG_ADD_LOCALE);
         dialog.showAndWait();
         return dialog.getResult();
     }
@@ -214,7 +215,7 @@ public class SongEditorController {
 
     private Song extractForm() {
         Song song = new Song(songId);
-        song.setAuthors(Arrays.stream(authorsInput.getText().split(",")).map(String::trim).toList());
+        song.setAuthors(StringUtils.split(authorsInput.getText()));
         song.setSongBook(songbookInput.getText());
         song.setEntry(songbookEntryInput.getText());
         song.setCopyright(copyrightInput.getText());

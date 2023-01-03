@@ -1,5 +1,6 @@
 package com.scottmo.app.controllers;
 
+import com.scottmo.app.Labels;
 import com.scottmo.app.views.ViewUtil;
 import com.scottmo.data.song.Song;
 import com.scottmo.services.ServiceSupplier;
@@ -73,14 +74,14 @@ public class SongViewerController {
     public void onEditSong(ActionEvent event) throws IOException {
         if (songList.getItems().size() == 0) return;
 
-        Stage verseEditorModal = ViewUtil.get().newModal("Edit Song", VERSE_EDITOR_FXML, ViewUtil.get().getOwnerWindow(event));
+        Stage verseEditorModal = ViewUtil.get().newModal(Labels.MODAL_EDIT_SONG_TITLE, VERSE_EDITOR_FXML, ViewUtil.get().getOwnerWindow(event));
         Song song = songService.get().getStore().get(getSelectedSongId());
         verseEditorModal.setUserData(song);
         verseEditorModal.show();
     }
 
     public void onNewSong(ActionEvent event) throws IOException {
-        Stage verseEditorModal = ViewUtil.get().newModal("New Song", VERSE_EDITOR_FXML, ViewUtil.get().getOwnerWindow(event));
+        Stage verseEditorModal = ViewUtil.get().newModal(Labels.MODAL_NEW_SONG_TITLE, VERSE_EDITOR_FXML, ViewUtil.get().getOwnerWindow(event));
         verseEditorModal.setUserData(new Song());
         verseEditorModal.showAndWait();
         refreshSongList();
@@ -89,7 +90,7 @@ public class SongViewerController {
     public void onDeleteSong(ActionEvent event) {
         if (songList.getItems().size() == 0) return;
 
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Delete [" + getSelectedSong() + "] ?",
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION, Labels.MODAL_DELETE_SONG_TITLE.formatted(getSelectedSong()),
                 ButtonType.YES, ButtonType.CANCEL);
         alert.showAndWait();
         if (alert.getResult() == ButtonType.YES) {
