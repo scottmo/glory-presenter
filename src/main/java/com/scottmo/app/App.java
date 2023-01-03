@@ -16,7 +16,7 @@ import java.io.IOException;
 import java.util.Objects;
 import java.util.function.Supplier;
 
-import static com.scottmo.config.Constants.APP_NAME;
+import static com.scottmo.config.AppContext.APP_NAME;
 
 public class App extends Application implements AppLogger {
     private static final int DEFAULT_WIDTH = 900;

@@ -2,6 +2,7 @@ package com.scottmo.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.scottmo.config.definitions.AppConfig;
+import com.scottmo.util.LocaleUtil;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -9,6 +10,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 public final class AppContext {
+    public static final String APP_NAME = "Glory Presenter";
+
+    // TODO: make this configurable
+    public static final String PRIMARY_LOCALE = LocaleUtil.DEFAULT_LOCALE;
+    public static final String SECONDARY_LOCALE = LocaleUtil.normalize("zh_CN");
+
     public static final String CONTENTS_DIR = "contents";
     public static final String CONTENTS_SLIDE_DIR = "contents_slide";
 
