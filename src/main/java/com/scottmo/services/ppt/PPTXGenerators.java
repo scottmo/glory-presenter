@@ -20,6 +20,41 @@ public final class PPTXGenerators {
 
     private static final AppContext appContext = ServiceSupplier.getAppContext();
 
+    public static void generate(List<Map<String, String>> contents, String tmplFilePath, String outputFilePath) throws IOException {
+        try (var inStream = new FileInputStream(tmplFilePath)) {
+            var tmplSlides = new XMLSlideShow(inStream);
+            // make copies of template slides
+            var numPlaceholderSlides = tmplSlides.getSlides().size();
+            int currentTemplateIndex = 0;
+            var srcSlide = tmplSlides.getSlides().get(currentTemplateIndex);
+            for (int j = 0; j < contents.size(); j++) {
+                var slide = tmplSlides.createSlide(srcSlide.getSlideLayout());
+                slide.importContent(srcSlide);
+            }
+            // remove template slides
+            for (int i = 0; i < numPlaceholderSlides; i++) {
+                tmplSlides.removeSlide(0);
+            }
+            try (var outStream = new FileOutputStream(outputFilePath)) {
+                tmplSlides.write(outStream);
+            }
+            tmplSlides.close();
+        }
+
+        try (var inStream = new FileInputStream(outputFilePath)) {
+            var ppt = new XMLSlideShow(inStream);
+            for (int i = 0; i < contents.size(); i++) {
+                var slide = ppt.getSlides().get(i);
+                Map<String, String> values = contents.get(i);
+                TemplatingUtil.replaceText(slide, values);
+            }
+            try (var outStream = new FileOutputStream(outputFilePath)) {
+                ppt.write(outStream);
+            }
+            ppt.close();
+        }
+    }
+
     public static void generate(String dataFilePath, String tmplFilePath, String outputDirPath) throws IOException {
         var content = ContentUtil.parse(Path.of(dataFilePath).toFile());
         if (content == null) return;
@@ -69,39 +104,6 @@ public final class PPTXGenerators {
             }
             ppt.close();
         }
-    }
-
-    public static void generate(String baseTemplate, List<InsertAction> insertActions, String outputPath) throws IOException {
-        Path outputFile = Path.of(outputPath);
-        XMLSlideShow outputPPT;
-
-        if (baseTemplate != null) {
-            Files.copy(Path.of(baseTemplate), outputFile, StandardCopyOption.REPLACE_EXISTING);
-            try (var inStream = new FileInputStream(outputFile.toString())) {
-                // this could be an issue. not sure if can close instream early
-                outputPPT = new XMLSlideShow(inStream);
-            }
-        } else {
-            outputPPT = new XMLSlideShow();
-        }
-
-        for (var insertAction : insertActions) {
-            try (var inStream = new FileInputStream(insertAction.templatePath())) {
-                var templatePPT = new XMLSlideShow(inStream);
-                var templateSlides = templatePPT.getSlides();
-                var content = ContentUtil.parse(new File(insertAction.dataPath()));
-                var insertionIndex = Integer.parseInt(insertAction.insertIndex());
-
-                for (var parameters : insertAction.parameters()) {
-                    var templateSlide = templateSlides.get(parameters.templateIndex());
-                }
-            }
-        }
-
-        try (var outStream = new FileOutputStream(outputFile.toString())) {
-            outputPPT.write(outStream);
-        }
-        outputPPT.close();
     }
 
     public static void main(String[] args) {
