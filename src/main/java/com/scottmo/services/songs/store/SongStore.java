@@ -8,6 +8,7 @@ import com.healthmarketscience.sqlbuilder.UpdateQuery;
 import com.scottmo.data.song.Song;
 import com.scottmo.data.song.SongVerse;
 
+import com.scottmo.util.StringUtils;
 import javafx.util.Pair;
 import org.apache.logging.log4j.util.Strings;
 
@@ -72,11 +73,11 @@ public final class SongStore {
             if (res.next()) {
                 String authors = res.getString(schema.song.authors.getName());
                 if (Strings.isNotEmpty(authors)) {
-                    song.setAuthors(Arrays.stream(authors.split(",")).toList());
+                    song.setAuthors(StringUtils.split(authors, ","));
                 }
                 String verseOrder = res.getString(schema.song.verseOrder.getName());
                 if (Strings.isNotEmpty(verseOrder)) {
-                    song.setVerseOrder(Arrays.stream(verseOrder.split(",")).toList());
+                    song.setVerseOrder(StringUtils.split(verseOrder, ","));
                 }
                 song.setCopyright(res.getString(schema.song.copyright.getName()));
                 song.setPublisher(res.getString(schema.song.publisher.getName()));
