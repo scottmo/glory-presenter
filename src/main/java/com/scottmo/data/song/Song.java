@@ -21,7 +21,7 @@ public class Song {
     private String songBook = "";
     private String entry = "";
     private String comments = "";
-    private String verseOrder = "";
+    private List<String> verseOrder = new ArrayList<>();
     private List<SongVerse> verses = new ArrayList<>();
 
     public Song() {}
@@ -139,12 +139,29 @@ public class Song {
         return Collections.emptyList();
     }
 
-    public String getVerseOrder() {
+    /**
+     *
+     * @return
+     * [
+     *     {
+     *         [locale]: [
+     *             "verse1line1",
+     *             "verse1line2",
+     *             ...
+     *          ]
+     *     }
+     * ]
+     */
+    public List<Map<String, List<String>>> getOrderedVerses() {
+        return Collections.emptyList();
+    }
+
+    public List<String> getVerseOrder() {
         return verseOrder;
     }
 
-    public void setVerseOrder(String verseOrder) {
-        this.verseOrder = StringUtils.normalizeListString(verseOrder, true);
+    public void setVerseOrder(List<String> verseOrder) {
+        this.verseOrder = verseOrder;
     }
 
     public void setVerses(List<SongVerse> verses) {
