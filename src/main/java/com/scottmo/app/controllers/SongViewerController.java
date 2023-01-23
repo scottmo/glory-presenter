@@ -2,8 +2,10 @@ package com.scottmo.app.controllers;
 
 import com.scottmo.app.Labels;
 import com.scottmo.app.views.ViewUtil;
+import com.scottmo.config.AppContext;
 import com.scottmo.data.song.Song;
 import com.scottmo.services.ServiceSupplier;
+import com.scottmo.services.ppt.SongSlidesGenerator;
 import com.scottmo.services.songs.SongService;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -19,6 +21,7 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
@@ -29,6 +32,8 @@ public class SongViewerController {
     private static final String VERSE_EDITOR_FXML = "/ui/songEditor.fxml";
 
     private final Supplier<SongService> songService = ServiceSupplier.get(SongService.class);
+    private final AppContext appContext = ServiceSupplier.getAppContext();
+
     private final Map<String, Integer> songIdsMap = new HashMap<>();
     private ObservableList<String> items;
 
@@ -75,7 +80,7 @@ public class SongViewerController {
         if (songList.getItems().size() == 0) return;
 
         Stage verseEditorModal = ViewUtil.get().newModal(Labels.MODAL_EDIT_SONG_TITLE, VERSE_EDITOR_FXML, ViewUtil.get().getOwnerWindow(event));
-        Song song = songService.get().getStore().get(getSelectedSongId());
+        Song song = loadSelectedSong();
         verseEditorModal.setUserData(song);
         verseEditorModal.show();
     }
@@ -90,7 +95,7 @@ public class SongViewerController {
     public void onDeleteSong(ActionEvent event) {
         if (songList.getItems().size() == 0) return;
 
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION, Labels.MODAL_DELETE_SONG_TITLE.formatted(getSelectedSong()),
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION, Labels.MODAL_DELETE_SONG_TITLE.formatted(getSelectedSongTitle()),
                 ButtonType.YES, ButtonType.CANCEL);
         alert.showAndWait();
         if (alert.getResult() == ButtonType.YES) {
@@ -99,12 +104,16 @@ public class SongViewerController {
         refreshSongList();
     }
 
-    private String getSelectedSong() {
+    private String getSelectedSongTitle() {
         return songList.getSelectionModel().getSelectedItem();
     }
 
     private int getSelectedSongId() {
-        return songIdsMap.get(getSelectedSong());
+        return songIdsMap.get(getSelectedSongTitle());
+    }
+
+    private Song loadSelectedSong() {
+        return songService.get().getStore().get(getSelectedSongId());
     }
 
     private Map<Integer, String> getSongTitles() {
@@ -121,5 +130,14 @@ public class SongViewerController {
             }
         }
         return titles;
+    }
+
+    public void onGeneratePPTX(ActionEvent event) throws IOException {
+        Song song = loadSelectedSong();
+        SongSlidesGenerator.generate(song, appContext.getRelativePath("templates/test-template.pptx"),
+                appContext.getRelativePath("test.pptx"), List.of("zh_cn", "en_us"), 2);
+    }
+
+    public void onGenerateGSlides(ActionEvent event) {
     }
 }
