@@ -60,9 +60,9 @@ public class SongEditorController {
 
         setupTitleLyricsTabs(song);
 
-        String verseOrder = song.getVerseOrder();
-        if (verseOrder != null && !verseOrder.isEmpty()) {
-            verseOrderInput.setText(verseOrder);
+        List<String> verseOrder = song.getVerseOrder();
+        if (!verseOrder.isEmpty()) {
+            verseOrderInput.setText(String.join(",", verseOrder));
         }
 
         refreshVerseOrderList();
@@ -221,7 +221,7 @@ public class SongEditorController {
         song.setCopyright(copyrightInput.getText());
         song.setComments(commentsInput.getText());
         song.setPublisher(publisherInput.getText());
-        song.setVerseOrder(verseOrderInput.getText());
+        song.setVerseOrder(StringUtils.split(verseOrderInput.getText(), ","));
 
         lyricsEditorMap.forEach((locale, lyricsEditor) -> {
             song.setTitle(locale, lyricsEditor.getTitle());

@@ -8,6 +8,7 @@ import com.scottmo.services.songs.openLyrics.model.OpenLyricsSong;
 import com.scottmo.services.songs.openLyrics.model.OpenLyricsSongBook;
 import com.scottmo.services.songs.openLyrics.model.OpenLyricsTitle;
 import com.scottmo.services.songs.openLyrics.model.OpenLyricsVerse;
+import com.scottmo.util.StringUtils;
 
 import java.util.List;
 
@@ -34,7 +35,7 @@ public class OpenLyricsConverter {
                 song.setEntry(songBook.getEntry());
             }
             song.setComments(olsong.getProperties().getComments());
-            song.setVerseOrder(olsong.getProperties().getVerseOrder());
+            song.setVerseOrder(StringUtils.split(olsong.getProperties().getVerseOrder(), ","));
             song.setVerses(olsong.getVerses().stream()
                     .map(v -> new SongVerse(v.getName(), v.getLines(), v.getLang())).toList());
             return song;
@@ -55,7 +56,7 @@ public class OpenLyricsConverter {
             olsong.getProperties().setPublisher(song.getPublisher());
             olsong.getProperties().setSongbooks(List.of(new OpenLyricsSongBook(song.getSongBook(), song.getEntry())));
             olsong.getProperties().setComments(song.getComments());
-            olsong.getProperties().setVerseOrder(song.getVerseOrder());
+            olsong.getProperties().setVerseOrder(String.join(",", song.getVerseOrder()));
             olsong.setVerses(song.getVerses().stream()
                     .map(v -> new OpenLyricsVerse(v.getName(), v.getLocale(), v.getText())).toList());
 

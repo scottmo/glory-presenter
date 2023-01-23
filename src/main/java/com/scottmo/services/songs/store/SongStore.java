@@ -74,7 +74,10 @@ public final class SongStore {
                 if (Strings.isNotEmpty(authors)) {
                     song.setAuthors(Arrays.stream(authors.split(",")).toList());
                 }
-                song.setVerseOrder(res.getString(schema.song.verseOrder.getName()));
+                String verseOrder = res.getString(schema.song.verseOrder.getName());
+                if (Strings.isNotEmpty(verseOrder)) {
+                    song.setVerseOrder(Arrays.stream(verseOrder.split(",")).toList());
+                }
                 song.setCopyright(res.getString(schema.song.copyright.getName()));
                 song.setPublisher(res.getString(schema.song.publisher.getName()));
                 song.setSongBook(res.getString(schema.song.songbook.getName()));
@@ -146,9 +149,9 @@ public final class SongStore {
                 sql.addPreparedColumns(schema.song.comments);
                 nonEmptyFields.add(song.getComments());
             }
-            if (Strings.isNotEmpty(song.getVerseOrder())) {
+            if (!song.getVerseOrder().isEmpty()) {
                 sql.addPreparedColumns(schema.song.verseOrder);
-                nonEmptyFields.add(song.getVerseOrder());
+                nonEmptyFields.add(String.join(",", song.getVerseOrder()));
             }
             sql.validate();
             try (var stmt = db.prepareStatement(sql.toString())) {
