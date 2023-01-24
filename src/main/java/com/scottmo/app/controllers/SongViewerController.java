@@ -136,7 +136,7 @@ public class SongViewerController {
         for (var title : songService.get().getStore().getTitles(SECONDARY_LOCALE)) {
             var songId = title.getKey();
             if (titles.containsKey(songId)) {
-                titles.put(songId, titles.get(songId) + " / " + title.getValue());
+                titles.put(songId, titles.get(songId) + " - " + title.getValue());
             } else {
                 titles.put(songId, title.getValue());
             }
