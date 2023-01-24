@@ -65,7 +65,7 @@ public class SongViewerController {
         }
 
         items = FXCollections.observableArrayList();
-        items.addAll(titles.values());
+        items.addAll(titles.values().stream().sorted().toList());
         songList.setItems(items);
 
         if (items.size() > 0) {
