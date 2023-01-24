@@ -26,6 +26,20 @@ final class TemplatingUtil {
                 .collect(Collectors.joining("\n"));
     }
 
+    public static void removeAllTexts(XSLFSlide slide, String regex) {
+        slide.getShapes().stream()
+                .filter(s -> s instanceof XSLFTextShape)
+                .forEach(s -> {
+                    XSLFTextShape shape = (XSLFTextShape) s;
+                    for (var pp : shape.getTextParagraphs()) {
+                        String text = pp.getText();
+                        clearText(pp);
+                        text = text.replaceAll(regex, "");
+                        setText(pp, text);
+                    }
+                });
+    }
+
     public static void replaceText(XSLFSlide slide, Map<String, String> replacements) {
         slide.getShapes().stream()
                 .filter(s -> s instanceof XSLFTextShape)
@@ -204,6 +218,10 @@ final class TemplatingUtil {
             tmplSlides.close();
         }
 
+        String placeholderTemplateRegex = placeholderTemplate.replace("%s", ".+")
+                .replace("{", "\\{")
+                .replace("}", "\\}");
+
         // now do the modifications
         try (var inStream = new FileInputStream(outputFilePath)) {
             var ppt = new XMLSlideShow(inStream);
@@ -211,7 +229,8 @@ final class TemplatingUtil {
                 var slide = ppt.getSlides().get(i);
                 Map<String, String> values = contents.get(i).entrySet().stream()
                                 .collect(Collectors.toMap(e -> placeholderTemplate.formatted(e.getKey()), e -> e.getValue()));
-                TemplatingUtil.replaceText(slide, values);
+                replaceText(slide, values);
+                removeAllTexts(slide, placeholderTemplateRegex);
             }
             try (var outStream = new FileOutputStream(outputFilePath)) {
                 ppt.write(outStream);
