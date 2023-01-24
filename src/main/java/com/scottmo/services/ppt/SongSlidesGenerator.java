@@ -16,8 +16,8 @@ import java.util.stream.IntStream;
 public class SongSlidesGenerator {
 
     // placeholder keys
-    private static final String VERSE_PREFIX = "verse_";
-    private static final String TITLE_PREFIX = "title_";
+    private static final String VERSE_PREFIX = "verse.";
+    private static final String TITLE_PREFIX = "title.";
     private static final String SONGBOOK = "songbook";
     private static final String ENTRY = "entry";
     private static final String COPYRIGHT = "copyright";
@@ -43,10 +43,8 @@ public class SongSlidesGenerator {
         List<String> textGroups = locales.stream().map(s -> VERSE_PREFIX + s).toList();
         List<Map<String, String>> lyrics = getSectionTexts(getOrderedVerses(song), textGroups, maxLines);
         // make song metadata also available to verse slides
-        for (int i = 0; i < song.getVerseOrder().size(); i++) {
-            Map<String, String> verse = lyrics.get(i);
+        for (Map<String, String> verse : lyrics) {
             verse.putAll(songMetadata);
-            verse.put("verseName", song.getVerseOrder().get(i));
         }
         slideContents.addAll(lyrics);
 
