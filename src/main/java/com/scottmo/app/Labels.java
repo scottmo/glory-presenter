@@ -7,7 +7,7 @@ public class Labels {
     public static final String TAB_ADD_LOCALE = "+";
 
     public static final String MODAL_NEW_SONG_TITLE = "New Song";
-    public static final String MODAL_EDIT_SONG_TITLE = "New Song";
+    public static final String MODAL_EDIT_SONG_TITLE = "Edit Song";
     public static final String MODAL_DELETE_SONG_TITLE = "Delete \"%s\" ?";
 
     public static final String BTN_EDIT_VERSE = "Edit";
