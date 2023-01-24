@@ -13,7 +13,6 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-
 <GridPane hgap="5.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.scottmo.app.controllers.SongViewerController">
    <columnConstraints>
       <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" />
@@ -65,7 +64,7 @@
             <VBox>
                <children>
                   <Label text="Lines Per Slide" />
-                  <Spinner fx:id="linesPerSlideInput" editable="true" />
+                  <Spinner fx:id="linesPerSlideInput" />
                   <Label text="Template" />
                   <TextField fx:id="templatePathInput" text="template-song.pptx" />
                   <Button mnemonicParsing="false" onAction="#onGeneratePPTX" text="Generate PPTX" />
