@@ -28,6 +28,7 @@ public final class AppContext {
     public static final String CONFIG_PATH = "./config.json";
 
     private static final String OUTPUT_DIR = "../output"; // same level as data
+    private static final String TEMPLATE_DIR = "templates";
 
     private AppConfig _config;
 
@@ -56,5 +57,9 @@ public final class AppContext {
 
     public String getOutputDir(String fileName) {
         return getRelativePath(Path.of(OUTPUT_DIR, fileName).toString());
+    }
+
+    public String getPPTXTemplate(String fileName) {
+        return getRelativePath(Path.of(TEMPLATE_DIR, fileName).toString());
     }
 }
