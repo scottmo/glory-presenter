@@ -62,7 +62,7 @@ public class SongEditorController {
 
         List<String> verseOrder = song.getVerseOrder();
         if (!verseOrder.isEmpty()) {
-            verseOrderInput.setText(String.join(",", verseOrder));
+            verseOrderInput.setText(String.join(", ", verseOrder));
         }
 
         refreshVerseOrderList();
