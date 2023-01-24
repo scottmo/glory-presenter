@@ -13,7 +13,10 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.control.Spinner;
+import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -39,9 +42,17 @@ public class SongViewerController {
 
     public TextField searchInput;
     public ListView<String> songList;
+    public Label totalNumSong;
+
+    public Spinner<Integer> linesPerSlideInput;
+    public TextField templatePathInput;
 
     public void initialize() {
-        Platform.runLater(this::refreshSongList);
+        Platform.runLater(() -> {
+            refreshSongList();
+
+            linesPerSlideInput.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 20, 2));
+        });
     }
 
     private void refreshSongList() {
@@ -60,6 +71,7 @@ public class SongViewerController {
         if (items.size() > 0) {
             songList.getSelectionModel().selectFirst();
         }
+        totalNumSong.setText(String.valueOf(items.size()));
     }
 
     public void onSearchSong(KeyEvent keyEvent) {
@@ -124,7 +136,7 @@ public class SongViewerController {
         for (var title : songService.get().getStore().getTitles(SECONDARY_LOCALE)) {
             var songId = title.getKey();
             if (titles.containsKey(songId)) {
-                titles.put(songId, titles.get(songId) + " | " + title.getValue());
+                titles.put(songId, titles.get(songId) + " / " + title.getValue());
             } else {
                 titles.put(songId, title.getValue());
             }
@@ -134,8 +146,9 @@ public class SongViewerController {
 
     public void onGeneratePPTX(ActionEvent event) throws IOException {
         Song song = loadSelectedSong();
-        SongSlidesGenerator.generate(song, appContext.getRelativePath("templates/test-template.pptx"),
-                appContext.getRelativePath("test.pptx"), List.of("zh_cn", "en_us"), 2);
+        String outputFileName = getSelectedSongTitle() + ".pptx";
+        SongSlidesGenerator.generate(song, appContext.getPPTXTemplate(templatePathInput.getText()),
+                appContext.getOutputDir(outputFileName), List.of("zh_cn", "en_us"), linesPerSlideInput.getValue());
     }
 
     public void onGenerateGSlides(ActionEvent event) {
