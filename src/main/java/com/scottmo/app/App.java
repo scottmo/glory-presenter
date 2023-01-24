@@ -10,7 +10,8 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.stage.Stage;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.util.Objects;
@@ -20,7 +21,7 @@ import static com.scottmo.config.AppContext.*;
 
 public class App extends Application implements AppLogger {
 
-    private static final Logger logger = Logger.getLogger(App.class.getName());
+    private final Logger logger = LogManager.getRootLogger();
 
     private final Supplier<AppLoggerService> appLoggerService = ServiceSupplier.get(AppLoggerService.class);
 
