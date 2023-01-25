@@ -2,7 +2,6 @@ package com.scottmo.data.bibleMetadata;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Strings;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,7 +26,7 @@ public class BibleMetadata {
     }
 
     public static int getBookIndex(String id) {
-        if (!Strings.isNullOrEmpty(id)) {
+        if (id != null && !id.isEmpty()) {
             BookMetadata bookMetadata = bookInfoMap.get(id);
             if (bookMetadata != null) {
                 return bookMetadata.index();

@@ -6,7 +6,7 @@
 
     <groupId>com.scottmo</groupId>
     <artifactId>glory-presenter</artifactId>
-    <version>1.1-SNAPSHOT</version>
+    <version>2.0</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -76,12 +76,6 @@
             <artifactId>jackson-dataformat-xml</artifactId>
             <version>2.14.0</version>
         </dependency>
-        <!-- for de/encoding google auth tokens -->
-        <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-            <version>2.8.9</version>
-        </dependency>
         <!-- db -->
         <dependency>
             <groupId>org.xerial</groupId>
@@ -105,27 +99,6 @@
             <artifactId>junit</artifactId>
             <version>4.13.2</version>
             <scope>compile</scope>
-        </dependency>
-        <!-- google apis -->
-        <dependency>
-            <groupId>com.google.api-client</groupId>
-            <artifactId>google-api-client</artifactId>
-            <version>1.33.0</version>
-        </dependency>
-        <dependency>
-            <groupId>com.google.oauth-client</groupId>
-            <artifactId>google-oauth-client-jetty</artifactId>
-            <version>1.32.1</version>
-        </dependency>
-        <dependency>
-            <groupId>com.google.apis</groupId>
-            <artifactId>google-api-services-slides</artifactId>
-            <version>v1-rev20210820-1.32.1</version>
-        </dependency>
-        <dependency>
-            <groupId>com.google.apis</groupId>
-            <artifactId>google-api-services-drive</artifactId>
-            <version>v3-rev20220815-2.0.0</version>
         </dependency>
         <!-- logger -->
         <dependency>
