@@ -20,8 +20,11 @@ import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -51,8 +54,27 @@ public class SongViewerController {
         Platform.runLater(() -> {
             refreshSongList();
 
+            templatePathInput.setOnMouseClicked(this::selectTemplateFile);
             linesPerSlideInput.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 20, 2));
         });
+    }
+
+    private void selectTemplateFile(MouseEvent event) {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Choose Template");
+        File pptxTemplateDir = new File(appContext.getPPTXTemplate(""));
+        fileChooser.setInitialDirectory(pptxTemplateDir);
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PPTX files (*.pptx)", "*.pptx"));
+        File selectedFile = fileChooser.showOpenDialog(getStage());
+        // selected new template file
+        if (selectedFile != null) {
+            // show just the file name if file is in template folder, otherwise ues full path
+            if (selectedFile.getParentFile().getAbsolutePath().equals(pptxTemplateDir.getAbsolutePath())) {
+                templatePathInput.setText(selectedFile.getName());
+            } else {
+                templatePathInput.setText(selectedFile.getAbsolutePath());
+            }
+        }
     }
 
     private void refreshSongList() {
@@ -146,11 +168,19 @@ public class SongViewerController {
 
     public void onGeneratePPTX(ActionEvent event) throws IOException {
         Song song = loadSelectedSong();
-        String outputFileName = getSelectedSongTitle() + ".pptx";
-        SongSlidesGenerator.generate(song, appContext.getPPTXTemplate(templatePathInput.getText()),
-                appContext.getOutputDir(outputFileName), List.of("zh_cn", "en_us"), linesPerSlideInput.getValue());
+        String outputFilePath = appContext.getOutputDir(getSelectedSongTitle() + ".pptx");
+        String templateFilePath = templatePathInput.getText();
+        if (!templateFilePath.contains("/")) {
+            templateFilePath = appContext.getPPTXTemplate(templateFilePath);
+        }
+        SongSlidesGenerator.generate(song, templateFilePath,
+                outputFilePath, List.of("zh_cn", "en_us"), linesPerSlideInput.getValue());
     }
 
     public void onGenerateGSlides(ActionEvent event) {
+    }
+
+    private Stage getStage() {
+        return (Stage) templatePathInput.getScene().getWindow();
     }
 }
