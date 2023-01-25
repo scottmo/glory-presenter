@@ -61,7 +61,6 @@ public class SongViewerController {
 
     private void selectTemplateFile(MouseEvent event) {
         FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Choose Template");
         File pptxTemplateDir = new File(appContext.getPPTXTemplate(""));
         fileChooser.setInitialDirectory(pptxTemplateDir);
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PPTX files (*.pptx)", "*.pptx"));
