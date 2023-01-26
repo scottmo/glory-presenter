@@ -7,7 +7,6 @@ import com.healthmarketscience.sqlbuilder.SelectQuery;
 import com.healthmarketscience.sqlbuilder.UpdateQuery;
 import com.scottmo.data.song.Song;
 import com.scottmo.data.song.SongVerse;
-
 import com.scottmo.util.StringUtils;
 import javafx.util.Pair;
 import org.apache.logging.log4j.util.Strings;
@@ -18,7 +17,6 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static com.scottmo.config.AppContext.PRIMARY_LOCALE;
@@ -73,11 +71,11 @@ public final class SongStore {
             if (res.next()) {
                 String authors = res.getString(schema.song.authors.getName());
                 if (Strings.isNotEmpty(authors)) {
-                    song.setAuthors(StringUtils.split(authors, ","));
+                    song.setAuthors(StringUtils.split(authors));
                 }
                 String verseOrder = res.getString(schema.song.verseOrder.getName());
                 if (Strings.isNotEmpty(verseOrder)) {
-                    song.setVerseOrder(StringUtils.split(verseOrder, ","));
+                    song.setVerseOrder(StringUtils.split(verseOrder));
                 }
                 song.setCopyright(res.getString(schema.song.copyright.getName()));
                 song.setPublisher(res.getString(schema.song.publisher.getName()));
@@ -225,7 +223,7 @@ public final class SongStore {
                 .addSetClause(schema.song.songbook, song.getSongBook())
                 .addSetClause(schema.song.entry, song.getEntry())
                 .addSetClause(schema.song.comments, song.getComments())
-                .addSetClause(schema.song.verseOrder, song.getVerseOrder())
+                .addSetClause(schema.song.verseOrder, String.join(",", song.getVerseOrder()))
                 .validate();
             stmt.executeUpdate(sql.toString());
 
