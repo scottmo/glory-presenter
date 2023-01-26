@@ -221,7 +221,7 @@ public class SongEditorController {
         song.setCopyright(copyrightInput.getText());
         song.setComments(commentsInput.getText());
         song.setPublisher(publisherInput.getText());
-        song.setVerseOrder(StringUtils.split(verseOrderInput.getText(), ","));
+        song.setVerseOrder(StringUtils.split(verseOrderInput.getText()));
 
         lyricsEditorMap.forEach((locale, lyricsEditor) -> {
             song.setTitle(locale, lyricsEditor.getTitle());
