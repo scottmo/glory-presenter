@@ -136,8 +136,7 @@ public class SongViewerController {
         try {
             SongSlidesGenerator.generate(song, templateFilePath,
                     outputFilePath, appContext.getConfig().locales(), linesPerSlideInput.getValue());
-            Alert alert = new Alert(Alert.AlertType.NONE, "Generated slides at " + outputFilePath, ButtonType.CLOSE);
-            alert.showAndWait();
+            logger.get().info("Generated slides at " + outputFilePath);
         } catch (IOException e) {
             logger.get().error("Failed to generate slides!", e);
         }
@@ -147,18 +146,19 @@ public class SongViewerController {
         FileChooser fileChooser = new FileChooser();
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("OpenLyrics (*.xml)", "*.xml"));
         List<File> selectedFiles = fileChooser.showOpenMultipleDialog(getStage());
-        for (File file : selectedFiles) {
-            try {
-                String openLyricsXML = Files.readString(file.toPath(), StandardCharsets.UTF_8);
-                Song song = songService.get().getOpenLyricsConverter().deserialize(openLyricsXML);
-                songService.get().getStore().store(song);
-            } catch (IOException e) {
-                logger.get().error("Failed to import song [%s]!".formatted(file.getName()), e);
+        if (selectedFiles != null) {
+            for (File file : selectedFiles) {
+                try {
+                    String openLyricsXML = Files.readString(file.toPath(), StandardCharsets.UTF_8);
+                    Song song = songService.get().getOpenLyricsConverter().deserialize(openLyricsXML);
+                    songService.get().getStore().store(song);
+                } catch (IOException e) {
+                    logger.get().error("Failed to import song [%s]!".formatted(file.getName()), e);
+                }
             }
+            refreshSongList();
+            logger.get().info("Done importing songs!");
         }
-        refreshSongList();
-        Alert alert = new Alert(Alert.AlertType.NONE, "Done importing songs!", ButtonType.CLOSE);
-        alert.showAndWait();
     }
 
     public void onExportSong(ActionEvent event) {
@@ -168,8 +168,7 @@ public class SongViewerController {
         String songXML = songService.get().getOpenLyricsConverter().serialize(song);
         try {
             Files.writeString(Path.of(outputFilePath), songXML, StandardCharsets.UTF_8);
-            Alert alert = new Alert(Alert.AlertType.NONE, "Exported song at " + outputFilePath, ButtonType.CLOSE);
-            alert.showAndWait();
+            logger.get().info("Exported song at " + outputFilePath);
         } catch (IOException e) {
             logger.get().error("Failed to export song [%s]!".formatted(songTitle), e);
         }
