@@ -7,7 +7,13 @@ public class AppLoggerService implements Service {
     public void registerLogger(AppLogger logger) {
         appLogger = logger;
     }
-    public AppLogger get() {
-        return appLogger;
+    public void info(String msg) {
+        appLogger.info(msg);
+    }
+    public void warn(String msg) {
+        appLogger.warn(msg);
+    }
+    public void error(String msg, Throwable e) {
+        appLogger.error(msg, e);
     }
 }

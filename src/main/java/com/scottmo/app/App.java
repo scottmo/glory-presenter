@@ -8,6 +8,7 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
@@ -34,14 +35,20 @@ public class App extends Application implements AppLogger {
 
     @Override
     public void warn(String msg) {
-        // pop up
+        Alert alert = new Alert(Alert.AlertType.WARNING);
+        alert.setContentText(msg);
+        alert.showAndWait();
     }
 
     @Override
     public void error(String msg, Throwable e) {
-        // pop up + log to file
         logger.error(msg, e);
         e.printStackTrace();
+
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(msg);
+        alert.setContentText(e.getMessage());
+        alert.showAndWait();
     }
 
     @Override
