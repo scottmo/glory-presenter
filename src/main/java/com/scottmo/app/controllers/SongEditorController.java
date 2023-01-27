@@ -2,6 +2,7 @@ package com.scottmo.app.controllers;
 
 import com.scottmo.app.Labels;
 import com.scottmo.app.views.TileLyricsEditor;
+import com.scottmo.app.views.ViewUtil;
 import com.scottmo.data.song.Song;
 import com.scottmo.data.song.SongVerse;
 import com.scottmo.services.ServiceSupplier;
@@ -246,7 +247,7 @@ public class SongEditorController {
     }
 
     private Stage getStage() {
-        return (Stage) verseOrderInput.getScene().getWindow();
+        return ViewUtil.get().getStage(verseOrderInput);
     }
 
 }
