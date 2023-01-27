@@ -13,6 +13,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import static com.scottmo.services.ppt.TemplatingUtil.PLACEHOLDER_TEMPLATE;
+
 public class SongSlidesGenerator {
 
     // placeholder keys
@@ -22,7 +24,6 @@ public class SongSlidesGenerator {
     private static final String ENTRY = "entry";
     private static final String COPYRIGHT = "copyright";
     private static final String PUBLISHER = "publisher";
-    private static final String PLACEHOLDER_TEMPLATE = "{%s}";
 
     public static void generate(Song song, String tmplFilePath, String outputFilePath, List<String> locales,
             int maxLines, boolean hasStartSlide, boolean hasEndSlide) throws IOException {
@@ -72,19 +73,15 @@ public class SongSlidesGenerator {
      */
     public static List<Map<String, List<String>>> getOrderedVerses(Song song) {
         List<Map<String, List<String>>> orderedVerses = new ArrayList<>(song.getVerseOrder().size());
-        for (int i = 0; i < song.getVerseOrder().size(); i++) {
-            orderedVerses.add(new HashMap<>());
+        for (String verseName : song.getVerseOrder()) {
+            Map<String, List<String>> verseGroup = new HashMap<>();
+            for (SongVerse verse : song.getVerses()) {
+                if (verse.getName().equals(verseName)) {
+                    verseGroup.put(VERSE_PREFIX + verse.getLocale(), StringUtils.split(verse.getText(), "\n"));
+                }
+            }
+            orderedVerses.add(verseGroup);
         }
-
-        Map<String, Integer> verseOrderMap = new HashMap<>();
-        for (int i = 0; i < song.getVerseOrder().size(); i++) {
-            verseOrderMap.put(song.getVerseOrder().get(i), i);
-        }
-        for (SongVerse verse : song.getVerses()) {
-            Map<String, List<String>> verseGroup = orderedVerses.get(verseOrderMap.get(verse.getName()));
-            verseGroup.put(VERSE_PREFIX + verse.getLocale(), StringUtils.split(verse.getText(), "\n"));
-        }
-
         return orderedVerses;
     }
 
