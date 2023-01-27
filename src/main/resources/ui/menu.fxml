@@ -5,9 +5,6 @@
 <?import javafx.scene.control.MenuItem?>
 
 <MenuBar prefWidth="900.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.scottmo.app.controllers.MenuController">
-    <Menu mnemonicParsing="false" text="Actions">
-        <MenuItem mnemonicParsing="false" text="Import Bible" />
-    </Menu>
     <Menu mnemonicParsing="false" text="Preferences">
         <MenuItem mnemonicParsing="false" onAction="#onToggleDarkMode" text="Toggle Dark Mode" />
     </Menu>
