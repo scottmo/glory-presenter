@@ -36,7 +36,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
-public class SongViewerController {
+public class SongTabController {
     private static final String VERSE_EDITOR_FXML = "/ui/songEditor.fxml";
 
     private final AppContext appContext = ServiceSupplier.getAppContext();
