@@ -5,8 +5,10 @@ import com.healthmarketscience.sqlbuilder.DeleteQuery;
 import com.healthmarketscience.sqlbuilder.InsertQuery;
 import com.healthmarketscience.sqlbuilder.SelectQuery;
 import com.healthmarketscience.sqlbuilder.UpdateQuery;
+import com.scottmo.config.AppContext;
 import com.scottmo.data.song.Song;
 import com.scottmo.data.song.SongVerse;
+import com.scottmo.services.ServiceSupplier;
 import com.scottmo.util.StringUtils;
 import javafx.util.Pair;
 import org.apache.logging.log4j.util.Strings;
@@ -19,9 +21,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.scottmo.config.AppContext.PRIMARY_LOCALE;
-
 public final class SongStore {
+    private final AppContext appContext = ServiceSupplier.getAppContext();
+
     private static final String DB_NAME = "songs";
     private final SongSchema schema = new SongSchema();
     private final Connection db;
@@ -40,7 +42,7 @@ public final class SongStore {
     }
 
     public List<Pair<Integer, String>> getTitles(String locale) {
-        if (locale == null) locale = PRIMARY_LOCALE;
+        if (locale == null) locale = appContext.getPrimaryLocale();
 
         List<Pair<Integer, String>> songTitles = new ArrayList<>();
 

@@ -62,7 +62,7 @@ public final class PPTXGenerators {
         var sections = content.getSections();
         if (sections == null || sections.isEmpty()) return;
 
-        String title = content.getJoinedTitle(appContext.getConfig().googleSlideConfig().textConfigsOrder());
+        String title = content.getJoinedTitle(appContext.getConfig().locales());
         String outputFilePath = Path.of(outputDirPath, title + ".pptx").toString();
 
         // Duplicate slide to match number of records.

@@ -1,5 +1,7 @@
 package com.scottmo.data.song;
 
+import com.scottmo.config.AppContext;
+import com.scottmo.services.ServiceSupplier;
 import com.scottmo.util.LocaleUtil;
 import com.scottmo.util.StringUtils;
 
@@ -9,9 +11,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.scottmo.config.AppContext.PRIMARY_LOCALE;
-
 public class Song {
+    private final AppContext appContext = ServiceSupplier.getAppContext();
+
     private int id = -1;
 
     private final Map<String, String> titles = new HashMap<>();
@@ -40,8 +42,8 @@ public class Song {
      */
     public String getPrimaryLocale() {
         List<String> locales = this.getLocales();
-        if (locales.isEmpty() || locales.contains(PRIMARY_LOCALE)) {
-            return PRIMARY_LOCALE;
+        if (locales.isEmpty() || locales.contains(appContext.getPrimaryLocale())) {
+            return appContext.getPrimaryLocale();
         }
         return locales.get(0);
     }

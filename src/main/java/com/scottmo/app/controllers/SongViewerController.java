@@ -35,9 +35,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
-import static com.scottmo.config.AppContext.PRIMARY_LOCALE;
-import static com.scottmo.config.AppContext.SECONDARY_LOCALE;
-
 public class SongViewerController {
     private static final String VERSE_EDITOR_FXML = "/ui/songEditor.fxml";
 
@@ -136,7 +133,7 @@ public class SongViewerController {
         }
         try {
             SongSlidesGenerator.generate(song, templateFilePath,
-                    outputFilePath, List.of("zh_cn", "en_us"), linesPerSlideInput.getValue());
+                    outputFilePath, appContext.getConfig().locales(), linesPerSlideInput.getValue());
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
             alert.setTitle("Success!");
             alert.setContentText("Generated slides at " + outputFilePath);
@@ -190,18 +187,26 @@ public class SongViewerController {
     }
 
     private Map<Integer, String> getSongTitles() {
+        List<String> locales = appContext.getConfig().locales();
         Map<Integer, String> titles = new HashMap<>();
-        for (var title : songService.get().getStore().getTitles(PRIMARY_LOCALE)) {
+        for (var title : songService.get().getStore().getTitles(locales.get(0))) {
             titles.put(title.getKey(), title.getValue());
         }
-        for (var title : songService.get().getStore().getTitles(SECONDARY_LOCALE)) {
-            var songId = title.getKey();
-            if (titles.containsKey(songId)) {
-                titles.put(songId, titles.get(songId) + " - " + title.getValue());
-            } else {
-                titles.put(songId, title.getValue());
+        if (locales.size() > 0) {
+            for (int i = 1; i < locales.size(); i++) {
+                for (var title : songService.get().getStore().getTitles(locales.get(i))) {
+                    Integer songId = title.getKey();
+                    String additionalTitle = title.getValue();
+                    if (titles.containsKey(songId)) {
+                        String currentTitle = titles.get(songId);
+                        titles.put(songId, currentTitle + " - " + additionalTitle);
+                    } else {
+                        titles.put(songId, additionalTitle);
+                    }
+                }
             }
         }
+
         return titles;
     }
 

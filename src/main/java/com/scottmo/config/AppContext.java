@@ -11,34 +11,32 @@ import java.nio.file.Path;
 
 public final class AppContext {
     public static final String APP_NAME = "Glory Presenter";
-
     public static final int APP_WIDTH = 900;
     public static final int APP_HEIGHT = 600;
 
-    // TODO: make this configurable
-    public static final String PRIMARY_LOCALE = LocaleUtil.DEFAULT_LOCALE;
-    public static final String SECONDARY_LOCALE = LocaleUtil.normalize("zh_CN");
-
-    public static final String CONTENTS_DIR = "contents";
-    public static final String CONTENTS_SLIDE_DIR = "contents_slide";
-
     public static final String CONFIG_PATH = "./config.json";
-
     private static final String OUTPUT_DIR = "../output"; // same level as data
     private static final String TEMPLATE_DIR = "templates";
 
-    private AppConfig _config;
+    private AppConfig appConfig;
 
     public AppConfig getConfig() {
-        if (_config == null) {
+        if (appConfig == null) {
             reload();
         }
-        return _config;
+        if (appConfig.locales().isEmpty()) {
+            appConfig.locales().add(LocaleUtil.DEFAULT_LOCALE);
+        }
+        int i = 0;
+        for (String locale: appConfig.locales()) {
+            appConfig.locales().set(i++, LocaleUtil.normalize(locale));
+        }
+        return appConfig;
     }
 
     public void reload() {
         try (BufferedReader bufferReader = Files.newBufferedReader((Path.of(CONFIG_PATH)))) {
-            _config = new ObjectMapper().readValue(bufferReader, AppConfig.class);
+            appConfig = new ObjectMapper().readValue(bufferReader, AppConfig.class);
         } catch (IOException e) {
             throw new RuntimeException("Unable to load config file!", e);
         }
@@ -58,5 +56,9 @@ public final class AppContext {
 
     public String getPPTXTemplate(String fileName) {
         return getRelativePath(Path.of(TEMPLATE_DIR, fileName).toString());
+    }
+
+    public String getPrimaryLocale() {
+        return appConfig.locales().get(0);
     }
 }
