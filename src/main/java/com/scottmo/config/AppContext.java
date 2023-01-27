@@ -6,6 +6,7 @@ import com.scottmo.util.LocaleUtil;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -35,7 +36,15 @@ public final class AppContext {
     }
 
     public void reload() {
-        try (BufferedReader bufferReader = Files.newBufferedReader((Path.of(CONFIG_PATH)))) {
+        Path configPath = Path.of(CONFIG_PATH);
+        if (!Files.exists(configPath)) {
+            try (InputStream in = AppContext.class.getClassLoader().getResourceAsStream("config.json")) {
+                Files.copy(in, configPath);
+            } catch (IOException e) {
+                throw new RuntimeException("Unable to create config.json!");
+            }
+        }
+        try (BufferedReader bufferReader = Files.newBufferedReader(configPath)) {
             appConfig = new ObjectMapper().readValue(bufferReader, AppConfig.class);
         } catch (IOException e) {
             throw new RuntimeException("Unable to load config file!", e);
