@@ -175,36 +175,37 @@ final class TemplatingUtil {
      * @param outputFilePath output pptx
      * @throws IOException
      */
-    public static void generateSlideShow(List<Map<String, String>> contents, String placeholderTemplate,
-                                         String tmplFilePath, String outputFilePath) throws IOException {
+    public static void generateSlideShow(List<Map<String, String>> contents, boolean hasStartContent, boolean hasEndContent,
+                                         String placeholderTemplate, String tmplFilePath, String outputFilePath) throws IOException {
         // make copies of template slides first and write
         // since for some reason the pptx reference is not able to modify the new copies in memory
         try (var inStream = new FileInputStream(tmplFilePath)) {
             var tmplSlides = new XMLSlideShow(inStream);
-
-            var numPlaceholderSlides = tmplSlides.getSlides().size();
-            var hasStartSlide = numPlaceholderSlides > 1;
-            var hasEndSlide = numPlaceholderSlides > 2;
-
+            int numPlaceholderSlides = tmplSlides.getSlides().size();
             // start slide if present
             XSLFSlide srcSlide;
-            if (hasStartSlide) {
+            if (hasStartContent) {
                 srcSlide = tmplSlides.getSlides().get(0);
                 duplicateSlide(tmplSlides, srcSlide);
             }
 
-            // content slides
-            int numContentSlides = contents.size();
-            if (hasStartSlide) numContentSlides--;
-            if (hasEndSlide) numContentSlides--;
-            srcSlide = tmplSlides.getSlides().get(1);
-            for (int j = 0; j < numContentSlides; j++) {
+            // content slides, alternate each content template slide if there are multiple
+            int contentStartIndex = hasStartContent ? 1 : 0;
+            int contentEndIndex = hasEndContent ? contents.size() - 1 : contents.size();
+            int contentTmplEndIndex = hasEndContent ? numPlaceholderSlides - 1 : numPlaceholderSlides;
+            int contentTmplSlideIndex = contentStartIndex;
+            for (int j = contentStartIndex; j < contentEndIndex; j++) {
+                srcSlide = tmplSlides.getSlides().get(contentTmplSlideIndex);
                 duplicateSlide(tmplSlides, srcSlide);
+                contentTmplSlideIndex++;
+                if (contentTmplSlideIndex == contentTmplEndIndex) {
+                    contentTmplSlideIndex = contentStartIndex;
+                }
             }
 
             // end slide if present
-            if (hasEndSlide) {
-                srcSlide = tmplSlides.getSlides().get(2);
+            if (hasEndContent) {
+                srcSlide = tmplSlides.getSlides().get(numPlaceholderSlides - 1);
                 duplicateSlide(tmplSlides, srcSlide);
             }
 
