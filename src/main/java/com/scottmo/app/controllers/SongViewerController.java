@@ -5,6 +5,7 @@ import com.scottmo.app.views.ViewUtil;
 import com.scottmo.config.AppContext;
 import com.scottmo.data.song.Song;
 import com.scottmo.services.ServiceSupplier;
+import com.scottmo.services.logging.AppLoggerService;
 import com.scottmo.services.ppt.SongSlidesGenerator;
 import com.scottmo.services.songs.SongService;
 import javafx.application.Platform;
@@ -40,8 +41,9 @@ import static com.scottmo.config.AppContext.SECONDARY_LOCALE;
 public class SongViewerController {
     private static final String VERSE_EDITOR_FXML = "/ui/songEditor.fxml";
 
-    private final Supplier<SongService> songService = ServiceSupplier.get(SongService.class);
     private final AppContext appContext = ServiceSupplier.getAppContext();
+    private final Supplier<SongService> songService = ServiceSupplier.get(SongService.class);
+    private final Supplier<AppLoggerService> logger = ServiceSupplier.get(AppLoggerService.class);
 
     private final Map<String, Integer> songIdsMap = new HashMap<>();
     private ObservableList<String> items;
@@ -125,18 +127,23 @@ public class SongViewerController {
         }
     }
 
-    public void onGeneratePPTX(ActionEvent event) throws IOException {
+    public void onGeneratePPTX(ActionEvent event) {
         Song song = loadSelectedSong();
         String outputFilePath = appContext.getOutputDir(getSelectedSongTitle() + ".pptx");
         String templateFilePath = templatePathInput.getText();
         if (!templateFilePath.contains("/")) {
             templateFilePath = appContext.getPPTXTemplate(templateFilePath);
         }
-        SongSlidesGenerator.generate(song, templateFilePath,
-                outputFilePath, List.of("zh_cn", "en_us"), linesPerSlideInput.getValue());
-    }
-
-    public void onGenerateGSlides(ActionEvent event) {
+        try {
+            SongSlidesGenerator.generate(song, templateFilePath,
+                    outputFilePath, List.of("zh_cn", "en_us"), linesPerSlideInput.getValue());
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle("Success!");
+            alert.setContentText("Generated slides at " + outputFilePath);
+            alert.showAndWait();
+        } catch (IOException e) {
+            logger.get().error("Failed to generate slides!", e);
+        }
     }
 
     private void refreshSongList() {
