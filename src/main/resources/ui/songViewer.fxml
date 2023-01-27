@@ -13,67 +13,62 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<GridPane hgap="5.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.scottmo.app.controllers.SongViewerController">
-   <columnConstraints>
-      <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" />
-      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="200.0" />
-   </columnConstraints>
-   <rowConstraints>
-      <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
-   </rowConstraints>
-   <children>
-      <GridPane hgap="5.0" vgap="5.0">
-          <columnConstraints>
-              <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" />
-              <ColumnConstraints hgrow="NEVER" maxWidth="100.0" minWidth="10.0" prefWidth="100.0" />
-          </columnConstraints>
-          <rowConstraints>
-              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
-              <RowConstraints minHeight="10.0" vgrow="ALWAYS" />
-          </rowConstraints>
-          <TextField fx:id="searchInput" onKeyPressed="#onSearchSong" />
-          <VBox GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1">
-              <Button mnemonicParsing="false" onAction="#onNewSong" prefWidth="100.0" text="New" />
-              <Button mnemonicParsing="false" onAction="#onEditSong" prefWidth="100.0" text="Edit" />
-              <Button mnemonicParsing="false" onAction="#onDeleteSong" prefWidth="100.0" text="Delete" />
+<GridPane hgap="5.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1"
+          fx:controller="com.scottmo.app.controllers.SongViewerController">
+    <columnConstraints>
+        <ColumnConstraints hgrow="ALWAYS" minWidth="10.0"/>
+        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="200.0"/>
+    </columnConstraints>
+    <rowConstraints>
+        <RowConstraints minHeight="10.0" vgrow="SOMETIMES"/>
+    </rowConstraints>
+    <padding>
+        <Insets left="10.0" right="10.0" top="10.0"/>
+    </padding>
+    <GridPane hgap="5.0" vgap="5.0">
+        <columnConstraints>
+            <ColumnConstraints hgrow="ALWAYS" minWidth="10.0"/>
+            <ColumnConstraints hgrow="NEVER" maxWidth="100.0" minWidth="10.0" prefWidth="100.0"/>
+        </columnConstraints>
+        <rowConstraints>
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER"/>
+            <RowConstraints minHeight="10.0" vgrow="ALWAYS"/>
+        </rowConstraints>
+        <TextField fx:id="searchInput" onKeyPressed="#onSearchSong"/>
+        <VBox GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1">
+            <Button mnemonicParsing="false" onAction="#onNewSong" prefWidth="100.0" text="New"/>
+            <Button fx:id="editButton" mnemonicParsing="false" onAction="#onEditSong" prefWidth="100.0" text="Edit"/>
+            <Button fx:id="deleteButton" mnemonicParsing="false" onAction="#onDeleteSong" prefWidth="100.0"
+                    text="Delete"/>
             <Separator prefWidth="200.0">
-               <padding>
-                  <Insets bottom="5.0" top="5.0" />
-               </padding>
+                <padding>
+                    <Insets bottom="5.0" top="5.0"/>
+                </padding>
             </Separator>
             <HBox fillHeight="false" prefWidth="200.0">
-               <children>
-                  <Label text="Total: " />
-                  <Label fx:id="totalNumSong" text="0" />
-               </children>
+                <Label text="Total: "/>
+                <Label fx:id="totalNumSong" text="0"/>
             </HBox>
-          </VBox>
-         <ListView fx:id="songList" prefWidth="600.0" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" GridPane.vgrow="ALWAYS" />
-         <Label alignment="CENTER" prefHeight="17.0" prefWidth="100.0" text="Search" GridPane.columnIndex="1" />
-         <padding>
-            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-         </padding>
-      </GridPane>
-      <HBox GridPane.columnIndex="1">
-         <children>
-            <Separator orientation="VERTICAL">
-               <HBox.margin>
-                  <Insets right="5.0" />
-               </HBox.margin>
-            </Separator>
-            <VBox>
-               <children>
-                  <Label text="Lines Per Slide" />
-                  <Spinner fx:id="linesPerSlideInput" />
-                  <Label text="Template" />
-                  <TextField fx:id="templatePathInput" text="template-song.pptx" />
-                  <Button mnemonicParsing="false" onAction="#onGeneratePPTX" text="Generate PPTX" />
-               </children>
-            </VBox>
-         </children>
-      </HBox>
-   </children>
-   <padding>
-      <Insets left="10.0" right="10.0" top="10.0" />
-   </padding>
+        </VBox>
+        <ListView fx:id="songList" prefWidth="600.0" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1"
+                  GridPane.vgrow="ALWAYS"/>
+        <Label alignment="CENTER" prefHeight="17.0" prefWidth="100.0" text="Search" GridPane.columnIndex="1"/>
+        <padding>
+            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+        </padding>
+    </GridPane>
+    <HBox GridPane.columnIndex="1">
+        <Separator orientation="VERTICAL">
+            <HBox.margin>
+                <Insets right="5.0"/>
+            </HBox.margin>
+        </Separator>
+        <VBox>
+            <Label text="Lines Per Slide"/>
+            <Spinner fx:id="linesPerSlideInput"/>
+            <Label text="Template"/>
+            <TextField fx:id="templatePathInput" text="template-song.pptx"/>
+            <Button mnemonicParsing="false" onAction="#onGeneratePPTX" text="Generate PPTX"/>
+        </VBox>
+    </HBox>
 </GridPane>
