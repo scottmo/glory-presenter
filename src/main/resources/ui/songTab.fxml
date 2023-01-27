@@ -2,6 +2,7 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.Separator?>
@@ -72,6 +73,8 @@
             <Spinner fx:id="linesPerSlideInput" />
             <Label text="Template" />
             <TextField fx:id="templatePathInput" text="template-song.pptx" />
+         <CheckBox fx:id="hasStartSlide" mnemonicParsing="false" text="has start slide" />
+         <CheckBox fx:id="hasEndSlide" mnemonicParsing="false" text="has end slide" />
             <Button mnemonicParsing="false" onAction="#onGeneratePPTX" text="Generate PPTX" />
         </VBox>
     </HBox>

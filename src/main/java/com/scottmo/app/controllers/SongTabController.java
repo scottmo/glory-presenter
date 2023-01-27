@@ -15,6 +15,7 @@ import javafx.event.ActionEvent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Spinner;
@@ -43,6 +44,8 @@ public class SongTabController {
     private final Supplier<AppLoggerService> logger = ServiceSupplier.get(AppLoggerService.class);
 
     private final Map<String, Integer> songIdsMap = new HashMap<>();
+    public CheckBox hasStartSlide;
+    public CheckBox hasEndSlide;
     private ObservableList<String> items;
 
     public TextField searchInput;
@@ -116,8 +119,8 @@ public class SongTabController {
             templateFilePath = appContext.getPPTXTemplate(templateFilePath);
         }
         try {
-            SongSlidesGenerator.generate(song, templateFilePath,
-                    outputFilePath, appContext.getConfig().locales(), linesPerSlideInput.getValue());
+            SongSlidesGenerator.generate(song, templateFilePath, outputFilePath, appContext.getConfig().locales(),
+                    linesPerSlideInput.getValue(), hasStartSlide.isSelected(), hasEndSlide.isSelected());
             logger.get().info("Generated slides at " + outputFilePath);
         } catch (IOException e) {
             logger.get().error("Failed to generate slides!", e);

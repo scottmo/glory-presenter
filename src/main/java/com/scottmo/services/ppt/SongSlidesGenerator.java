@@ -24,9 +24,8 @@ public class SongSlidesGenerator {
     private static final String PUBLISHER = "publisher";
     private static final String PLACEHOLDER_TEMPLATE = "{%s}";
 
-    public static void generate(Song song, String tmplFilePath, String outputFilePath, List<String> locales, int maxLines) throws IOException {
-        List<Map<String, String>> slideContents = new ArrayList<>();
-
+    public static void generate(Song song, String tmplFilePath, String outputFilePath, List<String> locales,
+            int maxLines, boolean hasStartSlide, boolean hasEndSlide) throws IOException {
         // song metadata for all slides
         Map<String, String> songMetadata = new HashMap<>();
         songMetadata.put(SONGBOOK, song.getSongBook());
@@ -36,8 +35,6 @@ public class SongSlidesGenerator {
         for (String locale: song.getLocales()) {
             songMetadata.put(TITLE_PREFIX + locale, song.getTitle(locale));
         }
-        // title
-        slideContents.add(songMetadata); // add only song metadata for title
 
         // lyrics
         List<String> textGroups = locales.stream().map(s -> VERSE_PREFIX + s).toList();
@@ -46,9 +43,18 @@ public class SongSlidesGenerator {
         for (Map<String, String> verse : lyrics) {
             verse.putAll(songMetadata);
         }
-        slideContents.addAll(lyrics);
 
-        TemplatingUtil.generateSlideShow(slideContents, PLACEHOLDER_TEMPLATE, tmplFilePath, outputFilePath);
+        List<Map<String, String>> slideContents = new ArrayList<>();
+        if (hasStartSlide) {
+            slideContents.add(songMetadata);
+        }
+        slideContents.addAll(lyrics);
+        if (hasEndSlide) {
+            slideContents.add(songMetadata);
+        }
+
+        TemplatingUtil.generateSlideShow(slideContents, hasStartSlide, hasEndSlide,
+                PLACEHOLDER_TEMPLATE, tmplFilePath, outputFilePath);
     }
 
     /**
