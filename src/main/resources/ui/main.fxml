@@ -1,14 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox prefHeight="400.0" prefWidth="640.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.scottmo.app.App">
+<VBox prefHeight="400.0" prefWidth="640.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.scottmo.app.App">
     <fx:include source="menu.fxml" />
     <TabPane tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
         <Tab text="Songs">
@@ -17,11 +15,8 @@
         <Tab text="Bible">
             <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
         </Tab>
-    </TabPane>
-   <Separator prefWidth="200.0" />
-   <Label fx:id="statusLabel">
       <padding>
-         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+         <Insets bottom="10.0" />
       </padding>
-   </Label>
+    </TabPane>
 </VBox>

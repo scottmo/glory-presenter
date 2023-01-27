@@ -10,7 +10,6 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.Label;
 import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -26,8 +25,6 @@ public class App extends Application implements AppLogger {
     private final Logger logger = LogManager.getRootLogger();
 
     private final Supplier<AppLoggerService> appLoggerService = ServiceSupplier.get(AppLoggerService.class);
-
-    public Label statusLabel;
 
     @Override
     public void info(String msg) {
