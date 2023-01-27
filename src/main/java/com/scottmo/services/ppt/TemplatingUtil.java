@@ -16,6 +16,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 final class TemplatingUtil {
+    static final String PLACEHOLDER_TEMPLATE = "{%s}";
 
     public static String getText(XSLFSlide slide) {
         return slide.getShapes().stream()
