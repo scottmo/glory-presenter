@@ -35,7 +35,7 @@ public class OpenLyricsConverter {
                 song.setEntry(songBook.getEntry());
             }
             song.setComments(olsong.getProperties().getComments());
-            song.setVerseOrder(StringUtils.split(olsong.getProperties().getVerseOrder(), ","));
+            song.setVerseOrder(StringUtils.split(olsong.getProperties().getVerseOrder()));
             song.setVerses(olsong.getVerses().stream()
                     .map(v -> new SongVerse(v.getName(), v.getLines(), v.getLang())).toList());
             return song;
