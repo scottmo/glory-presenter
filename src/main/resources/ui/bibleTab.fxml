@@ -6,7 +6,7 @@
 <?import javafx.scene.layout.VBox?>
 
 
-<VBox xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.scottmo.app.controllers.BibleTabController">
+<VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.scottmo.app.controllers.BibleTabController">
    <children>
       <TextField fx:id="bibleReferenceInput" />
       <ComboBox prefWidth="150.0" />
