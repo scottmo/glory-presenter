@@ -9,8 +9,6 @@ import com.scottmo.services.logging.AppLoggerService;
 import com.scottmo.services.ppt.SongSlidesGenerator;
 import com.scottmo.services.songs.SongService;
 import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -30,6 +28,9 @@ import javafx.stage.Stage;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,6 +50,7 @@ public class SongViewerController {
     public ListView<String> songList;
     public Button editButton;
     public Button deleteButton;
+    public Button exportButton;
     public Label totalNumSong;
     public Spinner<Integer> linesPerSlideInput;
     public TextField templatePathInput;
@@ -67,14 +69,14 @@ public class SongViewerController {
             if (searchInput.getText().isEmpty()) {
                 // restore list when empty
                 songList.setItems(items);
-                toggleEditDeleteButtons(items.size() > 0);
+                toggleSongActionButtons(items.size() > 0);
             } else {
                 // search ignore case
                 var filteredItems = items.filtered(item ->
                         item.toLowerCase().contains(searchInput.getText().toLowerCase()));
                 songList.setItems(filteredItems);
 
-                toggleEditDeleteButtons(filteredItems.size() > 0);
+                toggleSongActionButtons(filteredItems.size() > 0);
             }
         }
     }
@@ -134,12 +136,42 @@ public class SongViewerController {
         try {
             SongSlidesGenerator.generate(song, templateFilePath,
                     outputFilePath, appContext.getConfig().locales(), linesPerSlideInput.getValue());
-            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-            alert.setTitle("Success!");
-            alert.setContentText("Generated slides at " + outputFilePath);
+            Alert alert = new Alert(Alert.AlertType.NONE, "Generated slides at " + outputFilePath, ButtonType.CLOSE);
             alert.showAndWait();
         } catch (IOException e) {
             logger.get().error("Failed to generate slides!", e);
+        }
+    }
+
+    public void onImportSong(ActionEvent event) {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("OpenLyrics (*.xml)", "*.xml"));
+        List<File> selectedFiles = fileChooser.showOpenMultipleDialog(getStage());
+        for (File file : selectedFiles) {
+            try {
+                String openLyricsXML = Files.readString(file.toPath(), StandardCharsets.UTF_8);
+                Song song = songService.get().getOpenLyricsConverter().deserialize(openLyricsXML);
+                songService.get().getStore().store(song);
+            } catch (IOException e) {
+                logger.get().error("Failed to import song [%s]!".formatted(file.getName()), e);
+            }
+        }
+        refreshSongList();
+        Alert alert = new Alert(Alert.AlertType.NONE, "Done importing songs!", ButtonType.CLOSE);
+        alert.showAndWait();
+    }
+
+    public void onExportSong(ActionEvent event) {
+        Song song = loadSelectedSong();
+        String songTitle = getSelectedSongTitle();
+        String outputFilePath = appContext.getOutputDir(songTitle + ".xml");
+        String songXML = songService.get().getOpenLyricsConverter().serialize(song);
+        try {
+            Files.writeString(Path.of(outputFilePath), songXML, StandardCharsets.UTF_8);
+            Alert alert = new Alert(Alert.AlertType.NONE, "Exported song at " + outputFilePath, ButtonType.CLOSE);
+            alert.showAndWait();
+        } catch (IOException e) {
+            logger.get().error("Failed to export song [%s]!".formatted(songTitle), e);
         }
     }
 
@@ -160,17 +192,19 @@ public class SongViewerController {
         if (hasItems) {
             songList.getSelectionModel().selectFirst();
         }
-        toggleEditDeleteButtons(hasItems);
+        toggleSongActionButtons(hasItems);
         totalNumSong.setText(String.valueOf(items.size()));
     }
 
-    private void toggleEditDeleteButtons(boolean isEnabled) {
+    private void toggleSongActionButtons(boolean isEnabled) {
         if (isEnabled) {
             editButton.setDisable(false);
             deleteButton.setDisable(false);
+            exportButton.setDisable(false);
         } else {
             editButton.setDisable(true);
             deleteButton.setDisable(true);
+            exportButton.setDisable(true);
         }
     }
 
