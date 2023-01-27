@@ -43,7 +43,6 @@ public class App extends Application implements AppLogger {
     @Override
     public void error(String msg, Throwable e) {
         logger.error(msg, e);
-        e.printStackTrace();
 
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(msg);
