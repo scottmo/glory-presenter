@@ -9,6 +9,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
@@ -30,7 +31,8 @@ public class App extends Application implements AppLogger {
 
     @Override
     public void info(String msg) {
-        statusLabel.setText(msg);
+        Alert alert = new Alert(Alert.AlertType.NONE, msg, ButtonType.CLOSE);
+        alert.showAndWait();
     }
 
     @Override
