@@ -9,28 +9,30 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.scottmo.app.controllers.BibleTabController">
-   <padding>
-      <Insets left="10.0" right="10.0" />
-   </padding>
-   <HBox>
-      <children>
-         <Label text="Currently Available Versions: " />
-         <Label fx:id="availableVersionsText" text="Label" />
-      </children>
-   </HBox>
-   <Button mnemonicParsing="false" onAction="#onImport" text="Import" />
-   <Separator prefWidth="200.0">
-      <padding>
-         <Insets bottom="5.0" top="5.0" />
-      </padding>
-   </Separator>
-   <Label text="Bible Passage (e.g. 2 john 1:2-3; 3:4; 5:1-3)" />
-   <HBox>
-      <TextField fx:id="bibleReferenceInput" HBox.hgrow="ALWAYS" />
-      <MenuButton fx:id="bibleBookPicker" prefWidth="150.0" text="Select Book" />
-   </HBox>
-   <Label text="Template Path" />
-   <TextField fx:id="templatePathInput" text="template-bible.pptx" />
-   <Button mnemonicParsing="false" onAction="#onGeneratePPTX" text="Generate" />
+<?import javafx.scene.control.CheckBox?>
+<VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.scottmo.app.controllers.BibleTabController">
+    <padding>
+        <Insets left="10.0" right="10.0"/>
+    </padding>
+    <HBox>
+        <Label text="Currently Available Versions: "/>
+        <Label fx:id="availableVersionsText" text="Label"/>
+    </HBox>
+    <Button mnemonicParsing="false" onAction="#onImport" text="Import"/>
+    <Separator prefWidth="200.0">
+        <padding>
+            <Insets bottom="5.0" top="5.0"/>
+        </padding>
+    </Separator>
+    <Label text="Bible Passage (e.g. 2 john 1:2-3; 3:4; 5:1-3)"/>
+    <HBox>
+        <TextField fx:id="bibleReferenceInput" HBox.hgrow="ALWAYS"/>
+        <MenuButton fx:id="bibleBookPicker" prefWidth="150.0" text="Select Book"/>
+    </HBox>
+    <Label text="Template Path"/>
+    <TextField fx:id="templatePathInput" text="template-bible.pptx"/>
+    <CheckBox fx:id="hasStartSlide" mnemonicParsing="false" text="has start slide"/>
+    <CheckBox fx:id="hasEndSlide" mnemonicParsing="false" text="has end slide"/>
+    <Button mnemonicParsing="false" onAction="#onGeneratePPTX" text="Generate"/>
 </VBox>
