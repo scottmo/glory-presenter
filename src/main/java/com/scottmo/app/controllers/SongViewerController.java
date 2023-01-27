@@ -8,10 +8,13 @@ import com.scottmo.services.ServiceSupplier;
 import com.scottmo.services.ppt.SongSlidesGenerator;
 import com.scottmo.services.songs.SongService;
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
@@ -45,8 +48,9 @@ public class SongViewerController {
 
     public TextField searchInput;
     public ListView<String> songList;
+    public Button editButton;
+    public Button deleteButton;
     public Label totalNumSong;
-
     public Spinner<Integer> linesPerSlideInput;
     public TextField templatePathInput;
 
@@ -54,12 +58,57 @@ public class SongViewerController {
         Platform.runLater(() -> {
             refreshSongList();
 
-            templatePathInput.setOnMouseClicked(this::selectTemplateFile);
+            templatePathInput.setOnMouseClicked(this::onTemplatePathInputClicked);
             linesPerSlideInput.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 20, 2));
         });
     }
 
-    private void selectTemplateFile(MouseEvent event) {
+    public void onSearchSong(KeyEvent keyEvent) {
+        if (keyEvent.getCode().equals(KeyCode.ENTER)) {
+            if (searchInput.getText().isEmpty()) {
+                // restore list when empty
+                songList.setItems(items);
+                toggleEditDeleteButtons(items.size() > 0);
+            } else {
+                // search ignore case
+                var filteredItems = items.filtered(item ->
+                        item.toLowerCase().contains(searchInput.getText().toLowerCase()));
+                songList.setItems(filteredItems);
+
+                toggleEditDeleteButtons(filteredItems.size() > 0);
+            }
+        }
+    }
+
+    public void onNewSong(ActionEvent event) throws IOException {
+        Stage verseEditorModal = ViewUtil.get().newModal(Labels.MODAL_NEW_SONG_TITLE, VERSE_EDITOR_FXML, ViewUtil.get().getOwnerWindow(event));
+        verseEditorModal.setUserData(new Song());
+        verseEditorModal.showAndWait();
+        refreshSongList();
+    }
+
+    public void onEditSong(ActionEvent event) throws IOException {
+        if (songList.getItems().size() == 0) return;
+
+        Stage verseEditorModal = ViewUtil.get().newModal(Labels.MODAL_EDIT_SONG_TITLE, VERSE_EDITOR_FXML, ViewUtil.get().getOwnerWindow(event));
+        Song song = loadSelectedSong();
+        verseEditorModal.setUserData(song);
+        verseEditorModal.show();
+    }
+
+    public void onDeleteSong(ActionEvent event) {
+        if (songList.getItems().size() == 0) return;
+
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION, Labels.MODAL_DELETE_SONG_TITLE.formatted(getSelectedSongTitle()),
+                ButtonType.YES, ButtonType.CANCEL);
+        alert.showAndWait();
+        if (alert.getResult() == ButtonType.YES) {
+            songService.get().getStore().delete(getSelectedSongId());
+        }
+        refreshSongList();
+    }
+
+    private void onTemplatePathInputClicked(MouseEvent event) {
         FileChooser fileChooser = new FileChooser();
         File pptxTemplateDir = new File(appContext.getPPTXTemplate(""));
         fileChooser.setInitialDirectory(pptxTemplateDir);
@@ -76,6 +125,20 @@ public class SongViewerController {
         }
     }
 
+    public void onGeneratePPTX(ActionEvent event) throws IOException {
+        Song song = loadSelectedSong();
+        String outputFilePath = appContext.getOutputDir(getSelectedSongTitle() + ".pptx");
+        String templateFilePath = templatePathInput.getText();
+        if (!templateFilePath.contains("/")) {
+            templateFilePath = appContext.getPPTXTemplate(templateFilePath);
+        }
+        SongSlidesGenerator.generate(song, templateFilePath,
+                outputFilePath, List.of("zh_cn", "en_us"), linesPerSlideInput.getValue());
+    }
+
+    public void onGenerateGSlides(ActionEvent event) {
+    }
+
     private void refreshSongList() {
         Map<Integer, String> titles = getSongTitles();
         // build invert lookup map
@@ -89,52 +152,22 @@ public class SongViewerController {
         items.addAll(titles.values().stream().sorted().toList());
         songList.setItems(items);
 
-        if (items.size() > 0) {
+        boolean hasItems = items.size() > 0;
+        if (hasItems) {
             songList.getSelectionModel().selectFirst();
         }
+        toggleEditDeleteButtons(hasItems);
         totalNumSong.setText(String.valueOf(items.size()));
     }
 
-    public void onSearchSong(KeyEvent keyEvent) {
-        if (keyEvent.getCode().equals(KeyCode.ENTER)) {
-            if (searchInput.getText().isEmpty()) {
-                // restore list when empty
-                songList.setItems(items);
-            } else {
-                // search ignore case
-                var filteredItems = items.filtered(item ->
-                        item.toLowerCase().contains(searchInput.getText().toLowerCase()));
-                songList.setItems(filteredItems);
-            }
+    private void toggleEditDeleteButtons(boolean isEnabled) {
+        if (isEnabled) {
+            editButton.setDisable(false);
+            deleteButton.setDisable(false);
+        } else {
+            editButton.setDisable(true);
+            deleteButton.setDisable(true);
         }
-    }
-
-    public void onEditSong(ActionEvent event) throws IOException {
-        if (songList.getItems().size() == 0) return;
-
-        Stage verseEditorModal = ViewUtil.get().newModal(Labels.MODAL_EDIT_SONG_TITLE, VERSE_EDITOR_FXML, ViewUtil.get().getOwnerWindow(event));
-        Song song = loadSelectedSong();
-        verseEditorModal.setUserData(song);
-        verseEditorModal.show();
-    }
-
-    public void onNewSong(ActionEvent event) throws IOException {
-        Stage verseEditorModal = ViewUtil.get().newModal(Labels.MODAL_NEW_SONG_TITLE, VERSE_EDITOR_FXML, ViewUtil.get().getOwnerWindow(event));
-        verseEditorModal.setUserData(new Song());
-        verseEditorModal.showAndWait();
-        refreshSongList();
-    }
-
-    public void onDeleteSong(ActionEvent event) {
-        if (songList.getItems().size() == 0) return;
-
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION, Labels.MODAL_DELETE_SONG_TITLE.formatted(getSelectedSongTitle()),
-                ButtonType.YES, ButtonType.CANCEL);
-        alert.showAndWait();
-        if (alert.getResult() == ButtonType.YES) {
-            songService.get().getStore().delete(getSelectedSongId());
-        }
-        refreshSongList();
     }
 
     private String getSelectedSongTitle() {
@@ -163,20 +196,6 @@ public class SongViewerController {
             }
         }
         return titles;
-    }
-
-    public void onGeneratePPTX(ActionEvent event) throws IOException {
-        Song song = loadSelectedSong();
-        String outputFilePath = appContext.getOutputDir(getSelectedSongTitle() + ".pptx");
-        String templateFilePath = templatePathInput.getText();
-        if (!templateFilePath.contains("/")) {
-            templateFilePath = appContext.getPPTXTemplate(templateFilePath);
-        }
-        SongSlidesGenerator.generate(song, templateFilePath,
-                outputFilePath, List.of("zh_cn", "en_us"), linesPerSlideInput.getValue());
-    }
-
-    public void onGenerateGSlides(ActionEvent event) {
     }
 
     private Stage getStage() {
