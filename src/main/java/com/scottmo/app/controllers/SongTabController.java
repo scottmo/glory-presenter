@@ -59,7 +59,7 @@ public class SongTabController {
         Platform.runLater(() -> {
             refreshSongList();
 
-            templatePathInput.setOnMouseClicked(this::onTemplatePathInputClicked);
+            ViewUtil.get().attachFilePickerToInput(templatePathInput, appContext.getPPTXTemplate(""), ViewUtil.FILE_EXT_PPTX);
             linesPerSlideInput.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 20, 2));
         });
     }
@@ -109,23 +109,6 @@ public class SongTabController {
         refreshSongList();
     }
 
-    private void onTemplatePathInputClicked(MouseEvent event) {
-        FileChooser fileChooser = new FileChooser();
-        File pptxTemplateDir = new File(appContext.getPPTXTemplate(""));
-        fileChooser.setInitialDirectory(pptxTemplateDir);
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PPTX files (*.pptx)", "*.pptx"));
-        File selectedFile = fileChooser.showOpenDialog(getStage());
-        // selected new template file
-        if (selectedFile != null) {
-            // show just the file name if file is in template folder, otherwise ues full path
-            if (selectedFile.getParentFile().getAbsolutePath().equals(pptxTemplateDir.getAbsolutePath())) {
-                templatePathInput.setText(selectedFile.getName());
-            } else {
-                templatePathInput.setText(selectedFile.getAbsolutePath());
-            }
-        }
-    }
-
     public void onGeneratePPTX(ActionEvent event) {
         Song song = loadSelectedSong();
         String outputFilePath = appContext.getOutputDir(getSelectedSongTitle() + ".pptx");
@@ -144,7 +127,7 @@ public class SongTabController {
 
     public void onImportSong(ActionEvent event) {
         FileChooser fileChooser = new FileChooser();
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("OpenLyrics (*.xml)", "*.xml"));
+        fileChooser.getExtensionFilters().add(ViewUtil.FILE_EXT_OPENLYRICS);
         List<File> selectedFiles = fileChooser.showOpenMultipleDialog(getStage());
         if (selectedFiles != null) {
             for (File file : selectedFiles) {
@@ -244,6 +227,6 @@ public class SongTabController {
     }
 
     private Stage getStage() {
-        return (Stage) templatePathInput.getScene().getWindow();
+        return ViewUtil.get().getStage(templatePathInput);
     }
 }
