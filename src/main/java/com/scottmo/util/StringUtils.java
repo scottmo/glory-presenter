@@ -19,7 +19,6 @@ public final class StringUtils {
         return punctuationDigitRegex.matcher(str).find();
     }
 
-
     public static List<StringSegment> splitByCharset(String str, boolean shouldMergeNumbers) {
         List<StringSegment> result = new ArrayList<>();
 
@@ -170,5 +169,9 @@ public final class StringUtils {
 
     public static List<String> split(String str, String sep) {
         return Arrays.stream(str.split(sep)).map(String::trim).toList();
+    }
+
+    public static String sanitizeFilename(String inputName) {
+        return inputName.replaceAll("[^a-zA-Z0-9-_\\.]", "_");
     }
 }
