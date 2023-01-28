@@ -34,5 +34,5 @@
     <TextField fx:id="templatePathInput" text="template-bible.pptx"/>
     <CheckBox fx:id="hasStartSlide" mnemonicParsing="false" text="has start slide"/>
     <CheckBox fx:id="hasEndSlide" mnemonicParsing="false" text="has end slide"/>
-    <Button mnemonicParsing="false" onAction="#onGeneratePPTX" text="Generate"/>
+    <Button mnemonicParsing="false" onAction="#onGeneratePPTX" text="Generate PPTX"/>
 </VBox>
