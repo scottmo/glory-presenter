@@ -41,7 +41,10 @@ final class BookNamesTable {
      * structure: [ bookIndex: { bibleVersion: bookName }, ...]
      */
     List<Map<String, String>> queryAll() throws SQLException {
-        List<Map<String, String>> bookNames = new ArrayList<>(Collections.nCopies(BibleMetadata.getNumberOfBooks(), new HashMap<>()));
+        List<Map<String, String>> bookNames = new ArrayList<>();
+        for (int i = 0; i < BibleMetadata.getNumberOfBooks(); i++) {
+            bookNames.add(new HashMap<>());
+        }
 
         String sql = "SELECT * FROM %s".formatted(TABLE_NAME);
         try (Statement stmt = db.createStatement()) {
