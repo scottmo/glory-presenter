@@ -86,7 +86,7 @@ public class SongSlidesGenerator {
     }
 
     private static int getValueListSize(Map<String, List<String>> map) {
-        return map.values().stream().toList().get(0).size();
+        return map.values().iterator().next().size();
     }
 
     private static Map<String, List<String>> getSectionTextsByGroup(List<Map<String, List<String>>> orderedSectionTexts, List<String> textGroups, int maxLines) {

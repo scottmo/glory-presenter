@@ -8,6 +8,7 @@ import com.scottmo.services.ServiceSupplier;
 import com.scottmo.services.logging.AppLoggerService;
 import com.scottmo.services.ppt.SongSlidesGenerator;
 import com.scottmo.services.songs.SongService;
+import com.scottmo.util.StringUtils;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -113,7 +114,7 @@ public class SongTabController {
 
     public void onGeneratePPTX(ActionEvent event) {
         Song song = loadSelectedSong();
-        String outputFilePath = appContext.getOutputDir(getSelectedSongTitle() + ".pptx");
+        String outputFilePath = appContext.getOutputDir(StringUtils.sanitizeFilename(getSelectedSongTitle()) + ".pptx");
         String templateFilePath = templatePathInput.getText();
         if (!templateFilePath.contains("/")) {
             templateFilePath = appContext.getPPTXTemplate(templateFilePath);

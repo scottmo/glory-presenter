@@ -6,13 +6,19 @@ import com.scottmo.data.bibleMetadata.BibleMetadata;
 import com.scottmo.services.ServiceSupplier;
 import com.scottmo.services.bible.BibleStore;
 import com.scottmo.services.logging.AppLoggerService;
+import com.scottmo.services.ppt.BibleSlidesGenerator;
+import com.scottmo.util.StringUtils;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Supplier;
 
 public class BibleTabController {
@@ -24,6 +30,8 @@ public class BibleTabController {
     public TextField bibleReferenceInput;
     public MenuButton bibleBookPicker;
     public Label availableVersionsText;
+    public CheckBox hasStartSlide;
+    public CheckBox hasEndSlide;
 
     public void initialize() {
         Platform.runLater(() -> {
@@ -41,6 +49,21 @@ public class BibleTabController {
     }
 
     public void onGeneratePPTX(ActionEvent actionEvent) {
+        List<String> versions = new ArrayList<>(appContext.getConfig().bibleVersionToTextConfig().keySet());
+        String bibleRef =String.join(",", versions)+ " - " + bibleReferenceInput.getText();
+
+        String outputFilePath = appContext.getOutputDir(StringUtils.sanitizeFilename(bibleRef) + ".pptx");
+        String templateFilePath = templatePathInput.getText();
+        if (!templateFilePath.contains("/")) {
+            templateFilePath = appContext.getPPTXTemplate(templateFilePath);
+        }
+        try {
+            BibleSlidesGenerator.generate(bibleRef, templateFilePath, outputFilePath,
+                    hasStartSlide.isSelected(), hasEndSlide.isSelected());
+            logger.get().info("Generated slides at " + outputFilePath);
+        } catch (IOException e) {
+            logger.get().error("Failed to generate slides!", e);
+        }
     }
 
     private void onAddBook(ActionEvent event) {

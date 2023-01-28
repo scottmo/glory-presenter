@@ -1,103 +1,63 @@
 package com.scottmo.services.ppt;
 
-import com.scottmo.services.ServiceSupplier;
-import com.scottmo.config.AppContext;
-import com.scottmo.data.bibleMetadata.BibleMetadata;
-import com.scottmo.services.bible.BibleStore;
 import com.scottmo.data.bibleReference.BibleReference;
+import com.scottmo.services.ServiceSupplier;
+import com.scottmo.services.bible.BibleStore;
 import com.scottmo.services.bible.BibleVerse;
-import com.scottmo.data.bibleMetadata.BookMetadata;
-import org.apache.poi.xslf.usermodel.XMLSlideShow;
-import org.apache.poi.xslf.usermodel.XSLFSlideLayout;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
+
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
+import static com.scottmo.services.ppt.TemplatingUtil.PLACEHOLDER_TEMPLATE;
+
 public final class BibleSlidesGenerator {
-    private static final String TITLE_MASTER_KEY = "title";
-    private static final String VERSE_MASTER_KEY_PREFIX = "verse";
-    private static final String MAIN_LAYOUT_KEY = "main";
-
     private static final Supplier<BibleStore> bibleStore = ServiceSupplier.get(BibleStore.class);
-    private static final AppContext appContext = ServiceSupplier.getAppContext();
-    
-    private static void insertBibleText(String templateFilePath, String outputFilePath, String bibleReference) throws IOException {
-        try (var inStream = new FileInputStream(templateFilePath)) {
-            var ppt = new XMLSlideShow(inStream);
-            insertBibleText(ppt, bibleReference);
-            ppt.removeSlide(0);
-            try (var outStream = new FileOutputStream(outputFilePath)) {
-                ppt.write(outStream);
-            }
-            ppt.close();
+    private static final String VERSE_CHAPTER = "verse.chapter";
+    private static final String VERSE_NUMBER = "verse.number";
+    private static final String VERSE = "verse.%s";
+    private static final String VERSE_RANGE = "verses";
+    private static final String BOOK = "book.%s";
+
+    public static void generate(String bibleRefString, String tmplFilePath, String outputFilePath,
+            boolean hasStartSlide, boolean hasEndSlide) throws IOException {
+        BibleReference bibleReference = new BibleReference(bibleRefString);
+        List<Map<String, String>> slideContents = new ArrayList<>();
+
+        Map<String, List<BibleVerse>> bibleVerses = bibleStore.get().getBibleVerses(bibleReference);
+        Map<String, String> bookNames = bibleStore.get().getBookNames(bibleReference.getBook());
+
+        Map<String, String> bibleMetadata = new HashMap<>();
+        for (String version : bibleReference.getVersions()) {
+            bibleMetadata.put(BOOK.formatted(version), bookNames.get(version));
         }
-    }
+        bibleMetadata.put(VERSE_RANGE, bibleReference.getRangesString());
 
-    public static void generate(String templatePath, String destDir, String versions, String verses) throws IOException {
-        if (verses.isEmpty()) {
-            for (var entry : BibleMetadata.getBookInfoMap().entrySet()) {
-                String bookName = entry.getKey();
-                BookMetadata bookMetadata = entry.getValue();
-                for (int i = 0; i < bookMetadata.count().size(); i++) {
-                    String chapter = bookName + " " + (i + 1);
-                    insertBibleText(appContext.getRelativePath(templatePath),
-                            appContext.getRelativePath("%s/%s.pptx".formatted(destDir, chapter)), "%s - %s".formatted(versions, chapter));
-                }
-            }
-        } else {
-            String bibleReference = "%s - %s".formatted(versions, verses);
-            insertBibleText(appContext.getRelativePath(templatePath),
-                    appContext.getRelativePath("%s/%s.pptx".formatted(destDir, bibleReference)), bibleReference);
-        }
-    }
-
-    public static void generate(String templatePath, String destDir, String versions) throws IOException {
-        generate(templatePath, destDir, versions, "");
-    }
-
-    private static void insertBibleText(XMLSlideShow ppt, String bibleReferenceStr) {
-        insertBibleText(ppt, new BibleReference(bibleReferenceStr));
-    }
-
-    private static void insertBibleText(XMLSlideShow ppt, BibleReference ref) {
-        Map<String, List<BibleVerse>> bibleVerses = bibleStore.get().getBibleVerses(ref);
-        Map<String, String> bookNames = bibleStore.get().getBookNames(ref.getBook());
-        assert bookNames != null : "Unable to query book names with book ${ref.book}";
-
-        // create title slide
-        var titleLayout = TemplatingUtil.getSlideMasterLayout(ppt, TITLE_MASTER_KEY, MAIN_LAYOUT_KEY);
-        assert titleLayout != null : "Missing title master slide";
-
-        var titleSlide = ppt.createSlide(titleLayout);
-        Map<String, String> titleSlideValues = new HashMap<>();
-        for (String version : ref.getVersions()) {
-            titleSlideValues.put("{title_%s}".formatted(version), bookNames.getOrDefault(version, ""));
-        }
-        titleSlideValues.put("{range}", ref.getRangesString());
-        TemplatingUtil.replacePlaceholders(titleSlide, titleSlideValues);
-
-        // create verse slides
-        Map<String, XSLFSlideLayout> verseLayouts = new HashMap<>();
-        for (String version : ref.getVersions()) {
-            String key = "%s_%s".formatted(VERSE_MASTER_KEY_PREFIX, version);
-            verseLayouts.put(key, TemplatingUtil.getSlideMasterLayout(ppt, key, MAIN_LAYOUT_KEY));
+        if (hasStartSlide) {
+            slideContents.add(bibleMetadata);
         }
 
-        int numVerses = bibleVerses.get(ref.getVersions().get(0)).size();
+        int numVerses = bibleVerses.values().iterator().next().size();
         for (int i = 0; i < numVerses; i++) {
-            for (String version : ref.getVersions()) {
-                var slide = ppt.createSlide(verseLayouts.get("%s_%s".formatted(VERSE_MASTER_KEY_PREFIX, version)));
-                BibleVerse verse = bibleVerses.get(version).get(i);
-                String refStr = String.format("%s %d:%d", bookNames.get(version), verse.chapter(), verse.index());
-                TemplatingUtil.replacePlaceholders(slide, Map.of(
-                    "{verse}", verse.index() + " " + verse.text(),
-                    "{title}", refStr
-                ));
+            Map<String, String> verseMap = new HashMap<>();
+            for (String version : bibleReference.getVersions()) {
+                verseMap.put(VERSE.formatted(version), bibleVerses.get(version).get(i).text());
             }
+            BibleVerse verse = bibleVerses.get(bibleReference.getVersions().get(0)).get(i);
+            verseMap.put(VERSE_CHAPTER, String.valueOf(verse.chapter()));
+            verseMap.put(VERSE_NUMBER, String.valueOf(verse.index()));
+            verseMap.putAll(bibleMetadata);
+            slideContents.add(verseMap);
         }
+
+        if (hasEndSlide) {
+            slideContents.add(bibleMetadata);
+        }
+
+        TemplatingUtil.generateSlideShow(slideContents, hasStartSlide, hasEndSlide,
+                PLACEHOLDER_TEMPLATE, tmplFilePath, outputFilePath);
     }
 }
