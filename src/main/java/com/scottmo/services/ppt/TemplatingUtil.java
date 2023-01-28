@@ -10,6 +10,7 @@ import org.apache.poi.xslf.usermodel.XSLFTextShape;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -171,13 +172,17 @@ final class TemplatingUtil {
      * @param contents k,v placeholder value maps, each map represent 1 slide.
      *                 First k,v map will be used as start slide if present.
      *                 Last k,v map will be used as end slide if present.
+     * @param hasStartSlide whether there's a start slide
+     * @param hasEndSlide whether there's an end slide
      * @param placeholderTemplate placeholder format string. e.g. {%s}
      * @param tmplFilePath template pptx
      * @param outputFilePath output pptx
      * @throws IOException
      */
-    public static void generateSlideShow(List<Map<String, String>> contents, boolean hasStartContent, boolean hasEndContent,
+    public static void generateSlideShow(List<Map<String, String>> contents, boolean hasStartSlide, boolean hasEndSlide,
                                          String placeholderTemplate, String tmplFilePath, String outputFilePath) throws IOException {
+        List<Map<String, String>> preppedContents = new ArrayList<>();
+
         // make copies of template slides first and write
         // since for some reason the pptx reference is not able to modify the new copies in memory
         try (var inStream = new FileInputStream(tmplFilePath)) {
@@ -185,29 +190,29 @@ final class TemplatingUtil {
             int numPlaceholderSlides = tmplSlides.getSlides().size();
             // start slide if present
             XSLFSlide srcSlide;
-            if (hasStartContent) {
+            if (hasStartSlide) {
                 srcSlide = tmplSlides.getSlides().get(0);
                 duplicateSlide(tmplSlides, srcSlide);
+                preppedContents.add(contents.get(0));
             }
 
-            // content slides, alternate each content template slide if there are multiple
-            int contentStartIndex = hasStartContent ? 1 : 0;
-            int contentEndIndex = hasEndContent ? contents.size() - 1 : contents.size();
-            int contentTmplEndIndex = hasEndContent ? numPlaceholderSlides - 1 : numPlaceholderSlides;
-            int contentTmplSlideIndex = contentStartIndex;
+            // content slides, use all content template slides for each content value map
+            int contentStartIndex = hasStartSlide ? 1 : 0;
+            int contentEndIndex = hasEndSlide ? contents.size() - 1 : contents.size();
+            int contentTmplEndIndex = hasEndSlide ? numPlaceholderSlides - 1 : numPlaceholderSlides;
             for (int j = contentStartIndex; j < contentEndIndex; j++) {
-                srcSlide = tmplSlides.getSlides().get(contentTmplSlideIndex);
-                duplicateSlide(tmplSlides, srcSlide);
-                contentTmplSlideIndex++;
-                if (contentTmplSlideIndex == contentTmplEndIndex) {
-                    contentTmplSlideIndex = contentStartIndex;
+                for (int k = contentStartIndex; k < contentTmplEndIndex; k++) {
+                    srcSlide = tmplSlides.getSlides().get(k);
+                    duplicateSlide(tmplSlides, srcSlide);
+                    preppedContents.add(contents.get(j));
                 }
             }
 
             // end slide if present
-            if (hasEndContent) {
+            if (hasEndSlide) {
                 srcSlide = tmplSlides.getSlides().get(numPlaceholderSlides - 1);
                 duplicateSlide(tmplSlides, srcSlide);
+                preppedContents.add(contents.get(contents.size() - 1));
             }
 
             // remove template slides
@@ -227,9 +232,9 @@ final class TemplatingUtil {
         // now do the modifications
         try (var inStream = new FileInputStream(outputFilePath)) {
             var ppt = new XMLSlideShow(inStream);
-            for (int i = 0; i < contents.size(); i++) {
+            for (int i = 0; i < preppedContents.size(); i++) {
                 var slide = ppt.getSlides().get(i);
-                Map<String, String> values = contents.get(i).entrySet().stream()
+                Map<String, String> values = preppedContents.get(i).entrySet().stream()
                                 .collect(Collectors.toMap(e -> placeholderTemplate.formatted(e.getKey()), e -> e.getValue()));
                 replaceText(slide, values);
                 removeAllTexts(slide, placeholderTemplateRegex);
