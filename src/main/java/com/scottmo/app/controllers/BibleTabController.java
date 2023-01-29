@@ -3,6 +3,7 @@ package com.scottmo.app.controllers;
 import com.scottmo.app.views.ViewUtil;
 import com.scottmo.config.AppContext;
 import com.scottmo.data.bibleMetadata.BibleMetadata;
+import com.scottmo.data.bibleOsis.Osis;
 import com.scottmo.services.ServiceSupplier;
 import com.scottmo.services.bible.BibleStore;
 import com.scottmo.services.logging.AppLoggerService;
@@ -15,8 +16,13 @@ import javafx.scene.control.Label;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
@@ -35,7 +41,7 @@ public class BibleTabController {
 
     public void initialize() {
         Platform.runLater(() -> {
-            availableVersionsText.setText(String.join(", ", bibleStore.get().getAvailableVersions()));
+            refreshAvailableVersionsList();
             BibleMetadata.getBookInfoMap().keySet().forEach(verseName -> {
                 MenuItem item = new MenuItem(verseName);
                 item.setOnAction(this::onAddBook);
@@ -46,6 +52,22 @@ public class BibleTabController {
     }
 
     public void onImport(ActionEvent actionEvent) {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.getExtensionFilters().add(ViewUtil.FILE_EXT_BIBLEOSIS);
+        List<File> selectedFiles = fileChooser.showOpenMultipleDialog(getStage());
+        if (selectedFiles != null) {
+            for (File file : selectedFiles) {
+                try {
+                    String osisXML = Files.readString(file.toPath(), StandardCharsets.UTF_8);
+                    Osis bibleOsis = Osis.of(osisXML);
+                    bibleStore.get().insert(bibleOsis.getVerses(), bibleOsis.getId());
+                } catch (IOException e) {
+                    logger.get().error("Failed to import bible [%s]!".formatted(file.getName()), e);
+                }
+            }
+            refreshAvailableVersionsList();
+            logger.get().info("Done importing bibles!");
+        }
     }
 
     public void onGeneratePPTX(ActionEvent actionEvent) {
@@ -69,5 +91,13 @@ public class BibleTabController {
     private void onAddBook(ActionEvent event) {
         String bookName = ((MenuItem)event.getSource()).getText();
         bibleReferenceInput.setText(bookName);
+    }
+
+    private void refreshAvailableVersionsList() {
+        availableVersionsText.setText(String.join(", ", bibleStore.get().getAvailableVersions()));
+    }
+
+    private Stage getStage() {
+        return ViewUtil.get().getStage(templatePathInput);
     }
 }
