@@ -6,5 +6,5 @@ import java.util.Map;
 public record AppConfig (
         String dataDir,
         List<String> locales,
-        Map<String, String> bibleVersionToTextConfig
+        Map<String, String> bibleVersionToLocale
 ) {}

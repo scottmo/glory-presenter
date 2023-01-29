@@ -71,7 +71,7 @@ public class BibleTabController {
     }
 
     public void onGeneratePPTX(ActionEvent actionEvent) {
-        List<String> versions = new ArrayList<>(appContext.getConfig().bibleVersionToTextConfig().keySet());
+        List<String> versions = new ArrayList<>(appContext.getConfig().bibleVersionToLocale().keySet());
         String bibleRef =String.join(",", versions)+ " - " + bibleReferenceInput.getText();
 
         String outputFilePath = appContext.getOutputDir(StringUtils.sanitizeFilename(bibleRef) + ".pptx");

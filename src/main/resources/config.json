@@ -4,7 +4,7 @@
     "zh_cn",
     "en_us"
   ],
-  "bibleVersionToTextConfig": {
+  "bibleVersionToLocale": {
     "cuv": "zh_cn",
     "niv": "en_us"
   }
