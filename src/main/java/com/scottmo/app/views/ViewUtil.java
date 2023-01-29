@@ -48,6 +48,8 @@ public class ViewUtil {
             new FileChooser.ExtensionFilter("Powerpoint (*.pptx)", "*.pptx");
     public static final FileChooser.ExtensionFilter FILE_EXT_OPENLYRICS =
             new FileChooser.ExtensionFilter("OpenLyrics (*.xml)", "*.xml");
+    public static final FileChooser.ExtensionFilter FILE_EXT_BIBLEOSIS =
+            new FileChooser.ExtensionFilter("Bible Osis Format (*.xml)", "*.xml");
     public void attachFilePickerToInput(TextField input, String initDir, FileChooser.ExtensionFilter extensionFilter) {
         input.setOnMouseClicked((MouseEvent event) -> {
             FileChooser fileChooser = new FileChooser();
