@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.layout.VBox?>
+<VBox prefHeight="400.0" prefWidth="640.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.scottmo.app.App">
+    <fx:include source="menu.fxml" />
+    <TabPane tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
+        <Tab text="Songs">
+            <fx:include source="songTab.fxml" />
+        </Tab>
+        <Tab text="Bible">
+            <fx:include source="bibleTab.fxml" />
+        </Tab>
+      <padding>
+         <Insets bottom="10.0" />
+      </padding>
+    </TabPane>
+</VBox>

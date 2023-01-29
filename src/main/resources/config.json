@@ -1,0 +1,11 @@
+{
+  "dataDir": "./data",
+  "locales": [
+    "zh_cn",
+    "en_us"
+  ],
+  "bibleVersionToTextConfig": {
+    "cuv": "zh_cn",
+    "niv": "en_us"
+  }
+}
