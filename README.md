@@ -13,6 +13,17 @@ important to get someone that's untrained to help out right away. Using modern w
 difficult option as they all require training to use, whereas most people have experience operating a power
 point deck.
 
+## Caveats
+As I'm developing this on my spare time, I haven't really got a chance to fully test everything. You can see that I have
+not really written any tests for it. All I can say is that so far it's been working well for my church. Do note that
+there is limited error handling, so you may see random errors happening and not sure what's going on. I'll try to patch
+them as I continue to improve it, but support will be limited.
+
+## Technology
+- Java 17
+- JavaFX 17
+- Sqlite
+
 ## Features
 - UI for adding/editing songs
 - PPTX generation from bible verses or songs
