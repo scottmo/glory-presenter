@@ -30,6 +30,7 @@ import java.util.function.Supplier;
 public class BibleTabController {
     private final AppContext appContext = ServiceSupplier.getAppContext();
     private final Supplier<BibleStore> bibleStore = ServiceSupplier.get(BibleStore.class);
+    private final Supplier<BibleSlidesGenerator> pptxGenerator = ServiceSupplier.get(BibleSlidesGenerator.class);
     private final Supplier<AppLoggerService> logger = ServiceSupplier.get(AppLoggerService.class);
 
     public TextField templatePathInput;
@@ -80,7 +81,7 @@ public class BibleTabController {
             templateFilePath = appContext.getPPTXTemplate(templateFilePath);
         }
         try {
-            BibleSlidesGenerator.generate(bibleRef, templateFilePath, outputFilePath,
+            pptxGenerator.get().generate(bibleRef, templateFilePath, outputFilePath,
                     hasStartSlide.isSelected(), hasEndSlide.isSelected());
             logger.get().info("Generated slides at " + outputFilePath);
         } catch (IOException e) {

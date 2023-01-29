@@ -42,6 +42,7 @@ public class SongTabController {
 
     private final AppContext appContext = ServiceSupplier.getAppContext();
     private final Supplier<SongService> songService = ServiceSupplier.get(SongService.class);
+    private final Supplier<SongSlidesGenerator> pptxGenerator = ServiceSupplier.get(SongSlidesGenerator.class);
     private final Supplier<AppLoggerService> logger = ServiceSupplier.get(AppLoggerService.class);
 
     private final Map<String, Integer> songIdsMap = new HashMap<>();
@@ -120,7 +121,7 @@ public class SongTabController {
             templateFilePath = appContext.getPPTXTemplate(templateFilePath);
         }
         try {
-            SongSlidesGenerator.generate(song, templateFilePath, outputFilePath, appContext.getConfig().locales(),
+            pptxGenerator.get().generate(song, templateFilePath, outputFilePath, appContext.getConfig().locales(),
                     linesPerSlideInput.getValue(), hasStartSlide.isSelected(), hasEndSlide.isSelected());
             logger.get().info("Generated slides at " + outputFilePath);
         } catch (IOException e) {

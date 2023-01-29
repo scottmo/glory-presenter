@@ -2,6 +2,7 @@ package com.scottmo.services.ppt;
 
 import com.scottmo.data.song.Song;
 import com.scottmo.data.song.SongVerse;
+import com.scottmo.services.Service;
 import com.scottmo.util.StringUtils;
 
 import java.io.IOException;
@@ -15,8 +16,7 @@ import java.util.stream.IntStream;
 
 import static com.scottmo.services.ppt.TemplatingUtil.PLACEHOLDER_TEMPLATE;
 
-public class SongSlidesGenerator {
-
+public final class SongSlidesGenerator implements Service {
     // placeholder keys
     private static final String VERSE_PREFIX = "verse.";
     private static final String TITLE_PREFIX = "title.";
@@ -25,7 +25,7 @@ public class SongSlidesGenerator {
     private static final String COPYRIGHT = "copyright";
     private static final String PUBLISHER = "publisher";
 
-    public static void generate(Song song, String tmplFilePath, String outputFilePath, List<String> locales,
+    public void generate(Song song, String tmplFilePath, String outputFilePath, List<String> locales,
             int maxLines, boolean hasStartSlide, boolean hasEndSlide) throws IOException {
         // song metadata for all slides
         Map<String, String> songMetadata = new HashMap<>();

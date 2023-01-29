@@ -1,6 +1,7 @@
 package com.scottmo.services.ppt;
 
 import com.scottmo.data.bibleReference.BibleReference;
+import com.scottmo.services.Service;
 import com.scottmo.services.ServiceSupplier;
 import com.scottmo.services.bible.BibleStore;
 import com.scottmo.services.bible.BibleVerse;
@@ -14,15 +15,17 @@ import java.util.function.Supplier;
 
 import static com.scottmo.services.ppt.TemplatingUtil.PLACEHOLDER_TEMPLATE;
 
-public final class BibleSlidesGenerator {
-    private static final Supplier<BibleStore> bibleStore = ServiceSupplier.get(BibleStore.class);
+public final class BibleSlidesGenerator implements Service {
+    // placeholder keys
     private static final String VERSE_CHAPTER = "verse.chapter";
     private static final String VERSE_NUMBER = "verse.number";
     private static final String VERSE = "verse.%s";
     private static final String VERSE_RANGE = "verses";
     private static final String BOOK = "book.%s";
 
-    public static void generate(String bibleRefString, String tmplFilePath, String outputFilePath,
+    private final Supplier<BibleStore> bibleStore = ServiceSupplier.get(BibleStore.class);
+
+    public void generate(String bibleRefString, String tmplFilePath, String outputFilePath,
             boolean hasStartSlide, boolean hasEndSlide) throws IOException {
         BibleReference bibleReference = new BibleReference(bibleRefString);
         List<Map<String, String>> slideContents = new ArrayList<>();
