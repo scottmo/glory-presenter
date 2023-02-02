@@ -241,8 +241,12 @@ public class SongEditorController {
 
     private void onAddVerseOrder(ActionEvent event) {
         String verseName = ((MenuItem)event.getSource()).getText();
-        String verseOrder = verseOrderInput.getText();
-        String newVerseOrder = String.join(", ", verseOrder, verseName);
+        String newVerseOrder = verseOrderInput.getText();
+        if (newVerseOrder.trim().isEmpty()) {
+            newVerseOrder = verseName;
+        } else {
+            newVerseOrder += ", " + verseName;
+        }
         verseOrderInput.setText(newVerseOrder);
     }
 
