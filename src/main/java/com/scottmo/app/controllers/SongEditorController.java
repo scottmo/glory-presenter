@@ -70,7 +70,7 @@ public class SongEditorController {
 
         refreshVerseOrderList();
         // TODO: optimize this instead of re-init every click
-        verseOrderPicker.setOnMousePressed(event -> {
+        verseOrderPicker.setOnMouseEntered(event -> {
             refreshVerseOrderList();
         });
 
