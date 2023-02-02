@@ -3,6 +3,7 @@ package com.scottmo.app.controllers;
 import com.scottmo.app.Labels;
 import com.scottmo.app.views.TileLyricsEditor;
 import com.scottmo.app.views.ViewUtil;
+import com.scottmo.config.AppContext;
 import com.scottmo.data.song.Song;
 import com.scottmo.data.song.SongVerse;
 import com.scottmo.services.ServiceSupplier;
@@ -32,6 +33,7 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 public class SongEditorController {
+    private final AppContext appContext = ServiceSupplier.getAppContext();
     private final Supplier<SongService> songService = ServiceSupplier.get(SongService.class);
 
     private final Map<String, TileLyricsEditor> lyricsEditorMap = new HashMap<>();
@@ -197,6 +199,8 @@ public class SongEditorController {
     private String askForNewLocale() {
         TextInputDialog dialog = new TextInputDialog();
         dialog.setHeaderText(Labels.DIALOG_ADD_LOCALE);
+        // start with primary locale
+        dialog.getEditor().setText(appContext.getPrimaryLocale());
         dialog.showAndWait();
         return dialog.getResult();
     }
