@@ -98,7 +98,8 @@ public class SongTabController {
         Stage verseEditorModal = ViewUtil.get().newModal(Labels.MODAL_EDIT_SONG_TITLE, VERSE_EDITOR_FXML, ViewUtil.get().getOwnerWindow(event));
         Song song = loadSelectedSong();
         verseEditorModal.setUserData(song);
-        verseEditorModal.show();
+        verseEditorModal.showAndWait();
+        refreshSongList();
     }
 
     public void onDeleteSong(ActionEvent event) {
