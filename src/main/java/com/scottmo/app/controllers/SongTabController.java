@@ -207,26 +207,10 @@ public class SongTabController {
     }
 
     private Map<Integer, String> getSongTitles() {
-        List<String> locales = appContext.getConfig().locales();
         Map<Integer, String> titles = new HashMap<>();
-        for (var title : songService.get().getStore().getTitles(locales.get(0))) {
+        for (var title : songService.get().getStore().getAllSongDescriptors(appContext.getConfig().locales())) {
             titles.put(title.getKey(), title.getValue());
         }
-        if (locales.size() > 0) {
-            for (int i = 1; i < locales.size(); i++) {
-                for (var title : songService.get().getStore().getTitles(locales.get(i))) {
-                    Integer songId = title.getKey();
-                    String additionalTitle = title.getValue();
-                    if (titles.containsKey(songId)) {
-                        String currentTitle = titles.get(songId);
-                        titles.put(songId, currentTitle + " - " + additionalTitle);
-                    } else {
-                        titles.put(songId, additionalTitle);
-                    }
-                }
-            }
-        }
-
         return titles;
     }
 

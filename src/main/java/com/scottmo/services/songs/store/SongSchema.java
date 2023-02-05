@@ -1,105 +1,71 @@
 package com.scottmo.services.songs.store;
 
-import com.healthmarketscience.sqlbuilder.CreateTableQuery;
-import com.healthmarketscience.sqlbuilder.custom.mysql.MysObjects;
-import com.healthmarketscience.sqlbuilder.dbspec.basic.DbColumn;
-import com.healthmarketscience.sqlbuilder.dbspec.basic.DbSchema;
-import com.healthmarketscience.sqlbuilder.dbspec.basic.DbSpec;
-import com.healthmarketscience.sqlbuilder.dbspec.basic.DbTable;
-import com.scottmo.util.SqlUtils;
-
 final class SongSchema {
+    
+    static final String DB_NAME = "songs";
 
-    SongTable song;
-    TitleTable titles;
-    VerseTable verses;
+    static class SongTable {
+        static final String TABLE = "songs";
+        static final String ID = "id";
+        static final String AUTHORS = "authors";
+        static final String COPYRIGHT = "copyright";
+        static final String PUBLISHER = "publisher";
+        static final String SONGBOOK = "songbook";
+        static final String SONGBOOK_ENTRY = "entry";
+        static final String COMMENTS = "comments";
+        static final String VERSE_ORDER = "verseOrder";
 
-    SongSchema() {
-        DbSpec spec = new DbSpec();
-        DbSchema schema = spec.addDefaultSchema();
-        song = new SongTable(schema);
-        titles = new TitleTable(schema, song);
-        verses = new VerseTable(schema, song);
-    }
-
-    class SongTable {
-        DbTable table;
-        DbColumn id;
-        DbColumn authors;
-        DbColumn copyright;
-        DbColumn publisher;
-        DbColumn songbook;
-        DbColumn entry;
-        DbColumn comments;
-        DbColumn verseOrder;
-
-        SongTable(DbSchema schema) {
-            table = schema.addTable("songs");
-            id = table.addColumn("id", "INTEGER", null);
-            id.primaryKey();
-            authors = table.addColumn("authors", "TEXT", null);
-            copyright = table.addColumn("copyright", "TEXT", null);
-            publisher = table.addColumn("publisher", "TEXT", null);
-            songbook = table.addColumn("songbook", "TEXT", null);
-            entry = table.addColumn("entry", "TEXT", null);
-            comments = table.addColumn("comments", "TEXT", null);
-            verseOrder = table.addColumn("verseOrder", "TEXT", null);
+        static String createTable() {
+            return String.join(" ",
+                    "CREATE TABLE IF NOT EXISTS %s (".formatted(TABLE),
+                        "%s INTEGER PRIMARY KEY AUTOINCREMENT,".formatted(ID),
+                        "%s TEXT,".formatted(AUTHORS),
+                        "%s TEXT,".formatted(COPYRIGHT),
+                        "%s TEXT,".formatted(PUBLISHER),
+                        "%s TEXT,".formatted(SONGBOOK),
+                        "%s TEXT,".formatted(SONGBOOK_ENTRY),
+                        "%s TEXT,".formatted(COMMENTS),
+                        "%s TEXT".formatted(VERSE_ORDER),
+                    ")"
+            );
         }
     }
-    String createSongTable() {
-        return new CreateTableQuery(song.table, true)
-                .addCustomization(MysObjects.IF_NOT_EXISTS_TABLE)
-                .addColumnConstraint(song.id, SqlUtils.AUTO_INCREMENT)
-                .validate().toString();
-    }
 
-    class TitleTable {
-        DbTable table;
-        DbColumn songId;
-        DbColumn text;
-        DbColumn locale;
+    static class TitlesTable {
+        static final String TABLE = "titles";
+        static final String SONG_ID = "song_id";
+        static final String TEXT = "text";
+        static final String LOCALE = "locale";
 
-        TitleTable(DbSchema schema, SongTable songTable) {
-            table = schema.addTable("titles");
-            songId = table.addColumn("song_id", "INTEGER", null);
-            songId.references(null, songTable.table, songTable.id);
-            songId.notNull();
-            text = table.addColumn("text", "TEXT", null);
-            text.notNull();
-            locale = table.addColumn("locale", "TEXT", null);
-            locale.notNull();
-            table.primaryKey(null, songId.getName(), locale.getName());
+        static String createTable() {
+            return String.join(" ",
+                    "CREATE TABLE IF NOT EXISTS %s (".formatted(TABLE),
+                        "%s INTEGER NOT NULL REFERENCES %s (%s),".formatted(SONG_ID, SongTable.TABLE, SongTable.ID),
+                        "%s TEXT NOT NULL,".formatted(TEXT),
+                        "%s TEXT NOT NULL,".formatted(LOCALE),
+                        "PRIMARY KEY (%s, %s)".formatted(SONG_ID, LOCALE),
+                    ")"
+            );
         }
     }
-    String createTitleTable() {
-        return new CreateTableQuery(titles.table, true)
-                .addCustomization(MysObjects.IF_NOT_EXISTS_TABLE)
-                .validate().toString();
-    }
 
-    class VerseTable {
-        DbTable table;
-        DbColumn songId;
-        DbColumn name;
-        DbColumn text;
-        DbColumn locale;
+    static class VersesTable {
+        static final String TABLE = "verses";
+        static final String SONG_ID = "song_id";
+        static final String NAME = "name";
+        static final String TEXT = "text";
+        static final String LOCALE = "locale";
 
-        VerseTable(DbSchema schema, SongTable songTable) {
-            table = schema.addTable("verses");
-            songId = table.addColumn("song_id", "INTEGER", null);
-            songId.references(null, songTable.table, songTable.id);
-            name = table.addColumn("name", "TEXT", null);
-            name.notNull();
-            text = table.addColumn("text", "TEXT", null);
-            text.notNull();
-            locale = table.addColumn("locale", "TEXT", null);
-            locale.notNull();
-            table.primaryKey(null, songId.getName(), name.getName(), locale.getName());
+        static String createTable() {
+            return String.join(" ",
+                    "CREATE TABLE IF NOT EXISTS %s (".formatted(TABLE),
+                    "%s INTEGER NOT NULL REFERENCES %s (%s),".formatted(SONG_ID, SongTable.TABLE, SongTable.ID),
+                    "%s TEXT NOT NULL,".formatted(NAME),
+                    "%s TEXT NOT NULL,".formatted(TEXT),
+                    "%s TEXT NOT NULL,".formatted(LOCALE),
+                    "PRIMARY KEY (%s, %s, %s)".formatted(SONG_ID, NAME, LOCALE),
+                    ")"
+            );
         }
-    }
-    String createVerseTable() {
-        return new CreateTableQuery(verses.table, true)
-                .addCustomization(MysObjects.IF_NOT_EXISTS_TABLE)
-                .validate().toString();
     }
 }

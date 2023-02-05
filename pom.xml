@@ -82,11 +82,6 @@
             <artifactId>sqlite-jdbc</artifactId>
             <version>3.39.3.0</version>
         </dependency>
-        <dependency>
-            <groupId>com.healthmarketscience.sqlbuilder</groupId>
-            <artifactId>sqlbuilder</artifactId>
-            <version>3.0.2</version>
-        </dependency>
         <!-- testing -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>

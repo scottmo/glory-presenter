@@ -1,14 +1,7 @@
 package com.scottmo.services.songs.store;
 
-import com.healthmarketscience.sqlbuilder.BinaryCondition;
-import com.healthmarketscience.sqlbuilder.DeleteQuery;
-import com.healthmarketscience.sqlbuilder.InsertQuery;
-import com.healthmarketscience.sqlbuilder.SelectQuery;
-import com.healthmarketscience.sqlbuilder.UpdateQuery;
-import com.scottmo.config.AppContext;
 import com.scottmo.data.song.Song;
 import com.scottmo.data.song.SongVerse;
-import com.scottmo.services.ServiceSupplier;
 import com.scottmo.util.StringUtils;
 import javafx.util.Pair;
 import org.apache.logging.log4j.util.Strings;
@@ -20,92 +13,105 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static com.scottmo.services.songs.store.SongSchema.*;
 
 public final class SongStore {
-    private final AppContext appContext = ServiceSupplier.getAppContext();
-
-    private static final String DB_NAME = "songs";
-    private final SongSchema schema = new SongSchema();
     private final Connection db;
 
     public SongStore(Path storeLocation) {
         try {
             db = DriverManager.getConnection("jdbc:sqlite:" + storeLocation.resolve("%s.db".formatted(DB_NAME)));
             try (var stmt = db.createStatement()) {
-                stmt.executeUpdate(schema.createSongTable());
-                stmt.executeUpdate(schema.createTitleTable());
-                stmt.executeUpdate(schema.createVerseTable());
+                stmt.executeUpdate(SongTable.createTable());
+                stmt.executeUpdate(TitlesTable.createTable());
+                stmt.executeUpdate(VersesTable.createTable());
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public List<Pair<Integer, String>> getTitles(String locale) {
-        if (locale == null) locale = appContext.getPrimaryLocale();
+    public List<Pair<Integer, String>> getAllSongDescriptors(List<String> locales) {
+        List<Pair<Integer, String>> songDescriptors = new ArrayList<>();
 
-        List<Pair<Integer, String>> songTitles = new ArrayList<>();
-
+        String delimiter = " - ";
+        String sql = String.join(" ",
+                "SELECT %s, %s, %s, %s".formatted(SongTable.ID, SongTable.SONGBOOK, SongTable.SONGBOOK_ENTRY, TitlesTable.TEXT),
+                "FROM %s".formatted(SongTable.TABLE),
+                "INNER JOIN (",
+                    "SELECT %s, GROUP_CONCAT(%s, '%s') AS %s".formatted(TitlesTable.SONG_ID, TitlesTable.TEXT, delimiter, TitlesTable.TEXT),
+                    "FROM %s".formatted(TitlesTable.TABLE),
+                    "WHERE %s".formatted(locales.stream()
+                            .map(locale -> "%s == '%s'".formatted(TitlesTable.LOCALE, locale))
+                            .collect(Collectors.joining(" OR "))),
+                    "GROUP BY %s".formatted(TitlesTable.SONG_ID),
+                ") AS joinedTitles",
+                "ON %s.%s = joinedTitles.%s".formatted(SongTable.TABLE, SongTable.ID, TitlesTable.SONG_ID)
+                );
         try (var stmt = db.createStatement()) {
-            var res = stmt.executeQuery(new SelectQuery()
-                    .addAllTableColumns(schema.titles.table)
-                    .addCondition(BinaryCondition.equalTo(schema.titles.locale, locale))
-                    .validate().toString());
+            var res = stmt.executeQuery(sql);
             while (res.next()) {
-                Integer songId = res.getInt(schema.titles.songId.getName());
-                String title = res.getString(schema.titles.text.getName());
-                songTitles.add(new Pair<>(songId, title));
+                int songId = res.getInt(SongTable.ID);
+                String songbook = res.getString(SongTable.SONGBOOK);
+                String entry = res.getString(SongTable.SONGBOOK_ENTRY);
+                String title = res.getString(TitlesTable.TEXT);
+                String descriptor = Stream.of(songbook, entry, title)
+                        .filter(s -> s != null && !s.trim().isEmpty())
+                        .collect(Collectors.joining(delimiter));
+                songDescriptors.add(new Pair<>(songId, descriptor));
             }
         } catch (SQLException e) {
-            throw new RuntimeException("Unable to retrieve song titles from DB!", e);
+            throw new RuntimeException("Unable to retrieve song descriptors from DB!", e);
         }
 
-        return songTitles;
+        return songDescriptors;
     }
 
     public Song get(int songId) {
         Song song = new Song(songId);
         try (var stmt = db.createStatement()) {
-            ResultSet res = stmt.executeQuery(new SelectQuery()
-                    .addAllTableColumns(schema.song.table)
-                    .addCondition(BinaryCondition.equalTo(schema.song.id, songId))
-                    .validate().toString());
+            ResultSet res = stmt.executeQuery(String.join(" ",
+                    "SELECT * FROM %s".formatted(SongTable.TABLE),
+                    "WHERE %s = %d".formatted(SongTable.ID, songId)
+                    ));
             if (res.next()) {
-                String authors = res.getString(schema.song.authors.getName());
+                String authors = res.getString(SongTable.AUTHORS);
                 if (Strings.isNotEmpty(authors)) {
                     song.setAuthors(StringUtils.split(authors));
                 }
-                String verseOrder = res.getString(schema.song.verseOrder.getName());
+                String verseOrder = res.getString(SongTable.VERSE_ORDER);
                 if (Strings.isNotEmpty(verseOrder)) {
                     song.setVerseOrder(StringUtils.split(verseOrder));
                 }
-                song.setCopyright(res.getString(schema.song.copyright.getName()));
-                song.setPublisher(res.getString(schema.song.publisher.getName()));
-                song.setSongBook(res.getString(schema.song.songbook.getName()));
-                song.setEntry(res.getString(schema.song.entry.getName()));
-                song.setComments(res.getString(schema.song.comments.getName()));
+                song.setCopyright(res.getString(SongTable.COPYRIGHT));
+                song.setPublisher(res.getString(SongTable.PUBLISHER));
+                song.setSongBook(res.getString(SongTable.SONGBOOK));
+                song.setEntry(res.getString(SongTable.SONGBOOK_ENTRY));
+                song.setComments(res.getString(SongTable.COMMENTS));
             }
 
-            res = stmt.executeQuery(new SelectQuery()
-                    .addAllTableColumns(schema.titles.table)
-                    .addCondition(BinaryCondition.equalTo(schema.titles.songId, songId))
-                    .validate().toString());
+            res = stmt.executeQuery(String.join(" ",
+                    "SELECT * FROM %s".formatted(TitlesTable.TABLE),
+                    "WHERE %s = %d".formatted(TitlesTable.SONG_ID, songId)
+                    ));
             while (res.next()) {
-                song.setTitle(
-                        res.getString(schema.titles.locale.getName()),
-                        res.getString(schema.titles.text.getName()));
+                song.setTitle(res.getString(TitlesTable.LOCALE), res.getString(TitlesTable.TEXT));
             }
 
-            res = stmt.executeQuery(new SelectQuery()
-                    .addAllTableColumns(schema.verses.table)
-                    .addCondition(BinaryCondition.equalTo(schema.verses.songId, songId))
-                    .validate().toString());
+            res = stmt.executeQuery(String.join(" ",
+                    "SELECT * FROM %s".formatted(VersesTable.TABLE),
+                    "WHERE %s = %d".formatted(VersesTable.SONG_ID, songId)
+                    ));
             List<SongVerse> verses = new ArrayList<>();
             while (res.next()) {
                 verses.add(new SongVerse(
-                        res.getString(schema.verses.name.getName()),
-                        res.getString(schema.verses.text.getName()),
-                        res.getString(schema.verses.locale.getName())));
+                        res.getString(VersesTable.NAME),
+                        res.getString(VersesTable.TEXT),
+                        res.getString(VersesTable.LOCALE)));
             }
             song.setVerses(verses);
         } catch (SQLException e) {
@@ -124,38 +130,42 @@ public final class SongStore {
     private boolean insert(Song song) {
         int songId;
         try {
-            InsertQuery sql = new InsertQuery(schema.song.table);
+            List<String> nonEmptyFieldKeys = new ArrayList<>();
             List<String> nonEmptyFields = new ArrayList<>();
             if (!song.getAuthors().isEmpty()) {
-                sql.addPreparedColumns(schema.song.authors);
+                nonEmptyFieldKeys.add(SongTable.AUTHORS);
                 nonEmptyFields.add(String.join(",", song.getAuthors()));
             }
             if (Strings.isNotEmpty(song.getCopyright())) {
-                sql.addPreparedColumns(schema.song.copyright);
+                nonEmptyFieldKeys.add(SongTable.COPYRIGHT);
                 nonEmptyFields.add(song.getCopyright());
             }
             if (Strings.isNotEmpty(song.getPublisher())) {
-                sql.addPreparedColumns(schema.song.publisher);
+                nonEmptyFieldKeys.add(SongTable.PUBLISHER);
                 nonEmptyFields.add(song.getPublisher());
             }
             if (Strings.isNotEmpty(song.getSongBook())) {
-                sql.addPreparedColumns(schema.song.songbook);
+                nonEmptyFieldKeys.add(SongTable.SONGBOOK);
                 nonEmptyFields.add(song.getSongBook());
             }
             if (Strings.isNotEmpty(song.getEntry())) {
-                sql.addPreparedColumns(schema.song.entry);
+                nonEmptyFieldKeys.add(SongTable.SONGBOOK_ENTRY);
                 nonEmptyFields.add(song.getEntry());
             }
             if (Strings.isNotEmpty(song.getComments())) {
-                sql.addPreparedColumns(schema.song.comments);
+                nonEmptyFieldKeys.add(SongTable.COMMENTS);
                 nonEmptyFields.add(song.getComments());
             }
             if (!song.getVerseOrder().isEmpty()) {
-                sql.addPreparedColumns(schema.song.verseOrder);
+                nonEmptyFieldKeys.add(SongTable.VERSE_ORDER);
                 nonEmptyFields.add(String.join(",", song.getVerseOrder()));
             }
-            sql.validate();
-            try (var stmt = db.prepareStatement(sql.toString())) {
+            String sql = String.join(" ",
+                    "INSERT INTO %s".formatted(SongTable.TABLE),
+                    "(%s)".formatted(String.join(",", nonEmptyFieldKeys)),
+                    "VALUES(%s)".formatted(String.join(",", "?".repeat(nonEmptyFieldKeys.size()).split("")))
+                    );
+            try (var stmt = db.prepareStatement(sql)) {
                 for (int i = 0; i < nonEmptyFields.size(); i++) {
                     stmt.setString(i + 1, nonEmptyFields.get(i));
                 }
@@ -179,10 +189,12 @@ public final class SongStore {
     }
 
     private void insertTitles(int songId, Song song) throws SQLException {
-        var sql = new InsertQuery(schema.titles.table)
-                .addPreparedColumns(schema.titles.songId, schema.titles.locale, schema.titles.text);
-        sql.validate();
-        try (var stmt = db.prepareStatement(sql.toString())) {
+        String sql = String.join(" ",
+                "INSERT INTO %s".formatted(TitlesTable.TABLE),
+                "(%s, %s, %s)".formatted(TitlesTable.SONG_ID, TitlesTable.LOCALE, TitlesTable.TEXT),
+                "VALUES(?, ?, ?)"
+                );
+        try (var stmt = db.prepareStatement(sql)) {
             for (String locale : song.getLocales()) {
                 stmt.setInt(1, songId);
                 stmt.setString(2, locale);
@@ -195,10 +207,12 @@ public final class SongStore {
     }
 
     private void insertVerses(int songId, Song song) throws SQLException {
-        var sql = new InsertQuery(schema.verses.table)
-                .addPreparedColumns(schema.verses.songId, schema.verses.name, schema.verses.text, schema.verses.locale);
-        sql.validate();
-        try (var stmt = db.prepareStatement(sql.toString())) {
+        String sql = String.join(" ",
+        "INSERT INTO %s".formatted(VersesTable.TABLE),
+                "(%s, %s, %s, %s)".formatted(VersesTable.SONG_ID, VersesTable.NAME, VersesTable.TEXT, VersesTable.LOCALE),
+                "VALUES(?, ?, ?, ?)"
+                );
+        try (var stmt = db.prepareStatement(sql)) {
             for (SongVerse verse : song.getVerses()) {
                 stmt.setInt(1, songId);
                 stmt.setString(2, verse.getName());
@@ -217,17 +231,18 @@ public final class SongStore {
             delete(song.getId(), true);
         }
         try (var stmt = db.createStatement()) {
-            UpdateQuery sql = new UpdateQuery(schema.song.table)
-                .addCondition(BinaryCondition.equalTo(schema.song.id, song.getId()))
-                .addSetClause(schema.song.authors, String.join(",", song.getAuthors()))
-                .addSetClause(schema.song.copyright, song.getCopyright())
-                .addSetClause(schema.song.publisher, song.getPublisher())
-                .addSetClause(schema.song.songbook, song.getSongBook())
-                .addSetClause(schema.song.entry, song.getEntry())
-                .addSetClause(schema.song.comments, song.getComments())
-                .addSetClause(schema.song.verseOrder, String.join(",", song.getVerseOrder()))
-                .validate();
-            stmt.executeUpdate(sql.toString());
+            String sql = String.join(" ",
+            "UPDATE %s SET".formatted(SongTable.TABLE),
+                    "%s = '%s',".formatted(SongTable.AUTHORS, String.join(",", song.getAuthors())),
+                    "%s = '%s',".formatted(SongTable.COPYRIGHT, song.getCopyright()),
+                    "%s = '%s',".formatted(SongTable.PUBLISHER, song.getPublisher()),
+                    "%s = '%s',".formatted(SongTable.SONGBOOK, song.getSongBook()),
+                    "%s = '%s',".formatted(SongTable.SONGBOOK_ENTRY, song.getEntry()),
+                    "%s = '%s',".formatted(SongTable.COMMENTS, song.getComments()),
+                    "%s = '%s'".formatted(SongTable.VERSE_ORDER, String.join(",", song.getVerseOrder())),
+                    "WHERE %s = %d".formatted(SongTable.ID, song.getId())
+                    );
+            stmt.executeUpdate(sql);
 
             insertTitles(song.getId(), song);
             insertVerses(song.getId(), song);
@@ -242,15 +257,10 @@ public final class SongStore {
     }
 
     private boolean delete(int songId, boolean preserveMetadata) {
-        var deleteSong = new DeleteQuery(schema.song.table)
-                .addCondition(BinaryCondition.equalTo(schema.song.id, songId))
-                .validate().toString();
-        var deleteTitles = new DeleteQuery(schema.titles.table)
-                .addCondition(BinaryCondition.equalTo(schema.titles.songId, songId))
-                .validate().toString();
-        var deleteVerses = new DeleteQuery(schema.verses.table)
-                .addCondition(BinaryCondition.equalTo(schema.verses.songId, songId))
-                .validate().toString();
+        String deleteSql = "DELETE FROM %s WHERE %s = %d";
+        String deleteSong = deleteSql.formatted(SongTable.TABLE, SongTable.ID, songId);
+        String deleteTitles = deleteSql.formatted(TitlesTable.TABLE, TitlesTable.SONG_ID, songId);
+        String deleteVerses = deleteSql.formatted(VersesTable.TABLE, VersesTable.SONG_ID, songId);
         try (var stmt = db.createStatement()) {
             stmt.addBatch(deleteTitles);
             stmt.addBatch(deleteVerses);
