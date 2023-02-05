@@ -230,19 +230,34 @@ public final class SongStore {
         if (!locales.isEmpty()) {
             delete(song.getId(), true);
         }
-        try (var stmt = db.createStatement()) {
-            String sql = String.join(" ",
-            "UPDATE %s SET".formatted(SongTable.TABLE),
-                    "%s = '%s',".formatted(SongTable.AUTHORS, String.join(",", song.getAuthors())),
-                    "%s = '%s',".formatted(SongTable.COPYRIGHT, song.getCopyright()),
-                    "%s = '%s',".formatted(SongTable.PUBLISHER, song.getPublisher()),
-                    "%s = '%s',".formatted(SongTable.SONGBOOK, song.getSongBook()),
-                    "%s = '%s',".formatted(SongTable.SONGBOOK_ENTRY, song.getEntry()),
-                    "%s = '%s',".formatted(SongTable.COMMENTS, song.getComments()),
-                    "%s = '%s'".formatted(SongTable.VERSE_ORDER, String.join(",", song.getVerseOrder())),
-                    "WHERE %s = %d".formatted(SongTable.ID, song.getId())
-                    );
-            stmt.executeUpdate(sql);
+        List<String> keys = List.of(
+                SongTable.AUTHORS,
+                SongTable.COPYRIGHT,
+                SongTable.PUBLISHER,
+                SongTable.SONGBOOK,
+                SongTable.SONGBOOK_ENTRY,
+                SongTable.COMMENTS,
+                SongTable.VERSE_ORDER
+        );
+        List<String> values = List.of(
+                String.join(",", song.getAuthors()),
+                song.getCopyright(),
+                song.getPublisher(),
+                song.getSongBook(),
+                song.getEntry(),
+                song.getComments(),
+                String.join(",", song.getVerseOrder())
+        );
+        String sql = String.join(" ",
+                "UPDATE %s SET".formatted(SongTable.TABLE),
+                keys.stream().map(s -> s + "=?").collect(Collectors.joining(",")),
+                "WHERE %s = %d".formatted(SongTable.ID, song.getId())
+        );
+        try (var stmt = db.prepareStatement(sql)) {
+            for (int i = 0; i < values.size(); i++) {
+                stmt.setString(i + 1, values.get(i));
+            }
+            stmt.executeUpdate();
 
             insertTitles(song.getId(), song);
             insertVerses(song.getId(), song);
