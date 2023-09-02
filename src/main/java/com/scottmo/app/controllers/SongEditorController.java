@@ -212,9 +212,11 @@ public class SongEditorController {
     public void onSave(ActionEvent event) {
         // TODO validations
         Song song = extractForm();
-
         songService.get().getStore().store(song);
+    }
 
+    public void onSaveAndClose(ActionEvent event) {
+        onSave(event);
         getStage().close();
     }
 
