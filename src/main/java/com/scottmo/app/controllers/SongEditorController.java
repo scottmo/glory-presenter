@@ -17,6 +17,7 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TextArea;
@@ -43,6 +44,7 @@ public class SongEditorController {
     public TabPane titleLyricsTabs;
     private int lastSelectedLocaleTab;
 
+    public ScrollPane scrollPane;
     public TextField authorsInput;
     public TextField songbookInput;
     public TextField songbookEntryInput;
@@ -80,6 +82,8 @@ public class SongEditorController {
         copyrightInput.setText(song.getCopyright());
         commentsInput.setText(song.getComments());
         publisherInput.setText(song.getPublisher());
+
+        ViewUtil.get().setVScrollSpeed(scrollPane, 1);
     }
 
     private void refreshVerseOrderList() {

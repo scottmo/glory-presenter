@@ -6,6 +6,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.FileChooser;
@@ -66,6 +67,13 @@ public class ViewUtil {
                     input.setText(selectedFile.getAbsolutePath());
                 }
             }
+        });
+    }
+
+    public void setVScrollSpeed(ScrollPane scrollPane, double step) {
+        scrollPane.getContent().setOnScroll(scrollEvent -> {
+            double deltaY = scrollEvent.getDeltaY() * step / 100;
+            scrollPane.setVvalue(scrollPane.getVvalue() - deltaY);
         });
     }
 }

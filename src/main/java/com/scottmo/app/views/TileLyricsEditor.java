@@ -45,6 +45,7 @@ public class TileLyricsEditor extends GridPane {
             // make scrollable
             ScrollPane lyricsScrollPane = new ScrollPane();
             lyricsScrollPane.setContent(lyricsContainer);
+            ViewUtil.get().setVScrollSpeed(lyricsScrollPane, 1);
             add(lyricsScrollPane, 1, 1);
             setVgrow(lyricsScrollPane, Priority.ALWAYS);
             setHgrow(lyricsScrollPane, Priority.ALWAYS);
