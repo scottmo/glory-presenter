@@ -6,7 +6,7 @@
 
     <groupId>com.scottmo</groupId>
     <artifactId>glory-presenter</artifactId>
-    <version>2.0</version>
+    <version>3.0</version>
     <packaging>jar</packaging>
 
     <parent>
@@ -18,7 +18,6 @@
 
     <properties>
         <main-class>com.scottmo.Main</main-class>
-        <start-class>com.lionmint.core.test.integration.apns.mock.MockAPNSServer</start-class>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
