@@ -3,7 +3,6 @@ package com.scottmo;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
-import javax.swing.SwingUtilities;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -29,8 +28,7 @@ public class Main extends JFrame {
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(Main::new);
-        SpringApplication.run(Main.class);
+        SpringApplication.run(Main.class, args);
         // App.main(args);
     }
 }

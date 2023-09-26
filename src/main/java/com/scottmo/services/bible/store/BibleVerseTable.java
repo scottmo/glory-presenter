@@ -1,4 +1,4 @@
-package com.scottmo.services.bible;
+package com.scottmo.services.bible.store;
 
 import com.scottmo.data.bibleMetadata.BibleMetadata;
 

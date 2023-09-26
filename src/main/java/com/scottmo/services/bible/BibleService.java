@@ -6,8 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.scottmo.services.appContext.AppContextService;
+import com.scottmo.services.bible.store.BibleStore;
 
-@Component("bibleService")
+@Component
 public class BibleService {
     @Autowired
     private AppContextService appContextService;

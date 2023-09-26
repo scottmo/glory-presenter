@@ -1,9 +1,10 @@
-package com.scottmo.services.bible;
+package com.scottmo.services.bible.store;
 
 import com.scottmo.data.bibleMetadata.BibleMetadata;
 import com.scottmo.data.bibleReference.BibleReference;
 import com.scottmo.data.bibleReference.VerseRange;
 import com.scottmo.services.appContext.AppContextService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

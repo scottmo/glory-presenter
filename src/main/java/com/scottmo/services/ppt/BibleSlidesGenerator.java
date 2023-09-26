@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 
 import com.scottmo.data.bibleReference.BibleReference;
 import com.scottmo.services.bible.BibleService;
-import com.scottmo.services.bible.BibleVerse;
+import com.scottmo.services.bible.store.BibleVerse;
 
 @Component
 public final class BibleSlidesGenerator {

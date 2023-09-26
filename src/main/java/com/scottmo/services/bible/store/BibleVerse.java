@@ -1,4 +1,4 @@
-package com.scottmo.services.bible;
+package com.scottmo.services.bible.store;
 
 public record BibleVerse(
     int bookIndex,

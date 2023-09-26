@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 import java.nio.file.Path;
 
-@Component("songService")
+@Component
 public class SongService {
     @Autowired
     private AppContextService appContextService;
