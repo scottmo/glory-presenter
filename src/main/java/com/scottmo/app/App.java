@@ -1,7 +1,6 @@
 package com.scottmo.app;
 
 import atlantafx.base.theme.PrimerLight;
-import com.scottmo.services.ServiceSupplier;
 import com.scottmo.services.logging.AppLogger;
 import com.scottmo.services.logging.AppLoggerService;
 import javafx.application.Application;
@@ -13,18 +12,19 @@ import javafx.scene.control.ButtonType;
 import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
 import java.util.Objects;
-import java.util.function.Supplier;
 
-import static com.scottmo.config.AppContext.*;
+import static com.scottmo.services.appContext.AppContextService.*;
 
 public class App extends Application implements AppLogger {
 
     private final Logger logger = LogManager.getRootLogger();
 
-    private final Supplier<AppLoggerService> appLoggerService = ServiceSupplier.get(AppLoggerService.class);
+    @Autowired
+    private AppLoggerService appLoggerService;
 
     @Override
     public void info(String msg) {
@@ -54,7 +54,7 @@ public class App extends Application implements AppLogger {
         Thread.setDefaultUncaughtExceptionHandler((Thread t, Throwable e) -> {
             error("Oops!: " + e.getMessage() + "(see error.log for details)", e);
         });
-        appLoggerService.get().registerLogger(this);
+        appLoggerService.registerLogger(this);
 
         Application.setUserAgentStylesheet(new PrimerLight().getUserAgentStylesheet());
         Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("/ui/main.fxml")));

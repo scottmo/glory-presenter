@@ -1,21 +1,22 @@
 package com.scottmo.services.security;
 
-import com.scottmo.services.Service;
+import org.springframework.stereotype.Component;
 
+import javax.crypto.Cipher;
+import javax.crypto.SecretKey;
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.PBEKeySpec;
+import javax.crypto.spec.PBEParameterSpec;
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.GeneralSecurityException;
-import java.util.*;
-import javax.crypto.Cipher;
-import javax.crypto.SecretKey;
-import javax.crypto.SecretKeyFactory;
-import javax.crypto.spec.PBEKeySpec;
-import javax.crypto.spec.PBEParameterSpec;
+import java.util.Random;
 
-public final class CipherService implements Service {
+@Component
+public final class CipherService {
     private static final String algorithm = "PBEWithMD5AndTripleDES";
 
     private Cipher cipher(String password, byte[] salt, int mode) throws GeneralSecurityException {

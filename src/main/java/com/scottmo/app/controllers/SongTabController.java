@@ -2,9 +2,8 @@ package com.scottmo.app.controllers;
 
 import com.scottmo.app.Labels;
 import com.scottmo.app.views.ViewUtil;
-import com.scottmo.config.AppContext;
+import com.scottmo.services.appContext.AppContextService;
 import com.scottmo.data.song.Song;
-import com.scottmo.services.ServiceSupplier;
 import com.scottmo.services.logging.AppLoggerService;
 import com.scottmo.services.ppt.SongSlidesGenerator;
 import com.scottmo.services.songs.SongService;
@@ -26,6 +25,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
 import java.io.IOException;
@@ -40,10 +40,14 @@ import java.util.function.Supplier;
 public class SongTabController {
     private static final String VERSE_EDITOR_FXML = "/ui/songEditor.fxml";
 
-    private final AppContext appContext = ServiceSupplier.getAppContext();
-    private final Supplier<SongService> songService = ServiceSupplier.get(SongService.class);
-    private final Supplier<SongSlidesGenerator> pptxGenerator = ServiceSupplier.get(SongSlidesGenerator.class);
-    private final Supplier<AppLoggerService> logger = ServiceSupplier.get(AppLoggerService.class);
+    @Autowired
+    private AppContextService appContextService;
+    @Autowired
+    private SongService songService;
+    @Autowired
+    private SongSlidesGenerator pptxGenerator;
+    @Autowired
+    private AppLoggerService logger;
 
     private final Map<String, Integer> songIdsMap = new HashMap<>();
     public CheckBox hasStartSlide;
@@ -63,7 +67,7 @@ public class SongTabController {
         Platform.runLater(() -> {
             refreshSongList();
 
-            ViewUtil.get().attachFilePickerToInput(templatePathInput, appContext.getPPTXTemplate(""), ViewUtil.FILE_EXT_PPTX);
+            ViewUtil.get().attachFilePickerToInput(templatePathInput, appContextService.getPPTXTemplate(""), ViewUtil.FILE_EXT_PPTX);
             linesPerSlideInput.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 20, 2));
         });
     }
@@ -109,24 +113,24 @@ public class SongTabController {
                 ButtonType.YES, ButtonType.CANCEL);
         alert.showAndWait();
         if (alert.getResult() == ButtonType.YES) {
-            songService.get().getStore().delete(getSelectedSongId());
+            songService.getStore().delete(getSelectedSongId());
         }
         refreshSongList();
     }
 
     public void onGeneratePPTX(ActionEvent event) {
         Song song = loadSelectedSong();
-        String outputFilePath = appContext.getOutputDir(StringUtils.sanitizeFilename(getSelectedSongTitle()) + ".pptx");
+        String outputFilePath = appContextService.getOutputDir(StringUtils.sanitizeFilename(getSelectedSongTitle()) + ".pptx");
         String templateFilePath = templatePathInput.getText();
         if (!templateFilePath.contains("/")) {
-            templateFilePath = appContext.getPPTXTemplate(templateFilePath);
+            templateFilePath = appContextService.getPPTXTemplate(templateFilePath);
         }
         try {
-            pptxGenerator.get().generate(song, templateFilePath, outputFilePath, appContext.getConfig().locales(),
+            pptxGenerator.generate(song, templateFilePath, outputFilePath, appContextService.getConfig().locales(),
                     linesPerSlideInput.getValue(), hasStartSlide.isSelected(), hasEndSlide.isSelected());
-            logger.get().info("Generated slides at " + outputFilePath);
+            logger.info("Generated slides at " + outputFilePath);
         } catch (IOException e) {
-            logger.get().error("Failed to generate slides!", e);
+            logger.error("Failed to generate slides!", e);
         }
     }
 
@@ -138,27 +142,27 @@ public class SongTabController {
             for (File file : selectedFiles) {
                 try {
                     String openLyricsXML = Files.readString(file.toPath(), StandardCharsets.UTF_8);
-                    Song song = songService.get().getOpenLyricsConverter().deserialize(openLyricsXML);
-                    songService.get().getStore().store(song);
+                    Song song = songService.getOpenLyricsConverter().deserialize(openLyricsXML);
+                    songService.getStore().store(song);
                 } catch (IOException e) {
-                    logger.get().error("Failed to import song [%s]!".formatted(file.getName()), e);
+                    logger.error("Failed to import song [%s]!".formatted(file.getName()), e);
                 }
             }
             refreshSongList();
-            logger.get().info("Done importing songs!");
+            logger.info("Done importing songs!");
         }
     }
 
     public void onExportSong(ActionEvent event) {
         Song song = loadSelectedSong();
         String songTitle = getSelectedSongTitle();
-        String outputFilePath = appContext.getOutputDir(songTitle + ".xml");
-        String songXML = songService.get().getOpenLyricsConverter().serialize(song);
+        String outputFilePath = appContextService.getOutputDir(songTitle + ".xml");
+        String songXML = songService.getOpenLyricsConverter().serialize(song);
         try {
             Files.writeString(Path.of(outputFilePath), songXML, StandardCharsets.UTF_8);
-            logger.get().info("Exported song at " + outputFilePath);
+            logger.info("Exported song at " + outputFilePath);
         } catch (IOException e) {
-            logger.get().error("Failed to export song [%s]!".formatted(songTitle), e);
+            logger.error("Failed to export song [%s]!".formatted(songTitle), e);
         }
     }
 
@@ -204,12 +208,12 @@ public class SongTabController {
     }
 
     private Song loadSelectedSong() {
-        return songService.get().getStore().get(getSelectedSongId());
+        return songService.getStore().get(getSelectedSongId());
     }
 
     private Map<Integer, String> getSongTitles() {
         Map<Integer, String> titles = new HashMap<>();
-        for (var title : songService.get().getStore().getAllSongDescriptors(appContext.getConfig().locales())) {
+        for (var title : songService.getStore().getAllSongDescriptors(appContextService.getConfig().locales())) {
             titles.put(title.getKey(), title.getValue());
         }
         return titles;

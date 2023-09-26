@@ -1,8 +1,9 @@
 package com.scottmo.services.logging;
 
-import com.scottmo.services.Service;
+import org.springframework.stereotype.Component;
 
-public class AppLoggerService implements Service {
+@Component
+public class AppLoggerService {
     private AppLogger appLogger;
     public void registerLogger(AppLogger logger) {
         appLogger = logger;

@@ -1,17 +1,17 @@
 package com.scottmo;
 
-import com.scottmo.app.App;
-import org.springframework.beans.factory.annotation.Autowired;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JTextArea;
+import javax.swing.SwingUtilities;
+
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.ApplicationContext;
 
-import javax.swing.*;
+import com.scottmo.app.App;
 
 @SpringBootApplication
 public class Main extends JFrame {
-    @Autowired
-    private ApplicationContext springContainer;
 
     public Main() {
         // Set up the frame
@@ -31,5 +31,6 @@ public class Main extends JFrame {
     public static void main(String[] args) {
         SwingUtilities.invokeLater(Main::new);
         SpringApplication.run(Main.class);
+        // App.main(args);
     }
 }

@@ -1,9 +1,9 @@
 package com.scottmo.data.song;
 
-import com.scottmo.config.AppContext;
-import com.scottmo.services.ServiceSupplier;
+import com.scottmo.services.appContext.AppContextService;
 import com.scottmo.util.LocaleUtil;
 import com.scottmo.util.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -12,7 +12,8 @@ import java.util.List;
 import java.util.Map;
 
 public class Song {
-    private final AppContext appContext = ServiceSupplier.getAppContext();
+    @Autowired
+    private AppContextService appContextService;
 
     private int id = -1;
 
@@ -42,8 +43,8 @@ public class Song {
      */
     public String getPrimaryLocale() {
         List<String> locales = this.getLocales();
-        if (locales.isEmpty() || locales.contains(appContext.getPrimaryLocale())) {
-            return appContext.getPrimaryLocale();
+        if (locales.isEmpty() || locales.contains(appContextService.getPrimaryLocale())) {
+            return appContextService.getPrimaryLocale();
         }
         return locales.get(0);
     }

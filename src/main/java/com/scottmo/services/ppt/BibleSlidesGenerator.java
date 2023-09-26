@@ -1,21 +1,22 @@
 package com.scottmo.services.ppt;
 
-import com.scottmo.data.bibleReference.BibleReference;
-import com.scottmo.services.Service;
-import com.scottmo.services.ServiceSupplier;
-import com.scottmo.services.bible.BibleStore;
-import com.scottmo.services.bible.BibleVerse;
+import static com.scottmo.services.ppt.TemplatingUtil.PLACEHOLDER_TEMPLATE;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Supplier;
 
-import static com.scottmo.services.ppt.TemplatingUtil.PLACEHOLDER_TEMPLATE;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-public final class BibleSlidesGenerator implements Service {
+import com.scottmo.data.bibleReference.BibleReference;
+import com.scottmo.services.bible.BibleService;
+import com.scottmo.services.bible.BibleVerse;
+
+@Component
+public final class BibleSlidesGenerator {
     // placeholder keys
     private static final String VERSE_CHAPTER = "verse.chapter";
     private static final String VERSE_NUMBER = "verse.number";
@@ -23,15 +24,16 @@ public final class BibleSlidesGenerator implements Service {
     private static final String VERSE_RANGE = "verses";
     private static final String BOOK = "book.%s";
 
-    private final Supplier<BibleStore> bibleStore = ServiceSupplier.get(BibleStore.class);
+    @Autowired
+    private BibleService bibleService;
 
     public void generate(String bibleRefString, String tmplFilePath, String outputFilePath,
             boolean hasStartSlide, boolean hasEndSlide) throws IOException {
         BibleReference bibleReference = new BibleReference(bibleRefString);
         List<Map<String, String>> slideContents = new ArrayList<>();
 
-        Map<String, List<BibleVerse>> bibleVerses = bibleStore.get().getBibleVerses(bibleReference);
-        Map<String, String> bookNames = bibleStore.get().getBookNames(bibleReference.getBook());
+        Map<String, List<BibleVerse>> bibleVerses = bibleService.getStore().getBibleVerses(bibleReference);
+        Map<String, String> bookNames = bibleService.getStore().getBookNames(bibleReference.getBook());
 
         Map<String, String> bibleMetadata = new HashMap<>();
         for (String version : bibleReference.getVersions()) {

@@ -175,6 +175,7 @@
                 <executions>
                     <execution>
                         <id>position-react-build</id>
+                        <phase>compile</phase>
                         <goals>
                             <goal>copy-resources</goal>
                         </goals>

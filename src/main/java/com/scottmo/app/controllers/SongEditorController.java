@@ -3,10 +3,9 @@ package com.scottmo.app.controllers;
 import com.scottmo.app.Labels;
 import com.scottmo.app.views.TileLyricsEditor;
 import com.scottmo.app.views.ViewUtil;
-import com.scottmo.config.AppContext;
+import com.scottmo.services.appContext.AppContextService;
 import com.scottmo.data.song.Song;
 import com.scottmo.data.song.SongVerse;
-import com.scottmo.services.ServiceSupplier;
 import com.scottmo.services.songs.SongService;
 import com.scottmo.util.LocaleUtil;
 import com.scottmo.util.StringUtils;
@@ -26,6 +25,7 @@ import javafx.scene.control.TextInputDialog;
 import javafx.scene.input.MouseButton;
 import javafx.stage.Stage;
 import javafx.util.Pair;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -34,8 +34,10 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 public class SongEditorController {
-    private final AppContext appContext = ServiceSupplier.getAppContext();
-    private final Supplier<SongService> songService = ServiceSupplier.get(SongService.class);
+    @Autowired
+    private AppContextService appContextService;
+    @Autowired
+    private SongService songService;
 
     private final Map<String, TileLyricsEditor> lyricsEditorMap = new HashMap<>();
 
@@ -204,7 +206,7 @@ public class SongEditorController {
         TextInputDialog dialog = new TextInputDialog();
         dialog.setHeaderText(Labels.DIALOG_ADD_LOCALE);
         // start with primary locale
-        dialog.getEditor().setText(appContext.getPrimaryLocale());
+        dialog.getEditor().setText(appContextService.getPrimaryLocale());
         dialog.showAndWait();
         return dialog.getResult();
     }
@@ -216,7 +218,7 @@ public class SongEditorController {
     public void onSave(ActionEvent event) {
         // TODO validations
         Song song = extractForm();
-        songService.get().getStore().store(song);
+        songService.getStore().store(song);
     }
 
     public void onSaveAndClose(ActionEvent event) {

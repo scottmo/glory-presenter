@@ -1,8 +1,9 @@
-package com.scottmo.config;
+package com.scottmo.services.appContext;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.scottmo.config.definitions.AppConfig;
 import com.scottmo.util.LocaleUtil;
+import org.springframework.stereotype.Component;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -10,7 +11,8 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-public final class AppContext {
+@Component("appContextService")
+public final class AppContextService {
     public static final String APP_NAME = "Glory Presenter";
     public static final int APP_WIDTH = 900;
     public static final int APP_HEIGHT = 600;
@@ -38,7 +40,7 @@ public final class AppContext {
     public void reload() {
         Path configPath = Path.of(CONFIG_PATH);
         if (!Files.exists(configPath)) {
-            try (InputStream in = AppContext.class.getClassLoader().getResourceAsStream("config.json")) {
+            try (InputStream in = AppContextService.class.getClassLoader().getResourceAsStream("config.json")) {
                 Files.copy(in, configPath);
             } catch (IOException e) {
                 throw new RuntimeException("Unable to create config.json!");

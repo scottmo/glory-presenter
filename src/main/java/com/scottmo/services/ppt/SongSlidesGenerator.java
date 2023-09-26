@@ -2,8 +2,8 @@ package com.scottmo.services.ppt;
 
 import com.scottmo.data.song.Song;
 import com.scottmo.data.song.SongVerse;
-import com.scottmo.services.Service;
 import com.scottmo.util.StringUtils;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -16,7 +16,8 @@ import java.util.stream.IntStream;
 
 import static com.scottmo.services.ppt.TemplatingUtil.PLACEHOLDER_TEMPLATE;
 
-public final class SongSlidesGenerator implements Service {
+@Component
+public final class SongSlidesGenerator {
     // placeholder keys
     private static final String VERSE_PREFIX = "verse.";
     private static final String TITLE_PREFIX = "title.";

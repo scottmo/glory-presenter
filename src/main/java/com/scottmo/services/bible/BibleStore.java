@@ -3,8 +3,9 @@ package com.scottmo.services.bible;
 import com.scottmo.data.bibleMetadata.BibleMetadata;
 import com.scottmo.data.bibleReference.BibleReference;
 import com.scottmo.data.bibleReference.VerseRange;
-import com.scottmo.services.Service;
-import com.scottmo.services.ServiceSupplier;
+import com.scottmo.services.appContext.AppContextService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.nio.file.Path;
 import java.sql.Connection;
@@ -16,16 +17,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public final class BibleStore implements Service {
+public final class BibleStore {
     private static final String DB_NAME = "bible";
 
     private final BibleVerseTable bibleVerseTable;
     private final BookNamesTable bookNamesTable;
     private List<Map<String, String>> bookNames = Collections.emptyList(); // cache
-
-    public BibleStore() {
-        this(Path.of(ServiceSupplier.getAppContext().getConfig().dataDir()));
-    }
 
     public BibleStore(Path storeLocation) {
         try {
