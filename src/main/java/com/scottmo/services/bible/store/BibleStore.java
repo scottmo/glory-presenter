@@ -1,13 +1,5 @@
 package com.scottmo.services.bible.store;
 
-import com.scottmo.data.bibleMetadata.BibleMetadata;
-import com.scottmo.data.bibleReference.BibleReference;
-import com.scottmo.data.bibleReference.VerseRange;
-import com.scottmo.services.appContext.AppContextService;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -17,6 +9,10 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import com.scottmo.data.bibleMetadata.BibleMetadata;
+import com.scottmo.data.bibleReference.BibleReference;
+import com.scottmo.data.bibleReference.VerseRange;
 
 public final class BibleStore {
     private static final String DB_NAME = "bible";
