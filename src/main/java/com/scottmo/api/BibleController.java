@@ -27,7 +27,7 @@ import com.scottmo.util.StringUtils;
 
 
 @RestController
-@RequestMapping("/bible")
+@RequestMapping("/api/bible")
 public class BibleController {
 
     @Autowired
