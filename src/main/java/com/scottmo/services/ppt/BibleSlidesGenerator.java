@@ -27,6 +27,11 @@ public final class BibleSlidesGenerator {
     @Autowired
     private BibleService bibleService;
 
+    // TODO: determine hasStartSlide and hasEndSlide from templatefile
+    public void generate(String bibleRefString, String tmplFilePath, String outputFilePath) throws IOException {
+        generate(bibleRefString, tmplFilePath, outputFilePath, true, false);
+    }
+
     public void generate(String bibleRefString, String tmplFilePath, String outputFilePath,
             boolean hasStartSlide, boolean hasEndSlide) throws IOException {
         BibleReference bibleReference = new BibleReference(bibleRefString);

@@ -2,10 +2,16 @@ package com.scottmo.api;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.net.MalformedURLException;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
 public class RequestUtil {
@@ -43,5 +49,18 @@ public class RequestUtil {
 
     public ResponseEntity<Map<String, Object>> successResponse() {
         return successResponse(null);
+    }
+
+    public ResponseEntity<Resource> download(Path filePath) throws MalformedURLException {
+        Resource resource = new UrlResource(filePath.toUri());
+
+        if (resource.exists() && resource.isReadable()) {
+            return ResponseEntity.ok()
+                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filePath.getFileName().toString() + "\"")
+                    .body(resource);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 }
