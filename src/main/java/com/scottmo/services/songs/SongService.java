@@ -1,12 +1,18 @@
 package com.scottmo.services.songs;
 
-import com.scottmo.services.appContext.AppContextService;
-import com.scottmo.services.songs.openLyrics.OpenLyricsConverter;
-import com.scottmo.services.songs.store.SongStore;
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.nio.file.Path;
+import com.scottmo.data.song.Song;
+import com.scottmo.services.appContext.AppContextService;
+import com.scottmo.services.songs.openLyrics.OpenLyricsConverter;
+import com.scottmo.services.songs.store.SongStore;
 
 @Component
 public class SongService {
@@ -24,5 +30,11 @@ public class SongService {
 
     public OpenLyricsConverter getOpenLyricsConverter() {
         return openLyricsConverter;
+    }
+
+    public void importOpenLyricSong(File openLyricsFile) throws IOException {
+        String openLyricsXML = Files.readString(openLyricsFile.toPath(), StandardCharsets.UTF_8);
+        Song song = getOpenLyricsConverter().deserialize(openLyricsXML);
+        store.store(song);
     }
 }
