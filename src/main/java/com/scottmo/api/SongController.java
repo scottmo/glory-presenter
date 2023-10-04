@@ -28,7 +28,7 @@ import com.scottmo.services.songs.SongService;
 import com.scottmo.util.StringUtils;
 
 @RestController
-@RequestMapping("/api/songs")
+@RequestMapping("/api/song")
 public class SongController {
 
     @Autowired
@@ -78,6 +78,11 @@ public class SongController {
         String songXML = songService.getOpenLyricsConverter().serialize(song);
         Files.writeString(outputPath, songXML, StandardCharsets.UTF_8);
         return requestUtil.download(outputPath);
+    }
+
+    @PostMapping("/save")
+    public Integer saveSong(@RequestBody Song song) {
+        return songService.getStore().store(song);
     }
 
     @PostMapping("/import")

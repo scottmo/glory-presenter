@@ -120,15 +120,15 @@ public final class SongStore {
         return song;
     }
 
-    public boolean store(Song song) {
+    public int store(Song song) {
         if (song.getId() > -1) {
              return update(song);
         }
         return insert(song);
     }
 
-    private boolean insert(Song song) {
-        int songId;
+    private int insert(Song song) {
+        int songId = -1;
         try {
             List<String> nonEmptyFieldKeys = new ArrayList<>();
             List<String> nonEmptyFields = new ArrayList<>();
@@ -185,7 +185,7 @@ public final class SongStore {
         } catch (SQLException e) {
             throw new RuntimeException("Unable to insert song to DB!", e);
         }
-        return true;
+        return songId;
     }
 
     private void insertTitles(int songId, Song song) throws SQLException {
@@ -225,7 +225,7 @@ public final class SongStore {
         }
     }
 
-    private boolean update(Song song) {
+    private int update(Song song) {
         var locales = song.getLocales();
         if (!locales.isEmpty()) {
             delete(song.getId(), true);
@@ -264,7 +264,7 @@ public final class SongStore {
         } catch (SQLException e) {
             throw new RuntimeException("Unable to update song!", e);
         }
-        return true;
+        return song.getId();
     }
 
     public boolean delete(int songId) {
