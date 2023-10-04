@@ -26,6 +26,12 @@ public final class SongSlidesGenerator {
     private static final String COPYRIGHT = "copyright";
     private static final String PUBLISHER = "publisher";
 
+    // TODO: determine hasStartSlide and hasEndSlide from templatefile
+    public void generate(Song song, String tmplFilePath, String outputFilePath, List<String> locales,
+            int maxLines) throws IOException {
+        generate(song, tmplFilePath, outputFilePath, locales, maxLines, true, false);
+    }
+
     public void generate(Song song, String tmplFilePath, String outputFilePath, List<String> locales,
             int maxLines, boolean hasStartSlide, boolean hasEndSlide) throws IOException {
         // song metadata for all slides

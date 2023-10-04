@@ -2,12 +2,17 @@ package com.scottmo.api;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,6 +25,7 @@ import com.scottmo.data.song.Song;
 import com.scottmo.services.appContext.AppContextService;
 import com.scottmo.services.ppt.SongSlidesGenerator;
 import com.scottmo.services.songs.SongService;
+import com.scottmo.util.StringUtils;
 
 @RestController
 @RequestMapping("/api/songs")
@@ -34,7 +40,7 @@ public class SongController {
 
     private RequestUtil requestUtil = new RequestUtil();
 
-    @GetMapping("/songs")
+    @GetMapping("/titles")
     Map<Integer, String> getSongs() {
         Map<Integer, String> titles = new HashMap<>();
         for (var title : songService.getStore().getAllSongDescriptors(appContextService.getConfig().locales())) {
@@ -43,13 +49,39 @@ public class SongController {
         return titles;
     }
 
-    @GetMapping("/song/:id")
+    @GetMapping("/:id")
     Song getSong(@RequestParam Integer id) {
         return songService.getStore().get(id);
     }
 
-    @PostMapping("/songs")
-    ResponseEntity<Map<String, Object>> importBibles(@RequestBody List<String> songPaths) {
+    @GetMapping("/pptx")
+    public ResponseEntity<Resource> generatePPTX(
+            @RequestParam Integer songId,
+            @RequestParam Integer linesPerSlide,
+            @RequestParam String templatePath) throws MalformedURLException, IOException {
+
+        Song song = getSong(songId);
+        Path outputPath = Path.of(System.getProperty("java.io.tmpdir"), StringUtils.sanitizeFilename(song.getTitle()) + ".pptx");
+        if (!templatePath.contains("/")) {
+            templatePath = appContextService.getPPTXTemplate(templatePath);
+        }
+        pptxGenerator.generate(song, templatePath, outputPath.toString(), appContextService.getConfig().locales(),
+                linesPerSlide);
+    
+        return requestUtil.download(outputPath);
+    }
+
+    @GetMapping("/export/:id")
+    public ResponseEntity<Resource> exportSong(@RequestParam Integer id) throws IOException {
+        Song song = songService.getStore().get(id);
+        Path outputPath = Path.of(System.getProperty("java.io.tmpdir"), StringUtils.sanitizeFilename(song.getTitle()) + ".xml");
+        String songXML = songService.getOpenLyricsConverter().serialize(song);
+        Files.writeString(outputPath, songXML, StandardCharsets.UTF_8);
+        return requestUtil.download(outputPath);
+    }
+
+    @PostMapping("/import")
+    public ResponseEntity<Map<String, Object>> importSongs(@RequestBody List<String> songPaths) {
         if (songPaths == null || songPaths.isEmpty()) {
             return requestUtil.errorResponse("No file to import!");
         }
@@ -65,42 +97,4 @@ public class SongController {
         }
         return requestUtil.successResponse();
     }
-
-//    @GetMapping("/employees")
-//    List<Employee> all() {
-//        return repository.findAll();
-//    }
-//    // end::get-aggregate-root[]
-//
-//    @PostMapping("/employees")
-//    Employee newEmployee(@RequestBody Employee newEmployee) {
-//        return repository.save(newEmployee);
-//    }
-//
-//    @DeleteMapping("/employees/{id}")
-//    void deleteEmployee(@PathVariable Long id) {
-//        repository.deleteById(id);
-//    }
-//
-//    @GetMapping("/employees/{id}")
-//    Employee one(@PathVariable Long id) {
-//
-//        return repository.findById(id)
-//                .orElseThrow(() -> new EmployeeNotFoundException(id));
-//    }
-//
-//    @PutMapping("/employees/{id}")
-//    Employee replaceEmployee(@RequestBody Employee newEmployee, @PathVariable Long id) {
-//
-//        return repository.findById(id)
-//                .map(employee -> {
-//                    employee.setName(newEmployee.getName());
-//                    employee.setRole(newEmployee.getRole());
-//                    return repository.save(employee);
-//                })
-//                .orElseGet(() -> {
-//                    newEmployee.setId(id);
-//                    return repository.save(newEmployee);
-//                });
-//    }
 }
