@@ -1,5 +1,7 @@
 package com.scottmo;
 
+import java.awt.GraphicsEnvironment;
+
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
@@ -7,13 +9,14 @@ import javax.swing.JTextArea;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import com.scottmo.app.App;
-
 @SpringBootApplication
 public class Main {
+    private static String OS = System.getProperty("os.name").toLowerCase();
 
     public Main() {
-        // displayUI();
+        if (!GraphicsEnvironment.isHeadless()) {
+            displayUI();
+        }
     }
 
     private void displayUI() {
