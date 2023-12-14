@@ -1,14 +1,13 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import './index.css';
-import App from './App';
+import { MantineProvider, createTheme } from '@mantine/core';
+import '@mantine/core/styles/global.css';
 import reportWebVitals from './reportWebVitals';
 import {
     createBrowserRouter,
     RouterProvider,
 } from "react-router-dom";
-import { MantineProvider, createTheme } from '@mantine/core';
-import '@mantine/core/styles/global.css';
+import App from './App';
 
 const theme = createTheme({
     /** Your theme override here */
@@ -17,8 +16,6 @@ const theme = createTheme({
         'gcbc-red': ['#FDEDED', '#F4D7D7', '#EEA9A9', '#E87A79', '#E35350', '#E13B35', '#E02F28', '#C7231D', '#B11C18', '#9B1212'],
     },
 });
-
-
 
 // import GSlides from './ui/old_components_with_bootstrap/GSlides';
 // import GlobalProvider from "../old_components_with_bootstrap/providers/GlobalProvider";
