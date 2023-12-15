@@ -1,17 +1,9 @@
 import { useState } from 'react';
 import { AppShell, Burger, Group, NavLink, Code } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import {
-    IconBible,
-    IconBrandGoogle,
-    IconSettings,
-    IconSlideshow,
-    IconMusic,
-    IconCross,
-} from '@tabler/icons-react';
-import {
-    Link, Outlet
-} from "react-router-dom";
+import { IconCross, } from '@tabler/icons-react';
+import { Link, Outlet } from "react-router-dom";
+import routes from './routes';
 
 import '@mantine/core/styles/UnstyledButton.css';
 import '@mantine/core/styles/NavLink.css';
@@ -19,23 +11,15 @@ import '@mantine/core/styles/AppShell.css';
 import '@mantine/core/styles/Burger.css';
 import classes from './App.module.css';
 
-const data = [
-    { link: '/songs', label: 'Songs', icon: IconMusic },
-    { link: '/bible', label: 'Bible', icon: IconBible },
-    { link: '/gslides', label: 'Google Slides', icon: IconBrandGoogle },
-    { link: '/ppt', label: 'Powerpoint', icon: IconSlideshow },
-    { link: '/settings', label: 'Settings', icon: IconSettings }
-];
-
 export default function App() {
     const [active, setActive] = useState('Songs');
     const [opened, { toggle }] = useDisclosure();
 
-    const links = data.map((item) => (
+    const links = routes.map((item) => (
         <NavLink key={item.label} label={item.label}
             className={classes.link}
             active={item.label === active}
-            component={Link} to={item.link}
+            component={Link} to={item.path}
             onClick={(event) => setActive(item.label)}
             leftSection={<item.icon size="1rem" stroke={1.5} />} />
     ));
