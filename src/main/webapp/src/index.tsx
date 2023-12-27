@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { createBrowserRouter, RouterProvider, } from "react-router-dom";
+import { createHashRouter, RouterProvider, } from "react-router-dom";
+import { QueryClient, QueryClientProvider, } from '@tanstack/react-query'
 
 import { MantineProvider, createTheme } from '@mantine/core';
 import '@mantine/core/styles/global.css';
@@ -18,7 +19,7 @@ const theme = createTheme({
     },
 });
 
-const router = createBrowserRouter([
+const router = createHashRouter([
     {
         path: "/",
         element: <App/>,
@@ -26,15 +27,17 @@ const router = createBrowserRouter([
     },
 ]);
 
+const queryClient = new QueryClient();
+
 const root = ReactDOM.createRoot(
     document.getElementById('root') as HTMLElement
 );
 root.render(
     <React.StrictMode>
         <MantineProvider theme={theme}>
-            {/* <GlobalProvider> */}
-            <RouterProvider router={router} />
-            {/* </GlobalProvider> */}
+            <QueryClientProvider client={queryClient}>
+                <RouterProvider router={router} />
+            </QueryClientProvider>
         </MantineProvider>
     </React.StrictMode>
 );
