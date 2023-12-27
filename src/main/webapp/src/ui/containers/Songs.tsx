@@ -5,7 +5,7 @@ import { Table, LoadingOverlay, TextInput, Container } from '@mantine/core';
 import '@mantine/core/styles/Container.css';
 import '@mantine/core/styles/Table.css';
 import '@mantine/core/styles/Input.css';
-import { API, useApi } from '../api';
+import { QueryAPI, useApi } from '../api';
 
 function stringMatch(term: string, text: string) {
     return term.trim() ? text.toLowerCase().includes(term.trim().toLowerCase()) : true;
@@ -14,7 +14,7 @@ function stringMatch(term: string, text: string) {
 export default function Songs() {
     const [searchTerm, setSearchTerm] = useState('');
     const [debouncedSearchTerm] = useDebouncedValue(searchTerm, 200);
-    const { isPending, error, data } = useApi(API.songList);
+    const { isPending, error, data } = useApi(QueryAPI.songList);
 
     if (isPending) return <LoadingOverlay visible={true} zIndex={1000} overlayProps={{ radius: "sm", blur: 2 }} />;
 
