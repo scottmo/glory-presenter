@@ -1,15 +1,21 @@
+import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query'
 
-import { Table, LoadingOverlay } from '@mantine/core';
+import { useDebouncedValue } from '@mantine/hooks';
+import { Table, LoadingOverlay, TextInput } from '@mantine/core';
 import '@mantine/core/styles/Table.css';
+import '@mantine/core/styles/Input.css';
+
+function stringMatch(term: string, text: string) {
+    return term.trim() ? text.toLowerCase().includes(term.trim().toLowerCase()) : true;
+}
 
 export default function Songs() {
+    const [searchTerm, setSearchTerm] = useState('');
+    const [debouncedSearchTerm] = useDebouncedValue(searchTerm, 200);
     const { isPending, error, data } = useQuery({
         queryKey: ['song/titles'],
-        queryFn: () =>
-            fetch('/api/song/titles').then(
-                (res) => res.json(),
-            ),
+        queryFn: () => fetch('http://localhost:8080/api/song/titles').then((res) => res.json())
     });
 
     if (isPending) return <LoadingOverlay visible={true} zIndex={1000} overlayProps={{ radius: "sm", blur: 2 }} />;
@@ -17,6 +23,8 @@ export default function Songs() {
     if (error) return <div>{'An error has occurred: ' + error.message}</div>;
 
     return (
+        <>
+        <TextInput placeholder="Search" onChange={(event) => setSearchTerm(event.currentTarget.value)} />
         <Table>
             <Table.Thead>
                 <Table.Tr>
@@ -25,7 +33,9 @@ export default function Songs() {
             </Table.Thead>
             <Table.Tbody>
             {
-                Object.entries(data).map(([ key, songName ]) => (
+                Object.entries(data)
+                .filter(([ _, songName ]) => stringMatch(debouncedSearchTerm, songName as string))
+                .map(([ key, songName ]) => (
                     <Table.Tr key={key}>
                         <Table.Td data-key={key}>{songName as string}</Table.Td>
                     </Table.Tr>
@@ -33,5 +43,6 @@ export default function Songs() {
             }
             </Table.Tbody>
         </Table>
+        </>
     );
 }
