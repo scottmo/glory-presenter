@@ -8,10 +8,22 @@ import javax.swing.JTextArea;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @SpringBootApplication
 public class Main {
-    private static String OS = System.getProperty("os.name").toLowerCase();
+    @Bean
+    public WebMvcConfigurer corsMappingConfigurer() {
+        return new WebMvcConfigurer() {
+            @Override
+            public void addCorsMappings(CorsRegistry registry) {
+                // for testing
+                registry.addMapping("/**").allowedOrigins("http://localhost:3000");
+            }
+        };
+    }
 
     public Main() {
         if (!GraphicsEnvironment.isHeadless()) {
@@ -36,6 +48,5 @@ public class Main {
 
     public static void main(String[] args) {
         SpringApplication.run(Main.class, args);
-        // App.main(args);
     }
 }
