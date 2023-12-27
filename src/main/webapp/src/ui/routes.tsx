@@ -5,8 +5,8 @@ import {
     IconSlideshow,
     IconMusic,
 } from '@tabler/icons-react';
-import Songs from './ui/containers/Songs';
-import Settings from './ui/containers/Settings';
+import Songs from './containers/Songs';
+import Settings from './containers/Settings';
 
 export default [
     { path: '/songs', label: 'Songs', icon: IconMusic, component: Songs },
