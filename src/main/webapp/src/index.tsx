@@ -7,8 +7,8 @@ import { MantineProvider, createTheme } from '@mantine/core';
 import '@mantine/core/styles/global.css';
 
 import reportWebVitals from './reportWebVitals';
-import App from './App';
-import routes from './routes';
+import App from './ui/App';
+import routes from './ui/routes';
 // import GSlides from './ui/old_components_with_bootstrap/GSlides';
 // import GlobalProvider from "../old_components_with_bootstrap/providers/GlobalProvider";
 
