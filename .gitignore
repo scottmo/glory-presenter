@@ -36,3 +36,7 @@ dependency-reduced-pom.xml
 
 # OS
 .DS_Store
+
+# Test
+data
+config.json
