@@ -49,7 +49,7 @@ public class BibleController {
         return new ArrayList<>(BibleMetadata.getBookInfoMap().keySet());
     }
 
-    @PostMapping("/bible")
+    @PostMapping("/import")
     ResponseEntity<Map<String, Object>> importBibles(@RequestBody List<String> biblePaths) {
         if (biblePaths == null || biblePaths.isEmpty()) {
             return requestUtil.errorResponse("No file to import!");
