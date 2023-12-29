@@ -142,28 +142,12 @@ public class Song {
         return verses;
     }
 
+    @JsonIgnore
     public List<String> getVerseNames() {
         List<SongVerse> verses = getVerses();
         if (verses != null) {
             return getVerses().stream().map(SongVerse::getName).toList();
         }
-        return Collections.emptyList();
-    }
-
-    /**
-     *
-     * @return
-     * [
-     *     {
-     *         [locale]: [
-     *             "verse1line1",
-     *             "verse1line2",
-     *             ...
-     *          ]
-     *     }
-     * ]
-     */
-    public List<Map<String, List<String>>> getOrderedVerses() {
         return Collections.emptyList();
     }
 
