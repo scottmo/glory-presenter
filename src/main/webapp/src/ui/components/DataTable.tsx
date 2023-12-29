@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 import { useDebouncedValue } from '@mantine/hooks';
-import { Table, TextInput, Container } from '@mantine/core';
+import { Table, Input, Container } from '@mantine/core';
 import '@mantine/core/styles/Container.css';
 import '@mantine/core/styles/Input.css';
 import '@mantine/core/styles/Table.css';
@@ -35,8 +35,10 @@ export default function DataTable({ headers, rows }: Props) {
 
     return (
         <Container>
-            <TextInput placeholder="Search"
-                onChange={(event) => setSearchTerm(event.currentTarget.value)} />
+            <Input.Wrapper label="Search">
+                <Input placeholder="Holy holy holy"
+                    onChange={(event) => setSearchTerm(event.currentTarget.value)} />
+            </Input.Wrapper>
             <Table>
                 <Table.Thead>
                     <Table.Tr>
@@ -51,7 +53,7 @@ export default function DataTable({ headers, rows }: Props) {
                 {filteredRows.map(row => (
                     <Table.Tr key={row.key}>
                     {row.columns.map(column => (
-                        <Table.Td data-key={row.key + column.label}>
+                        <Table.Td key={column.label} data-key={row.key + column.label}>
                             {column.label}
                         </Table.Td>
                     ))}

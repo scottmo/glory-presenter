@@ -27,7 +27,7 @@ export function useApi(path: string, params?: Record<string, string>) {
     const requestUri = generateRequestUri(path, params);
     return useQuery({
         queryKey: [requestUri],
-        queryFn: () => axios.get(requestUri),
+        queryFn: () => axios.get(requestUri).then(resp => resp.data),
     });
 }
 

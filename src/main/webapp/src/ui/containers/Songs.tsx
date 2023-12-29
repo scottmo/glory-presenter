@@ -18,7 +18,7 @@ export default function Songs() {
             <DataTable
                 headers={['Name']}
                 rows={Object.entries(data).map(([key, songName]) => ({
-                    key, columns: [{ label: songName }]
+                    key, columns: [{ label: songName as string }]
                 }))}
             />
         </Container>
