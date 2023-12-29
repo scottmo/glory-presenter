@@ -49,7 +49,7 @@ export interface ISong {
 }
 
 // slides
-export interface ISlideTextConfig {
+export interface SlideTextConfig {
     alignment?: string;
     margin?: number;
     fontFamily?: string;
@@ -59,9 +59,27 @@ export interface ISlideTextConfig {
     x?: number;
     y?: number;
 }
-export type ISlideConfig = {
-    [langCode: string]: ISlideTextConfig & {
+export type SlideConfig = {
+    [langCode: string]: SlideTextConfig & {
         numberOfCharactersPerLine?: number;
         numberOfLinesPerSlide?: number;
     }
+}
+
+export type Song = {
+    id?: string;
+    titles?: Record<string, string>;
+    authors?: string[];
+    publisher?: string;
+    copyright?: string;
+    songBook?: string;
+    entry?: string;
+    comments?: string;
+    verseOrder?: string[];
+    verses?: {
+        name: string;
+        text: string;
+        locale: string;
+    }[];
+    locales?: string[];
 }
