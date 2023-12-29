@@ -50,7 +50,7 @@ function generateRequestUri(path: string, params?: Record<string, string>) {
     const paramKeys = extractParams(requestUri);
     for (let key of paramKeys) {
         if (params[key]) {
-            requestUri = requestUri.replace(key, params[key]);
+            requestUri = requestUri.replace(':' + key, params[key]);
             delete params[key];
         }
     }
