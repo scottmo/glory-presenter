@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -49,8 +50,8 @@ public class SongController {
         return titles;
     }
 
-    @GetMapping("/:id")
-    Song getSong(@RequestParam Integer id) {
+    @GetMapping("/{id}")
+    Song getSong(@PathVariable Integer id) {
         return songService.getStore().get(id);
     }
 
@@ -71,8 +72,8 @@ public class SongController {
         return requestUtil.download(outputPath);
     }
 
-    @GetMapping("/export/:id")
-    public ResponseEntity<Resource> exportSong(@RequestParam Integer id) throws IOException {
+    @GetMapping("/export/{id}")
+    public ResponseEntity<Resource> exportSong(@PathVariable Integer id) throws IOException {
         Song song = songService.getStore().get(id);
         Path outputPath = Path.of(System.getProperty("java.io.tmpdir"), StringUtils.sanitizeFilename(song.getTitle()) + ".xml");
         String songXML = songService.getOpenLyricsConverter().serialize(song);
