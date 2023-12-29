@@ -1,9 +1,8 @@
 package com.scottmo.data.song;
 
-import com.scottmo.services.appContext.AppContextService;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.scottmo.util.LocaleUtil;
 import com.scottmo.util.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -12,9 +11,6 @@ import java.util.List;
 import java.util.Map;
 
 public class Song {
-    @Autowired
-    private AppContextService appContextService;
-
     private int id = -1;
 
     private final Map<String, String> titles = new HashMap<>();
@@ -26,6 +22,8 @@ public class Song {
     private String comments = "";
     private List<String> verseOrder = new ArrayList<>();
     private List<SongVerse> verses = new ArrayList<>();
+
+    private String defaultLocale;
 
     public Song() {}
 
@@ -41,14 +39,24 @@ public class Song {
      * @return primary locale used in this song. If no locale or default locale is present, default locale
      * is the primary one, otherwise the first locale available.
      */
+    @JsonIgnore
     public String getPrimaryLocale() {
         List<String> locales = this.getLocales();
-        if (locales.isEmpty() || locales.contains(appContextService.getPrimaryLocale())) {
-            return appContextService.getPrimaryLocale();
+        if (locales.isEmpty() || locales.contains(defaultLocale)) {
+            return defaultLocale;
         }
         return locales.get(0);
     }
 
+    public void setDefaultLocale(String locale) {
+        this.defaultLocale = locale;
+    }
+
+    public Map<String, String> getTitles() {
+        return titles;
+    }
+
+    @JsonIgnore
     public String getTitle() {
         return this.titles.get(getPrimaryLocale());
     }
