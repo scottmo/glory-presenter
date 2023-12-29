@@ -43,7 +43,7 @@ export default function DataTable({ headers, rows }: Props) {
                 <Table.Thead>
                     <Table.Tr>
                     {headers.map(header => (
-                        <Table.Th>
+                        <Table.Th key={header}>
                             {header}
                         </Table.Th>
                     ))}
