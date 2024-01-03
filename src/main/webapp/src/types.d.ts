@@ -66,20 +66,23 @@ export type SlideConfig = {
     }
 }
 
+export type SongVerse = {
+    name: string;
+    text: string;
+    locale: string;
+};
 export type Song = {
     id?: string;
-    titles?: Record<string, string>;
     authors?: string[];
     publisher?: string;
     copyright?: string;
     songBook?: string;
     entry?: string;
     comments?: string;
-    verseOrder?: string[];
-    verses?: {
-        name: string;
+    titles?: {
         text: string;
         locale: string;
     }[];
-    locales?: string[];
+    verseOrder?: string[];
+    verses?: SongVerse[];
 }
