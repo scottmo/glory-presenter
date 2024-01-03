@@ -35,7 +35,6 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Supplier;
 
 public class SongTabController {
     private static final String VERSE_EDITOR_FXML = "/ui/songEditor.fxml";
