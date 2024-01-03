@@ -6,14 +6,13 @@ import com.scottmo.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.stream.Collectors;
 
 public class Song {
     private int id = -1;
 
-    private final Map<String, String> titles = new HashMap<>();
+    private List<SongTitle> titles = new ArrayList<>();
     private List<String> authors = new ArrayList<>();
     private String publisher = "";
     private String copyright = "";
@@ -52,18 +51,23 @@ public class Song {
         this.defaultLocale = locale;
     }
 
-    public Map<String, String> getTitles() {
+    public List<SongTitle> getTitles() {
         return titles;
     }
 
     @JsonIgnore
     public String getTitle() {
-        return this.titles.get(getPrimaryLocale());
+        return getTitle(getPrimaryLocale());
     }
 
     public String getTitle(String locale) {
         locale = LocaleUtil.normalize(locale);
-        return this.titles.getOrDefault(locale, this.getTitle());
+        for (SongTitle title : this.titles) {
+            if (title.getLocale().equals(locale)) {
+                return title.getText();
+            }
+        }
+        return null;
     }
 
     public void setTitle(String title) {
@@ -76,12 +80,14 @@ public class Song {
         } else {
             locale = LocaleUtil.normalize(locale);
         }
-        this.titles.put(locale, StringUtils.trim(title));
+        this.titles.add(new SongTitle(StringUtils.trim(title), locale));
     }
 
+    @JsonIgnore
     public List<String> getLocales() {
-        List<String> locales = new ArrayList<>(this.titles.keySet());
-        return Collections.unmodifiableList(locales);
+        return this.titles.stream()
+            .map(SongTitle::getLocale)
+            .collect(Collectors.toList());
     }
 
     public List<String> getAuthors() {
