@@ -18,13 +18,14 @@ type Row = {
 type Props = {
     headers: string[];
     rows: Row[];
+    tableClassName: string;
 }
 
 function stringMatch(term: string, text: string) {
     return term.trim() ? text.toLowerCase().includes(term.trim().toLowerCase()) : true;
 }
 
-export default function DataTable({ headers, rows }: Props) {
+export default function DataTable({ headers, rows, tableClassName }: Props) {
     const [searchTerm, setSearchTerm] = useState('');
     const [debouncedSearchTerm] = useDebouncedValue(searchTerm, 200);
 
@@ -34,11 +35,12 @@ export default function DataTable({ headers, rows }: Props) {
     });
 
     return (
-        <Container>
+        <div>
             <Input.Wrapper label="Search">
                 <Input placeholder="Holy holy holy"
                     onChange={(event) => setSearchTerm(event.currentTarget.value)} />
             </Input.Wrapper>
+            <div className={tableClassName}>
             <Table>
                 <Table.Thead>
                     <Table.Tr>
@@ -61,6 +63,7 @@ export default function DataTable({ headers, rows }: Props) {
                 ))}
                 </Table.Tbody>
             </Table>
-        </Container>
+            </div>
+        </div>
     );
 }
