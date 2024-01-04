@@ -21,8 +21,6 @@ import '@mantine/core/styles/Flex.css';
 
 import App from './ui/App';
 import routes from './ui/routes';
-// import GSlides from './ui/old_components_with_bootstrap/GSlides';
-// import GlobalProvider from "../old_components_with_bootstrap/providers/GlobalProvider";
 
 const theme = createTheme({
     primaryColor: 'gcbc-red',
