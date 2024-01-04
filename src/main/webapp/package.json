@@ -16,8 +16,7 @@
     "react-router-dom": "^6.21.0",
     "react-scripts": "5.0.1",
     "react-select-search": "^4.1.7",
-    "use-async-resource": "^2.2.2",
-    "web-vitals": "^2.1.4"
+    "use-async-resource": "^2.2.2"
   },
   "devDependencies": {
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",

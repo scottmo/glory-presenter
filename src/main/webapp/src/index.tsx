@@ -19,7 +19,6 @@ import '@mantine/core/styles/ModalBase.css';
 import '@mantine/core/styles/Input.css';
 import '@mantine/core/styles/Flex.css';
 
-import reportWebVitals from './reportWebVitals';
 import App from './ui/App';
 import routes from './ui/routes';
 // import GSlides from './ui/old_components_with_bootstrap/GSlides';
@@ -54,8 +53,3 @@ root.render(
         </MantineProvider>
     </React.StrictMode>
 );
-
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
