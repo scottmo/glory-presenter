@@ -16,7 +16,7 @@ import classes from './Songs.module.css';
 export default function Songs() {
     const { isPending, error, data } = useApi(QueryAPI.songList);
     const [opened, { open, close }] = useDisclosure(false);
-    const [songId, setSongId] = useState('1');
+    const [songId, setSongId] = useState('');
 
     if (isPending) return <LoadingOverlay visible={true} zIndex={1000} overlayProps={{ radius: "sm", blur: 2 }} />;
 
