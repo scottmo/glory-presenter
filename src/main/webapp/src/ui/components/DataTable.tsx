@@ -5,6 +5,7 @@ import { Table, Input, Container } from '@mantine/core';
 import '@mantine/core/styles/Container.css';
 import '@mantine/core/styles/Input.css';
 import '@mantine/core/styles/Table.css';
+import classes from './DataTable.module.css';
 
 type Column = {
     label: string;
@@ -19,13 +20,14 @@ type Props = {
     headers: string[];
     rows: Row[];
     tableClassName: string;
+    onRowClick?: (row: Row) => void;
 }
 
 function stringMatch(term: string, text: string) {
     return term.trim() ? text.toLowerCase().includes(term.trim().toLowerCase()) : true;
 }
 
-export default function DataTable({ headers, rows, tableClassName }: Props) {
+export default function DataTable({ headers, rows, tableClassName, onRowClick }: Props) {
     const [searchTerm, setSearchTerm] = useState('');
     const [debouncedSearchTerm] = useDebouncedValue(searchTerm, 200);
 
@@ -41,7 +43,7 @@ export default function DataTable({ headers, rows, tableClassName }: Props) {
                     onChange={(event) => setSearchTerm(event.currentTarget.value)} />
             </Input.Wrapper>
             <div className={tableClassName}>
-            <Table>
+            <Table highlightOnHover striped>
                 <Table.Thead>
                     <Table.Tr>
                     {headers.map(header => (
@@ -53,7 +55,7 @@ export default function DataTable({ headers, rows, tableClassName }: Props) {
                 </Table.Thead>
                 <Table.Tbody>
                 {filteredRows.map(row => (
-                    <Table.Tr key={row.key}>
+                    <Table.Tr key={row.key} onClick={() => onRowClick?.(row)} className={onRowClick && classes.clickableRow}>
                     {row.columns.map(column => (
                         <Table.Td key={column.label} data-key={row.key + column.label}>
                             {column.label}
