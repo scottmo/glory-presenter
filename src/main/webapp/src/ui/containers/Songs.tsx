@@ -24,7 +24,6 @@ export default function Songs() {
 
     return (
         <>
-            <Button onClick={open}>Open song editor</Button>
             <Flex
                 direction={{ base: 'column', sm: 'row' }}
                 gap={{ base: 'sm', sm: 'lg' }}
@@ -33,6 +32,7 @@ export default function Songs() {
                 <DataTable
                     tableClassName={classes.songTable}
                     headers={['Name']}
+                    onRowClick={(row) => { setSongId(row.key); open(); }}
                     rows={Object.entries(data).map(([key, songName]) => ({
                         key, columns: [{ label: songName as string }]
                     }))}
