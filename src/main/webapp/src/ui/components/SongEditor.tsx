@@ -3,12 +3,14 @@ import type { Song, SongVerse } from '../../types';
 import { useState } from 'react';
 
 import { useForm } from '@mantine/form';
-import { LoadingOverlay, Button, Input, Textarea, Text, Group } from '@mantine/core';
+import { LoadingOverlay, Grid, Flex, Tabs, Button, Input, Textarea, Text, Group } from '@mantine/core';
 import '@mantine/core/styles/Button.css';
 import '@mantine/core/styles/Group.css';
 import '@mantine/core/styles/Input.css';
 import '@mantine/core/styles/LoadingOverlay.css';
 import '@mantine/core/styles/Text.css';
+import '@mantine/core/styles/Tabs.css';
+import '@mantine/core/styles/Grid.css';
 
 import { QueryAPI, useApi } from '../api';
 
@@ -108,44 +110,62 @@ export function SongForm({ song, onSubmit }: Props) {
             <Input.Wrapper label="Authors">
                 <Input {...form.getInputProps('authors')} />
             </Input.Wrapper>
-            <Input.Wrapper label="Publisher">
-                <Input {...form.getInputProps('publisher')} />
-            </Input.Wrapper>
-            <Input.Wrapper label="Copyright">
-                <Input {...form.getInputProps('copyright')} />
-            </Input.Wrapper>
-            <Input.Wrapper label="Song Book">
-                <Input {...form.getInputProps('songBook')} />
-            </Input.Wrapper>
-            <Input.Wrapper label="Entry">
-                <Input {...form.getInputProps('entry')} />
-            </Input.Wrapper>
-            <Input.Wrapper label="Comments">
-                <Input {...form.getInputProps('comments')} />
-            </Input.Wrapper>
+            <Grid gutter="xs">
+                <Grid.Col span={6}>
+                    <Input.Wrapper label="Publisher">
+                        <Input {...form.getInputProps('publisher')} />
+                    </Input.Wrapper>
+                </Grid.Col>
+                <Grid.Col span={6}>
+                    <Input.Wrapper label="Copyright">
+                        <Input {...form.getInputProps('copyright')} />
+                    </Input.Wrapper>
+                </Grid.Col>
+            </Grid>
+            <Grid gutter="xs">
+                <Grid.Col span={8}>
+                    <Input.Wrapper label="Song Book">
+                        <Input {...form.getInputProps('songBook')} />
+                    </Input.Wrapper>
+                </Grid.Col>
+                <Grid.Col span={4}>
+                    <Input.Wrapper label="Entry">
+                        <Input {...form.getInputProps('entry')} />
+                    </Input.Wrapper>
+                </Grid.Col>
+            </Grid>
+            <Textarea label="Comments" autosize
+                {...form.getInputProps('comments')}
+            />
             <Input.Wrapper label="Verse Order">
                 <Input {...form.getInputProps('verseOrder')} />
             </Input.Wrapper>
-            <Text fw={500} size="sm" style={{ flex: 1 }}>
+            <br/>
+            <Text fw={500} size="sm">
                 Lyrics
             </Text>
-            {form.values.lyrics.map((item, index) => (
-                <div key={item.locale}>
-                    <Input.Wrapper label="Locale">
-                        <Input {...form.getInputProps(`lyrics.${index}.locale`)} />
-                    </Input.Wrapper>
-                    <Input.Wrapper label="Title">
-                        <Input {...form.getInputProps(`lyrics.${index}.title`)} />
-                    </Input.Wrapper>
-                    <Textarea
-                        label="Verses"
-                        placeholder={EXAMPLE_LYRICS}
-                        minRows={10}
-                        autosize
-                        {...form.getInputProps(`lyrics.${index}.verses`)}
-                    />
-                </div>
-            ))}
+            <Tabs defaultValue={form.values.lyrics[0].locale}>
+                <Tabs.List>
+                {form.values.lyrics.map((item, index) => (
+                    <Tabs.Tab key={item.locale} value={item.locale}>
+                        {item.locale}
+                    </Tabs.Tab>
+                ))}
+                </Tabs.List>
+                {form.values.lyrics.map((item, index) => (
+                    <Tabs.Panel key={item.locale} value={item.locale}>
+                        <Input.Wrapper label="Title">
+                            <Input {...form.getInputProps(`lyrics.${index}.title`)} />
+                        </Input.Wrapper>
+                        <Textarea
+                            label="Verses"
+                            placeholder={EXAMPLE_LYRICS}
+                            rows={10}
+                            {...form.getInputProps(`lyrics.${index}.verses`)}
+                        />
+                    </Tabs.Panel>
+                ))}
+            </Tabs>
             <Group justify="flex-end" mt="md">
                 <Button type="submit">Save</Button>
             </Group>
