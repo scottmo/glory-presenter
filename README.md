@@ -1,5 +1,11 @@
 # Glory Presenter
 
+## TODO
+- api controllers
+- react ui to display settings form from json config
+- bring back google api code
+- add service account auth option
+
 ## Introduction
 Glory presenter is an app that's solely focused on the power point experience.
 Modern options such as ProPresenter, OpenLP, Quelea, etc. are all very good options if a church has a dedicated
@@ -31,6 +37,9 @@ them as I continue to improve it, but support will be limited.
 - support importing bible in OSIS format, see https://crosswire.org/osis/
 
 ## Sample App Config
+
+## Testing
+`mvn com.github.eirslett:frontend-maven-plugin:test@build-frontend`
 
 ### Directory
 - glory-presenter
