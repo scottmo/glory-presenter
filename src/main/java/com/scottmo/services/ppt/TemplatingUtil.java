@@ -61,6 +61,13 @@ final class TemplatingUtil {
         }
     }
 
+    private static void resetSpacing(XSLFTextParagraph pp) {
+        pp.setSpaceBefore(0.0);
+        pp.setSpaceAfter(0.0);
+        pp.setIndent(0.0);
+        pp.setLineSpacing(100.0);
+    }
+
     public static void appendText(XSLFTextShape textShape, String text) {
         String[] lines = text.trim().split("\n");
         var pps = textShape.getTextParagraphs();
@@ -71,6 +78,7 @@ final class TemplatingUtil {
                 pp.addLineBreak();
             }
         }
+        resetSpacing(pp);
     }
 
     /**
@@ -90,6 +98,7 @@ final class TemplatingUtil {
             newTextRun.setFontFamily(baseTextRun.getFontFamily());
             newTextRun.setFontSize(baseTextRun.getFontSize());
         }
+        resetSpacing(pp);
     }
 
     /**
