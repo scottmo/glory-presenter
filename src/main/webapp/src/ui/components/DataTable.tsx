@@ -7,11 +7,11 @@ import '@mantine/core/styles/Input.css';
 import '@mantine/core/styles/Table.css';
 import classes from './DataTable.module.css';
 
-type Column = {
+export type Column = {
     label: string;
 }
 
-type Row = {
+export type Row = {
     key: string;
     columns: Column[];
 }

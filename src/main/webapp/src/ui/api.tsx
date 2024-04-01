@@ -17,6 +17,7 @@ type ServerAction = {
 export const ActionAPI: Record<string, ServerAction> = {
     generateSongPPTX : { method: 'GET',  path: 'song/pptx' },
     exportSong       : { method: 'GET',  path: 'song/export/:id' },
+    deleteSong       : { method: 'DELETE', path: 'song/:id' },
     saveSong         : { method: 'POST', path: 'song/save' },
     importSongs      : { method: 'POST', path: 'song/import' },
     importBible      : { method: 'POST', path: 'bible/import' },

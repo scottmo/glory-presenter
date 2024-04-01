@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -53,6 +54,11 @@ public class SongController {
     @GetMapping("/{id}")
     Song getSong(@PathVariable Integer id) {
         return songService.getStore().get(id);
+    }
+
+    @DeleteMapping("/{id}")
+    Song getSong(@PathVariable Integer id) {
+        return songService.getStore().delete(id);
     }
 
     @GetMapping("/pptx")

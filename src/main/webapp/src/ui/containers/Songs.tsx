@@ -1,10 +1,10 @@
 import { useState } from "react";
-import { QueryAPI, useApi } from "../api";
+import { QueryAPI, ActionAPI, useApi, runAction } from "../api";
 
 import { useDisclosure } from "@mantine/hooks";
-import { Table, Input } from "@mantine/core";
+import { Input } from "@mantine/core";
 import { Flex, LoadingOverlay, Modal, Button, NumberInput, Checkbox, Divider } from "@mantine/core";
-import DataTable from "../components/DataTable";
+import DataTable, { Row } from "../components/DataTable";
 import SongEditor from "../components/SongEditor";
 
 import "@mantine/core/styles/Flex.css";
@@ -27,6 +27,23 @@ export default function Songs() {
 
     if (error) return <div>{"An error has occurred: " + error.message}</div>;
 
+    const handleSelectSong = (row: Row) => {
+        setSongId(row.key);
+    };
+
+    const handleNewSong = () => {
+        setSongId("");
+        open();
+    };
+
+    const handleEditSong = () => {
+        open();
+    };
+
+    const handleDeleteSong = () => {
+        runAction(ActionAPI.deleteSong, { id: songId });
+    };
+
     return (
         <>
             <Flex justify="center" align="center" direction="row" wrap="wrap" gap="md" >
@@ -34,18 +51,18 @@ export default function Songs() {
                     <DataTable
                         tableClassName={classes.songTable}
                         headers={["Name"]}
-                        onRowClick={(row) => { setSongId(row.key); open(); }}
+                        onRowClick={handleSelectSong}
                         rows={Object.entries(data).map(([key, songName]) => ({
                             key, columns: [{ label: songName as string }]
                         }))}
                     />
                 </Flex>
                 <Flex direction="column" justify="flex-start" align="flex-start" gap="xs" >
-                    <p>Total # of Songs: </p>
+                    <p>Total # of Songs: { Object.entries(data).length }</p>
                     <Divider />
-                    <Button fullWidth>New</Button>
-                    <Button fullWidth>Edit</Button>
-                    <Button fullWidth>Delete</Button>
+                    <Button fullWidth onClick={handleNewSong}>New</Button>
+                    <Button fullWidth onClick={handleEditSong}>Edit</Button>
+                    <Button fullWidth onClick={handleDeleteSong}>Delete</Button>
                     <Divider />
                     <Button fullWidth>Import</Button>
                     <Button fullWidth>Export</Button>
