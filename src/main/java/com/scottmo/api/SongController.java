@@ -57,8 +57,11 @@ public class SongController {
     }
 
     @DeleteMapping("/{id}")
-    Song getSong(@PathVariable Integer id) {
-        return songService.getStore().delete(id);
+    ResponseEntity<Map<String, Object>> deleteSong(@PathVariable Integer id) {
+        boolean isSuccess = songService.getStore().delete(id);
+        return isSuccess
+            ? requestUtil.successResponse()
+            : requestUtil.errorResponse("Failed to delete song with id %s!".formatted(id));
     }
 
     @GetMapping("/pptx")
