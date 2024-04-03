@@ -1,31 +1,33 @@
 import { useState } from "react";
-import { QueryAPI, ActionAPI, useApi, runAction } from "../api";
-
 import { useDisclosure } from "@mantine/hooks";
-import { Input } from "@mantine/core";
-import { Flex, LoadingOverlay, Modal, Button, NumberInput, Checkbox, Divider } from "@mantine/core";
-import DataTable, { Row } from "../components/DataTable";
-import SongEditor from "../components/SongEditor";
+import { Flex, LoadingOverlay, Modal, Button, TextInput, NumberInput, Checkbox, Divider } from "@mantine/core";
 
 import "@mantine/core/styles/Flex.css";
 import "@mantine/core/styles/Checkbox.css";
 import "@mantine/core/styles/Input.css";
 import '@mantine/core/styles/Divider.css';
 import "@mantine/core/styles/NumberInput.css";
+import "@mantine/core/styles/TextInput.css";
 import "@mantine/core/styles/LoadingOverlay.css";
 import "@mantine/core/styles/ModalBase.css";
 import "@mantine/core/styles/Modal.css";
 import "@mantine/core/styles/Button.css";
+
+import type { Song } from '../../types';
+import { QueryAPI, ActionAPI, useApi, runAction } from "../api";
+import DataTable, { Row } from "../components/DataTable";
+import SongEditor from "../components/SongEditor";
+
 import classes from "./Songs.module.css";
 
 export default function Songs() {
     const { isPending, error, data } = useApi(QueryAPI.songList);
     const [opened, { open, close }] = useDisclosure(false);
     const [songId, setSongId] = useState("");
-
-    if (isPending) return <LoadingOverlay visible={true} zIndex={1000} overlayProps={{ radius: "sm", blur: 2 }} />;
-
-    if (error) return <div>{"An error has occurred: " + error.message}</div>;
+    const [linesPerSlide, setLinesPerSlide] = useState<string|number>(4);
+    const [templatePath, setTemplatePath] = useState("template-song.pptx");
+    const [hasStartSlide, toggleStartSlide] = useState(true);
+    const [hasEndSlide, toggleEndSlide] = useState(false);
 
     const handleSelectSong = (row: Row) => {
         setSongId(row.key);
@@ -43,6 +45,37 @@ export default function Songs() {
     const handleDeleteSong = () => {
         runAction(ActionAPI.deleteSong, { id: songId });
     };
+
+    const handleImportSongs = () => {
+        // TODO
+    };
+
+    const handleExportSongs = () => {
+        // TODO
+    };
+
+    const handleGeneratePPTX = () => {
+
+    };
+
+    const handleGenerateGSlides = () => {
+
+    };
+
+    const handleSetTemplatePath = (e: React.ChangeEvent<HTMLInputElement) => {
+        setTemplatePath(e.target.value);
+    };
+
+    const handleSubmitSong = (song: Song) => {
+        runAction(ActionAPI.saveSong, { song });
+    };
+
+    const handleToggleStartSlide = () => toggleStartSlide(!hasStartSlide);
+    const handleToggleEndSlide = () => toggleEndSlide(!hasEndSlide);
+
+    if (isPending) return <LoadingOverlay visible={true} zIndex={1000} overlayProps={{ radius: "sm", blur: 2 }} />;
+
+    if (error) return <div>{"An error has occurred: " + error.message}</div>;
 
     return (
         <>
@@ -64,21 +97,23 @@ export default function Songs() {
                     <Button fullWidth onClick={handleEditSong}>Edit</Button>
                     <Button fullWidth onClick={handleDeleteSong}>Delete</Button>
                     <Divider />
-                    <Button fullWidth>Import</Button>
-                    <Button fullWidth>Export</Button>
+                    <Button fullWidth onClick={handleImportSongs}>Import</Button>
+                    <Button fullWidth onClick={handleExportSongs}>Export</Button>
                     <Divider />
-                    <NumberInput label="Lines Per Slide" placeholder="1 to 10" min={1} max={10}/>
-                    <Input.Wrapper label="PPT Template">
-                        <Input />
-                    </Input.Wrapper>
-                    <Checkbox defaultChecked label="has start slide" />
-                    <Checkbox label="has end slide" />
-                    <Button fullWidth>Generate PPTX</Button>
-                    <Button fullWidth>Generate Google Slides</Button>
+                    <NumberInput label="Lines Per Slide" placeholder="1 to 10" min={1} max={10}
+                        value={linesPerSlide} onChange={setLinesPerSlide} />
+                    <TextInput label="PPT Template"
+                        value={templatePath} onChange={handleSetTemplatePath} />
+                    <Checkbox defaultChecked label="has start slide"
+                        checked={hasStartSlide} onChange={handleToggleStartSlide} />
+                    <Checkbox label="has end slide"
+                        checked={hasEndSlide} onChange={handleToggleEndSlide} />
+                    <Button fullWidth onClick={handleGeneratePPTX}>Generate PPTX</Button>
+                    <Button fullWidth onClick={handleGenerateGSlides}>Generate Google Slides</Button>
                 </Flex>
             </Flex>
             <Modal opened={opened} onClose={close} title="Edit Song" centered>
-                <SongEditor song={{ id: songId }} onSubmit={(song) => console.log(song)}/>
+                <SongEditor song={{ id: songId }} onSubmit={handleSubmitSong}/>
             </Modal>
         </>
     );
