@@ -2,8 +2,8 @@ package com.scottmo.services.songs.store;
 
 import com.scottmo.data.song.Song;
 import com.scottmo.data.song.SongVerse;
+import com.scottmo.util.Pair;
 import com.scottmo.util.StringUtils;
-import javafx.util.Pair;
 import org.apache.logging.log4j.util.Strings;
 
 import java.nio.file.Path;

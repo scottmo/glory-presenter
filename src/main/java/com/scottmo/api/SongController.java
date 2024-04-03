@@ -46,7 +46,7 @@ public class SongController {
     Map<Integer, String> getSongs() {
         Map<Integer, String> titles = new HashMap<>();
         for (var title : songService.getStore().getAllSongDescriptors(appContextService.getConfig().locales())) {
-            titles.put(title.getKey(), title.getValue());
+            titles.put(title.key(), title.value());
         }
         return titles;
     }
