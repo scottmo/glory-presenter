@@ -44,6 +44,7 @@ export default function Songs() {
 
     const handleDeleteSong = () => {
         runAction(ActionAPI.deleteSong, { id: songId });
+        increaseCacheBustCounter();
     };
 
     const handleImportSongs = () => {
