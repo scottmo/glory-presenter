@@ -1,9 +1,8 @@
 import { useState } from 'react';
 
 import { useDebouncedValue } from '@mantine/hooks';
-import { Table, Input } from '@mantine/core';
+import { Table, TextInput } from '@mantine/core';
 import '@mantine/core/styles/Container.css';
-import '@mantine/core/styles/Input.css';
 import '@mantine/core/styles/Table.css';
 import classes from './DataTable.module.css';
 
@@ -38,10 +37,8 @@ export default function DataTable({ headers, rows, tableClassName, onRowClick }:
 
     return (
         <div>
-            <Input.Wrapper label="Search">
-                <Input placeholder="Holy holy holy"
+            <TextInput label="Search" placeholder="Holy holy holy"
                     onChange={(event) => setSearchTerm(event.currentTarget.value)} />
-            </Input.Wrapper>
             <div className={tableClassName}>
                 <Table highlightOnHover striped>
                     <Table.Thead>
