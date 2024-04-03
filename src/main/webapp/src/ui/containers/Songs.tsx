@@ -13,7 +13,7 @@ import "@mantine/core/styles/ModalBase.css";
 import "@mantine/core/styles/NumberInput.css";
 
 import type { Song } from '../../types';
-import { API, downloadFile, runAction, useApi, useCacheBustCounter } from "../api";
+import { API, downloadFile, runAction, useQuery, useCacheBustCounter } from "../api";
 import DataTable, { Row } from "../components/DataTable";
 import SongEditor from "../components/SongEditor";
 
@@ -21,8 +21,8 @@ import classes from "./Songs.module.css";
 
 export default function Songs() {
     const [ cacheBustCounter, increaseCacheBustCounter ] = useCacheBustCounter();
-    const songListQuery = useApi(API.songList, { cacheBustCounter });
-    const configQuery = useApi(API.getConfig);
+    const songListQuery = useQuery(API.songList, { cacheBustCounter });
+    const configQuery = useQuery(API.getConfig);
 
     const [ opened, { open, close } ] = useDisclosure(false);
     const [ songId, setSongId ] = useState("");

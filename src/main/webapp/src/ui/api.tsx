@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { useState } from "react";
-import { useQuery } from '@tanstack/react-query';
+import { useQuery as useReactQuery } from '@tanstack/react-query';
 
 const apiOrigin = 'http://localhost:8080/api';
 
@@ -34,10 +34,10 @@ export function useCacheBustCounter(): [number, () => void] {
     return [cacheBustCounter, increaseCacheBustCounter];
 }
 
-export function useApi(path: string | ServerAction, params?: ApiParams, options?: Record<string, any>) {
+export function useQuery(path: string | ServerAction, params?: ApiParams, options?: Record<string, any>) {
     path = typeof path === 'string' ? path : path.path;
     const requestUri = generateRequestUri(path, params);
-    return useQuery({
+    return useReactQuery({
         queryKey: [requestUri],
         queryFn: () => axios.get(requestUri).then(resp => resp.data),
         ...options,
