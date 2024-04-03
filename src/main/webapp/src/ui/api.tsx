@@ -46,10 +46,16 @@ export function useApi(path: string, params?: ApiParams, options?: Record<string
 
 export function runAction(api: ServerAction, params: ApiParams, data?: any) {
     const requestUri = generateRequestUri(api.path, params);
-    if (api.method === 'GET') {
-        return axios.get(requestUri);
+    switch (api.method) {
+        case 'GET':
+            return axios.get(requestUri);
+        case 'POST':
+            return axios.post(requestUri, data);
+        case 'DELETE':
+            return axios.delete(requestUri, data);
+        default:
+            throw new Error('Invalid action!');
     }
-    return axios.post(requestUri, data);
 }
 
 export function downloadFile(path: string | ServerAction, params?: ApiParams) {
