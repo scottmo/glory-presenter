@@ -29,11 +29,17 @@ function stringMatch(term: string, text: string) {
 export default function DataTable({ headers, rows, tableClassName, onRowClick }: Props) {
     const [searchTerm, setSearchTerm] = useState('');
     const [debouncedSearchTerm] = useDebouncedValue(searchTerm, 200);
+    const [selectedRow, setSelectedRow] = useState('');
 
     const filteredRows = rows.filter(row => {
         const searchKey = row.columns.reduce((acc, curr) => acc + " " + curr.label, "");
         return stringMatch(debouncedSearchTerm, searchKey);
     });
+
+    const handleRowClick = (row: Row) => {
+        setSelectedRow(row.key);
+        onRowClick?.(row);
+    };
 
     return (
         <div>
@@ -52,7 +58,8 @@ export default function DataTable({ headers, rows, tableClassName, onRowClick }:
                     </Table.Thead>
                     <Table.Tbody>
                         {filteredRows.map(row => (
-                            <Table.Tr key={row.key} onClick={() => onRowClick?.(row)} className={onRowClick && classes.clickableRow}>
+                            <Table.Tr key={row.key} onClick={() => handleRowClick(row)} className={onRowClick && classes.clickableRow}
+                                    bg={row.key === selectedRow ? 'var(--mantine-color-red-light)' : undefined}>
                                 {row.columns.map(column => (
                                     <Table.Td key={column.label} data-key={row.key + column.label}>
                                         {column.label}
