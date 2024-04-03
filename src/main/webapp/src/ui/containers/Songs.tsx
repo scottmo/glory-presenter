@@ -13,14 +13,15 @@ import "@mantine/core/styles/Modal.css";
 import "@mantine/core/styles/Button.css";
 
 import type { Song } from '../../types';
-import { QueryAPI, ActionAPI, useApi, runAction, downloadFile } from "../api";
+import { QueryAPI, ActionAPI, useApi, runAction, downloadFile, useCacheBustCounter } from "../api";
 import DataTable, { Row } from "../components/DataTable";
 import SongEditor from "../components/SongEditor";
 
 import classes from "./Songs.module.css";
 
 export default function Songs() {
-    const { isPending, error, data } = useApi(QueryAPI.songList);
+    const [cacheBustCounter, increaseCacheBustCounter] = useCacheBustCounter();
+    const { isPending, error, data } = useApi(QueryAPI.songList, { cacheBustCounter });
     const [opened, { open, close }] = useDisclosure(false);
     const [songId, setSongId] = useState("");
     const [linesPerSlide, setLinesPerSlide] = useState<string|number>(2);
@@ -66,7 +67,8 @@ export default function Songs() {
     };
 
     const handleSubmitSong = (song: Song) => {
-        runAction(ActionAPI.saveSong, {}, { song });
+        runAction(ActionAPI.saveSong, {}, song);
+        increaseCacheBustCounter();
     };
 
     const handleToggleStartSlide = () => toggleStartSlide(!hasStartSlide);
@@ -78,7 +80,7 @@ export default function Songs() {
 
     return (
         <>
-            <Flex justify="center" align="center" direction="row" wrap="wrap" gap="md" >
+            <Flex justify="center" align="flex-start" direction="row" wrap="wrap" gap="md" >
                 <Flex direction="column" gap="md" >
                     <DataTable
                         tableClassName={classes.songTable}

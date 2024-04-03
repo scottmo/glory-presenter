@@ -65,7 +65,7 @@ type Props = {
 }
 
 export default function SongEditor({ song, onSubmit }: Props) {
-    const { isPending, error, data } = useApi(QueryAPI.song, { id: song.id }, { enabled: !!song.id });
+    const { isPending, error, data } = useApi(QueryAPI.song, { id: song.id }, { enabled: !!song.id, cacheTime: 0 });
 
     if (isPending) return <LoadingOverlay visible={true} zIndex={1000} overlayProps={{ radius: "sm", blur: 2 }} />;
 

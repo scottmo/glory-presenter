@@ -1,5 +1,6 @@
-import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
+import { useState } from "react";
+import { useQuery } from '@tanstack/react-query';
 
 const apiOrigin = 'http://localhost:8080/api';
 
@@ -24,7 +25,17 @@ export const ActionAPI: Record<string, ServerAction> = {
     generateBiblePPTX: { method: 'GET',  path: 'bible/pptx' },
 };
 
-export function useApi(path: string, params?: Record<string, string | undefined>, options?: Record<string, any>) {
+type ApiParams = Record<string, string | number | undefined>;
+
+export function useCacheBustCounter(): [number, () => void] {
+    const [cacheBustCounter, setCacheBustCounter] = useState(0);
+    const increaseCacheBustCounter = () => {
+        setCacheBustCounter(cacheBustCounter + 1);
+    };
+    return [cacheBustCounter, increaseCacheBustCounter];
+}
+
+export function useApi(path: string, params?: ApiParams, options?: Record<string, any>) {
     const requestUri = generateRequestUri(path, params);
     return useQuery({
         queryKey: [requestUri],
@@ -33,7 +44,7 @@ export function useApi(path: string, params?: Record<string, string | undefined>
     });
 }
 
-export function runAction(api: ServerAction, params: any, data?: any) {
+export function runAction(api: ServerAction, params: ApiParams, data?: any) {
     const requestUri = generateRequestUri(api.path, params);
     if (api.method === 'GET') {
         return axios.get(requestUri);
@@ -41,7 +52,7 @@ export function runAction(api: ServerAction, params: any, data?: any) {
     return axios.post(requestUri, data);
 }
 
-export function downloadFile(path: string | ServerAction, params?: Record<string, string | number | undefined>) {
+export function downloadFile(path: string | ServerAction, params?: ApiParams) {
     window.open(generateRequestUri(path, params), '_blank');
 }
 
@@ -49,7 +60,7 @@ function extractParams(path: string) {
     return (path.match(/:\w+/g) || []).map(token => token.substring(1));
 }
 
-function generateRequestUri(path: string | ServerAction, params?: Record<string, string | number | undefined>) {
+function generateRequestUri(path: string | ServerAction, params?: ApiParams) {
     let requestUri = typeof path === 'string' ? path : path.path;
     params = Object.assign({}, params);
     // fill route params
