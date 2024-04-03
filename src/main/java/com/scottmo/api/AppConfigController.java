@@ -19,12 +19,12 @@ public class AppConfigController {
     @Autowired
     private AppContextService appContextService;
 
-    @GetMapping("/")
+    @GetMapping("")
     AppConfig getAppConfig() {
         return appContextService.getConfig();
     }
 
-    @PostMapping("/")
+    @PostMapping("")
     public ResponseEntity<Map<String, Object>> saveConfig(@RequestBody AppConfig config) {
         // TODO
         return RequestUtil.successResponse();

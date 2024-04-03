@@ -1,9 +1,11 @@
-import { Button, Checkbox, Divider, Flex, LoadingOverlay, Modal, NumberInput, TextInput } from "@mantine/core";
+import { Button, Checkbox, Divider, Flex,
+    LoadingOverlay, Modal, NumberInput, Select } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { useState } from "react";
 
 import "@mantine/core/styles/Button.css";
 import "@mantine/core/styles/Checkbox.css";
+import '@mantine/core/styles/Combobox.css';
 import '@mantine/core/styles/Divider.css';
 import "@mantine/core/styles/Flex.css";
 import "@mantine/core/styles/Input.css";
@@ -19,6 +21,9 @@ import SongEditor from "../components/SongEditor";
 
 import classes from "./Songs.module.css";
 
+const DEFAULT_LINES_PER_SLIDE = 2;
+const DEFAULT_TEMPLATE_PATH = "Error: none found!"
+
 export default function Songs() {
     const [ cacheBustCounter, increaseCacheBustCounter ] = useCacheBustCounter();
     const songListQuery = useQuery(API.songList, { cacheBustCounter });
@@ -26,8 +31,8 @@ export default function Songs() {
 
     const [ opened, { open, close } ] = useDisclosure(false);
     const [ songId, setSongId ] = useState("");
-    const [ linesPerSlide, setLinesPerSlide ] = useState<string|number>(2);
-    const [ templatePath, setTemplatePath ] = useState("template-song.pptx");
+    const [ linesPerSlide, setLinesPerSlide ] = useState<string|number>(DEFAULT_LINES_PER_SLIDE);
+    const [ templatePath, setTemplatePath ] = useState(configQuery?.data?.templatePaths?.[0] || DEFAULT_TEMPLATE_PATH);
     const [ hasStartSlide, toggleStartSlide ] = useState(true);
     const [ hasEndSlide, toggleEndSlide ] = useState(false);
 
@@ -65,17 +70,10 @@ export default function Songs() {
         // TODO
     };
 
-    const handleSetTemplatePath = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setTemplatePath(e.target.value);
-    };
-
     const handleSubmitSong = (song: Song) => {
         runAction(API.saveSong, {}, song);
         increaseCacheBustCounter();
     };
-
-    const handleToggleStartSlide = () => toggleStartSlide(!hasStartSlide);
-    const handleToggleEndSlide = () => toggleEndSlide(!hasEndSlide);
 
     const isPending = songListQuery.isPending || configQuery.isPending;
     if (isPending) return <LoadingOverlay visible={true} zIndex={1000} overlayProps={{ radius: "sm", blur: 2 }} />;
@@ -108,12 +106,12 @@ export default function Songs() {
                     <Divider />
                     <NumberInput label="Lines Per Slide" placeholder="1 to 10" min={1} max={10}
                         value={linesPerSlide} onChange={setLinesPerSlide} />
-                    <TextInput label="PPT Template"
-                        value={templatePath} onChange={handleSetTemplatePath} />
+                    <Select label="PPT Template" data={configQuery?.data?.templatePaths} placeholder="Pick a template"
+                        value={templatePath} onChange={(value) => setTemplatePath(value)} />
                     <Checkbox label="has start slide"
-                        checked={hasStartSlide} onChange={handleToggleStartSlide} />
+                        checked={hasStartSlide} onChange={() => toggleStartSlide(!hasStartSlide)} />
                     <Checkbox label="has end slide"
-                        checked={hasEndSlide} onChange={handleToggleEndSlide} />
+                        checked={hasEndSlide} onChange={() => toggleEndSlide(!hasEndSlide)} />
                     <Button fullWidth onClick={handleGeneratePPTX}>Generate PPTX</Button>
                     <Button fullWidth onClick={handleGenerateGSlides}>Generate Google Slides</Button>
                 </Flex>
