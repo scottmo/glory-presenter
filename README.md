@@ -1,12 +1,14 @@
 # Glory Presenter
 
 ## TODO
+
 - api controllers
 - react ui to display settings form from json config
 - bring back google api code
 - add service account auth option
 
 ## Introduction
+
 Glory presenter is an app that's solely focused on the power point experience.
 Modern options such as ProPresenter, OpenLP, Quelea, etc. are all very good options if a church has a dedicated
 department or staffs to maintain and operate. Unfortunately, this is not always feasible for small churches and
@@ -20,28 +22,33 @@ difficult option as they all require training to use, whereas most people have e
 point deck.
 
 ## Caveats
+
 As I'm developing this on my spare time, I haven't really got a chance to fully test everything. You can see that I have
 not really written any tests for it. All I can say is that so far it's been working well for my church. Do note that
 there is limited error handling, so you may see random errors happening and not sure what's going on. I'll try to patch
 them as I continue to improve it, but support will be limited.
 
 ## Technology
+
 - Java 17
 - JavaFX 17
 - Sqlite
 
 ## Features
+
 - UI for adding/editing songs
 - PPTX generation from bible verses or songs
-- support importing songs in Open Lyrics format, see https://docs.openlyrics.org/
-- support importing bible in OSIS format, see https://crosswire.org/osis/
+- support importing songs in Open Lyrics format, see <https://docs.openlyrics.org/>
+- support importing bible in OSIS format, see <https://crosswire.org/osis/>
 
 ## Sample App Config
 
 ## Testing
+
 `mvn com.github.eirslett:frontend-maven-plugin:npm@run-frontend`
 
 ### Directory
+
 - glory-presenter
   - glory-presenter.jar
   - config.json
@@ -54,6 +61,7 @@ them as I continue to improve it, but support will be limited.
       - template-song.pptx
 
 ### config.json
+
 ```json
 {
   "dataDir": "./data",
@@ -69,10 +77,12 @@ them as I continue to improve it, but support will be limited.
 ```
 
 ## PPTX Generation
+
 Generation is  based off of an existing pptx template. Placeholder texts in the pptx template will be replaced with
 the actual values fromm the local database. See samples folder for examples.
 
 ### Placeholders
+
 - bible slides - e.g. genesis 1:2, assuming $version is asv
   - {verse.chapter} - 1
   - {verse.number} - 2
