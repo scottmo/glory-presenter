@@ -39,7 +39,7 @@ them as I continue to improve it, but support will be limited.
 ## Sample App Config
 
 ## Testing
-`mvn com.github.eirslett:frontend-maven-plugin:npm@build-frontend`
+`mvn com.github.eirslett:frontend-maven-plugin:npm@run-frontend`
 
 ### Directory
 - glory-presenter
