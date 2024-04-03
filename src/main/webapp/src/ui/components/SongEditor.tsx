@@ -11,7 +11,7 @@ import '@mantine/core/styles/LoadingOverlay.css';
 import '@mantine/core/styles/Tabs.css';
 import '@mantine/core/styles/Text.css';
 
-import { QueryAPI, useApi } from '../api';
+import { API, useApi } from '../api';
 
 const EXAMPLE_LYRICS = `# v1
 Holy holy holy,
@@ -64,7 +64,7 @@ type Props = {
 }
 
 export default function SongEditor({ song, onSubmit }: Props) {
-    const { isPending, error, data } = useApi(QueryAPI.song, { id: song.id }, { enabled: !!song.id, cacheTime: 0 });
+    const { isPending, error, data } = useApi(API.song, { id: song.id }, { enabled: !!song.id, cacheTime: 0 });
 
     if (isPending) return <LoadingOverlay visible={true} zIndex={1000} overlayProps={{ radius: "sm", blur: 2 }} />;
 

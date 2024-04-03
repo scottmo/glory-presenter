@@ -37,8 +37,6 @@ public class BibleController {
     @Autowired
     private BibleSlidesGenerator pptxGenerator;
 
-    private RequestUtil requestUtil = new RequestUtil();
-
     @GetMapping("/versions")
     List<String> getVersions() {
         return bibleService.getStore().getAvailableVersions();
@@ -52,7 +50,7 @@ public class BibleController {
     @PostMapping("/import")
     ResponseEntity<Map<String, Object>> importBibles(@RequestBody List<String> biblePaths) {
         if (biblePaths == null || biblePaths.isEmpty()) {
-            return requestUtil.errorResponse("No file to import!");
+            return RequestUtil.errorResponse("No file to import!");
         }
         List<File> osisXMLFiles = biblePaths.stream()
             .map(path -> new File(path))
@@ -61,10 +59,10 @@ public class BibleController {
             try {
                 bibleService.importOsisBible(file);
             } catch (IOException e) {
-                return requestUtil.errorResponse("Failed to import bible [%s]!".formatted(file.getName()), e);
+                return RequestUtil.errorResponse("Failed to import bible [%s]!".formatted(file.getName()), e);
             }
         }
-        return requestUtil.successResponse();
+        return RequestUtil.successResponse();
     }
 
     @GetMapping("/pptx")
@@ -81,6 +79,6 @@ public class BibleController {
         }
         pptxGenerator.generate(bibleRef, templatePath, outputPath.toString());
     
-        return requestUtil.download(outputPath);
+        return RequestUtil.download(outputPath);
     }
 }

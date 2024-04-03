@@ -4,25 +4,24 @@ import { useQuery } from '@tanstack/react-query';
 
 const apiOrigin = 'http://localhost:8080/api';
 
-export const QueryAPI = {
-    songList     : 'song/titles',
-    song         : 'song/:id',
-    bibleVersions: 'bible/versions',
-    bibleBooks   : 'bible/books',
-};
-
 type ServerAction = {
     method: string;
     path: string;
 }
-export const ActionAPI: Record<string, ServerAction> = {
-    generateSongPPTX : { method: 'GET',  path: 'song/pptx' },
-    exportSong       : { method: 'GET',  path: 'song/export/:id' },
+export const API: Record<string, ServerAction> = {
+    getConfig        : { method: 'GET',    path: 'config' },
+    saveConfig       : { method: 'POST',   path: 'config' },
+    generateSongPPTX : { method: 'GET',    path: 'song/pptx' },
+    songList         : { method: 'GET',    path: 'song/titles' },
+    song             : { method: 'GET',    path: 'song/:id' },
+    exportSong       : { method: 'GET',    path: 'song/export/:id' },
     deleteSong       : { method: 'DELETE', path: 'song/:id' },
-    saveSong         : { method: 'POST', path: 'song/save' },
-    importSongs      : { method: 'POST', path: 'song/import' },
-    importBible      : { method: 'POST', path: 'bible/import' },
-    generateBiblePPTX: { method: 'GET',  path: 'bible/pptx' },
+    saveSong         : { method: 'POST',   path: 'song/save' },
+    importSongs      : { method: 'POST',   path: 'song/import' },
+    bibleVersions    : { method: 'GET',    path: 'bible/versions' },
+    bibleBooks       : { method: 'GET',    path: 'bible/books' },
+    importBible      : { method: 'POST',   path: 'bible/import' },
+    generateBiblePPTX: { method: 'GET',    path: 'bible/pptx' },
 };
 
 type ApiParams = Record<string, string | number | undefined>;
@@ -35,7 +34,8 @@ export function useCacheBustCounter(): [number, () => void] {
     return [cacheBustCounter, increaseCacheBustCounter];
 }
 
-export function useApi(path: string, params?: ApiParams, options?: Record<string, any>) {
+export function useApi(path: string | ServerAction, params?: ApiParams, options?: Record<string, any>) {
+    path = typeof path === 'string' ? path : path.path;
     const requestUri = generateRequestUri(path, params);
     return useQuery({
         queryKey: [requestUri],

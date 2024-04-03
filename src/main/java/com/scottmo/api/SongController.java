@@ -40,8 +40,6 @@ public class SongController {
     @Autowired
     private SongSlidesGenerator pptxGenerator;
 
-    private RequestUtil requestUtil = new RequestUtil();
-
     @GetMapping("/titles")
     Map<Integer, String> getSongs() {
         Map<Integer, String> titles = new HashMap<>();
@@ -60,8 +58,8 @@ public class SongController {
     ResponseEntity<Map<String, Object>> deleteSong(@PathVariable Integer id) {
         boolean isSuccess = songService.getStore().delete(id);
         return isSuccess
-            ? requestUtil.successResponse()
-            : requestUtil.errorResponse("Failed to delete song with id %s!".formatted(id));
+            ? RequestUtil.successResponse()
+            : RequestUtil.errorResponse("Failed to delete song with id %s!".formatted(id));
     }
 
     @GetMapping("/pptx")
@@ -78,7 +76,7 @@ public class SongController {
         pptxGenerator.generate(song, templatePath, outputPath.toString(), appContextService.getConfig().locales(),
                 linesPerSlide);
     
-        return requestUtil.download(outputPath);
+        return RequestUtil.download(outputPath);
     }
 
     @GetMapping("/export/{id}")
@@ -87,7 +85,7 @@ public class SongController {
         Path outputPath = Path.of(System.getProperty("java.io.tmpdir"), StringUtils.sanitizeFilename(song.getTitle()) + ".xml");
         String songXML = songService.getOpenLyricsConverter().serialize(song);
         Files.writeString(outputPath, songXML, StandardCharsets.UTF_8);
-        return requestUtil.download(outputPath);
+        return RequestUtil.download(outputPath);
     }
 
     @PostMapping("/save")
@@ -98,7 +96,7 @@ public class SongController {
     @PostMapping("/import")
     public ResponseEntity<Map<String, Object>> importSongs(@RequestBody List<String> songPaths) {
         if (songPaths == null || songPaths.isEmpty()) {
-            return requestUtil.errorResponse("No file to import!");
+            return RequestUtil.errorResponse("No file to import!");
         }
         List<File> files = songPaths.stream()
             .map(path -> new File(path))
@@ -107,9 +105,9 @@ public class SongController {
             try {
                 songService.importOpenLyricSong(file);
             } catch (IOException e) {
-                return requestUtil.errorResponse("Failed to import song [%s]!".formatted(file.getName()), e);
+                return RequestUtil.errorResponse("Failed to import song [%s]!".formatted(file.getName()), e);
             }
         }
-        return requestUtil.successResponse();
+        return RequestUtil.successResponse();
     }
 }

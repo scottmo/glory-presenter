@@ -15,7 +15,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
 public class RequestUtil {
-    public ResponseEntity<Map<String, Object>> errorResponse(String message, Throwable e) {
+    public static ResponseEntity<Map<String, Object>> errorResponse(String message, Throwable e) {
         Map<String, Object> response = new HashMap<>();
 
         response.put("status", "error");
@@ -31,11 +31,11 @@ public class RequestUtil {
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
-    public ResponseEntity<Map<String, Object>> errorResponse(String message) {
+    public static ResponseEntity<Map<String, Object>> errorResponse(String message) {
         return errorResponse(message, null);
     }
 
-    public ResponseEntity<Map<String, Object>> successResponse(Object data) {
+    public static ResponseEntity<Map<String, Object>> successResponse(Object data) {
         Map<String, Object> response = new HashMap<>();
 
         response.put("status", "ok");
@@ -47,11 +47,11 @@ public class RequestUtil {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    public ResponseEntity<Map<String, Object>> successResponse() {
+    public static ResponseEntity<Map<String, Object>> successResponse() {
         return successResponse(null);
     }
 
-    public ResponseEntity<Resource> download(Path filePath) throws MalformedURLException {
+    public static ResponseEntity<Resource> download(Path filePath) throws MalformedURLException {
         Resource resource = new UrlResource(filePath.toUri());
 
         if (resource.exists() && resource.isReadable()) {

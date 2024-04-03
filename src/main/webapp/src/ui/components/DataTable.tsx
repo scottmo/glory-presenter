@@ -2,8 +2,10 @@ import { useState } from 'react';
 
 import { useDebouncedValue } from '@mantine/hooks';
 import { Table, TextInput } from '@mantine/core';
+
 import '@mantine/core/styles/Container.css';
 import '@mantine/core/styles/Table.css';
+
 import classes from './DataTable.module.css';
 
 export type Column = {
@@ -58,7 +60,8 @@ export default function DataTable({ headers, rows, tableClassName, onRowClick }:
                     </Table.Thead>
                     <Table.Tbody>
                         {filteredRows.map(row => (
-                            <Table.Tr key={row.key} onClick={() => handleRowClick(row)} className={onRowClick && classes.clickableRow}
+                            <Table.Tr key={row.key} onClick={() => handleRowClick(row)}
+                                    className={onRowClick && classes.clickableRow}
                                     bg={row.key === selectedRow ? 'var(--mantine-color-red-light)' : undefined}>
                                 {row.columns.map(column => (
                                     <Table.Td key={column.label} data-key={row.key + column.label}>

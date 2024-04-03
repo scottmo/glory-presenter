@@ -1,15 +1,17 @@
 package com.scottmo.services.appContext;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.scottmo.config.definitions.AppConfig;
-import com.scottmo.util.LocaleUtil;
-import org.springframework.stereotype.Component;
-
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+
+import org.springframework.stereotype.Component;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import com.scottmo.config.definitions.AppConfig;
+import com.scottmo.util.LocaleUtil;
 
 @Component("appContextService")
 public final class AppContextService {
@@ -18,7 +20,6 @@ public final class AppContextService {
     public static final int APP_HEIGHT = 600;
 
     public static final String CONFIG_PATH = "./config.json";
-    private static final String OUTPUT_DIR = "../output"; // same level as data
     private static final String TEMPLATE_DIR = "templates";
 
     private AppConfig appConfig;
@@ -26,13 +27,6 @@ public final class AppContextService {
     public AppConfig getConfig() {
         if (appConfig == null) {
             reload();
-        }
-        if (appConfig.locales().isEmpty()) {
-            appConfig.locales().add(LocaleUtil.DEFAULT_LOCALE);
-        }
-        int i = 0;
-        for (String locale: appConfig.locales()) {
-            appConfig.locales().set(i++, LocaleUtil.normalize(locale));
         }
         return appConfig;
     }
@@ -51,6 +45,28 @@ public final class AppContextService {
         } catch (IOException e) {
             throw new RuntimeException("Unable to load config file!", e);
         }
+        // set default locale
+        if (appConfig.locales().isEmpty()) {
+            appConfig.locales().add(LocaleUtil.DEFAULT_LOCALE);
+        }
+        // normalize locales
+        int i = 0;
+        for (String locale: appConfig.locales()) {
+            appConfig.locales().set(i++, LocaleUtil.normalize(locale));
+        }
+        // load template paths
+        File templateDir = Path.of(appConfig.dataDir(), TEMPLATE_DIR).toFile();
+        if (!templateDir.exists()) {
+            templateDir.mkdirs();
+        }
+        if (templateDir.isDirectory()) {
+            File[] files = templateDir.listFiles();
+            for (File file : files) {
+                appConfig.templatePaths().add(file.getName());
+            }
+        } else {
+            throw new Error("Unable to load pptx templates! Please fix templates dir and restart!");
+        }
     }
 
     public String getRelativePath(String fileName) {
@@ -59,10 +75,6 @@ public final class AppContextService {
         } catch (IOException e) {
             return "";
         }
-    }
-
-    public String getOutputDir(String fileName) {
-        return getRelativePath(Path.of(OUTPUT_DIR, fileName).toString());
     }
 
     public String getPPTXTemplate(String fileName) {

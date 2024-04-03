@@ -13,21 +13,23 @@ import "@mantine/core/styles/ModalBase.css";
 import "@mantine/core/styles/NumberInput.css";
 
 import type { Song } from '../../types';
-import { ActionAPI, QueryAPI, downloadFile, runAction, useApi, useCacheBustCounter } from "../api";
+import { API, downloadFile, runAction, useApi, useCacheBustCounter } from "../api";
 import DataTable, { Row } from "../components/DataTable";
 import SongEditor from "../components/SongEditor";
 
 import classes from "./Songs.module.css";
 
 export default function Songs() {
-    const [cacheBustCounter, increaseCacheBustCounter] = useCacheBustCounter();
-    const { isPending, error, data } = useApi(QueryAPI.songList, { cacheBustCounter });
-    const [opened, { open, close }] = useDisclosure(false);
-    const [songId, setSongId] = useState("");
-    const [linesPerSlide, setLinesPerSlide] = useState<string|number>(2);
-    const [templatePath, setTemplatePath] = useState("template-song.pptx");
-    const [hasStartSlide, toggleStartSlide] = useState(true);
-    const [hasEndSlide, toggleEndSlide] = useState(false);
+    const [ cacheBustCounter, increaseCacheBustCounter ] = useCacheBustCounter();
+    const songListQuery = useApi(API.songList, { cacheBustCounter });
+    const configQuery = useApi(API.getConfig);
+
+    const [ opened, { open, close } ] = useDisclosure(false);
+    const [ songId, setSongId ] = useState("");
+    const [ linesPerSlide, setLinesPerSlide ] = useState<string|number>(2);
+    const [ templatePath, setTemplatePath ] = useState("template-song.pptx");
+    const [ hasStartSlide, toggleStartSlide ] = useState(true);
+    const [ hasEndSlide, toggleEndSlide ] = useState(false);
 
     const handleSelectSong = (row: Row) => {
         setSongId(row.key);
@@ -43,7 +45,7 @@ export default function Songs() {
     };
 
     const handleDeleteSong = () => {
-        runAction(ActionAPI.deleteSong, { id: songId });
+        runAction(API.deleteSong, { id: songId });
         increaseCacheBustCounter();
     };
 
@@ -52,11 +54,11 @@ export default function Songs() {
     };
 
     const handleExportSong = () => {
-        downloadFile(ActionAPI.exportSong, { id: songId });
+        downloadFile(API.exportSong, { id: songId });
     };
 
     const handleGeneratePPTX = () => {
-        downloadFile(ActionAPI.generateSongPPTX, { id: songId, linesPerSlide, templatePath });
+        downloadFile(API.generateSongPPTX, { id: songId, linesPerSlide, templatePath });
     };
 
     const handleGenerateGSlides = () => {
@@ -68,15 +70,17 @@ export default function Songs() {
     };
 
     const handleSubmitSong = (song: Song) => {
-        runAction(ActionAPI.saveSong, {}, song);
+        runAction(API.saveSong, {}, song);
         increaseCacheBustCounter();
     };
 
     const handleToggleStartSlide = () => toggleStartSlide(!hasStartSlide);
     const handleToggleEndSlide = () => toggleEndSlide(!hasEndSlide);
 
+    const isPending = songListQuery.isPending || configQuery.isPending;
     if (isPending) return <LoadingOverlay visible={true} zIndex={1000} overlayProps={{ radius: "sm", blur: 2 }} />;
 
+    const error = songListQuery.error || configQuery.error;
     if (error) return <div>{"An error has occurred: " + error.message}</div>;
 
     return (
@@ -87,13 +91,13 @@ export default function Songs() {
                         tableClassName={classes.songTable}
                         headers={["Name"]}
                         onRowClick={handleSelectSong}
-                        rows={Object.entries(data).map(([key, songName]) => ({
+                        rows={Object.entries(songListQuery.data).map(([key, songName]) => ({
                             key, columns: [{ label: songName as string }]
                         }))}
                     />
                 </Flex>
                 <Flex direction="column" justify="flex-start" align="flex-start" gap="xs" >
-                    <p>Total # of Songs: { Object.entries(data).length }</p>
+                    <p>Total # of Songs: { Object.entries(songListQuery.data).length }</p>
                     <Divider />
                     <Button fullWidth onClick={handleNewSong}>New</Button>
                     <Button fullWidth onClick={handleEditSong}>Edit</Button>
