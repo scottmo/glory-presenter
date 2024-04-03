@@ -45,8 +45,8 @@ function extractParams(path: string) {
     return (path.match(/:\w+/g) || []).map(token => token.substring(1));
 }
 
-function generateRequestUri(path: string, params?: Record<string, string | undefined>) {
-    let requestUri = path;
+export function generateRequestUri(path: string | ServerAction, params?: Record<string, string | number | undefined>) {
+    let requestUri = typeof path === 'string' ? path : path.path;
     params = Object.assign({}, params);
     // fill route params
     const paramKeys = extractParams(requestUri);

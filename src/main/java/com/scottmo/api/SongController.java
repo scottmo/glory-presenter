@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -66,11 +66,11 @@ public class SongController {
 
     @GetMapping("/pptx")
     public ResponseEntity<Resource> generatePPTX(
-            @RequestParam Integer songId,
+            @RequestParam Integer id,
             @RequestParam Integer linesPerSlide,
             @RequestParam String templatePath) throws MalformedURLException, IOException {
 
-        Song song = getSong(songId);
+        Song song = getSong(id);
         Path outputPath = Path.of(System.getProperty("java.io.tmpdir"), StringUtils.sanitizeFilename(song.getTitle()) + ".pptx");
         if (!templatePath.contains("/")) {
             templatePath = appContextService.getPPTXTemplate(templatePath);

@@ -14,7 +14,7 @@ import "@mantine/core/styles/Modal.css";
 import "@mantine/core/styles/Button.css";
 
 import type { Song } from '../../types';
-import { QueryAPI, ActionAPI, useApi, runAction } from "../api";
+import { QueryAPI, ActionAPI, useApi, runAction, generateRequestUri } from "../api";
 import DataTable, { Row } from "../components/DataTable";
 import SongEditor from "../components/SongEditor";
 
@@ -50,8 +50,8 @@ export default function Songs() {
         // TODO
     };
 
-    const handleExportSongs = () => {
-        // TODO
+    const handleExportSong = () => {
+        window.open(generateRequestUri(ActionAPI.exportSong, { id: songId }), '_blank');
     };
 
     const handleGeneratePPTX = () => {
@@ -59,10 +59,10 @@ export default function Songs() {
     };
 
     const handleGenerateGSlides = () => {
-
+        window.open(generateRequestUri(ActionAPI.generateSongPPTX, { id: songId, linesPerSlide, templatePath }), '_blank');
     };
 
-    const handleSetTemplatePath = (e: React.ChangeEvent<HTMLInputElement) => {
+    const handleSetTemplatePath = (e: React.ChangeEvent<HTMLInputElement>) => {
         setTemplatePath(e.target.value);
     };
 
@@ -98,7 +98,7 @@ export default function Songs() {
                     <Button fullWidth onClick={handleDeleteSong}>Delete</Button>
                     <Divider />
                     <Button fullWidth onClick={handleImportSongs}>Import</Button>
-                    <Button fullWidth onClick={handleExportSongs}>Export</Button>
+                    <Button fullWidth onClick={handleExportSong}>Export</Button>
                     <Divider />
                     <NumberInput label="Lines Per Slide" placeholder="1 to 10" min={1} max={10}
                         value={linesPerSlide} onChange={setLinesPerSlide} />
