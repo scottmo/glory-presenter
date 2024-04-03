@@ -77,6 +77,7 @@ export default function SongEditor({ song, onSubmit }: Props) {
 }
 
 export function SongForm({ song, onSubmit }: Props) {
+    const id = song.id;
     const form = useForm({
         initialValues: {
             authors: song?.authors?.join(', ') || '',
@@ -93,6 +94,7 @@ export function SongForm({ song, onSubmit }: Props) {
     const handleSubmit = form.onSubmit(({ authors, publisher, copyright, songBook, entry, comments,
             verseOrder, lyrics }) => {
         const song: Song = {
+            id,
             publisher, copyright, songBook, entry, comments,
             authors: toStringArray(authors),
             verseOrder: toStringArray(verseOrder),

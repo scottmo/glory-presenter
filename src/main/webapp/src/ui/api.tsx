@@ -41,11 +41,15 @@ export function runAction(api: ServerAction, params: any, data?: any) {
     return axios.post(requestUri, data);
 }
 
+export function downloadFile(path: string | ServerAction, params?: Record<string, string | number | undefined>) {
+    window.open(generateRequestUri(path, params), '_blank');
+}
+
 function extractParams(path: string) {
     return (path.match(/:\w+/g) || []).map(token => token.substring(1));
 }
 
-export function generateRequestUri(path: string | ServerAction, params?: Record<string, string | number | undefined>) {
+function generateRequestUri(path: string | ServerAction, params?: Record<string, string | number | undefined>) {
     let requestUri = typeof path === 'string' ? path : path.path;
     params = Object.assign({}, params);
     // fill route params
@@ -58,7 +62,10 @@ export function generateRequestUri(path: string | ServerAction, params?: Record<
     }
     // put the rest as query params
     if (Object.keys(params).length > 0) {
-        requestUri += '?' + Object.entries(params).map(([k, v]) => `${k}=${v}`).join('&');
+        requestUri += '?' + Object.entries(params)
+            .map(([k, v]) => typeof v !== 'object' ? `${k}=${v}` : '')
+            .filter(s => !!s)
+            .join('&');
     }
     return `${apiOrigin}/${requestUri}`;
 }

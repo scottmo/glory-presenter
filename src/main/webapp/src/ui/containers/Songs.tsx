@@ -7,14 +7,13 @@ import "@mantine/core/styles/Checkbox.css";
 import "@mantine/core/styles/Input.css";
 import '@mantine/core/styles/Divider.css';
 import "@mantine/core/styles/NumberInput.css";
-import "@mantine/core/styles/TextInput.css";
 import "@mantine/core/styles/LoadingOverlay.css";
 import "@mantine/core/styles/ModalBase.css";
 import "@mantine/core/styles/Modal.css";
 import "@mantine/core/styles/Button.css";
 
 import type { Song } from '../../types';
-import { QueryAPI, ActionAPI, useApi, runAction, generateRequestUri } from "../api";
+import { QueryAPI, ActionAPI, useApi, runAction, downloadFile } from "../api";
 import DataTable, { Row } from "../components/DataTable";
 import SongEditor from "../components/SongEditor";
 
@@ -24,7 +23,7 @@ export default function Songs() {
     const { isPending, error, data } = useApi(QueryAPI.songList);
     const [opened, { open, close }] = useDisclosure(false);
     const [songId, setSongId] = useState("");
-    const [linesPerSlide, setLinesPerSlide] = useState<string|number>(4);
+    const [linesPerSlide, setLinesPerSlide] = useState<string|number>(2);
     const [templatePath, setTemplatePath] = useState("template-song.pptx");
     const [hasStartSlide, toggleStartSlide] = useState(true);
     const [hasEndSlide, toggleEndSlide] = useState(false);
@@ -51,15 +50,15 @@ export default function Songs() {
     };
 
     const handleExportSong = () => {
-        window.open(generateRequestUri(ActionAPI.exportSong, { id: songId }), '_blank');
+        downloadFile(ActionAPI.exportSong, { id: songId });
     };
 
     const handleGeneratePPTX = () => {
-
+        downloadFile(ActionAPI.generateSongPPTX, { id: songId, linesPerSlide, templatePath });
     };
 
     const handleGenerateGSlides = () => {
-        window.open(generateRequestUri(ActionAPI.generateSongPPTX, { id: songId, linesPerSlide, templatePath }), '_blank');
+        // TODO
     };
 
     const handleSetTemplatePath = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -67,7 +66,7 @@ export default function Songs() {
     };
 
     const handleSubmitSong = (song: Song) => {
-        runAction(ActionAPI.saveSong, { song });
+        runAction(ActionAPI.saveSong, {}, { song });
     };
 
     const handleToggleStartSlide = () => toggleStartSlide(!hasStartSlide);
@@ -104,7 +103,7 @@ export default function Songs() {
                         value={linesPerSlide} onChange={setLinesPerSlide} />
                     <TextInput label="PPT Template"
                         value={templatePath} onChange={handleSetTemplatePath} />
-                    <Checkbox defaultChecked label="has start slide"
+                    <Checkbox label="has start slide"
                         checked={hasStartSlide} onChange={handleToggleStartSlide} />
                     <Checkbox label="has end slide"
                         checked={hasEndSlide} onChange={handleToggleEndSlide} />
