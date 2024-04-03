@@ -1,16 +1,15 @@
 import type { Song, SongVerse } from '../../types';
 
-import { useState } from 'react';
-
+import { Button, Grid, Group, Input, LoadingOverlay, Tabs, Text, Textarea } from '@mantine/core';
 import { useForm } from '@mantine/form';
-import { LoadingOverlay, Grid, Flex, Tabs, Button, Input, Textarea, Text, Group } from '@mantine/core';
+
 import '@mantine/core/styles/Button.css';
+import '@mantine/core/styles/Grid.css';
 import '@mantine/core/styles/Group.css';
 import '@mantine/core/styles/Input.css';
 import '@mantine/core/styles/LoadingOverlay.css';
-import '@mantine/core/styles/Text.css';
 import '@mantine/core/styles/Tabs.css';
-import '@mantine/core/styles/Grid.css';
+import '@mantine/core/styles/Text.css';
 
 import { QueryAPI, useApi } from '../api';
 
@@ -78,6 +77,11 @@ export default function SongEditor({ song, onSubmit }: Props) {
 
 export function SongForm({ song, onSubmit }: Props) {
     const id = song.id;
+    let lyrics = stringifyVerses(song);
+    if (lyrics.length === 0) {
+        // TODO fetch default locales from server
+        lyrics = [{ locale: 'zh_cn', title: '歌名' }, { locale: 'en_us', title: 'title' }] as Lyrics[];
+    }
     const form = useForm({
         initialValues: {
             authors: song?.authors?.join(', ') || '',
@@ -87,7 +91,7 @@ export function SongForm({ song, onSubmit }: Props) {
             entry: song?.entry || '',
             comments: song?.comments || '',
             verseOrder: song?.verseOrder?.join(', ') || '',
-            lyrics: stringifyVerses(song) || [] as Lyrics[],
+            lyrics,
         }
     });
 

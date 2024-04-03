@@ -1,19 +1,19 @@
-import { useState } from "react";
+import { Button, Checkbox, Divider, Flex, LoadingOverlay, Modal, NumberInput, TextInput } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { Flex, LoadingOverlay, Modal, Button, TextInput, NumberInput, Checkbox, Divider } from "@mantine/core";
+import { useState } from "react";
 
-import "@mantine/core/styles/Flex.css";
-import "@mantine/core/styles/Checkbox.css";
-import "@mantine/core/styles/Input.css";
-import '@mantine/core/styles/Divider.css';
-import "@mantine/core/styles/NumberInput.css";
-import "@mantine/core/styles/LoadingOverlay.css";
-import "@mantine/core/styles/ModalBase.css";
-import "@mantine/core/styles/Modal.css";
 import "@mantine/core/styles/Button.css";
+import "@mantine/core/styles/Checkbox.css";
+import '@mantine/core/styles/Divider.css';
+import "@mantine/core/styles/Flex.css";
+import "@mantine/core/styles/Input.css";
+import "@mantine/core/styles/LoadingOverlay.css";
+import "@mantine/core/styles/Modal.css";
+import "@mantine/core/styles/ModalBase.css";
+import "@mantine/core/styles/NumberInput.css";
 
 import type { Song } from '../../types';
-import { QueryAPI, ActionAPI, useApi, runAction, downloadFile, useCacheBustCounter } from "../api";
+import { ActionAPI, QueryAPI, downloadFile, runAction, useApi, useCacheBustCounter } from "../api";
 import DataTable, { Row } from "../components/DataTable";
 import SongEditor from "../components/SongEditor";
 
@@ -34,7 +34,7 @@ export default function Songs() {
     };
 
     const handleNewSong = () => {
-        setSongId("");
+        setSongId("-1");
         open();
     };
 
