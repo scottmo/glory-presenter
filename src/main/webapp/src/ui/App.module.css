@@ -32,3 +32,7 @@
 .linkIcon {
     color: var(--mantine-color-black);
 }
+
+.outlet {
+    height: calc(100vh - 60px);
+}

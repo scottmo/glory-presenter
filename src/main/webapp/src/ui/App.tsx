@@ -26,7 +26,7 @@ export default function App() {
 
     return (
         <AppShell
-            header={{ height: { base: 60, md: 70, lg: 80 } }}
+            header={{ height: { base: 60 } }}
             navbar={{
                 width: { base: 200, md: 300, lg: 400 },
                 breakpoint: 'sm',
@@ -44,7 +44,9 @@ export default function App() {
             <AppShell.Navbar p="md">
                 <div>{links}</div>
             </AppShell.Navbar>
-            <AppShell.Main><Outlet /></AppShell.Main>
+            <AppShell.Main className={classes.outlet}>
+                <Outlet />
+            </AppShell.Main>
         </AppShell>
     );
 }

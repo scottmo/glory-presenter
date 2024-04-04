@@ -1,5 +1,5 @@
 import { Button, Checkbox, Divider, Flex,
-    LoadingOverlay, Modal, NumberInput, Select } from "@mantine/core";
+    LoadingOverlay, Modal, NumberInput, Select, ScrollArea } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { useState } from "react";
 
@@ -18,8 +18,6 @@ import type { Song } from '../../types';
 import { API, downloadFile, runAction, useQuery, useCacheBustCounter } from "../api";
 import DataTable, { Row } from "../components/DataTable";
 import SongEditor from "../components/SongEditor";
-
-import classes from "./Songs.module.css";
 
 const DEFAULT_LINES_PER_SLIDE = 2;
 const DEFAULT_TEMPLATE_PATH = "Error: none found!"
@@ -85,14 +83,15 @@ export default function Songs() {
         <>
             <Flex justify="center" align="flex-start" direction="row" wrap="wrap" gap="md" >
                 <Flex direction="column" gap="md" >
-                    <DataTable
-                        tableClassName={classes.songTable}
-                        headers={["Name"]}
-                        onRowClick={handleSelectSong}
-                        rows={Object.entries(songListQuery.data).map(([key, songName]) => ({
-                            key, columns: [{ label: songName as string }]
-                        }))}
-                    />
+                    <ScrollArea h={document.body.offsetHeight - 100}>
+                        <DataTable
+                            headers={["Name"]}
+                            onRowClick={handleSelectSong}
+                            rows={Object.entries(songListQuery.data).map(([key, songName]) => ({
+                                key, columns: [{ label: songName as string }]
+                            }))}
+                        />
+                    </ScrollArea>
                 </Flex>
                 <Flex direction="column" justify="flex-start" align="flex-start" gap="xs" >
                     <p>Total # of Songs: { Object.entries(songListQuery.data).length }</p>

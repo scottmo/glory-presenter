@@ -20,7 +20,6 @@ export type Row = {
 type Props = {
     headers: string[];
     rows: Row[];
-    tableClassName: string;
     onRowClick?: (row: Row) => void;
 }
 
@@ -28,7 +27,7 @@ function stringMatch(term: string, text: string) {
     return term.trim() ? text.toLowerCase().includes(term.trim().toLowerCase()) : true;
 }
 
-export default function DataTable({ headers, rows, tableClassName, onRowClick }: Props) {
+export default function DataTable({ headers, rows, onRowClick }: Props) {
     const [searchTerm, setSearchTerm] = useState('');
     const [debouncedSearchTerm] = useDebouncedValue(searchTerm, 200);
     const [selectedRow, setSelectedRow] = useState('');
@@ -47,7 +46,7 @@ export default function DataTable({ headers, rows, tableClassName, onRowClick }:
         <div>
             <TextInput label="Search" placeholder="Holy holy holy"
                     onChange={(event) => setSearchTerm(event.currentTarget.value)} />
-            <div className={tableClassName}>
+            <div>
                 <Table highlightOnHover striped>
                     <Table.Thead>
                         <Table.Tr>
