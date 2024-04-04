@@ -82,7 +82,7 @@ export default function Songs() {
     return (
         <>
             <Flex justify="center" align="flex-start" direction="row" wrap="wrap" gap="md" >
-                <Flex direction="column" gap="md" >
+                <Flex direction="column" gap="md" w={650} >
                     <ScrollArea h={document.body.offsetHeight - 100}>
                         <DataTable
                             headers={["Name"]}
