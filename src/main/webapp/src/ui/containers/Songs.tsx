@@ -116,7 +116,7 @@ export default function Songs() {
                 </Flex>
             </Flex>
             <Modal opened={opened} onClose={close} title="Edit Song" centered>
-                <SongEditor song={{ id: songId }} onSubmit={handleSubmitSong}/>
+                <SongEditor song={{ id: songId }} locales={configQuery?.data?.locales} onSubmit={handleSubmitSong}/>
             </Modal>
         </>
     );

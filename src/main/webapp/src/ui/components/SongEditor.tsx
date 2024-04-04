@@ -60,10 +60,11 @@ function stringifyVerses(song: Song): Lyrics[] {
 
 type Props = {
     song: Song;
+    locales: string[];
     onSubmit: (song: Song) => void
 }
 
-export default function SongEditor({ song, onSubmit }: Props) {
+export default function SongEditor({ song, locales, onSubmit }: Props) {
     const { isPending, error, data } = useQuery(API.song, { id: song.id }, { enabled: !!song.id, cacheTime: 0 });
 
     if (isPending) return <LoadingOverlay visible={true} zIndex={1000} overlayProps={{ radius: "sm", blur: 2 }} />;
@@ -71,16 +72,16 @@ export default function SongEditor({ song, onSubmit }: Props) {
     if (error) return <div>{'Unable to load song: ' + error.message}</div>;
 
     return (
-        <SongForm song={data} onSubmit={onSubmit} />
+        <SongForm song={data} locales={locales} onSubmit={onSubmit} />
     );
 }
 
-export function SongForm({ song, onSubmit }: Props) {
+export function SongForm({ song, locales, onSubmit }: Props) {
     const id = song.id;
     let lyrics = stringifyVerses(song);
     if (lyrics.length === 0) {
         // TODO fetch default locales from server
-        lyrics = [{ locale: 'zh_cn', title: '歌名' }, { locale: 'en_us', title: 'title' }] as Lyrics[];
+        lyrics = locales.map(locale => ({ locale, title: '' })) as Lyrics[];
     }
     const form = useForm({
         initialValues: {
