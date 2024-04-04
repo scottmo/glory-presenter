@@ -33,6 +33,7 @@
     color: var(--mantine-color-black);
 }
 
+/* to keep outlet's content in view; 60px is the header height */
 .outlet {
     height: calc(100vh - 60px);
 }
