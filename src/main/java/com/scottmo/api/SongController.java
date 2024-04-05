@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.scottmo.data.song.Song;
 import com.scottmo.services.appContext.AppContextService;
@@ -94,19 +95,18 @@ public class SongController {
     }
 
     @PostMapping("/import")
-    public ResponseEntity<Map<String, Object>> importSongs(@RequestBody List<String> songPaths) {
-        if (songPaths == null || songPaths.isEmpty()) {
-            return RequestUtil.errorResponse("No file to import!");
+    public ResponseEntity<Map<String, Object>> importSongs(@RequestParam("file") MultipartFile file) {
+        if (file.isEmpty()) {
+            return RequestUtil.errorResponse("Please select a file to upload");
         }
-        List<File> files = songPaths.stream()
-            .map(path -> new File(path))
-            .collect(Collectors.toList());
-        for (File file : files) {
-            try {
-                songService.importOpenLyricSong(file);
-            } catch (IOException e) {
-                return RequestUtil.errorResponse("Failed to import song [%s]!".formatted(file.getName()), e);
-            }
+
+        // TODO handle importing a zip of songs
+        try {
+            String content = new String(file.getBytes());
+            songService.importOpenLyricSong(content);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return RequestUtil.errorResponse("Failed to import song [%s]!".formatted(file.getName()), e);
         }
         return RequestUtil.successResponse();
     }

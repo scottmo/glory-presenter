@@ -34,6 +34,10 @@ public class SongService {
 
     public void importOpenLyricSong(File openLyricsFile) throws IOException {
         String openLyricsXML = Files.readString(openLyricsFile.toPath(), StandardCharsets.UTF_8);
+        importOpenLyricSong(openLyricsXML);
+    }
+
+    public void importOpenLyricSong(String openLyricsXML) throws IOException {
         Song song = getOpenLyricsConverter().deserialize(openLyricsXML);
         store.store(song);
     }

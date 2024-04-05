@@ -18,6 +18,7 @@ import type { Song } from '../../types';
 import { API, downloadFile, runAction, useQuery, useCacheBustCounter } from "../api";
 import DataTable, { Row } from "../components/DataTable";
 import SongEditor from "../components/SongEditor";
+import FileUpload from "../components/FileUpload";
 
 const DEFAULT_LINES_PER_SLIDE = 2;
 const DEFAULT_TEMPLATE_PATH = "Error: none found!"
@@ -50,10 +51,6 @@ export default function Songs() {
     const handleDeleteSong = () => {
         runAction(API.deleteSong, { id: songId });
         increaseCacheBustCounter();
-    };
-
-    const handleImportSongs = () => {
-        // TODO
     };
 
     const handleExportSong = () => {
@@ -100,7 +97,7 @@ export default function Songs() {
                     <Button fullWidth onClick={handleEditSong}>Edit</Button>
                     <Button fullWidth onClick={handleDeleteSong}>Delete</Button>
                     <Divider />
-                    <Button fullWidth onClick={handleImportSongs}>Import</Button>
+                    <FileUpload label="Import" uploadAPI={API.importSongs} />
                     <Button fullWidth onClick={handleExportSong}>Export</Button>
                     <Divider />
                     <NumberInput label="Lines Per Slide" placeholder="1 to 10" min={1} max={10}

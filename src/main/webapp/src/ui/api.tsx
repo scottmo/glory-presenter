@@ -4,7 +4,7 @@ import { useQuery as useReactQuery } from '@tanstack/react-query';
 
 const apiOrigin = 'http://localhost:8080/api';
 
-type ServerAction = {
+export type ServerAction = {
     method: string;
     path: string;
 }
