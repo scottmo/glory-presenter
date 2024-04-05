@@ -31,9 +31,12 @@ export default function Songs() {
     const [ opened, { open, close } ] = useDisclosure(false);
     const [ songId, setSongId ] = useState("");
     const [ linesPerSlide, setLinesPerSlide ] = useState<string|number>(DEFAULT_LINES_PER_SLIDE);
-    const [ templatePath, setTemplatePath ] = useState(configQuery?.data?.templatePaths?.[0] || DEFAULT_TEMPLATE_PATH);
     const [ hasStartSlide, toggleStartSlide ] = useState(true);
     const [ hasEndSlide, toggleEndSlide ] = useState(false);
+    const defaultTemplatePath = configQuery?.data?.templatePaths
+        ?.find((path: string) => path.includes('song'))
+        || DEFAULT_TEMPLATE_PATH;
+    const [ templatePath, setTemplatePath ] = useState(defaultTemplatePath);
 
     const handleSelectSong = (row: Row) => {
         setSongId(row.key);
@@ -70,6 +73,14 @@ export default function Songs() {
         increaseCacheBustCounter();
     };
 
+    const handleSongImported = (errMsg: string) => {
+        if (!errMsg) {
+            increaseCacheBustCounter();
+        } else {
+            // TODO
+        }
+    };
+
     const isPending = songListQuery.isPending || configQuery.isPending;
     if (isPending) return <LoadingOverlay visible={true} zIndex={1000} overlayProps={{ radius: "sm", blur: 2 }} />;
 
@@ -97,17 +108,17 @@ export default function Songs() {
                     <Button fullWidth onClick={handleEditSong}>Edit</Button>
                     <Button fullWidth onClick={handleDeleteSong}>Delete</Button>
                     <Divider />
-                    <FileUpload label="Import" uploadAPI={API.importSongs} />
+                    <FileUpload label="Import" uploadAPI={API.importSongs} onUpload={handleSongImported} />
                     <Button fullWidth onClick={handleExportSong}>Export</Button>
                     <Divider />
                     <NumberInput label="Lines Per Slide" placeholder="1 to 10" min={1} max={10}
                         value={linesPerSlide} onChange={setLinesPerSlide} />
                     <Select label="PPT Template" data={configQuery?.data?.templatePaths} placeholder="Pick a template"
-                        value={templatePath} onChange={(value) => setTemplatePath(value)} />
+                        value={templatePath} onChange={setTemplatePath} />
                     <Checkbox label="has start slide"
-                        checked={hasStartSlide} onChange={() => toggleStartSlide(!hasStartSlide)} />
+                        checked={hasStartSlide} onChange={(e) => toggleStartSlide(e.target.checked)} />
                     <Checkbox label="has end slide"
-                        checked={hasEndSlide} onChange={() => toggleEndSlide(!hasEndSlide)} />
+                        checked={hasEndSlide} onChange={(e) => toggleEndSlide(e.target.checked)} />
                     <Button fullWidth onClick={handleGeneratePPTX}>Generate PPTX</Button>
                     <Button fullWidth onClick={handleGenerateGSlides}>Generate Google Slides</Button>
                 </Flex>

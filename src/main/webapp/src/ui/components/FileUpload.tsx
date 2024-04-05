@@ -4,13 +4,16 @@ import { ServerAction, runAction } from '../api';
 type Props = {
     label: string;
     uploadAPI: ServerAction;
+    onUpload?: (errMsg: string) => void;
 };
 
-export default function FileUpload({ label, uploadAPI }: Props) {
+export default function FileUpload({ label, uploadAPI, onUpload }: Props) {
     const handleUpload = async (file: File | null) => {
         const response = await runAction(uploadAPI, {}, file);
         if (response.data.status !== "ok") {
-            // TODO
+            onUpload?.(response.data.message);
+        } else {
+            onUpload?.("");
         }
     };
 

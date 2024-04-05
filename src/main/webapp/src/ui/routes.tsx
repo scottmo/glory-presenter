@@ -1,17 +1,18 @@
 import {
     IconBible,
     IconBrandGoogle,
+    IconMusic,
     IconSettings,
     IconSlideshow,
-    IconMusic,
 } from '@tabler/icons-react';
-import Songs from './containers/Songs';
+import Bible from './containers/Bible';
 import Settings from './containers/Settings';
+import Songs from './containers/Songs';
 
 export default [
-    { path: '/songs', label: 'Songs', icon: IconMusic, component: Songs },
-    { path: '/bible', label: 'Bible', icon: IconBible, component: Songs },
+    { path: '/bible', label: 'Bible', icon: IconBible, component: Bible },
     { path: '/gslides', label: 'Google Slides', icon: IconBrandGoogle, component: Songs },
     { path: '/ppt', label: 'Powerpoint', icon: IconSlideshow, component: Songs },
-    { path: '/settings', label: 'Settings', icon: IconSettings, component: Settings }
+    { path: '/settings', label: 'Settings', icon: IconSettings, component: Settings },
+    { path: '/songs', label: 'Songs', icon: IconMusic, component: Songs },
 ];
