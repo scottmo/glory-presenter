@@ -70,6 +70,7 @@ export default function Songs() {
 
     const handleSubmitSong = (song: Song) => {
         runAction(API.saveSong, {}, song);
+        close();
         increaseCacheBustCounter();
     };
 
@@ -123,7 +124,7 @@ export default function Songs() {
                     <Button fullWidth onClick={handleGenerateGSlides}>Generate Google Slides</Button>
                 </Flex>
             </Flex>
-            <Modal opened={opened} onClose={close} title="Edit Song" centered>
+            <Modal opened={opened} onClose={close} title="Edit Song" centered w={800}>
                 <SongEditor song={{ id: songId }} locales={configQuery?.data?.locales} onSubmit={handleSubmitSong}/>
             </Modal>
         </>
