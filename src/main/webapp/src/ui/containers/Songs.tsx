@@ -124,7 +124,7 @@ export default function Songs() {
                     <Button fullWidth onClick={handleGenerateGSlides}>Generate Google Slides</Button>
                 </Flex>
             </Flex>
-            <Modal opened={opened} onClose={close} title="Edit Song" centered w={800}>
+            <Modal opened={opened} onClose={close} title="Edit Song" centered size="xl">
                 <SongEditor song={{ id: songId }} locales={configQuery?.data?.locales} onSubmit={handleSubmitSong}/>
             </Modal>
         </>

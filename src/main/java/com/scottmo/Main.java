@@ -40,7 +40,7 @@ public class Main extends JFrame {
 
         JButton openAppButton = new JButton("Launch UI");
         openAppButton.addActionListener(e -> {
-            openWebpage("http://localhost:8080");
+            openWebpage("http://localhost:8080/#/songs");
         });
         JTextArea textArea = new JTextArea("Status: running");
 

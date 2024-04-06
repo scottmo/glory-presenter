@@ -1,6 +1,6 @@
 import type { Song, SongVerse } from '../../types';
 
-import { Button, Grid, Group, Input, LoadingOverlay, Tabs, Text, Textarea } from '@mantine/core';
+import { Button, Flex, Grid, Group, Input, LoadingOverlay, Tabs, Text, TextInput, Textarea } from '@mantine/core';
 import { useForm } from '@mantine/form';
 
 import '@mantine/core/styles/Button.css';
@@ -114,65 +114,56 @@ export function SongForm({ song, locales, onSubmit }: Props) {
 
     return (
         <form onSubmit={handleSubmit}>
-            <Input.Wrapper label="Authors">
-                <Input {...form.getInputProps('authors')} />
-            </Input.Wrapper>
-            <Grid gutter="xs">
+            <Grid>
                 <Grid.Col span={6}>
-                    <Input.Wrapper label="Publisher">
-                        <Input {...form.getInputProps('publisher')} />
-                    </Input.Wrapper>
+                    <TextInput label="Authors" {...form.getInputProps('authors')} />
+                    <Grid gutter="xs">
+                        <Grid.Col span={6}>
+                            <TextInput label="Publisher" {...form.getInputProps('publisher')} />
+                        </Grid.Col>
+                        <Grid.Col span={6}>
+                            <TextInput label="Copyright" {...form.getInputProps('copyright')} />
+                        </Grid.Col>
+                    </Grid>
+                    <Grid gutter="xs">
+                        <Grid.Col span={8}>
+                            <TextInput label="Song Book" {...form.getInputProps('songBook')} />
+                        </Grid.Col>
+                        <Grid.Col span={4}>
+                            <TextInput label="Entry" {...form.getInputProps('entry')} />
+                        </Grid.Col>
+                    </Grid>
+                    <Textarea label="Comments" autosize
+                        {...form.getInputProps('comments')}
+                    />
+                    <TextInput label="Verse Order" {...form.getInputProps('verseOrder')} />
                 </Grid.Col>
                 <Grid.Col span={6}>
-                    <Input.Wrapper label="Copyright">
-                        <Input {...form.getInputProps('copyright')} />
-                    </Input.Wrapper>
+                    <Text fw={500} size="sm">Lyrics</Text>
+                    <Tabs defaultValue={form.values.lyrics[0].locale}>
+                        <Tabs.List>
+                        {form.values.lyrics.map((item, index) => (
+                            <Tabs.Tab key={item.locale} value={item.locale}>
+                                {item.locale}
+                            </Tabs.Tab>
+                        ))}
+                        </Tabs.List>
+                        {form.values.lyrics.map((item, index) => (
+                            <Tabs.Panel key={item.locale} value={item.locale}>
+                                <Input.Wrapper label="Title">
+                                    <Input {...form.getInputProps(`lyrics.${index}.title`)} />
+                                </Input.Wrapper>
+                                <Textarea
+                                    label="Verses"
+                                    placeholder={EXAMPLE_LYRICS}
+                                    rows={10}
+                                    {...form.getInputProps(`lyrics.${index}.verses`)}
+                                />
+                            </Tabs.Panel>
+                        ))}
+                    </Tabs>
                 </Grid.Col>
             </Grid>
-            <Grid gutter="xs">
-                <Grid.Col span={8}>
-                    <Input.Wrapper label="Song Book">
-                        <Input {...form.getInputProps('songBook')} />
-                    </Input.Wrapper>
-                </Grid.Col>
-                <Grid.Col span={4}>
-                    <Input.Wrapper label="Entry">
-                        <Input {...form.getInputProps('entry')} />
-                    </Input.Wrapper>
-                </Grid.Col>
-            </Grid>
-            <Textarea label="Comments" autosize
-                {...form.getInputProps('comments')}
-            />
-            <Input.Wrapper label="Verse Order">
-                <Input {...form.getInputProps('verseOrder')} />
-            </Input.Wrapper>
-            <br/>
-            <Text fw={500} size="sm">
-                Lyrics
-            </Text>
-            <Tabs defaultValue={form.values.lyrics[0].locale}>
-                <Tabs.List>
-                {form.values.lyrics.map((item, index) => (
-                    <Tabs.Tab key={item.locale} value={item.locale}>
-                        {item.locale}
-                    </Tabs.Tab>
-                ))}
-                </Tabs.List>
-                {form.values.lyrics.map((item, index) => (
-                    <Tabs.Panel key={item.locale} value={item.locale}>
-                        <Input.Wrapper label="Title">
-                            <Input {...form.getInputProps(`lyrics.${index}.title`)} />
-                        </Input.Wrapper>
-                        <Textarea
-                            label="Verses"
-                            placeholder={EXAMPLE_LYRICS}
-                            rows={10}
-                            {...form.getInputProps(`lyrics.${index}.verses`)}
-                        />
-                    </Tabs.Panel>
-                ))}
-            </Tabs>
             <Group justify="flex-end" mt="md">
                 <Button type="submit">Save</Button>
             </Group>
