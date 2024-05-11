@@ -30,6 +30,7 @@ export default function Songs() {
 
     const [ opened, { open, close } ] = useDisclosure(false);
     const [ songId, setSongId ] = useState("");
+    const [ shouldCreateNew, setShouldCreateNew ] = useState(false);
     const [ linesPerSlide, setLinesPerSlide ] = useState<string|number>(DEFAULT_LINES_PER_SLIDE);
     const [ hasStartSlide, toggleStartSlide ] = useState(true);
     const [ hasEndSlide, toggleEndSlide ] = useState(false);
@@ -43,11 +44,17 @@ export default function Songs() {
     };
 
     const handleNewSong = () => {
+        setShouldCreateNew(true);
         setSongId("-1");
         open();
     };
 
     const handleEditSong = () => {
+        open();
+    };
+
+    const handleDuplicateSong = () => {
+        setShouldCreateNew(true);
         open();
     };
 
@@ -69,7 +76,10 @@ export default function Songs() {
     };
 
     const handleSubmitSong = (song: Song) => {
-        runAction(API.saveSong, {}, song);
+        const newSong = shouldCreateNew
+            ? Object.assign({}, song, { id: "-1" })
+            : song;
+        runAction(API.saveSong, {}, newSong);
         close();
         increaseCacheBustCounter();
     };
@@ -107,25 +117,29 @@ export default function Songs() {
                     <Divider />
                     <Button fullWidth onClick={handleNewSong}>New</Button>
                     <Button fullWidth onClick={handleEditSong}>Edit</Button>
+                    <Button fullWidth onClick={handleDuplicateSong}>Duplicate</Button>
                     <Button fullWidth onClick={handleDeleteSong}>Delete</Button>
                     <Divider />
                     <FileUpload label="Import" uploadAPI={API.importSongs} onUpload={handleSongImported} />
                     <Button fullWidth onClick={handleExportSong}>Export</Button>
                     <Divider />
                     <NumberInput label="Lines Per Slide" placeholder="1 to 10" min={1} max={10}
-                        value={linesPerSlide} onChange={setLinesPerSlide} />
-                    <Select label="PPT Template" data={configQuery?.data?.templatePaths} placeholder="Pick a template"
-                        value={templatePath} onChange={setTemplatePath} />
+                            value={linesPerSlide} onChange={setLinesPerSlide} />
+                    <Select label="PPT Template" placeholder="Pick a template"
+                            data={configQuery?.data?.templatePaths}
+                            value={templatePath} onChange={setTemplatePath} />
                     <Checkbox label="has start slide"
-                        checked={hasStartSlide} onChange={(e) => toggleStartSlide(e.target.checked)} />
+                            checked={hasStartSlide} onChange={(e) => toggleStartSlide(e.target.checked)} />
                     <Checkbox label="has end slide"
-                        checked={hasEndSlide} onChange={(e) => toggleEndSlide(e.target.checked)} />
+                            checked={hasEndSlide} onChange={(e) => toggleEndSlide(e.target.checked)} />
                     <Button fullWidth onClick={handleGeneratePPTX}>Generate PPTX</Button>
                     <Button fullWidth onClick={handleGenerateGSlides}>Generate Google Slides</Button>
                 </Flex>
             </Flex>
-            <Modal opened={opened} onClose={close} title="Edit Song" centered size="xl">
-                <SongEditor song={{ id: songId }} locales={configQuery?.data?.locales} onSubmit={handleSubmitSong}/>
+            <Modal title="Edit Song" centered size="xl"
+                    opened={opened} onClose={close} closeOnClickOutside={false}>
+                <SongEditor song={{ id: songId }} locales={configQuery?.data?.locales}
+                        onSubmit={handleSubmitSong}/>
             </Modal>
         </>
     );
