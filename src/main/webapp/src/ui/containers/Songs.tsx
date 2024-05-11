@@ -120,7 +120,7 @@ export default function Songs() {
                     <Button fullWidth onClick={handleDuplicateSong}>Duplicate</Button>
                     <Button fullWidth onClick={handleDeleteSong}>Delete</Button>
                     <Divider />
-                    <FileUpload label="Import" uploadAPI={API.importSongs} onUpload={handleSongImported} />
+                    <FileUpload fullWidth label="Import" uploadAPI={API.importSongs} onUpload={handleSongImported} />
                     <Button fullWidth onClick={handleExportSong}>Export</Button>
                     <Divider />
                     <NumberInput label="Lines Per Slide" placeholder="1 to 10" min={1} max={10}
