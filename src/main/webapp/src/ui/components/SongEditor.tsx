@@ -32,6 +32,8 @@ type Lyrics = {
     locale: string;
 }
 function parseVerses(text: string, locale: string): SongVerse[] {
+    if (!text || !locale) return [];
+
     return text.split('#').map(s => s.trim()).filter(s => !!s).reduce((verses, verseText) => {
         const currentVerses = verseText.split('\n').map(s => s.trim());
         const name = currentVerses.shift();
@@ -112,6 +114,28 @@ export function SongForm({ song, locales, onSubmit }: Props) {
         onSubmit(song);
     });
 
+    const handleVerseOrderGeneration = () => {
+        if (form.values.lyrics?.length > 0) {
+            let verseNames: string[] = [];
+            let chorusNames: string[] = [];
+            // get all verse names and sort them in order
+            form.values.lyrics.map(({ locale, verses }) => parseVerses(verses, locale)).flat()
+                .map(verse => verse.name)
+                .forEach(name => {
+                    if (name.startsWith("v") && !verseNames.includes(name)) verseNames.push(name);
+                    if (name.startsWith("c") && !chorusNames.includes(name)) chorusNames.push(name);
+                });
+            verseNames.sort();
+            chorusNames.sort();
+
+            const verseOrder: string[] = [];
+            for (const name of verseNames) {
+                verseOrder.push(name, ...chorusNames);
+            }
+            form.setValues({ verseOrder: verseOrder.join(", ") });
+        }
+    };
+
     return (
         <form onSubmit={handleSubmit}>
             <Grid>
@@ -136,7 +160,9 @@ export function SongForm({ song, locales, onSubmit }: Props) {
                     <Textarea label="Comments" autosize
                         {...form.getInputProps('comments')}
                     />
-                    <TextInput label="Verse Order" {...form.getInputProps('verseOrder')} />
+                    <TextInput label="Verse Order" {...form.getInputProps('verseOrder')}
+                            rightSection={<Button onClick={handleVerseOrderGeneration}>G</Button>}
+                        />
                 </Grid.Col>
                 <Grid.Col span={6}>
                     <Text fw={500} size="sm">Lyrics</Text>
