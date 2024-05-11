@@ -48,6 +48,8 @@ public class Main extends JFrame {
         panel.add(textArea);
         panel.add(openAppButton);
         this.getContentPane().add(panel);
+
+        openWebpage("http://localhost:8080/#/songs");
     }
 
     private boolean openWebpage(URI uri) {
