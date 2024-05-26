@@ -2,15 +2,11 @@ import { Button, Divider, Flex, LoadingOverlay, Select, TextInput } from "@manti
 import { useState } from "react";
 
 import "@mantine/core/styles/Button.css";
-import "@mantine/core/styles/Checkbox.css";
 import '@mantine/core/styles/Combobox.css';
 import '@mantine/core/styles/Divider.css';
 import "@mantine/core/styles/Flex.css";
 import "@mantine/core/styles/Input.css";
 import "@mantine/core/styles/LoadingOverlay.css";
-import "@mantine/core/styles/Modal.css";
-import "@mantine/core/styles/ModalBase.css";
-import "@mantine/core/styles/NumberInput.css";
 
 import { API, downloadFile, useCacheBustCounter, useQuery } from "../api";
 import FileUpload from "../components/FileUpload";
