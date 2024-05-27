@@ -18,6 +18,7 @@ import com.google.api.services.slides.v1.model.BatchUpdatePresentationRequest;
 import com.google.api.services.slides.v1.model.Page;
 import com.google.api.services.slides.v1.model.Request;
 import com.scottmo.config.definitions.AppConfig;
+import com.scottmo.services.google.SlideConfig.TextConfig;
 
 public class GoogleCloudService {
     private JsonFactory jsonFactory = GsonFactory.getDefaultInstance();

@@ -1,6 +1,8 @@
 package com.scottmo.services.google;
 
 import com.google.api.services.slides.v1.model.*;
+import com.scottmo.services.google.SlideConfig.ParagraphConfig;
+import com.scottmo.services.google.SlideConfig.TextConfig;
 import com.scottmo.util.StringSegment;
 import com.scottmo.util.StringUtils;
 

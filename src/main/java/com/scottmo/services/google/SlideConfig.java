@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import com.scottmo.services.google.SlideConfig.TextConfig;
+
 public class SlideConfig {
     private final String unit;
     private final Double slideWidth;
@@ -85,28 +87,84 @@ public class SlideConfig {
                 '}';
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        SlideConfig that = (SlideConfig) o;
-        return Objects.equals(unit, that.unit) &&
-                Objects.equals(slideWidth, that.slideWidth) &&
-                Objects.equals(slideHeight, that.slideHeight) &&
-                Objects.equals(paragraph, that.paragraph) &&
-                Objects.equals(defaultTextConfig, that.defaultTextConfig) &&
-                Objects.equals(defaultAsciiTextConfig, that.defaultAsciiTextConfig) &&
-                Objects.equals(defaultNonAsciiTextConfig, that.defaultNonAsciiTextConfig) &&
-                Objects.equals(textConfigsOrder, that.textConfigsOrder) &&
-                Objects.equals(bibleVersionToTextConfig, that.bibleVersionToTextConfig) &&
-                Objects.equals(textConfigs, that.textConfigs);
+    public class ParagraphConfig {
+        private final String alignment;
+        private final double indentation;
+        private final double x;
+        private final double y;
+
+        public ParagraphConfig(String alignment, double indentation, double x, double y) {
+            this.alignment = alignment;
+            this.indentation = indentation;
+            this.x = x;
+            this.y = y;
+        }
+
+        public String getAlignment() {
+            return alignment;
+        }
+
+        public double getIndentation() {
+            return indentation;
+        }
+
+        public double getX() {
+            return x;
+        }
+
+        public double getY() {
+            return y;
+        }
+
+        @Override
+        public String toString() {
+            return "ParagraphConfig{" +
+                    "alignment='" + alignment + '\'' +
+                    ", indentation=" + indentation +
+                    ", x=" + x +
+                    ", y=" + y +
+                    '}';
+        }
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(unit, slideWidth, slideHeight, paragraph, defaultTextConfig,
-            defaultAsciiTextConfig, defaultNonAsciiTextConfig, textConfigsOrder,
-            bibleVersionToTextConfig, textConfigs);
+    public class TextConfig {
+        private final String fontFamily;
+        private final double fontSize;
+        private final String fontColor;
+        private final String fontStyles;
+    
+        public TextConfig(String fontFamily, double fontSize, String fontColor, String fontStyles) {
+            this.fontFamily = fontFamily;
+            this.fontSize = fontSize;
+            this.fontColor = fontColor;
+            this.fontStyles = fontStyles;
+        }
+    
+        public String getFontFamily() {
+            return fontFamily;
+        }
+    
+        public double getFontSize() {
+            return fontSize;
+        }
+    
+        public String getFontColor() {
+            return fontColor;
+        }
+    
+        public String getFontStyles() {
+            return fontStyles;
+        }
+    
+        @Override
+        public String toString() {
+            return "TextConfig{" +
+                    ", fontFamily='" + fontFamily + '\'' +
+                    ", fontSize=" + fontSize +
+                    ", fontColor='" + fontColor + '\'' +
+                    ", fontStyles='" + fontStyles + '\'' +
+                    '}';
+        }
     }
 }
 
