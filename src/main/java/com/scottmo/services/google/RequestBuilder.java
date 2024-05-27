@@ -57,10 +57,10 @@ public final class RequestBuilder {
                                 ))
                                 .setStyle(textRun.getStyle().clone()
                                         .setForegroundColor(new OptionalColor()
-                                                .setOpaqueColor(SlidesUtil.getRGBColor(textConfig.fontColor())))
-                                        .setFontFamily(textConfig.fontFamily())
+                                                .setOpaqueColor(SlidesUtil.getRGBColor(textConfig.getFontColor())))
+                                        .setFontFamily(textConfig.getFontFamily())
                                         .setWeightedFontFamily(textRun.getStyle().getWeightedFontFamily().clone()
-                                                .setFontFamily(textConfig.fontFamily())))));
+                                                .setFontFamily(textConfig.getFontFamily())))));
             });
         });
     }
@@ -122,13 +122,13 @@ public final class RequestBuilder {
         // paragraph style
         boolean hasParagraphStyle = false;
         ParagraphStyle ppStyle = new ParagraphStyle();
-        if (!paragraphConfig.alignment().isEmpty()) {
+        if (!paragraphConfig.getAlignment().isEmpty()) {
             hasParagraphStyle = true;
-            ppStyle.setAlignment(paragraphConfig.alignment());
+            ppStyle.setAlignment(paragraphConfig.getAlignment());
         }
-        if (paragraphConfig.indentation() > 0) {
+        if (paragraphConfig.getIndentation() > 0) {
             hasParagraphStyle = true;
-            Dimension indent = SlidesUtil.getDimension(paragraphConfig.indentation());
+            Dimension indent = SlidesUtil.getDimension(paragraphConfig.getIndentation());
             ppStyle.setIndentFirstLine(indent)
                     .setIndentStart(indent)
                     .setIndentEnd(indent);
@@ -146,30 +146,30 @@ public final class RequestBuilder {
         // text style
         boolean hasTextStyle = false;
         TextStyle textStyle = new TextStyle();
-        if (!textConfig.fontStyles().isEmpty()) {
+        if (!textConfig.getFontStyles().isEmpty()) {
             hasTextStyle = true;
-            textStyle.setSmallCaps(textConfig.fontStyles().contains("smallCaps"))
-                    .setStrikethrough(textConfig.fontStyles().contains("strikethrough"))
-                    .setUnderline(textConfig.fontStyles().contains("underline"))
-                    .setBold(textConfig.fontStyles().contains("bold"))
-                    .setItalic(textConfig.fontStyles().contains("italic"));
+            textStyle.setSmallCaps(textConfig.getFontStyles().contains("smallCaps"))
+                    .setStrikethrough(textConfig.getFontStyles().contains("strikethrough"))
+                    .setUnderline(textConfig.getFontStyles().contains("underline"))
+                    .setBold(textConfig.getFontStyles().contains("bold"))
+                    .setItalic(textConfig.getFontStyles().contains("italic"));
         }
-        if (!textConfig.fontColor().isEmpty()) {
+        if (!textConfig.getFontColor().isEmpty()) {
             hasTextStyle = true;
             textStyle.setForegroundColor(new OptionalColor()
-                    .setOpaqueColor(SlidesUtil.getRGBColor(textConfig.fontColor())));
+                    .setOpaqueColor(SlidesUtil.getRGBColor(textConfig.getFontColor())));
         }
-        if (textConfig.fontSize() > 0) {
+        if (textConfig.getFontSize() > 0) {
             hasTextStyle = true;
-            textStyle.setFontSize(SlidesUtil.getDimension(textConfig.fontSize()));
+            textStyle.setFontSize(SlidesUtil.getDimension(textConfig.getFontSize()));
         }
-        if (!textConfig.fontFamily().isEmpty()) {
+        if (!textConfig.getFontFamily().isEmpty()) {
             hasTextStyle = true;
-            textStyle.setFontFamily(textConfig.fontFamily());
+            textStyle.setFontFamily(textConfig.getFontFamily());
         }
-        if (textConfig.fontStyles().contains("bold")) {
+        if (textConfig.getFontStyles().contains("bold")) {
             textStyle.setWeightedFontFamily(new WeightedFontFamily()
-                    .setFontFamily(textConfig.fontFamily())
+                    .setFontFamily(textConfig.getFontFamily())
                     .setWeight(700));
         }
 
@@ -189,7 +189,7 @@ public final class RequestBuilder {
     public void insertText(String textBoxId, Map<String, String> textConfig, SlideConfig slideConfig) {
         // we always insert from the top of the text box, so reverse the list and when inserting,
         // we push the text down
-        List<String> textConfigsOrder = slideConfig.textConfigsOrder().stream()
+        List<String> textConfigsOrder = slideConfig.getTextConfigsOrder().stream()
                 .sorted(Collections.reverseOrder())
                 .filter(textConfig::containsKey)
                 .toList();
@@ -197,18 +197,18 @@ public final class RequestBuilder {
             String configName = textConfigsOrder.get(i);
             String ln = i == 0 ? "" : "\n";
             insertText(textBoxId, textConfig.get(configName) + ln,
-                    slideConfig.paragraph(), slideConfig.textConfigs().get(configName));
+                    slideConfig.getParagraph(), slideConfig.getTextConfigs().get(configName));
         }
     }
 
     public String createText(String pageElementId, String textContent,
                              ParagraphConfig paragraphConfig, TextConfig textConfig, boolean isFullPage) {
         double textBoxW = DefaultSlideConfig.SLIDE_W;
-        double textBoxH = (isFullPage || textConfig.fontSize() <= 0)
+        double textBoxH = (isFullPage || textConfig.getFontSize() <= 0)
                 ? DefaultSlideConfig.SLIDE_H
-                : textConfig.fontSize() * 2;
+                : textConfig.getFontSize() * 2;
 
-        String textBoxId = createTextBox(pageElementId, textBoxW, textBoxH, paragraphConfig.x(), paragraphConfig.y());
+        String textBoxId = createTextBox(pageElementId, textBoxW, textBoxH, paragraphConfig.getX(), paragraphConfig.getY());
         insertText(textBoxId, textContent, paragraphConfig, textConfig);
         return textBoxId;
     }
