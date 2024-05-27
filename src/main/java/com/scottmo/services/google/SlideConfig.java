@@ -11,21 +11,16 @@ public class SlideConfig {
     private final Double slideWidth;
     private final Double slideHeight;
     private final ParagraphConfig paragraph;
-    private final String defaultTextConfig;
-    private final String defaultAsciiTextConfig;
-    private final String defaultNonAsciiTextConfig;
     private final List<String> textConfigsOrder;
     private final Map<String, String> bibleVersionToTextConfig;
     private final Map<String, TextConfig> textConfigs;
 
-    public SlideConfig(String unit, Double slideWidth, Double slideHeight, ParagraphConfig paragraph, String defaultTextConfig, String defaultAsciiTextConfig, String defaultNonAsciiTextConfig, List<String> textConfigsOrder, Map<String, String> bibleVersionToTextConfig, Map<String, TextConfig> textConfigs) {
+    public SlideConfig(String unit, Double slideWidth, Double slideHeight, ParagraphConfig paragraph,
+            List<String> textConfigsOrder, Map<String, String> bibleVersionToTextConfig, Map<String, TextConfig> textConfigs) {
         this.unit = unit;
         this.slideWidth = slideWidth;
         this.slideHeight = slideHeight;
         this.paragraph = paragraph;
-        this.defaultTextConfig = defaultTextConfig;
-        this.defaultAsciiTextConfig = defaultAsciiTextConfig;
-        this.defaultNonAsciiTextConfig = defaultNonAsciiTextConfig;
         this.textConfigsOrder = textConfigsOrder;
         this.bibleVersionToTextConfig = bibleVersionToTextConfig;
         this.textConfigs = textConfigs;
@@ -47,18 +42,6 @@ public class SlideConfig {
         return paragraph;
     }
 
-    public String getDefaultTextConfig() {
-        return defaultTextConfig;
-    }
-
-    public String getDefaultAsciiTextConfig() {
-        return defaultAsciiTextConfig;
-    }
-
-    public String getDefaultNonAsciiTextConfig() {
-        return defaultNonAsciiTextConfig;
-    }
-
     public List<String> getTextConfigsOrder() {
         return textConfigsOrder;
     }
@@ -78,9 +61,6 @@ public class SlideConfig {
                 ", slideWidth=" + slideWidth +
                 ", slideHeight=" + slideHeight +
                 ", paragraph=" + paragraph +
-                ", defaultTextConfig='" + defaultTextConfig + '\'' +
-                ", defaultAsciiTextConfig='" + defaultAsciiTextConfig + '\'' +
-                ", defaultNonAsciiTextConfig='" + defaultNonAsciiTextConfig + '\'' +
                 ", textConfigsOrder=" + textConfigsOrder +
                 ", bibleVersionToTextConfig=" + bibleVersionToTextConfig +
                 ", textConfigs=" + textConfigs +
