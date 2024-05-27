@@ -39,5 +39,6 @@ dependency-reduced-pom.xml
 
 # Testing
 config.json
+credentials.json
 /data
 temp

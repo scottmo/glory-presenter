@@ -8,6 +8,13 @@ import java.util.Map;
 import java.util.Set;
 
 public class AppConfig {
+    public static final String APP_NAME = "Glory Presenter";
+    public static final int APP_WIDTH = 900;
+    public static final int APP_HEIGHT = 600;
+
+    public static final String CONFIG_PATH = "./config.json";
+    public static final String TEMPLATE_DIR = "templates";
+
     private String dataDir;
     private List<String> locales;
     private Map<String, String> bibleVersionToLocale;

@@ -15,13 +15,6 @@ import com.scottmo.util.LocaleUtil;
 
 @Component("appContextService")
 public final class AppContextService {
-    public static final String APP_NAME = "Glory Presenter";
-    public static final int APP_WIDTH = 900;
-    public static final int APP_HEIGHT = 600;
-
-    public static final String CONFIG_PATH = "./config.json";
-    private static final String TEMPLATE_DIR = "templates";
-
     private AppConfig appConfig;
 
     public AppConfig getConfig() {
@@ -32,7 +25,7 @@ public final class AppContextService {
     }
 
     public void reload() {
-        Path configPath = Path.of(CONFIG_PATH);
+        Path configPath = Path.of(AppConfig.CONFIG_PATH);
         if (!Files.exists(configPath)) {
             try (InputStream in = AppContextService.class.getClassLoader().getResourceAsStream("config.json")) {
                 Files.copy(in, configPath);
@@ -55,7 +48,7 @@ public final class AppContextService {
             appConfig.locales().set(i++, LocaleUtil.normalize(locale));
         }
         // load template paths
-        File templateDir = Path.of(appConfig.dataDir(), TEMPLATE_DIR).toFile();
+        File templateDir = Path.of(appConfig.dataDir(), AppConfig.TEMPLATE_DIR).toFile();
         if (!templateDir.exists()) {
             templateDir.mkdirs();
         }
@@ -78,7 +71,7 @@ public final class AppContextService {
     }
 
     public String getPPTXTemplate(String fileName) {
-        return getRelativePath(Path.of(TEMPLATE_DIR, fileName).toString());
+        return getRelativePath(Path.of(AppConfig.TEMPLATE_DIR, fileName).toString());
     }
 
     public String getPrimaryLocale() {
