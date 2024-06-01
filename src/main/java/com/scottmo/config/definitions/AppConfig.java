@@ -16,7 +16,7 @@ public class AppConfig {
     public static final String TEMPLATE_DIR = "templates";
 
     private String dataDir;
-    private List<String> locales;
+    private List<String> locales; // order matters to which locale comes first
     private Map<String, String> bibleVersionToLocale;
     private Set<String> templatePaths;
 

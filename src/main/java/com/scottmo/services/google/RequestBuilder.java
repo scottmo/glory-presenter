@@ -1,16 +1,41 @@
 package com.scottmo.services.google;
 
-import com.google.api.services.slides.v1.model.*;
-import com.scottmo.services.google.SlideConfig.ParagraphConfig;
-import com.scottmo.services.google.SlideConfig.TextConfig;
-import com.scottmo.util.StringSegment;
-import com.scottmo.util.StringUtils;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
+import com.google.api.services.slides.v1.model.AffineTransform;
+import com.google.api.services.slides.v1.model.CreateShapeRequest;
+import com.google.api.services.slides.v1.model.CreateSlideRequest;
+import com.google.api.services.slides.v1.model.DeleteObjectRequest;
+import com.google.api.services.slides.v1.model.Dimension;
+import com.google.api.services.slides.v1.model.InsertTextRequest;
+import com.google.api.services.slides.v1.model.LayoutPlaceholderIdMapping;
+import com.google.api.services.slides.v1.model.LayoutReference;
+import com.google.api.services.slides.v1.model.OptionalColor;
+import com.google.api.services.slides.v1.model.Page;
+import com.google.api.services.slides.v1.model.PageElement;
+import com.google.api.services.slides.v1.model.PageElementProperties;
+import com.google.api.services.slides.v1.model.ParagraphStyle;
+import com.google.api.services.slides.v1.model.Placeholder;
+import com.google.api.services.slides.v1.model.Presentation;
+import com.google.api.services.slides.v1.model.Range;
+import com.google.api.services.slides.v1.model.Request;
+import com.google.api.services.slides.v1.model.Shape;
+import com.google.api.services.slides.v1.model.ShapeProperties;
+import com.google.api.services.slides.v1.model.Size;
+import com.google.api.services.slides.v1.model.TextRun;
+import com.google.api.services.slides.v1.model.TextStyle;
+import com.google.api.services.slides.v1.model.UpdatePageElementTransformRequest;
+import com.google.api.services.slides.v1.model.UpdateParagraphStyleRequest;
+import com.google.api.services.slides.v1.model.UpdateShapePropertiesRequest;
+import com.google.api.services.slides.v1.model.UpdateTextStyleRequest;
+import com.google.api.services.slides.v1.model.WeightedFontFamily;
+import com.scottmo.services.google.SlideConfig.TextConfig;
+import com.scottmo.util.StringSegment;
+import com.scottmo.util.StringUtils;
 
 public final class RequestBuilder {
 
@@ -19,6 +44,16 @@ public final class RequestBuilder {
     public static final String ID_PLACEHOLDER_PREFIX = "p";
 
     private final List<Request> requests = new ArrayList<>();
+
+    private final Presentation ppt;
+    private final SlideConfig slideConfig;
+    private final List<String> locales;
+
+    public RequestBuilder(Presentation ppt, SlideConfig slideConfig, List<String> locales) {
+        this.ppt = ppt;
+        this.slideConfig = slideConfig;
+        this.locales = locales;
+    }
 
     public List<Request> build() {
         return requests;
@@ -68,14 +103,27 @@ public final class RequestBuilder {
     }
 
     public void resizeToFullPage(String pageElementId) {
+        Size pageSize = ppt.getPageSize();
+        Double slideWidth = pageSize.getWidth().getMagnitude();
+        Double slideHeight = pageSize.getHeight().getMagnitude();
+        String unit = pageSize.getWidth().getUnit();
+
+        PageElementProperties pageElementProperties = new PageElementProperties()
+                .setSize(new Size()
+                    .setWidth(new Dimension().setMagnitude(slideWidth).setUnit(unit))
+                    .setHeight(new Dimension().setMagnitude(slideHeight).setUnit(unit)))
+                .setTransform(new AffineTransform()
+                        .setScaleX(slideWidth / 1000000)
+                        .setScaleY(slideHeight / 1000000)
+                        .setTranslateX(0.0)
+                        .setTranslateY(0.0)
+                        .setUnit(unit));
+
         requests.add(new Request()
                 .setUpdatePageElementTransform(new UpdatePageElementTransformRequest()
                         .setObjectId(pageElementId)
-                        .setTransform(new AffineTransform()
-                                .setScaleX(DefaultSlideConfig.SLIDE_W / DefaultSlideConfig.SLIDE_BASE)
-                                .setScaleY(DefaultSlideConfig.SLIDE_H / DefaultSlideConfig.SLIDE_BASE)
-                                .setUnit("PT"))
-                        .setApplyMode("ABSOLUTE")));
+                        .setTransform(pageElementProperties.getTransform())
+                        .setApplyMode("RELATIVE")));
     }
 
     public String createTextBox(String pageElementId,
@@ -104,14 +152,11 @@ public final class RequestBuilder {
         return textBoxId;
     }
 
-    public void insertText(String textBoxId, String textContent,
-                           ParagraphConfig paragraphConfig, TextConfig textConfig) {
-        insertText(textBoxId, textContent, paragraphConfig, textConfig, 0);
+    public void insertText(String textBoxId, String textContent, TextConfig textConfig) {
+        insertText(textBoxId, textContent, textConfig, 0);
     }
 
-    public void insertText(String textBoxId, String textContent,
-                           ParagraphConfig paragraphConfig, TextConfig textConfig,
-                           int textInsertionIndex) {
+    public void insertText(String textBoxId, String textContent, TextConfig textConfig, int textInsertionIndex) {
         // text
         requests.add(new Request()
                 .setInsertText(new InsertTextRequest()
@@ -124,13 +169,13 @@ public final class RequestBuilder {
         // paragraph style
         boolean hasParagraphStyle = false;
         ParagraphStyle ppStyle = new ParagraphStyle();
-        if (!paragraphConfig.getAlignment().isEmpty()) {
+        if (!slideConfig.getAlignment().isEmpty()) {
             hasParagraphStyle = true;
-            ppStyle.setAlignment(paragraphConfig.getAlignment());
+            ppStyle.setAlignment(slideConfig.getAlignment());
         }
-        if (paragraphConfig.getIndentation() > 0) {
+        if (slideConfig.getIndentation() > 0) {
             hasParagraphStyle = true;
-            Dimension indent = SlidesUtil.getDimension(paragraphConfig.getIndentation());
+            Dimension indent = SlidesUtil.getDimension(slideConfig.getIndentation());
             ppStyle.setIndentFirstLine(indent)
                     .setIndentStart(indent)
                     .setIndentEnd(indent);
@@ -188,30 +233,32 @@ public final class RequestBuilder {
     /**
      * Insert multilingual texts.
      */
-    public void insertText(String textBoxId, Map<String, String> textConfig, SlideConfig slideConfig) {
+    public void insertText(String textBoxId) {
         // we always insert from the top of the text box, so reverse the list and when inserting,
         // we push the text down
-        List<String> textConfigsOrder = slideConfig.getTextConfigsOrder().stream()
+        List<String> textConfigsOrder = locales.stream()
                 .sorted(Collections.reverseOrder())
-                .filter(textConfig::containsKey)
+                .filter(slideConfig.getTextConfigs()::containsKey)
                 .toList();
         for (int i = 0; i < textConfigsOrder.size(); i++) {
             String configName = textConfigsOrder.get(i);
             String ln = i == 0 ? "" : "\n";
-            insertText(textBoxId, textConfig.get(configName) + ln,
-                    slideConfig.getParagraph(), slideConfig.getTextConfigs().get(configName));
+            insertText(textBoxId, slideConfig.getTextConfigs().get(configName) + ln,
+                slideConfig.getTextConfigs().get(configName));
         }
     }
 
     public String createText(String pageElementId, String textContent,
-                             ParagraphConfig paragraphConfig, TextConfig textConfig, boolean isFullPage) {
-        double textBoxW = DefaultSlideConfig.SLIDE_W;
+            TextConfig textConfig, boolean isFullPage) {
+        Size pageSize = ppt.getPageSize();
+        // TODO: do i need to divide 1000000
+        double textBoxW = pageSize.getWidth().getMagnitude();
         double textBoxH = (isFullPage || textConfig.getFontSize() <= 0)
-                ? DefaultSlideConfig.SLIDE_H
+                ? pageSize.getHeight().getMagnitude()
                 : textConfig.getFontSize() * 2;
 
-        String textBoxId = createTextBox(pageElementId, textBoxW, textBoxH, paragraphConfig.getX(), paragraphConfig.getY());
-        insertText(textBoxId, textContent, paragraphConfig, textConfig);
+        String textBoxId = createTextBox(pageElementId, textBoxW, textBoxH, slideConfig.getX(), slideConfig.getY());
+        insertText(textBoxId);
         return textBoxId;
     }
 

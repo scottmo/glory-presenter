@@ -6,6 +6,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
@@ -16,11 +19,17 @@ import com.google.api.services.drive.model.File;
 import com.google.api.services.slides.v1.Slides;
 import com.google.api.services.slides.v1.model.BatchUpdatePresentationRequest;
 import com.google.api.services.slides.v1.model.Page;
+import com.google.api.services.slides.v1.model.Presentation;
 import com.google.api.services.slides.v1.model.Request;
 import com.scottmo.config.definitions.AppConfig;
+import com.scottmo.services.appContext.AppContextService;
 import com.scottmo.services.google.SlideConfig.TextConfig;
 
+@Component
 public class GoogleCloudService {
+    @Autowired
+    private AppContextService appContextService;
+
     private JsonFactory jsonFactory = GsonFactory.getDefaultInstance();
 
     private Slides _slidesApi;
@@ -71,6 +80,10 @@ public class GoogleCloudService {
         return getSlidesApi().presentations().get(presentationId).execute().getSlides();
     }
 
+    public Presentation getPresentation(String presentationId) throws IOException {
+        return getSlidesApi().presentations().get(presentationId).execute();
+    }
+
     public boolean updateSlides(String presentationId, List<Request> updateRequests) throws IOException {
         if (updateRequests.isEmpty()) return false;
 
@@ -86,19 +99,23 @@ public class GoogleCloudService {
         return true;
     }
 
-    public void setDefaultTitleText(String presentationId) throws IOException {
-        RequestBuilder requestBuilder = new RequestBuilder();
-        List<Page> slides = getSlides(presentationId);
-        slides.forEach(requestBuilder::setDefaultTitleText);
+    public void setDefaultTitleText(String presentationId, SlideConfig slideConfig) throws IOException {
+        Presentation ppt = getPresentation(presentationId);
+        RequestBuilder requestBuilder = new RequestBuilder(ppt, slideConfig, appContextService.getConfig().locales());
+        ppt.getSlides().forEach(requestBuilder::setDefaultTitleText);
         updateSlides(presentationId, requestBuilder.build());
     }
 
-    public void setBaseFont(String presentationId) throws IOException {
+    public void setBaseFont(String presentationId, SlideConfig slideConfig) throws IOException {
         // FIXME pass this down from somewhere
-        Map<String, TextConfig> textConfigs = new HashMap<>();
-        RequestBuilder requestBuilder = new RequestBuilder();
-        List<Page> slides = getSlides(presentationId);
-        slides.forEach(slide -> {
+        var textConfigs = new HashMap<String, TextConfig>() {{
+            put("zh_cn", new TextConfig("STKaiti", 60, "255, 255, 255", "bold"));
+            put("en_us", new TextConfig("Arial Narrow", 52, "255, 255, 153", "bold"));
+        }};
+
+        Presentation ppt = getPresentation(presentationId);
+        RequestBuilder requestBuilder = new RequestBuilder(ppt, slideConfig, appContextService.getConfig().locales());
+        ppt.getSlides().forEach(slide -> {
             requestBuilder.setBaseFont(slide, textConfigs);
         });
         updateSlides(presentationId, requestBuilder.build());

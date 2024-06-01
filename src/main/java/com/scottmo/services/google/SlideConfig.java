@@ -1,53 +1,36 @@
 package com.scottmo.services.google;
 
-import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-
-import com.scottmo.services.google.SlideConfig.TextConfig;
 
 public class SlideConfig {
-    private final String unit;
-    private final Double slideWidth;
-    private final Double slideHeight;
-    private final ParagraphConfig paragraph;
-    private final List<String> textConfigsOrder;
-    private final Map<String, String> bibleVersionToTextConfig;
+    private final String alignment;
+    private final double indentation;
+    private final double x;
+    private final double y;
     private final Map<String, TextConfig> textConfigs;
 
-    public SlideConfig(String unit, Double slideWidth, Double slideHeight, ParagraphConfig paragraph,
-            List<String> textConfigsOrder, Map<String, String> bibleVersionToTextConfig, Map<String, TextConfig> textConfigs) {
-        this.unit = unit;
-        this.slideWidth = slideWidth;
-        this.slideHeight = slideHeight;
-        this.paragraph = paragraph;
-        this.textConfigsOrder = textConfigsOrder;
-        this.bibleVersionToTextConfig = bibleVersionToTextConfig;
+    public SlideConfig(String alignment, double indentation, double x, double y, Map<String, TextConfig> textConfigs) {
+        this.alignment = alignment;
+        this.indentation = indentation;
+        this.x = x;
+        this.y = y;
         this.textConfigs = textConfigs;
     }
 
-    public String getUnit() {
-        return unit;
+    public String getAlignment() {
+        return alignment;
     }
 
-    public Double getSlideWidth() {
-        return slideWidth;
+    public double getIndentation() {
+        return indentation;
     }
 
-    public Double getSlideHeight() {
-        return slideHeight;
+    public double getX() {
+        return x;
     }
 
-    public ParagraphConfig getParagraph() {
-        return paragraph;
-    }
-
-    public List<String> getTextConfigsOrder() {
-        return textConfigsOrder;
-    }
-
-    public Map<String, String> getBibleVersionToTextConfig() {
-        return bibleVersionToTextConfig;
+    public double getY() {
+        return y;
     }
 
     public Map<String, TextConfig> getTextConfigs() {
@@ -57,57 +40,15 @@ public class SlideConfig {
     @Override
     public String toString() {
         return "SlideConfig{" +
-                "unit='" + unit + '\'' +
-                ", slideWidth=" + slideWidth +
-                ", slideHeight=" + slideHeight +
-                ", paragraph=" + paragraph +
-                ", textConfigsOrder=" + textConfigsOrder +
-                ", bibleVersionToTextConfig=" + bibleVersionToTextConfig +
+                "alignment='" + alignment + '\'' +
+                ", indentation=" + indentation +
+                ", x=" + x +
+                ", y=" + y +
                 ", textConfigs=" + textConfigs +
                 '}';
     }
 
-    public class ParagraphConfig {
-        private final String alignment;
-        private final double indentation;
-        private final double x;
-        private final double y;
-
-        public ParagraphConfig(String alignment, double indentation, double x, double y) {
-            this.alignment = alignment;
-            this.indentation = indentation;
-            this.x = x;
-            this.y = y;
-        }
-
-        public String getAlignment() {
-            return alignment;
-        }
-
-        public double getIndentation() {
-            return indentation;
-        }
-
-        public double getX() {
-            return x;
-        }
-
-        public double getY() {
-            return y;
-        }
-
-        @Override
-        public String toString() {
-            return "ParagraphConfig{" +
-                    "alignment='" + alignment + '\'' +
-                    ", indentation=" + indentation +
-                    ", x=" + x +
-                    ", y=" + y +
-                    '}';
-        }
-    }
-
-    public class TextConfig {
+    public static class TextConfig {
         private final String fontFamily;
         private final double fontSize;
         private final String fontColor;
