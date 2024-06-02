@@ -12,15 +12,18 @@ function extractPresentationId(url: string) {
     return null;
 }
 
-const CONFIGURATION_EXAMPLE = `# zh_cn
+const CONFIGURATION_EXAMPLE = `x: 0
+y: 0
+margin: 28
 alignment: CENTER
+
+# zh_cn
 fontColor: 255, 255, 255
 fontFamily: STKaiti
 fontSize: 60
 fontStyles: bold
 
 # en_us
-alignment: CENTER
 fontColor: 255, 255, 153
 fontFamily: Arial Narrow
 fontSize: 52
