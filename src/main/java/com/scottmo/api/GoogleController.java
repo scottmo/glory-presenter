@@ -25,13 +25,15 @@ public class GoogleController {
     @Autowired
     private GoogleCloudService googleService;
 
-    @GetMapping("/updatestyles")
-    public ResponseEntity<Map<String, Object>> updateStyles(@PathVariable String pptId,
-            @RequestParam String slideConfigString) {
+    @GetMapping("/updatestyles/{id}")
+    public ResponseEntity<Map<String, Object>> updateStyles(@PathVariable String id,
+            @RequestParam String slideConfigString,
+            @RequestParam Integer startIndex,
+            @RequestParam Integer endIndex) {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             SlideConfig slideConfig = objectMapper.readValue(slideConfigString, SlideConfig.class);
-            googleService.setDefaultTitleText(pptId, slideConfig);
+            googleService.setDefaultTitleText(id, slideConfig);
             return RequestUtil.successResponse();
         } catch (JsonProcessingException e) {
             return RequestUtil.errorResponse("Invalid slide config");
