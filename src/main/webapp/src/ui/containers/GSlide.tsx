@@ -1,6 +1,8 @@
 
 import { Button, NumberInput, Tabs, TextInput, Textarea } from "@mantine/core";
+import { JsonEditor } from "json-edit-react";
 import { useState } from "react";
+import { API, downloadFile, runAction, useQuery, useCacheBustCounter } from "../api";
 
 function extractPresentationId(url: string) {
     try {
@@ -12,26 +14,33 @@ function extractPresentationId(url: string) {
     return null;
 }
 
-const CONFIGURATION_EXAMPLE = `# zh_cn
-alignment: CENTER
-fontColor: 255, 255, 255
-fontFamily: STKaiti
-fontSize: 60
-fontStyles: bold
-
-# en_us
-alignment: CENTER
-fontColor: 255, 255, 153
-fontFamily: Arial Narrow
-fontSize: 52
-fontStyles: bold
-`;
+const CONFIGURATION_EXAMPLE = {
+    x: 0,
+    y: 0,
+    indentation: 28,
+    alignment: "CENTER",
+    fontConfigs: {
+        zh_cn: {
+            fontColor: "255, 255, 255",
+            fontFamily: "STKaiti",
+            fontSize: 60,
+            fontStyles: "bold",
+        },
+        en_us: {
+            fontColor: "255, 255, 153",
+            fontFamily: "Arial Narrow",
+            fontSize: 52,
+            fontStyles: "bold",
+        }
+    }
+};
 
 export default function GSlide() {
     const [ pptId, setPptId ] = useState("");
     const [ content, setContent ] = useState("");
     const [ startIndex, setStartIndex ] = useState(0);
     const [ endIndex, setEndIndex ] = useState(999);
+    const [ slideConfig, setSlideConfig ] = useState(CONFIGURATION_EXAMPLE as object);
 
     const handlePresentationURL = (value: string) => {
         const pptId = extractPresentationId(value);
@@ -45,12 +54,17 @@ export default function GSlide() {
     };
 
     const handlePresentationUpdate = () => {
-
+        runAction(API.updateStyles, { id: pptId, slideConfig: JSON.stringify(slideConfig), startIndex, endIndex });
     };
 
     return <>
         <TextInput label="Presentation ID/URL" onChange={e => handlePresentationURL(e.target.value)}/>
-        <Textarea label="Configuration" rows={10} defaultValue={CONFIGURATION_EXAMPLE} />
+        <JsonEditor data={slideConfig} rootName="slideConfig" indent={4}
+            showStringQuotes={false}
+            restrictDelete={true}
+            restrictAdd={({ level }) => level > 1 /* only allow adding font configs */ }
+            onUpdate={({ newData }) => setSlideConfig(newData)}
+        />
 
         <Tabs defaultValue="generate">
             <Tabs.List>
