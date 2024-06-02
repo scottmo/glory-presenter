@@ -23,7 +23,7 @@ import com.google.api.services.slides.v1.model.Presentation;
 import com.google.api.services.slides.v1.model.Request;
 import com.scottmo.config.definitions.AppConfig;
 import com.scottmo.services.appContext.AppContextService;
-import com.scottmo.services.google.SlideConfig.TextConfig;
+import com.scottmo.services.google.SlideConfig.FontConfig;
 
 @Component
 public class GoogleCloudService {
@@ -108,9 +108,9 @@ public class GoogleCloudService {
 
     public void setBaseFont(String presentationId, SlideConfig slideConfig) throws IOException {
         // FIXME pass this down from somewhere
-        var textConfigs = new HashMap<String, TextConfig>() {{
-            put("zh_cn", new TextConfig("STKaiti", 60, "255, 255, 255", "bold"));
-            put("en_us", new TextConfig("Arial Narrow", 52, "255, 255, 153", "bold"));
+        var textConfigs = new HashMap<String, FontConfig>() {{
+            put("zh_cn", new FontConfig("STKaiti", 60, "255, 255, 255", "bold"));
+            put("en_us", new FontConfig("Arial Narrow", 52, "255, 255, 153", "bold"));
         }};
 
         Presentation ppt = getPresentation(presentationId);

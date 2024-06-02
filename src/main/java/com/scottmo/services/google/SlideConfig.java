@@ -7,14 +7,14 @@ public class SlideConfig {
     private final double indentation;
     private final double x;
     private final double y;
-    private final Map<String, TextConfig> textConfigs;
+    private final Map<String, FontConfig> fontConfigs;
 
-    public SlideConfig(String alignment, double indentation, double x, double y, Map<String, TextConfig> textConfigs) {
+    public SlideConfig(String alignment, double indentation, double x, double y, Map<String, FontConfig> fontConfigs) {
         this.alignment = alignment;
         this.indentation = indentation;
         this.x = x;
         this.y = y;
-        this.textConfigs = textConfigs;
+        this.fontConfigs = fontConfigs;
     }
 
     public String getAlignment() {
@@ -33,28 +33,17 @@ public class SlideConfig {
         return y;
     }
 
-    public Map<String, TextConfig> getTextConfigs() {
-        return textConfigs;
+    public Map<String, FontConfig> getFontConfigs() {
+        return fontConfigs;
     }
 
-    @Override
-    public String toString() {
-        return "SlideConfig{" +
-                "alignment='" + alignment + '\'' +
-                ", indentation=" + indentation +
-                ", x=" + x +
-                ", y=" + y +
-                ", textConfigs=" + textConfigs +
-                '}';
-    }
-
-    public static class TextConfig {
+    public static class FontConfig {
         private final String fontFamily;
         private final double fontSize;
         private final String fontColor;
         private final String fontStyles;
     
-        public TextConfig(String fontFamily, double fontSize, String fontColor, String fontStyles) {
+        public FontConfig(String fontFamily, double fontSize, String fontColor, String fontStyles) {
             this.fontFamily = fontFamily;
             this.fontSize = fontSize;
             this.fontColor = fontColor;
@@ -75,16 +64,6 @@ public class SlideConfig {
     
         public String getFontStyles() {
             return fontStyles;
-        }
-    
-        @Override
-        public String toString() {
-            return "TextConfig{" +
-                    ", fontFamily='" + fontFamily + '\'' +
-                    ", fontSize=" + fontSize +
-                    ", fontColor='" + fontColor + '\'' +
-                    ", fontStyles='" + fontStyles + '\'' +
-                    '}';
         }
     }
 }

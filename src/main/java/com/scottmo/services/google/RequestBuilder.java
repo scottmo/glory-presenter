@@ -33,7 +33,7 @@ import com.google.api.services.slides.v1.model.UpdateParagraphStyleRequest;
 import com.google.api.services.slides.v1.model.UpdateShapePropertiesRequest;
 import com.google.api.services.slides.v1.model.UpdateTextStyleRequest;
 import com.google.api.services.slides.v1.model.WeightedFontFamily;
-import com.scottmo.services.google.SlideConfig.TextConfig;
+import com.scottmo.services.google.SlideConfig.FontConfig;
 import com.scottmo.util.StringSegment;
 import com.scottmo.util.StringUtils;
 
@@ -62,7 +62,7 @@ public final class RequestBuilder {
     /**
      * set base font for a slide
      */
-    public void setBaseFont(Page slide, Map<String, TextConfig> textConfigs) {
+    public void setBaseFont(Page slide, Map<String, FontConfig> textConfigs) {
         slide.getPageElements().stream()
                 .filter(pageElement -> pageElement.getObjectId() != null)
                 .forEach(pageElement -> {
@@ -79,11 +79,11 @@ public final class RequestBuilder {
      * set base font for a text run
      */
     private void setBaseFontForText(String pageElementId, TextRun textRun,
-                                    Map<String, TextConfig> textConfigs, int startIndex) {
+                                    Map<String, FontConfig> textConfigs, int startIndex) {
         Optional.ofNullable(textRun.getContent()).ifPresent(content -> {
             StringUtils.splitByCharset(content, true).forEach(contentSegment -> {
                 String textConfigName = getTextConfigName(contentSegment);
-                TextConfig textConfig = textConfigs.get(textConfigName);
+                FontConfig textConfig = textConfigs.get(textConfigName);
                 requests.add(new Request()
                         .setUpdateTextStyle(new UpdateTextStyleRequest()
                                 .setObjectId(pageElementId)
@@ -152,11 +152,11 @@ public final class RequestBuilder {
         return textBoxId;
     }
 
-    public void insertText(String textBoxId, String textContent, TextConfig textConfig) {
+    public void insertText(String textBoxId, String textContent, FontConfig textConfig) {
         insertText(textBoxId, textContent, textConfig, 0);
     }
 
-    public void insertText(String textBoxId, String textContent, TextConfig textConfig, int textInsertionIndex) {
+    public void insertText(String textBoxId, String textContent, FontConfig textConfig, int textInsertionIndex) {
         // text
         requests.add(new Request()
                 .setInsertText(new InsertTextRequest()
@@ -238,18 +238,18 @@ public final class RequestBuilder {
         // we push the text down
         List<String> textConfigsOrder = locales.stream()
                 .sorted(Collections.reverseOrder())
-                .filter(slideConfig.getTextConfigs()::containsKey)
+                .filter(slideConfig.getFontConfigs()::containsKey)
                 .toList();
         for (int i = 0; i < textConfigsOrder.size(); i++) {
             String configName = textConfigsOrder.get(i);
             String ln = i == 0 ? "" : "\n";
-            insertText(textBoxId, slideConfig.getTextConfigs().get(configName) + ln,
-                slideConfig.getTextConfigs().get(configName));
+            insertText(textBoxId, slideConfig.getFontConfigs().get(configName) + ln,
+                slideConfig.getFontConfigs().get(configName));
         }
     }
 
     public String createText(String pageElementId, String textContent,
-            TextConfig textConfig, boolean isFullPage) {
+            FontConfig textConfig, boolean isFullPage) {
         Size pageSize = ppt.getPageSize();
         // TODO: do i need to divide 1000000
         double textBoxW = pageSize.getWidth().getMagnitude();
