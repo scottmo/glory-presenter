@@ -41,7 +41,7 @@ public class SongController {
     @GetMapping("/titles")
     Map<Integer, String> getSongs() {
         Map<Integer, String> titles = new HashMap<>();
-        for (var title : songService.getStore().getAllSongDescriptors(appContextService.getConfig().locales())) {
+        for (var title : songService.getStore().getAllSongDescriptors(appContextService.getConfig().getLocales())) {
             titles.put(title.key(), title.value());
         }
         return titles;
@@ -71,7 +71,7 @@ public class SongController {
         if (!templatePath.contains("/")) {
             templatePath = appContextService.getPPTXTemplate(templatePath);
         }
-        pptxGenerator.generate(song, templatePath, outputPath.toString(), appContextService.getConfig().locales(),
+        pptxGenerator.generate(song, templatePath, outputPath.toString(), appContextService.getConfig().getLocales(),
                 linesPerSlide);
     
         return RequestUtil.download(outputPath);

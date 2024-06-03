@@ -39,23 +39,23 @@ public final class AppContextService {
             throw new RuntimeException("Unable to load config file!", e);
         }
         // set default locale
-        if (appConfig.locales().isEmpty()) {
-            appConfig.locales().add(LocaleUtil.DEFAULT_LOCALE);
+        if (appConfig.getLocales().isEmpty()) {
+            appConfig.getLocales().add(LocaleUtil.DEFAULT_LOCALE);
         }
         // normalize locales
         int i = 0;
-        for (String locale: appConfig.locales()) {
-            appConfig.locales().set(i++, LocaleUtil.normalize(locale));
+        for (String locale: appConfig.getLocales()) {
+            appConfig.getLocales().set(i++, LocaleUtil.normalize(locale));
         }
         // load template paths
-        File templateDir = Path.of(appConfig.dataDir(), AppConfig.TEMPLATE_DIR).toFile();
+        File templateDir = Path.of(appConfig.getDataDir(), AppConfig.TEMPLATE_DIR).toFile();
         if (!templateDir.exists()) {
             templateDir.mkdirs();
         }
         if (templateDir.isDirectory()) {
             File[] files = templateDir.listFiles();
             for (File file : files) {
-                appConfig.templatePaths().add(file.getName());
+                appConfig.getTemplatePaths().add(file.getName());
             }
         } else {
             throw new Error("Unable to load pptx templates! Please fix templates dir and restart!");
@@ -64,7 +64,7 @@ public final class AppContextService {
 
     public String getRelativePath(String fileName) {
         try {
-            return Path.of(getConfig().dataDir(), fileName).toFile().getCanonicalPath();
+            return Path.of(getConfig().getDataDir(), fileName).toFile().getCanonicalPath();
         } catch (IOException e) {
             return "";
         }
@@ -75,6 +75,6 @@ public final class AppContextService {
     }
 
     public String getPrimaryLocale() {
-        return appConfig.locales().get(0);
+        return appConfig.getLocales().get(0);
     }
 }

@@ -23,7 +23,7 @@ public class SongService {
 
     public SongStore getStore() {
         if (store == null) {
-            store = new SongStore(Path.of(appContextService.getConfig().dataDir()));
+            store = new SongStore(Path.of(appContextService.getConfig().getDataDir()));
         }
         return store;
     }

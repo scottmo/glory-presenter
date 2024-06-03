@@ -21,7 +21,7 @@ public class BibleService {
 
     public BibleStore getStore() {
         if (store == null) {
-            store = new BibleStore(Path.of(appContextService.getConfig().dataDir()));
+            store = new BibleStore(Path.of(appContextService.getConfig().getDataDir()));
         }
         return store;
     }

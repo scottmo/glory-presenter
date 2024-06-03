@@ -70,7 +70,7 @@ public class BibleController {
             @RequestParam String bibleRef,
             @RequestParam String templatePath) throws MalformedURLException, IOException {
 
-        List<String> versions = new ArrayList<>(appContextService.getConfig().bibleVersionToLocale().keySet());
+        List<String> versions = new ArrayList<>(appContextService.getConfig().getBibleVersionToLocale().keySet());
         bibleRef = String.join(",", versions) + " - " + bibleRef;
 
         Path outputPath = Path.of(System.getProperty("java.io.tmpdir"), StringUtils.sanitizeFilename(bibleRef) + ".pptx");

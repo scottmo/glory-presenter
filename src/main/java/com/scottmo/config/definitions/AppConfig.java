@@ -16,22 +16,22 @@ public class AppConfig {
     public static final String TEMPLATE_DIR = "templates";
 
     private String dataDir;
-    private List<String> locales; // order matters to which locale comes first
-    private Map<String, String> bibleVersionToLocale;
-    private Set<String> templatePaths;
+    private List<String> locales = new ArrayList<>();; // order matters to which locale comes first
+    private Map<String, String> bibleVersionToLocale = new HashMap<>();
+    private Set<String> templatePaths = new HashSet<>();
 
-    public AppConfig(
-            String dataDir,
-            List<String> locales,
-            Map<String, String> bibleVersionToLocale,
-            Set<String> templatePaths) {
-        this.dataDir = dataDir;
-        this.locales = (locales == null) ? new ArrayList<>() : locales;
-        this.bibleVersionToLocale = (bibleVersionToLocale == null) ? new HashMap<>() : bibleVersionToLocale;
-        this.templatePaths = (templatePaths == null) ? new HashSet<>() : templatePaths;
-    }
+    // public AppConfig(
+    //         String dataDir,
+    //         List<String> locales,
+    //         Map<String, String> bibleVersionToLocale,
+    //         Set<String> templatePaths) {
+    //     this.dataDir = dataDir;
+    //     this.locales = (locales == null) ? new ArrayList<>() : locales;
+    //     this.bibleVersionToLocale = (bibleVersionToLocale == null) ? new HashMap<>() : bibleVersionToLocale;
+    //     this.templatePaths = (templatePaths == null) ? new HashSet<>() : templatePaths;
+    // }
 
-    public String dataDir() {
+    public String getDataDir() {
         return dataDir;
     }
 
@@ -39,7 +39,7 @@ public class AppConfig {
         this.dataDir = dataDir;
     }
 
-    public List<String> locales() {
+    public List<String> getLocales() {
         return locales;
     }
 
@@ -47,7 +47,7 @@ public class AppConfig {
         this.locales = locales;
     }
 
-    public Map<String, String> bibleVersionToLocale() {
+    public Map<String, String> getBibleVersionToLocale() {
         return bibleVersionToLocale;
     }
 
@@ -55,7 +55,7 @@ public class AppConfig {
         this.bibleVersionToLocale = bibleVersionToLocale;
     }
 
-    public Set<String> templatePaths() {
+    public Set<String> getTemplatePaths() {
         return templatePaths;
     }
 
