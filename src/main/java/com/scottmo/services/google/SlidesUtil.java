@@ -86,7 +86,7 @@ public final class SlidesUtil {
         String rgbString = Strings.isNullOrEmpty(rgbValues) ? "255, 255, 255" : rgbValues;
         List<Float> rgb = Arrays.stream(rgbString.split(","))
                 .map(String::trim)
-                .map(Float::parseFloat)
+                .map(v -> Float.parseFloat(v)/255)
                 .toList();
         return new OpaqueColor()
                 .setRgbColor(new RgbColor()

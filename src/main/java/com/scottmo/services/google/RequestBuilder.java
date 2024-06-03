@@ -26,6 +26,7 @@ import com.google.api.services.slides.v1.model.Request;
 import com.google.api.services.slides.v1.model.Shape;
 import com.google.api.services.slides.v1.model.ShapeProperties;
 import com.google.api.services.slides.v1.model.Size;
+import com.google.api.services.slides.v1.model.TextElement;
 import com.google.api.services.slides.v1.model.TextRun;
 import com.google.api.services.slides.v1.model.TextStyle;
 import com.google.api.services.slides.v1.model.UpdatePageElementTransformRequest;
@@ -63,43 +64,59 @@ public final class RequestBuilder {
      * set base font for a slide
      */
     public void setBaseFont(Page slide, Map<String, FontConfig> textConfigs) {
-        slide.getPageElements().stream()
-                .filter(pageElement -> pageElement.getObjectId() != null)
-                .forEach(pageElement -> {
-                    SlidesUtil.getTextElements(pageElement).stream()
-                            .filter(textElement -> textElement.getTextRun() != null)
-                            .forEach(textElement -> {
-                                setBaseFontForText(pageElement.getObjectId(), textElement.getTextRun(),
-                                        textConfigs, textElement.getStartIndex());
-                            });
-                });
+        for (PageElement pageElement : slide.getPageElements()) {
+            if (pageElement.getObjectId() == null) continue;
+            for (TextElement textElement : SlidesUtil.getTextElements(pageElement)) {
+                if (textElement.getTextRun() == null) continue;
+                int startIndex = Optional.ofNullable(textElement.getStartIndex())
+                    .map(Integer::intValue).orElse(0);
+                setBaseFontForText(pageElement.getObjectId(), textElement.getTextRun(),
+                        textConfigs, startIndex);
+            }
+        }
     }
 
     /**
      * set base font for a text run
      */
     private void setBaseFontForText(String pageElementId, TextRun textRun,
-                                    Map<String, FontConfig> textConfigs, int startIndex) {
-        Optional.ofNullable(textRun.getContent()).ifPresent(content -> {
-            StringUtils.splitByCharset(content, true).forEach(contentSegment -> {
-                String textConfigName = getTextConfigName(contentSegment);
-                FontConfig textConfig = textConfigs.get(textConfigName);
-                requests.add(new Request()
-                        .setUpdateTextStyle(new UpdateTextStyleRequest()
-                                .setObjectId(pageElementId)
-                                .setFields("*")
-                                .setTextRange(SlidesUtil.getTextRange(
-                                        startIndex + contentSegment.startIndex(),
-                                        startIndex + contentSegment.endIndex()
-                                ))
-                                .setStyle(textRun.getStyle().clone()
-                                        .setForegroundColor(new OptionalColor()
-                                                .setOpaqueColor(SlidesUtil.getRGBColor(textConfig.getFontColor())))
-                                        .setFontFamily(textConfig.getFontFamily())
-                                        .setWeightedFontFamily(textRun.getStyle().getWeightedFontFamily().clone()
-                                                .setFontFamily(textConfig.getFontFamily())))));
-            });
-        });
+                Map<String, FontConfig> textConfigs, int startIndex) {
+        String content = textRun.getContent();
+        if (content == null || content.isEmpty()) return;
+
+        for (StringSegment contentSegment : StringUtils.splitByCharset(content, true)) {
+            String textConfigName = getTextConfigName(contentSegment);
+            FontConfig textConfig = textConfigs.get(textConfigName);
+            requests.add(new Request()
+                    .setUpdateTextStyle(new UpdateTextStyleRequest()
+                            .setObjectId(pageElementId)
+                            .setFields("*")
+                            .setTextRange(SlidesUtil.getTextRange(
+                                    startIndex + contentSegment.startIndex(),
+                                    startIndex + contentSegment.endIndex()
+                            ))
+                            .setStyle(applyTextStyle(textRun, textConfig))));
+        }
+    }
+
+    private TextStyle applyTextStyle(TextRun textRun, FontConfig fontConfig) {
+        TextStyle newStyle = textRun.getStyle().clone();
+
+        if (fontConfig.getFontColor() != null) {
+            newStyle.setForegroundColor(new OptionalColor()
+                    .setOpaqueColor(SlidesUtil.getRGBColor(fontConfig.getFontColor())));
+        }
+        if (fontConfig.getFontFamily() != null) {
+            // regular font family
+            newStyle.setFontFamily(fontConfig.getFontFamily());
+            // if bold, apply font family to bold font family
+            if (textRun.getStyle().getWeightedFontFamily() != null) {
+                WeightedFontFamily weightedStyle = textRun.getStyle().getWeightedFontFamily().clone();
+                weightedStyle.setFontFamily(fontConfig.getFontFamily());
+                newStyle.setWeightedFontFamily(weightedStyle);
+            }
+        }
+        return newStyle;
     }
 
     public void resizeToFullPage(String pageElementId) {

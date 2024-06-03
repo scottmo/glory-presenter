@@ -40,7 +40,7 @@ export default function GSlide() {
     const [ content, setContent ] = useState("");
     const [ startIndex, setStartIndex ] = useState(0);
     const [ endIndex, setEndIndex ] = useState(999);
-    const [ slideConfig, setSlideConfig ] = useState(CONFIGURATION_EXAMPLE as object);
+    const [ slideConfig, setSlideConfig ] = useState(CONFIGURATION_EXAMPLE as any);
 
     const handlePresentationURL = (value: string) => {
         const pptId = extractPresentationId(value);
@@ -54,13 +54,15 @@ export default function GSlide() {
     };
 
     const handlePresentationUpdate = () => {
-        runAction(API.updateStyles, { id: pptId, slideConfig: JSON.stringify(slideConfig), startIndex, endIndex });
+        runAction(API.updateStyles, { id: pptId, startIndex, endIndex }, slideConfig);
     };
 
     return <>
         <TextInput label="Presentation ID/URL" onChange={e => handlePresentationURL(e.target.value)}/>
         <JsonEditor data={slideConfig} rootName="slideConfig" indent={4}
             showStringQuotes={false}
+            showCollectionCount={false}
+            rootFontSize={"14px"}
             restrictDelete={true}
             restrictAdd={({ level }) => level > 1 /* only allow adding font configs */ }
             onUpdate={({ newData }) => setSlideConfig(newData)}

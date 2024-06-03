@@ -9,7 +9,7 @@ export type ServerAction = {
     path: string;
 }
 export const API: Record<string, ServerAction> = {
-    updateStyles     : { method: 'GET',    path: 'google/updatestyles/:id'},
+    updateStyles     : { method: 'POST',   path: 'google/updatestyles/:id'},
     getConfig        : { method: 'GET',    path: 'config' },
     saveConfig       : { method: 'POST',   path: 'config' },
     generateSongPPTX : { method: 'GET',    path: 'song/pptx' },

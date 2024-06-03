@@ -2,9 +2,7 @@ package com.scottmo.services.google;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -23,7 +21,6 @@ import com.google.api.services.slides.v1.model.Presentation;
 import com.google.api.services.slides.v1.model.Request;
 import com.scottmo.config.definitions.AppConfig;
 import com.scottmo.services.appContext.AppContextService;
-import com.scottmo.services.google.SlideConfig.FontConfig;
 
 @Component
 public class GoogleCloudService {
@@ -101,22 +98,16 @@ public class GoogleCloudService {
 
     public void setDefaultTitleText(String presentationId, SlideConfig slideConfig) throws IOException {
         Presentation ppt = getPresentation(presentationId);
-        RequestBuilder requestBuilder = new RequestBuilder(ppt, slideConfig, appContextService.getConfig().locales());
+        RequestBuilder requestBuilder = new RequestBuilder(ppt, slideConfig, appContextService.getConfig().getLocales());
         ppt.getSlides().forEach(requestBuilder::setDefaultTitleText);
         updateSlides(presentationId, requestBuilder.build());
     }
 
     public void setBaseFont(String presentationId, SlideConfig slideConfig) throws IOException {
-        // FIXME pass this down from somewhere
-        var textConfigs = new HashMap<String, FontConfig>() {{
-            put("zh_cn", new FontConfig("STKaiti", 60, "255, 255, 255", "bold"));
-            put("en_us", new FontConfig("Arial Narrow", 52, "255, 255, 153", "bold"));
-        }};
-
         Presentation ppt = getPresentation(presentationId);
-        RequestBuilder requestBuilder = new RequestBuilder(ppt, slideConfig, appContextService.getConfig().locales());
+        RequestBuilder requestBuilder = new RequestBuilder(ppt, slideConfig, appContextService.getConfig().getLocales());
         ppt.getSlides().forEach(slide -> {
-            requestBuilder.setBaseFont(slide, textConfigs);
+            requestBuilder.setBaseFont(slide, slideConfig.getFontConfigs());
         });
         updateSlides(presentationId, requestBuilder.build());
     }

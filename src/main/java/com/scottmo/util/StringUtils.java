@@ -36,7 +36,7 @@ public final class StringUtils {
                 }
             }
             if (segment == null) {
-                segment = new StringSegment(i, i, ch, isAscii);
+                segment = new StringSegment(i, i + 1, ch, isAscii);
             }
         }
         if (segment != null && !segment.value().isEmpty()) {
