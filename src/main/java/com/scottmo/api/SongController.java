@@ -21,11 +21,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.scottmo.data.song.Song;
-import com.scottmo.services.appContext.AppContextService;
-import com.scottmo.services.ppt.SongSlidesGenerator;
-import com.scottmo.services.songs.SongService;
-import com.scottmo.util.StringUtils;
+import com.scottmo.core.appContext.impl.AppContextService;
+import com.scottmo.core.google.impl.RequestUtil;
+import com.scottmo.core.ppt.impl.SongSlidesGenerator;
+import com.scottmo.core.songs.api.song.Song;
+import com.scottmo.core.songs.impl.SongService;
+import com.scottmo.shared.StringUtils;
 
 @RestController
 @RequestMapping("/api/song")

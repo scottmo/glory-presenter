@@ -19,11 +19,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.scottmo.data.bibleMetadata.BibleMetadata;
-import com.scottmo.services.appContext.AppContextService;
-import com.scottmo.services.bible.BibleService;
-import com.scottmo.services.ppt.BibleSlidesGenerator;
-import com.scottmo.util.StringUtils;
+import com.scottmo.core.appContext.impl.AppContextService;
+import com.scottmo.core.bible.api.bibleMetadata.BibleMetadata;
+import com.scottmo.core.bible.impl.BibleService;
+import com.scottmo.core.google.impl.RequestUtil;
+import com.scottmo.core.ppt.impl.BibleSlidesGenerator;
+import com.scottmo.shared.StringUtils;
 
 
 @RestController

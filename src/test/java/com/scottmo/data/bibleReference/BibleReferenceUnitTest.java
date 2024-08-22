@@ -4,6 +4,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.Test;
 
+import com.scottmo.core.bible.api.bibleReference.BibleReference;
+
 import java.util.List;
 
 public class BibleReferenceUnitTest {

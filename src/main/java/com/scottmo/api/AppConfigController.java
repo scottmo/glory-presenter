@@ -10,8 +10,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.scottmo.config.definitions.AppConfig;
-import com.scottmo.services.appContext.AppContextService;
+import com.scottmo.core.appContext.api.AppConfig;
+import com.scottmo.core.appContext.impl.AppContextService;
+import com.scottmo.core.google.impl.RequestUtil;
 
 @RestController
 @RequestMapping("/api/config")
