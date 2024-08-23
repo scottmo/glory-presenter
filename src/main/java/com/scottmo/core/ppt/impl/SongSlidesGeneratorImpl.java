@@ -1,5 +1,6 @@
 package com.scottmo.core.ppt.impl;
 
+import com.scottmo.core.ppt.api.SongSlidesGenerator;
 import com.scottmo.core.songs.api.song.Song;
 import com.scottmo.core.songs.api.song.SongVerse;
 import com.scottmo.shared.StringUtils;
@@ -18,7 +19,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @Component
-public final class SongSlidesGenerator {
+public final class SongSlidesGeneratorImpl implements SongSlidesGenerator {
     // placeholder keys
     private static final String VERSE_PREFIX = "verse.";
     private static final String TITLE_PREFIX = "title.";
@@ -27,12 +28,13 @@ public final class SongSlidesGenerator {
     private static final String COPYRIGHT = "copyright";
     private static final String PUBLISHER = "publisher";
 
-    // TODO: determine hasStartSlide and hasEndSlide from templatefile
+    @Override
     public void generate(Song song, String tmplFilePath, String outputFilePath, List<String> locales,
             int maxLines) throws IOException {
         generate(song, tmplFilePath, outputFilePath, locales, maxLines, true, false);
     }
 
+    @Override
     public void generate(Song song, String tmplFilePath, String outputFilePath, List<String> locales,
             int maxLines, boolean hasStartSlide, boolean hasEndSlide) throws IOException {
         // song metadata for all slides
@@ -79,7 +81,7 @@ public final class SongSlidesGenerator {
      *     }
      * ]
      */
-    public static List<Map<String, List<String>>> getOrderedVerses(Song song) {
+    private List<Map<String, List<String>>> getOrderedVerses(Song song) {
         List<Map<String, List<String>>> orderedVerses = new ArrayList<>(song.getVerseOrder().size());
         for (String verseName : song.getVerseOrder()) {
             Map<String, List<String>> verseGroup = new HashMap<>();
@@ -93,11 +95,11 @@ public final class SongSlidesGenerator {
         return orderedVerses;
     }
 
-    private static int getValueListSize(Map<String, List<String>> map) {
+    private int getValueListSize(Map<String, List<String>> map) {
         return map.values().iterator().next().size();
     }
 
-    private static Map<String, List<String>> getSectionTextsByGroup(List<Map<String, List<String>>> orderedSectionTexts, List<String> textGroups, int maxLines) {
+    private Map<String, List<String>> getSectionTextsByGroup(List<Map<String, List<String>>> orderedSectionTexts, List<String> textGroups, int maxLines) {
         if (textGroups.isEmpty()) {
             return Collections.emptyMap();
         }
@@ -128,7 +130,7 @@ public final class SongSlidesGenerator {
         return data;
     }
 
-    public static List<Map<String, String>> getSectionTexts(List<Map<String, List<String>>> orderedSectionTexts, List<String> textGroups, int maxLines) {
+    private List<Map<String, String>> getSectionTexts(List<Map<String, List<String>>> orderedSectionTexts, List<String> textGroups, int maxLines) {
         Map<String, List<String>> distributedText = getSectionTextsByGroup(orderedSectionTexts, textGroups, maxLines);
         int numSections = getValueListSize(distributedText);
         return IntStream.range(0, numSections)

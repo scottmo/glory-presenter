@@ -13,17 +13,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.scottmo.core.appContext.impl.AppContextService;
-import com.scottmo.core.google.impl.GoogleCloudService;
-import com.scottmo.core.google.impl.RequestUtil;
-import com.scottmo.core.google.impl.SlideConfig;
+import com.scottmo.core.google.api.GoogleCloudService;
+import com.scottmo.core.google.api.SlideConfig;
 
 @RestController
 @RequestMapping("/api/google")
 public class GoogleController {
-    @Autowired
-    private AppContextService appContextService;
     @Autowired
     private GoogleCloudService googleService;
 

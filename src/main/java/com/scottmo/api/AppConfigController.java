@@ -11,8 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.scottmo.core.appContext.api.AppConfig;
-import com.scottmo.core.appContext.impl.AppContextService;
-import com.scottmo.core.google.impl.RequestUtil;
+import com.scottmo.core.appContext.api.AppContextService;
 
 @RestController
 @RequestMapping("/api/config")

@@ -10,12 +10,14 @@ import java.nio.file.Path;
 import org.springframework.stereotype.Component;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.scottmo.core.appContext.api.AppConfig;
+import com.scottmo.core.appContext.api.AppContextService;
 import com.scottmo.shared.LocaleUtil;
 
-@Component("appContextService")
-public final class AppContextService {
+@Component
+public final class AppContextServiceImpl implements AppContextService {
     private AppConfig appConfig;
 
+    @Override
     public AppConfig getConfig() {
         if (appConfig == null) {
             reload();
@@ -23,6 +25,7 @@ public final class AppContextService {
         return appConfig;
     }
 
+    @Override
     public void reload() {
         Path configPath = Path.of(AppConfig.CONFIG_PATH);
         if (!Files.exists(configPath)) {
@@ -61,6 +64,7 @@ public final class AppContextService {
         }
     }
 
+    @Override
     public String getRelativePath(String fileName) {
         try {
             return Path.of(getConfig().getDataDir(), fileName).toFile().getCanonicalPath();
@@ -69,10 +73,12 @@ public final class AppContextService {
         }
     }
 
+    @Override
     public String getPPTXTemplate(String fileName) {
         return getRelativePath(Path.of(AppConfig.TEMPLATE_DIR, fileName).toString());
     }
 
+    @Override
     public String getPrimaryLocale() {
         return appConfig.getLocales().get(0);
     }

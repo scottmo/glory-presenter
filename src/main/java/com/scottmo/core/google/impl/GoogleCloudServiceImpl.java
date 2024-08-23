@@ -20,10 +20,12 @@ import com.google.api.services.slides.v1.model.Page;
 import com.google.api.services.slides.v1.model.Presentation;
 import com.google.api.services.slides.v1.model.Request;
 import com.scottmo.core.appContext.api.AppConfig;
-import com.scottmo.core.appContext.impl.AppContextService;
+import com.scottmo.core.appContext.api.AppContextService;
+import com.scottmo.core.google.api.GoogleCloudService;
+import com.scottmo.core.google.api.SlideConfig;
 
 @Component
-public class GoogleCloudService {
+public class GoogleCloudServiceImpl implements GoogleCloudService {
     @Autowired
     private AppContextService appContextService;
 
@@ -61,6 +63,7 @@ public class GoogleCloudService {
         return _driveApi;
     }
 
+    @Override
     public String copyPresentation(String title, String folderId, String templatePresentationId) {
         try {
             File fileMetadata = new File()
@@ -73,14 +76,17 @@ public class GoogleCloudService {
         }
     }
 
+    @Override
     public List<Page> getSlides(String presentationId) throws IOException {
         return getSlidesApi().presentations().get(presentationId).execute().getSlides();
     }
 
+    @Override
     public Presentation getPresentation(String presentationId) throws IOException {
         return getSlidesApi().presentations().get(presentationId).execute();
     }
 
+    @Override
     public boolean updateSlides(String presentationId, List<Request> updateRequests) throws IOException {
         if (updateRequests.isEmpty()) return false;
 
@@ -96,6 +102,7 @@ public class GoogleCloudService {
         return true;
     }
 
+    @Override
     public void setDefaultTitleText(String presentationId, SlideConfig slideConfig) throws IOException {
         Presentation ppt = getPresentation(presentationId);
         RequestBuilder requestBuilder = new RequestBuilder(ppt, slideConfig, appContextService.getConfig().getLocales());
@@ -103,6 +110,7 @@ public class GoogleCloudService {
         updateSlides(presentationId, requestBuilder.build());
     }
 
+    @Override
     public void setBaseFont(String presentationId, SlideConfig slideConfig) throws IOException {
         Presentation ppt = getPresentation(presentationId);
         RequestBuilder requestBuilder = new RequestBuilder(ppt, slideConfig, appContextService.getConfig().getLocales());

@@ -2,6 +2,8 @@ package com.scottmo.core.security.impl;
 
 import org.springframework.stereotype.Component;
 
+import com.scottmo.core.security.api.CipherService;
+
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
@@ -16,7 +18,7 @@ import java.security.GeneralSecurityException;
 import java.util.Random;
 
 @Component
-public final class CipherService {
+public final class CipherServiceImpl implements CipherService {
     private static final String algorithm = "PBEWithMD5AndTripleDES";
 
     private Cipher cipher(String password, byte[] salt, int mode) throws GeneralSecurityException {
@@ -50,6 +52,7 @@ public final class CipherService {
         return outStream.toByteArray();
     }
 
+    @Override
     public void encryptFile(String inFilePath, String outFilePath, String password)
             throws GeneralSecurityException, IOException {
         byte[] salt = new byte[8];
@@ -67,6 +70,7 @@ public final class CipherService {
         }
     }
 
+    @Override
     public void decryptFile(String inFilePath, String outFilePath, String password)
             throws GeneralSecurityException, IOException {
         byte[] output = decrypt(inFilePath, password);
@@ -75,6 +79,7 @@ public final class CipherService {
         }
     }
 
+    @Override
     public byte[] decrypt(String inFilePath, String password)
             throws GeneralSecurityException, IOException {
         try (FileInputStream inFile = new FileInputStream(inFilePath)) {

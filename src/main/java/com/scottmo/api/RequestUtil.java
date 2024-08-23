@@ -1,4 +1,4 @@
-package com.scottmo.core.google.impl;
+package com.scottmo.api;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -14,7 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
-public class RequestUtil {
+class RequestUtil {
     public static ResponseEntity<Map<String, Object>> errorResponse(String message, Throwable e) {
         Map<String, Object> response = new HashMap<>();
 

@@ -1,4 +1,4 @@
-package com.scottmo.core.google.impl;
+package com.scottmo.core.google.api;
 
 import java.util.Map;
 

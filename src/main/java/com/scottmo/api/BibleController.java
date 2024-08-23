@@ -19,11 +19,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.scottmo.core.appContext.impl.AppContextService;
+import com.scottmo.core.appContext.api.AppContextService;
 import com.scottmo.core.bible.api.bibleMetadata.BibleMetadata;
-import com.scottmo.core.bible.impl.BibleService;
-import com.scottmo.core.google.impl.RequestUtil;
-import com.scottmo.core.ppt.impl.BibleSlidesGenerator;
+import com.scottmo.core.bible.api.BibleService;
+import com.scottmo.core.ppt.api.BibleSlidesGenerator;
 import com.scottmo.shared.StringUtils;
 
 
@@ -40,7 +39,7 @@ public class BibleController {
 
     @GetMapping("/versions")
     List<String> getVersions() {
-        return bibleService.getStore().getAvailableVersions();
+        return bibleService.getAvailableVersions();
     }
 
     @GetMapping("/books")

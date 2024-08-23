@@ -12,11 +12,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.scottmo.core.bible.api.bibleReference.BibleReference;
-import com.scottmo.core.bible.impl.BibleService;
-import com.scottmo.core.bible.impl.store.BibleVerse;
+import com.scottmo.core.bible.api.BibleService;
+import com.scottmo.core.bible.api.bibleMetadata.BibleVerse;
+import com.scottmo.core.ppt.api.BibleSlidesGenerator;
 
 @Component
-public final class BibleSlidesGenerator {
+public final class BibleSlidesGeneratorImpl implements BibleSlidesGenerator {
     // placeholder keys
     private static final String VERSE_CHAPTER = "verse.chapter";
     private static final String VERSE_NUMBER = "verse.number";
@@ -27,18 +28,19 @@ public final class BibleSlidesGenerator {
     @Autowired
     private BibleService bibleService;
 
-    // TODO: determine hasStartSlide and hasEndSlide from templatefile
+    @Override
     public void generate(String bibleRefString, String tmplFilePath, String outputFilePath) throws IOException {
         generate(bibleRefString, tmplFilePath, outputFilePath, true, false);
     }
 
+    @Override
     public void generate(String bibleRefString, String tmplFilePath, String outputFilePath,
             boolean hasStartSlide, boolean hasEndSlide) throws IOException {
         BibleReference bibleReference = new BibleReference(bibleRefString);
         List<Map<String, String>> slideContents = new ArrayList<>();
 
-        Map<String, List<BibleVerse>> bibleVerses = bibleService.getStore().getBibleVerses(bibleReference);
-        Map<String, String> bookNames = bibleService.getStore().getBookNames(bibleReference.getBook());
+        Map<String, List<BibleVerse>> bibleVerses = bibleService.getBibleVerses(bibleReference);
+        Map<String, String> bookNames = bibleService.getBookNames(bibleReference.getBook());
 
         Map<String, String> bibleMetadata = new HashMap<>();
         for (String version : bibleReference.getVersions()) {

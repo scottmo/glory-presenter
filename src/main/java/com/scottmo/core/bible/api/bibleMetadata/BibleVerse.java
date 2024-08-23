@@ -1,4 +1,4 @@
-package com.scottmo.core.bible.impl.store;
+package com.scottmo.core.bible.api.bibleMetadata;
 
 public record BibleVerse(
     int bookIndex,

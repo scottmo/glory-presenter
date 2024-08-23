@@ -21,11 +21,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.scottmo.core.appContext.impl.AppContextService;
-import com.scottmo.core.google.impl.RequestUtil;
-import com.scottmo.core.ppt.impl.SongSlidesGenerator;
+import com.scottmo.core.appContext.api.AppContextService;
+import com.scottmo.core.ppt.api.SongSlidesGenerator;
 import com.scottmo.core.songs.api.song.Song;
-import com.scottmo.core.songs.impl.SongService;
+import com.scottmo.core.songs.api.SongService;
 import com.scottmo.shared.StringUtils;
 
 @RestController
@@ -42,7 +41,7 @@ public class SongController {
     @GetMapping("/titles")
     Map<Integer, String> getSongs() {
         Map<Integer, String> titles = new HashMap<>();
-        for (var title : songService.getStore().getAllSongDescriptors(appContextService.getConfig().getLocales())) {
+        for (var title : songService.getAllSongDescriptors(appContextService.getConfig().getLocales())) {
             titles.put(title.key(), title.value());
         }
         return titles;
@@ -50,12 +49,12 @@ public class SongController {
 
     @GetMapping("/{id}")
     Song getSong(@PathVariable Integer id) {
-        return songService.getStore().get(id);
+        return songService.get(id);
     }
 
     @DeleteMapping("/{id}")
     ResponseEntity<Map<String, Object>> deleteSong(@PathVariable Integer id) {
-        boolean isSuccess = songService.getStore().delete(id);
+        boolean isSuccess = songService.delete(id);
         return isSuccess
             ? RequestUtil.successResponse()
             : RequestUtil.errorResponse("Failed to delete song with id %s!".formatted(id));
@@ -80,16 +79,16 @@ public class SongController {
 
     @GetMapping("/export/{id}")
     public ResponseEntity<Resource> exportSong(@PathVariable Integer id) throws IOException {
-        Song song = songService.getStore().get(id);
+        Song song = songService.get(id);
         Path outputPath = Path.of(System.getProperty("java.io.tmpdir"), StringUtils.sanitizeFilename(song.getTitle()) + ".xml");
-        String songXML = songService.getOpenLyricsConverter().serialize(song);
+        String songXML = songService.serializeToOpenLyrics(song);
         Files.writeString(outputPath, songXML, StandardCharsets.UTF_8);
         return RequestUtil.download(outputPath);
     }
 
     @PostMapping("/save")
     public Integer saveSong(@RequestBody Song song) {
-        return songService.getStore().store(song);
+        return songService.store(song);
     }
 
     @PostMapping("/import")
