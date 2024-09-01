@@ -8,15 +8,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import com.scottmo.core.bible.api.bibleReference.BibleReference;
 import com.scottmo.core.bible.api.BibleService;
 import com.scottmo.core.bible.api.bibleMetadata.BibleVerse;
 import com.scottmo.core.ppt.api.BibleSlidesGenerator;
 
-@Component
 public final class BibleSlidesGeneratorImpl implements BibleSlidesGenerator {
     // placeholder keys
     private static final String VERSE_CHAPTER = "verse.chapter";
@@ -25,7 +21,6 @@ public final class BibleSlidesGeneratorImpl implements BibleSlidesGenerator {
     private static final String VERSE_RANGE = "verses";
     private static final String BOOK = "book.%s";
 
-    @Autowired
     private BibleService bibleService;
 
     @Override

@@ -24,9 +24,7 @@ import com.scottmo.core.appContext.api.AppContextService;
 import com.scottmo.core.google.api.GoogleCloudService;
 import com.scottmo.core.google.api.SlideConfig;
 
-@Component
 public class GoogleCloudServiceImpl implements GoogleCloudService {
-    @Autowired
     private AppContextService appContextService;
 
     private JsonFactory jsonFactory = GsonFactory.getDefaultInstance();

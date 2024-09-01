@@ -80,11 +80,11 @@ public final class SongStore {
                     ));
             if (res.next()) {
                 String authors = res.getString(SongTable.AUTHORS);
-                if (Strings.isNotEmpty(authors)) {
+                if (authors != null && !authors.isEmpty()) {
                     song.setAuthors(StringUtils.split(authors));
                 }
                 String verseOrder = res.getString(SongTable.VERSE_ORDER);
-                if (Strings.isNotEmpty(verseOrder)) {
+                if (verseOrder != null && !verseOrder.isEmpty()) {
                     song.setVerseOrder(StringUtils.split(verseOrder));
                 }
                 song.setCopyright(res.getString(SongTable.COPYRIGHT));

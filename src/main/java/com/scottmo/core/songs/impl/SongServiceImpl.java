@@ -7,9 +7,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import com.scottmo.core.appContext.api.AppContextService;
 import com.scottmo.core.songs.api.SongService;
 import com.scottmo.core.songs.api.song.Song;
@@ -17,9 +14,7 @@ import com.scottmo.core.songs.impl.openLyrics.OpenLyricsConverter;
 import com.scottmo.core.songs.impl.store.SongStore;
 import com.scottmo.shared.Pair;
 
-@Component
 public class SongServiceImpl implements SongService {
-    @Autowired
     private AppContextService appContextService;
     private SongStore store;
     private final OpenLyricsConverter openLyricsConverter = new OpenLyricsConverter();

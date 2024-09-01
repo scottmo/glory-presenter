@@ -8,9 +8,6 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import com.scottmo.core.appContext.api.AppContextService;
 import com.scottmo.core.bible.api.BibleService;
 import com.scottmo.core.bible.api.bibleMetadata.BibleVerse;
@@ -18,9 +15,7 @@ import com.scottmo.core.bible.api.bibleOsis.Osis;
 import com.scottmo.core.bible.api.bibleReference.BibleReference;
 import com.scottmo.core.bible.impl.store.BibleStore;
 
-@Component
 public class BibleServiceImpl implements BibleService {
-    @Autowired
     private AppContextService appContextService;
     private BibleStore store;
 

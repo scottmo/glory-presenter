@@ -5,8 +5,6 @@ import com.scottmo.core.songs.api.song.Song;
 import com.scottmo.core.songs.api.song.SongVerse;
 import com.scottmo.shared.StringUtils;
 
-import org.springframework.stereotype.Component;
-
 import static com.scottmo.core.ppt.impl.TemplatingUtil.PLACEHOLDER_TEMPLATE;
 
 import java.io.IOException;
@@ -18,7 +16,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-@Component
 public final class SongSlidesGeneratorImpl implements SongSlidesGenerator {
     // placeholder keys
     private static final String VERSE_PREFIX = "verse.";

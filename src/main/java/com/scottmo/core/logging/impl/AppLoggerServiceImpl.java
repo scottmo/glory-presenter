@@ -1,11 +1,8 @@
 package com.scottmo.core.logging.impl;
 
-import org.springframework.stereotype.Component;
-
 import com.scottmo.core.logging.api.AppLogger;
 import com.scottmo.core.logging.api.AppLoggerService;
 
-@Component
 public class AppLoggerServiceImpl implements AppLoggerService {
     private AppLogger appLogger;
     @Override

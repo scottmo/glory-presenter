@@ -1,7 +1,5 @@
 package com.scottmo.core.security.impl;
 
-import org.springframework.stereotype.Component;
-
 import com.scottmo.core.security.api.CipherService;
 
 import javax.crypto.Cipher;
@@ -17,7 +15,6 @@ import java.io.InputStream;
 import java.security.GeneralSecurityException;
 import java.util.Random;
 
-@Component
 public final class CipherServiceImpl implements CipherService {
     private static final String algorithm = "PBEWithMD5AndTripleDES";
 

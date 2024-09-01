@@ -7,13 +7,11 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import org.springframework.stereotype.Component;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.scottmo.core.appContext.api.AppConfig;
 import com.scottmo.core.appContext.api.AppContextService;
 import com.scottmo.shared.LocaleUtil;
 
-@Component
 public final class AppContextServiceImpl implements AppContextService {
     private AppConfig appConfig;
 
