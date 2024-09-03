@@ -2,10 +2,7 @@
 
 ## TODO
 
-- api controllers
-- react ui to display settings form from json config
-- bring back google api code
-- add service account auth option
+- pass deps through constructor for services
 
 ## Introduction
 

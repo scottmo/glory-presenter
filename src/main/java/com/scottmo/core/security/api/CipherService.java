@@ -3,7 +3,9 @@ package com.scottmo.core.security.api;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 
-public interface CipherService {
+import com.scottmo.core.Service;
+
+public interface CipherService extends Service {
 
     void encryptFile(String inFilePath, String outFilePath, String password)
             throws GeneralSecurityException, IOException;

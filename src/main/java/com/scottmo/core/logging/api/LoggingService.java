@@ -1,7 +1,12 @@
 package com.scottmo.core.logging.api;
 
-public interface AppLogger {
+import com.scottmo.core.Service;
+
+public interface LoggingService extends Service {
+
     void info(String msg);
+
     void warn(String msg);
+
     void error(String msg, Throwable e);
 }

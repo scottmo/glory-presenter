@@ -8,9 +8,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.scottmo.core.bible.api.bibleReference.BibleReference;
 import com.scottmo.core.bible.api.BibleService;
 import com.scottmo.core.bible.api.bibleMetadata.BibleVerse;
+import com.scottmo.core.bible.api.bibleReference.BibleReference;
 import com.scottmo.core.ppt.api.BibleSlidesGenerator;
 
 public final class BibleSlidesGeneratorImpl implements BibleSlidesGenerator {

@@ -1,4 +1,4 @@
-package com.scottmo.core.appContext.api;
+package com.scottmo.core.config;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -7,13 +7,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class AppConfig {
+public class Config {
     public static final String APP_NAME = "Glory Presenter";
     public static final int APP_WIDTH = 900;
     public static final int APP_HEIGHT = 600;
 
     public static final String CONFIG_PATH = "./config.json";
     public static final String TEMPLATE_DIR = "templates";
+
+    public static final String LABELS_PATH = "./labels.json";
 
     private String dataDir;
     private List<String> locales = new ArrayList<>();; // order matters to which locale comes first

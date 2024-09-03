@@ -19,13 +19,14 @@ import com.google.api.services.slides.v1.model.BatchUpdatePresentationRequest;
 import com.google.api.services.slides.v1.model.Page;
 import com.google.api.services.slides.v1.model.Presentation;
 import com.google.api.services.slides.v1.model.Request;
-import com.scottmo.core.appContext.api.AppConfig;
-import com.scottmo.core.appContext.api.AppContextService;
+import com.scottmo.core.Service;
+import com.scottmo.core.config.Config;
+import com.scottmo.core.config.ConfigService;
 import com.scottmo.core.google.api.GoogleCloudService;
 import com.scottmo.core.google.api.SlideConfig;
 
 public class GoogleCloudServiceImpl implements GoogleCloudService {
-    private AppContextService appContextService;
+    private ConfigService configService = ConfigService.get();
 
     private JsonFactory jsonFactory = GsonFactory.getDefaultInstance();
 
@@ -36,7 +37,7 @@ public class GoogleCloudServiceImpl implements GoogleCloudService {
             try {
                 HttpTransport httpTransport = GoogleNetHttpTransport.newTrustedTransport();
                 _slidesApi = new Slides.Builder(httpTransport, jsonFactory, auth.getRequestInitializer())
-                        .setApplicationName(AppConfig.APP_NAME)
+                        .setApplicationName(Config.APP_NAME)
                         .build();
             } catch (IOException | GeneralSecurityException e) {
                 throw new RuntimeException("Unable to connect to Google Slides API!");
@@ -52,7 +53,7 @@ public class GoogleCloudServiceImpl implements GoogleCloudService {
             try {
                 NetHttpTransport httpTransport = GoogleNetHttpTransport.newTrustedTransport();
                 _driveApi = new Drive.Builder(httpTransport, jsonFactory, auth.getRequestInitializer())
-                        .setApplicationName(AppConfig.APP_NAME)
+                        .setApplicationName(Config.APP_NAME)
                         .build();
             } catch (IOException | GeneralSecurityException e) {
                 throw new RuntimeException("Unable to connect to Google Drive API!");
@@ -103,7 +104,7 @@ public class GoogleCloudServiceImpl implements GoogleCloudService {
     @Override
     public void setDefaultTitleText(String presentationId, SlideConfig slideConfig) throws IOException {
         Presentation ppt = getPresentation(presentationId);
-        RequestBuilder requestBuilder = new RequestBuilder(ppt, slideConfig, appContextService.getConfig().getLocales());
+        RequestBuilder requestBuilder = new RequestBuilder(ppt, slideConfig, configService.getConfig().getLocales());
         ppt.getSlides().forEach(requestBuilder::setDefaultTitleText);
         updateSlides(presentationId, requestBuilder.build());
     }
@@ -111,7 +112,7 @@ public class GoogleCloudServiceImpl implements GoogleCloudService {
     @Override
     public void setBaseFont(String presentationId, SlideConfig slideConfig) throws IOException {
         Presentation ppt = getPresentation(presentationId);
-        RequestBuilder requestBuilder = new RequestBuilder(ppt, slideConfig, appContextService.getConfig().getLocales());
+        RequestBuilder requestBuilder = new RequestBuilder(ppt, slideConfig, configService.getConfig().getLocales());
         ppt.getSlides().forEach(slide -> {
             requestBuilder.setBaseFont(slide, slideConfig.getFontConfigs());
         });

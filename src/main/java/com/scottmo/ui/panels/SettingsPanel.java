@@ -1,11 +1,11 @@
-package com.scottscmo.ui.panels;
+package com.scottmo.ui.panels;
 
-import com.scottscmo.AppLogger;
-import com.scottscmo.Config;
-import com.scottscmo.ui.components.FileEditor;
-import com.scottscmo.ui.components.Form;
-import com.scottscmo.ui.components.FormInput;
-import com.scottscmo.util.Cryptor;
+import com.scottmo.AppLogger;
+import com.scottmo.Config;
+import com.scottmo.ui.components.FileEditor;
+import com.scottmo.ui.components.Form;
+import com.scottmo.ui.components.FormInput;
+import com.scottmo.util.Cryptor;
 import net.miginfocom.swing.MigLayout;
 
 import javax.swing.*;

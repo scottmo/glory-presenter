@@ -1,7 +1,7 @@
-package com.scottscmo.ui.components;
+package com.scottmo.ui.components;
 
-import com.scottscmo.Application;
-import com.scottscmo.Config;
+import com.scottmo.Application;
+import com.scottmo.Config;
 import net.miginfocom.swing.MigLayout;
 
 import javax.swing.JButton;

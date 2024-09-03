@@ -5,10 +5,11 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+import com.scottmo.core.Service;
 import com.scottmo.core.bible.api.bibleMetadata.BibleVerse;
 import com.scottmo.core.bible.api.bibleReference.BibleReference;
 
-public interface BibleService {
+public interface BibleService extends Service {
 
     int insert(Map<String, List<List<String>>> bible, String version);
 

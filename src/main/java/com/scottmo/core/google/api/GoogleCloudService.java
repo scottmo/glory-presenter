@@ -6,8 +6,9 @@ import java.util.List;
 import com.google.api.services.slides.v1.model.Page;
 import com.google.api.services.slides.v1.model.Presentation;
 import com.google.api.services.slides.v1.model.Request;
+import com.scottmo.core.Service;
 
-public interface GoogleCloudService {
+public interface GoogleCloudService extends Service {
 
     String copyPresentation(String title, String folderId, String templatePresentationId);
 

@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.scottmo.core.appContext.api.AppContextService;
+import com.scottmo.core.config.ConfigService;
 import com.scottmo.core.ppt.api.SongSlidesGenerator;
 import com.scottmo.core.songs.api.SongService;
 import com.scottmo.core.songs.api.song.Song;
@@ -23,7 +23,7 @@ import com.scottmo.shared.StringUtils;
 
 public class SongController {
 
-    private AppContextService appContextService;
+    private ConfigService appContextService;
     private SongService songService;
     private SongSlidesGenerator pptxGenerator;
 

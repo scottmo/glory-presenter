@@ -1,11 +1,11 @@
-package com.scottscmo.ui.panels;
+package com.scottmo.ui.panels;
 
-import com.scottscmo.AppLogger;
-import com.scottscmo.Config;
-import com.scottscmo.ppt.BibleSlidesGenerator;
-import com.scottscmo.ppt.PPTXGenerators;
-import com.scottscmo.ui.components.Form;
-import com.scottscmo.ui.components.FormInput;
+import com.scottmo.AppLogger;
+import com.scottmo.Config;
+import com.scottmo.ppt.BibleSlidesGenerator;
+import com.scottmo.ppt.PPTXGenerators;
+import com.scottmo.ui.components.Form;
+import com.scottmo.ui.components.FormInput;
 import net.miginfocom.swing.MigLayout;
 
 import javax.swing.*;

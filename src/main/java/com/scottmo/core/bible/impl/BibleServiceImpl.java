@@ -8,20 +8,20 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
-import com.scottmo.core.appContext.api.AppContextService;
 import com.scottmo.core.bible.api.BibleService;
 import com.scottmo.core.bible.api.bibleMetadata.BibleVerse;
 import com.scottmo.core.bible.api.bibleOsis.Osis;
 import com.scottmo.core.bible.api.bibleReference.BibleReference;
 import com.scottmo.core.bible.impl.store.BibleStore;
+import com.scottmo.core.config.ConfigService;
 
 public class BibleServiceImpl implements BibleService {
-    private AppContextService appContextService;
+    private ConfigService configService = ConfigService.get();
     private BibleStore store;
 
     private BibleStore getStore() {
         if (store == null) {
-            store = new BibleStore(Path.of(appContextService.getConfig().getDataDir()));
+            store = new BibleStore(Path.of(configService.getConfig().getDataDir()));
         }
         return store;
     }

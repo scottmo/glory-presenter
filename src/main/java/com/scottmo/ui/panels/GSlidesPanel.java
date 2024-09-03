@@ -1,13 +1,13 @@
-package com.scottscmo.ui.panels;
+package com.scottmo.ui.panels;
 
-import com.scottscmo.AppLogger;
-import com.scottscmo.Config;
-import com.scottscmo.bibleReference.BibleReference;
-import com.scottscmo.google.Action;
-import com.scottscmo.google.GoogleSlidesService;
-import com.scottscmo.model.content.ContentUtil;
-import com.scottscmo.ui.components.Form;
-import com.scottscmo.ui.components.FormInput;
+import com.scottmo.AppLogger;
+import com.scottmo.Config;
+import com.scottmo.bibleReference.BibleReference;
+import com.scottmo.google.Action;
+import com.scottmo.google.GoogleSlidesService;
+import com.scottmo.model.content.ContentUtil;
+import com.scottmo.ui.components.Form;
+import com.scottmo.ui.components.FormInput;
 import net.miginfocom.swing.MigLayout;
 
 import javax.swing.*;

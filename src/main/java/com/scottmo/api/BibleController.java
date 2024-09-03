@@ -14,15 +14,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.scottmo.core.appContext.api.AppContextService;
 import com.scottmo.core.bible.api.BibleService;
 import com.scottmo.core.bible.api.bibleMetadata.BibleMetadata;
+import com.scottmo.core.config.ConfigService;
 import com.scottmo.core.ppt.api.BibleSlidesGenerator;
 import com.scottmo.shared.StringUtils;
 
 public class BibleController {
 
-    private AppContextService appContextService;
+    private ConfigService appContextService;
     private BibleService bibleService;
     private BibleSlidesGenerator pptxGenerator;
 

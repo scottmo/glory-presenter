@@ -1,12 +1,12 @@
 package com.scottmo.api;
 
-import com.scottmo.core.appContext.api.AppConfig;
-import com.scottmo.core.appContext.api.AppContextService;
+import com.scottmo.core.config.Config;
+import com.scottmo.core.config.ConfigService;
 
 public class AppConfigController {
-    private AppContextService appContextService;
+    private ConfigService appContextService;
 
-    AppConfig getAppConfig() {
+    Config getAppConfig() {
         return appContextService.getConfig();
     }
 }

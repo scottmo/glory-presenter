@@ -7,7 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
-import com.scottmo.core.appContext.api.AppContextService;
+import com.scottmo.core.config.ConfigService;
 import com.scottmo.core.songs.api.SongService;
 import com.scottmo.core.songs.api.song.Song;
 import com.scottmo.core.songs.impl.openLyrics.OpenLyricsConverter;
@@ -15,13 +15,13 @@ import com.scottmo.core.songs.impl.store.SongStore;
 import com.scottmo.shared.Pair;
 
 public class SongServiceImpl implements SongService {
-    private AppContextService appContextService;
+    private ConfigService configService = ConfigService.get();
     private SongStore store;
     private final OpenLyricsConverter openLyricsConverter = new OpenLyricsConverter();
 
     private SongStore getStore() {
         if (store == null) {
-            store = new SongStore(Path.of(appContextService.getConfig().getDataDir()));
+            store = new SongStore(Path.of(configService.getConfig().getDataDir()));
         }
         return store;
     }

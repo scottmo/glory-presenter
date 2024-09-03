@@ -1,12 +1,5 @@
 package com.scottmo.core.security.impl;
 
-import com.scottmo.core.security.api.CipherService;
-
-import javax.crypto.Cipher;
-import javax.crypto.SecretKey;
-import javax.crypto.SecretKeyFactory;
-import javax.crypto.spec.PBEKeySpec;
-import javax.crypto.spec.PBEParameterSpec;
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -14,6 +7,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.GeneralSecurityException;
 import java.util.Random;
+
+import javax.crypto.Cipher;
+import javax.crypto.SecretKey;
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.PBEKeySpec;
+import javax.crypto.spec.PBEParameterSpec;
+
+import com.scottmo.core.security.api.CipherService;
 
 public final class CipherServiceImpl implements CipherService {
     private static final String algorithm = "PBEWithMD5AndTripleDES";

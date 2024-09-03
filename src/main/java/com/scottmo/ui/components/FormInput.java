@@ -1,4 +1,4 @@
-package com.scottscmo.ui.components;
+package com.scottmo.ui.components;
 
 public record FormInput(
         String id,
