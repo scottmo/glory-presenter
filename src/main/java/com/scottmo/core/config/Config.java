@@ -17,6 +17,7 @@ public class Config {
 
     public static final String LABELS_PATH = "./labels.json";
 
+    private String outputDir;
     private String dataDir;
     private List<String> locales = new ArrayList<>();; // order matters to which locale comes first
     private Map<String, String> bibleVersionToLocale = new HashMap<>();
@@ -39,6 +40,14 @@ public class Config {
 
     public void setDataDir(String dataDir) {
         this.dataDir = dataDir;
+    }
+
+    public String getOutputDir() {
+        return outputDir;
+    }
+
+    public void setOutputDir(String outputDir) {
+        this.outputDir = outputDir;
     }
 
     public List<String> getLocales() {

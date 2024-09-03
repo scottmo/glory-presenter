@@ -107,6 +107,14 @@ public class ConfigService {
         }
     }
 
+    public String getOutputPath(String fileName) {
+        try {
+            return Path.of(getConfig().getOutputDir(), fileName).toFile().getCanonicalPath();
+        } catch (IOException e) {
+            return "";
+        }
+    }
+
     public String getPPTXTemplate(String fileName) {
         return getRelativePath(Path.of(Config.TEMPLATE_DIR, fileName).toString());
     }

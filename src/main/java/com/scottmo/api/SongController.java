@@ -8,13 +8,7 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.springframework.core.io.Resource;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.multipart.MultipartFile;
-
+import com.scottmo.core.ServiceProvider;
 import com.scottmo.core.config.ConfigService;
 import com.scottmo.core.ppt.api.SongSlidesGenerator;
 import com.scottmo.core.songs.api.SongService;
@@ -23,9 +17,9 @@ import com.scottmo.shared.StringUtils;
 
 public class SongController {
 
-    private ConfigService appContextService;
-    private SongService songService;
-    private SongSlidesGenerator pptxGenerator;
+    private ConfigService configService = ConfigService.get();
+    private SongService songService = ServiceProvider.get(SongService.class).get();
+    private SongSlidesGenerator pptxGenerator = ServiceProvider.get(SongSlidesGenerator.class).get();
 
     public SongController(SongService songService, SongSlidesGenerator pptxGenerator) {
         this.songService = songService;
@@ -34,64 +28,62 @@ public class SongController {
 
     Map<Integer, String> getSongs() {
         Map<Integer, String> titles = new HashMap<>();
-        for (var title : songService.getAllSongDescriptors(appContextService.getConfig().getLocales())) {
+        for (var title : songService.getAllSongDescriptors(configService.getConfig().getLocales())) {
             titles.put(title.key(), title.value());
         }
         return titles;
     }
 
-    Song getSong(@PathVariable Integer id) {
+    Song getSong(Integer id) {
         return songService.get(id);
     }
 
-    ResponseEntity<Map<String, Object>> deleteSong(@PathVariable Integer id) {
+    public boolean deleteSong(Integer id) {
         boolean isSuccess = songService.delete(id);
-        return isSuccess
-            ? RequestUtil.successResponse()
-            : RequestUtil.errorResponse("Failed to delete song with id %s!".formatted(id));
+        if (!isSuccess) {
+            throw new RuntimeException("Failed to delete song with id %s!".formatted(id));
+        }
+        return true;
     }
 
-    public ResponseEntity<Resource> generatePPTX(
-            @RequestParam Integer id,
-            @RequestParam Integer linesPerSlide,
-            @RequestParam String templatePath) throws MalformedURLException, IOException {
+    public boolean generatePPTX( Integer id, Integer linesPerSlide, String templatePath)
+            throws MalformedURLException, IOException {
 
         Song song = getSong(id);
-        Path outputPath = Path.of(System.getProperty("java.io.tmpdir"), StringUtils.sanitizeFilename(song.getTitle()) + ".pptx");
+        String outputPath = configService.getOutputPath(StringUtils.sanitizeFilename(song.getTitle()) + ".pptx");
         if (!templatePath.contains("/")) {
-            templatePath = appContextService.getPPTXTemplate(templatePath);
+            templatePath = configService.getPPTXTemplate(templatePath);
         }
-        pptxGenerator.generate(song, templatePath, outputPath.toString(), appContextService.getConfig().getLocales(),
+        pptxGenerator.generate(song, templatePath, outputPath, configService.getConfig().getLocales(),
                 linesPerSlide);
     
-        return RequestUtil.download(outputPath);
+        return true;
     }
 
-    public ResponseEntity<Resource> exportSong(@PathVariable Integer id) throws IOException {
+    public boolean exportSong(Integer id) throws IOException {
         Song song = songService.get(id);
-        Path outputPath = Path.of(System.getProperty("java.io.tmpdir"), StringUtils.sanitizeFilename(song.getTitle()) + ".xml");
+        String outputPath = configService.getOutputPath(StringUtils.sanitizeFilename(song.getTitle()) + ".xml");
         String songXML = songService.serializeToOpenLyrics(song);
-        Files.writeString(outputPath, songXML, StandardCharsets.UTF_8);
-        return RequestUtil.download(outputPath);
+        Files.writeString(Path.of(outputPath), songXML, StandardCharsets.UTF_8);
+        return true;
     }
 
-    public Integer saveSong(@RequestBody Song song) {
+    public Integer saveSong(Song song) {
         return songService.store(song);
     }
 
-    public ResponseEntity<Map<String, Object>> importSongs(@RequestParam("file") MultipartFile file) {
-        if (file.isEmpty()) {
-            return RequestUtil.errorResponse("Please select a file to upload");
+    public boolean importSongs(String filePath) {
+        if (filePath == null || filePath.isEmpty()) {
+            throw new IllegalArgumentException("Please select a file to upload");
         }
 
         // TODO handle importing a zip of songs
         try {
-            String content = new String(file.getBytes());
+            String content = Files.readString(Path.of(filePath));
             songService.importOpenLyricSong(content);
         } catch (IOException e) {
-            e.printStackTrace();
-            return RequestUtil.errorResponse("Failed to import song [%s]!".formatted(file.getName()), e);
+            throw new RuntimeException("Failed to import song [%s]!".formatted(filePath), e);
         }
-        return RequestUtil.successResponse();
+        return true;
     }
 }
