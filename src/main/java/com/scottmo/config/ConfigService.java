@@ -8,10 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.scottmo.core.bible.api.bibleMetadata.BibleMetadata;
-import com.scottmo.core.bible.api.bibleMetadata.BookMetadata;
 import com.scottmo.shared.LocaleUtil;
 
 public class ConfigService {

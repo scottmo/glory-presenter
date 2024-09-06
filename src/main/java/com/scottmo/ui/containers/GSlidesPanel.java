@@ -1,4 +1,4 @@
-package com.scottmo.ui.panels;
+package com.scottmo.ui.containers;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
