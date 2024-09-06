@@ -1,8 +1,7 @@
 package com.scottmo.ui.components;
 
-import com.scottmo.Application;
-import com.scottmo.Config;
-import net.miginfocom.swing.MigLayout;
+import com.scottmo.App;
+import com.scottmo.core.config.ConfigService;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -34,8 +33,8 @@ public final class FilePicker {
 
     private static String selectedFilePath = "";
 
-    public void show(Consumer<String> onSelected) {
-        show(FILES_AND_DIRECTORIES, Config.get().dataDir(), onSelected);
+    public static void show(Consumer<String> onSelected) {
+        show(FILES_AND_DIRECTORIES, ConfigService.get().getConfig().getDataDir(), onSelected);
     }
 
     public static void show(int mode, String dirPath, Consumer<String> onSelected) {
@@ -46,7 +45,7 @@ public final class FilePicker {
         }
 
         // components
-        var modalDialog = new JDialog(Application.get(), "Select File", Dialog.ModalityType.DOCUMENT_MODAL);
+        var modalDialog = new JDialog(App.get(), "Select File", Dialog.ModalityType.DOCUMENT_MODAL);
         var searchInput = new JTextField();
         var fileList = new JList<String>();
         var selectBtn = new JButton("Select");
@@ -60,12 +59,12 @@ public final class FilePicker {
         fileList.setVisibleRowCount(10);
         fileList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-        int appHeight = Application.get().getHeight();
-        int appWidth = Application.get().getWidth();
+        int appHeight = App.get().getHeight();
+        int appWidth = App.get().getWidth();
         modalDialog.setBounds(appWidth / 4, appHeight / 4, appWidth / 2, appHeight / 2);
 
         var modalDialogContent = modalDialog.getContentPane();
-        modalDialogContent.setLayout(new MigLayout("wrap 5"));
+        // modalDialogContent.setLayout(new MigLayout("wrap 5"));
         modalDialogContent.add(new JLabel("Search"));
         modalDialogContent.add(searchInput, "span, align left");
         modalDialogContent.add(new JScrollPane(fileList), "span");
@@ -127,7 +126,7 @@ public final class FilePicker {
         var fc = new JFileChooser();
         fc.setCurrentDirectory(startPath);
         fc.setFileSelectionMode(mode);
-        var returnVal = fc.showSaveDialog(Application.get());
+        var returnVal = fc.showSaveDialog(App.get());
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             var selectedPath = fc.getSelectedFile().toPath().toAbsolutePath().toString();
             onSelected.accept(selectedPath);

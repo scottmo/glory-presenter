@@ -4,9 +4,6 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
@@ -19,7 +16,6 @@ import com.google.api.services.slides.v1.model.BatchUpdatePresentationRequest;
 import com.google.api.services.slides.v1.model.Page;
 import com.google.api.services.slides.v1.model.Presentation;
 import com.google.api.services.slides.v1.model.Request;
-import com.scottmo.core.Service;
 import com.scottmo.core.config.Config;
 import com.scottmo.core.config.ConfigService;
 import com.scottmo.core.google.api.GoogleCloudService;

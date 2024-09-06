@@ -1,7 +1,6 @@
 package com.scottmo.api;
 
 import java.io.IOException;
-import java.util.Map;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.scottmo.core.google.api.GoogleCloudService;

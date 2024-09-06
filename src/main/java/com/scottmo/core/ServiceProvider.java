@@ -10,8 +10,6 @@ import com.scottmo.core.bible.api.BibleService;
 import com.scottmo.core.bible.impl.BibleServiceImpl;
 import com.scottmo.core.google.api.GoogleCloudService;
 import com.scottmo.core.google.impl.GoogleCloudServiceImpl;
-import com.scottmo.core.logging.api.LoggingService;
-import com.scottmo.core.logging.impl.UILoggingServiceImpl;
 import com.scottmo.core.ppt.api.BibleSlidesGenerator;
 import com.scottmo.core.ppt.api.SongSlidesGenerator;
 import com.scottmo.core.ppt.impl.BibleSlidesGeneratorImpl;
@@ -23,15 +21,6 @@ import com.scottmo.core.songs.impl.SongServiceImpl;
 
 public class ServiceProvider {
     private static final Map<Class<?>, Object> services = new HashMap<>();
-    private static JFrame uiFrame;
-
-    public static void registerUiFrame(JFrame frame) {
-        uiFrame = frame;
-    }
-
-    public static LoggingService getLoggingService() {
-        return new UILoggingServiceImpl(uiFrame);
-    }
 
     @SuppressWarnings("unchecked")
     public static <T extends Service> Supplier<T> get(Class<T> clazz) {
@@ -50,9 +39,6 @@ public class ServiceProvider {
 
     @SuppressWarnings("unchecked")
     private static <T extends Service> T getRaw(Class<T> clazz) {
-        if (LoggingService.class.isAssignableFrom(clazz)) {
-            return (T) new UILoggingServiceImpl(uiFrame);
-        }
         if (SongService.class.isAssignableFrom(clazz)) {
             return (T) new SongServiceImpl();
         }

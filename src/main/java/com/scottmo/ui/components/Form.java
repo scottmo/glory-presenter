@@ -1,15 +1,5 @@
 package com.scottmo.ui.components;
 
-import com.scottmo.AppLogger;
-import com.scottmo.Config;
-import net.miginfocom.swing.MigLayout;
-
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -20,8 +10,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-public final class Form {
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
 
+public final class Form {
     private static final Map<String, Integer> FILE_PICKER_TYPE_MAP = Map.of(
             "file", FilePicker.FILES,
             "directory", FilePicker.DIRECTORIES,
@@ -40,7 +36,7 @@ public final class Form {
         titleLabel.setFont(new Font(titleLabel.getFont().getName(), Font.BOLD, titleLabel.getFont().getSize() + 2));
 
         ui.setMinimumSize(new Dimension(400, 0));
-        ui.setLayout(new MigLayout("ins 0, wrap 2", "[100][100, left, fill, grow]"));
+        // ui.setLayout(new MigLayout("ins 0, wrap 2", "[100][100, left, fill, grow]"));
         ui.add(titleLabel, "span");
 
         for (var config : inputConfigs) {
@@ -57,7 +53,7 @@ public final class Form {
         submitBtn.addActionListener(e -> {
             String result = onSubmit.apply(this);
             if (result != null) {
-                AppLogger.show(result);
+                Dialog.info(result);
             }
         });
     }
@@ -74,7 +70,7 @@ public final class Form {
             return input;
         } else if ("textarea".equals(config.type())) {
             var input = new JTextArea(config.height(), config.width());
-            input.setFont(Config.getTextAreaFont());
+            // input.setFont(configService.getConfig().getTextAreaFont());
             return input;
         } else {
             return new JTextField(config.defaultValue());
