@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.Set;
 
 public class Config {
-    public static final String APP_NAME = "Glory Presenter";
     public static final int APP_WIDTH = 900;
     public static final int APP_HEIGHT = 600;
 

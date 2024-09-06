@@ -21,7 +21,7 @@ public class App extends JFrame {
     }
 
     public App() {
-        setTitle(configService.getLabel("title"));
+        setTitle(configService.getLabel("appName"));
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setResizable(false);
 
