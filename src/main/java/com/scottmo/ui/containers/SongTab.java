@@ -1,9 +1,15 @@
 package com.scottmo.ui.containers;
 
+import static org.httprpc.sierra.UIBuilder.cell;
+import static org.httprpc.sierra.UIBuilder.column;
+import static org.httprpc.sierra.UIBuilder.row;
+import static org.httprpc.sierra.UIBuilder.strut;
+
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,6 +17,7 @@ import java.util.Map;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 
 import com.scottmo.config.ConfigService;
 import com.scottmo.core.ServiceProvider;
@@ -19,6 +26,8 @@ import com.scottmo.shared.Pair;
 import com.scottmo.ui.components.ListView;
 
 public final class SongTab extends JPanel {
+    private static final int UI_GAP = 5;
+
     private ConfigService configService = ConfigService.get();
     private SongService songService = ServiceProvider.get(SongService.class).get();
 
@@ -64,15 +73,25 @@ public final class SongTab extends JPanel {
             }
         });
 
-        // Add components to the frame
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.add(getSelectedButton);
-        buttonPanel.add(selectAllButton);
-        buttonPanel.add(deselectAllButton);
-
         setLayout(new BorderLayout());
-        add(songList, BorderLayout.CENTER);
-        add(buttonPanel, BorderLayout.SOUTH);
+        add(row(UI_GAP,
+            strut(UI_GAP),
+            column(UI_GAP,
+                strut(UI_GAP),
+                cell(new JTextField()),
+                cell(songList)
+                    .weightBy(1.0), // take as much space as possible
+                strut(UI_GAP)
+            ).weightBy(4.0),
+            column(UI_GAP,
+                strut(30),
+                cell(getSelectedButton),
+                cell(selectAllButton),
+                cell(deselectAllButton)
+            ).weightBy(1.0),
+            strut(UI_GAP)
+        )
+        .getComponent());
     }
 
     private void loadSongList() {
@@ -85,6 +104,7 @@ public final class SongTab extends JPanel {
             songIdMap.put(songName, songId);
             items.add(songName);
         }
+        Collections.sort(items);
         songList.setItems(items);
     }
 }
