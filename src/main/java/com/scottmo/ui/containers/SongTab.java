@@ -4,25 +4,31 @@ import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
+import com.scottmo.config.ConfigService;
+import com.scottmo.core.ServiceProvider;
+import com.scottmo.core.songs.api.SongService;
+import com.scottmo.shared.Pair;
 import com.scottmo.ui.components.ListView;
 
 public final class SongTab extends JPanel {
+    private ConfigService configService = ConfigService.get();
+    private SongService songService = ServiceProvider.get(SongService.class).get();
+
+    // cache to look up song id
+    private Map<String, Integer> songIdMap = new HashMap<>();
+
+    private ListView songList = new ListView();
 
     public SongTab() {
-        // Create a list of items
-        List<String> items = new ArrayList<>();
-        for (int i = 0; i < 500; i++) {
-            items.add("Item " + i);
-        }
-
-        ListView songList = new ListView(items);
+        loadSongList();
         songList.setSelectionListener(new ListView.SelectionListener() {
             @Override
             public void onItemSelected(String item, boolean isSelected) {
@@ -67,5 +73,18 @@ public final class SongTab extends JPanel {
         setLayout(new BorderLayout());
         add(songList, BorderLayout.CENTER);
         add(buttonPanel, BorderLayout.SOUTH);
+    }
+
+    private void loadSongList() {
+        List<Pair<Integer, String>> songs = songService.getAllSongDescriptors(configService.getConfig().getLocales());
+        List<String> items = new ArrayList<>();
+        songIdMap.clear();
+        for (Pair<Integer,String> pair : songs) {
+            Integer songId = pair.key();
+            String songName = pair.value();
+            songIdMap.put(songName, songId);
+            items.add(songName);
+        }
+        songList.setItems(items);
     }
 }

@@ -23,12 +23,29 @@ public class ListView extends JPanel {
     private JPanel listPanel;
     private SelectionListener listener;
 
-    public ListView(List<String> items) {
+    public ListView() {
         itemPanels = new ArrayList<>();
         checkBoxes = new ArrayList<>();
 
         listPanel = new JPanel();
         listPanel.setLayout(new BoxLayout(listPanel, BoxLayout.Y_AXIS));
+
+        JScrollPane scrollPane = new JScrollPane(listPanel);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(16); // Makes scrolling smoother
+
+        setLayout(new BorderLayout());
+        add(scrollPane, BorderLayout.CENTER);
+    }
+
+    public ListView(List<String> items) {
+        this();
+        setItems(items);
+    }
+
+    public void setItems(List<String> items) {
+        listPanel.removeAll(); // Remove all current items
+        itemPanels.clear();
+        checkBoxes.clear();
 
         for (String item : items) {
             JPanel itemPanel = new JPanel(new BorderLayout());
@@ -61,11 +78,9 @@ public class ListView extends JPanel {
             listPanel.add(itemPanel);
         }
 
-        JScrollPane scrollPane = new JScrollPane(listPanel);
-        scrollPane.getVerticalScrollBar().setUnitIncrement(16); // Makes scrolling smoother
-
-        setLayout(new BorderLayout());
-        add(scrollPane, BorderLayout.CENTER);
+        // Refresh the panel to show the updated items
+        listPanel.revalidate();
+        listPanel.repaint();
     }
 
     private void setSelected(String item, JCheckBox checkBox, JPanel itemPanel) {
