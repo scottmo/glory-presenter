@@ -10,6 +10,7 @@ import java.util.Set;
 public class Config {
     public static final int APP_WIDTH = 900;
     public static final int APP_HEIGHT = 600;
+    public static final int UI_GAP = 4;
 
     public static final String CONFIG_PATH = "./config.json";
     public static final String TEMPLATE_DIR = "templates";

@@ -28,10 +28,12 @@ public class ConfigService {
         return appConfig;
     }
 
+    private static final String LABEL_MISSING = "MISSING LABEL";
+    private static final String LABEL_INVALID = "INVALID LABEL";
     private Map<String, Object> labels;
     public String getLabel(String path) {
-            if (labels == null) {
-                try (InputStream in = ConfigService.class.getClassLoader().getResourceAsStream(Config.LABELS_PATH)){
+        if (labels == null) {
+            try (InputStream in = ConfigService.class.getClassLoader().getResourceAsStream(Config.LABELS_PATH)){
                 ObjectMapper mapper = new ObjectMapper();
                 labels = mapper.readValue(in, Map.class);
             } catch (IOException e) {
@@ -43,7 +45,7 @@ public class ConfigService {
         for (int i = 0; i < keys.length; i++) {
             String key = keys[i];
 
-            if (!labelSet.containsKey(key)) return null;
+            if (!labelSet.containsKey(key)) return LABEL_MISSING;
     
             Object value = labelSet.get(key);
             // if at last key and value is a string, then we have a valid label to return
@@ -55,10 +57,10 @@ public class ConfigService {
                 labelSet = (Map<String, Object>) value;
             } else {
                 // label is invalid
-                return null;
+                return LABEL_INVALID;
             }
         }
-        return null;
+        return LABEL_MISSING;
     }
 
     // instantiate config

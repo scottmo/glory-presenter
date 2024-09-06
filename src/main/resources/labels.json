@@ -5,7 +5,15 @@
         "buttonNewSong": "New",
         "buttonEditSong": "Edit",
         "buttonDeleteSong": "Delete",
-        "buttonDeselect": "Deselect"
+        "buttonDeselect": "Deselect",
+        "buttonGenerateGSlide": "Generate GSlide",
+        "buttonGeneratePPT": "Generate PPT",
+        "editor": {
+            "titleNew": "New Song",
+            "titleEdit": "Edit Song",
+            "buttonSave": "Save",
+            "buttonCancel": "Cancel"
+        }
     },
     "bible": {
         "containerTitle": "Bible"

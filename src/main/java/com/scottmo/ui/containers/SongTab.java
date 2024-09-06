@@ -4,6 +4,7 @@ import static org.httprpc.sierra.UIBuilder.cell;
 import static org.httprpc.sierra.UIBuilder.column;
 import static org.httprpc.sierra.UIBuilder.row;
 import static org.httprpc.sierra.UIBuilder.strut;
+import static com.scottmo.config.Config.UI_GAP;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
@@ -15,20 +16,20 @@ import java.util.List;
 import java.util.Map;
 
 import javax.swing.JButton;
-import javax.swing.JOptionPane;
+import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import com.scottmo.config.ConfigService;
 import com.scottmo.core.ServiceProvider;
 import com.scottmo.core.songs.api.SongService;
+import com.scottmo.core.songs.api.song.Song;
 import com.scottmo.shared.Pair;
 import com.scottmo.ui.components.Dialog;
 import com.scottmo.ui.components.ListView;
+import com.scottmo.ui.components.SongEditor;
 
 public final class SongTab extends JPanel {
-    private static final int UI_GAP = 5;
-
     private ConfigService configService = ConfigService.get();
     private SongService songService = ServiceProvider.get(SongService.class).get();
 
@@ -49,6 +50,26 @@ public final class SongTab extends JPanel {
             @Override
             public void onItemSelected(String item, boolean isSelected) {
                 updateButtonState();
+            }
+        });
+
+        buttonNewSong.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                showSongEditor(null);
+            }
+        });
+
+        buttonEditSong.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String songName = songList.getSelectedItems().get(0);
+                Integer songId = songIdMap.get(songName);
+                if (songId == null) {
+                    Dialog.error(String.format("Unable to edit %s. Song cannot be found!", songName));
+                } else {
+                    showSongEditor(songId);
+                }
             }
         });
 
@@ -85,7 +106,7 @@ public final class SongTab extends JPanel {
                 strut(UI_GAP)
             ).weightBy(4.0),
             column(UI_GAP,
-                strut(30),
+                strut(35),
                 cell(buttonNewSong),
                 cell(buttonEditSong),
                 cell(buttonDeleteSong),
@@ -114,5 +135,21 @@ public final class SongTab extends JPanel {
         buttonEditSong.setEnabled(songList.getSelectCount() == 1);
         buttonDeleteSong.setEnabled(songList.getSelectCount() > 0);
         buttonDeselect.setEnabled(songList.getSelectCount() > 0);
+    }
+
+    private void showSongEditor(Integer id) {
+        String title = id == null ? "songs.editor.titleNew" : "songs.editor.titleEdit";
+        SongEditor songEditor = new SongEditor();
+        JDialog modal = Dialog.showModal(configService.getLabel(title), songEditor);
+        songEditor.setActionListener(new SongEditor.ActionListener() {
+            @Override
+            public void onSave(Song song) {
+                songService.store(song);
+            }
+            @Override
+            public void onCancel() {
+                modal.dispose();
+            }
+        });
     }
 }
