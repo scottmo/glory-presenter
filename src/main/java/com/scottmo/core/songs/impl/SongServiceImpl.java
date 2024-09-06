@@ -7,7 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
-import com.scottmo.core.config.ConfigService;
+import com.scottmo.config.ConfigService;
 import com.scottmo.core.songs.api.SongService;
 import com.scottmo.core.songs.api.song.Song;
 import com.scottmo.core.songs.impl.openLyrics.OpenLyricsConverter;

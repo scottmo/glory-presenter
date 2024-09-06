@@ -16,7 +16,7 @@ import com.google.api.services.slides.v1.model.BatchUpdatePresentationRequest;
 import com.google.api.services.slides.v1.model.Page;
 import com.google.api.services.slides.v1.model.Presentation;
 import com.google.api.services.slides.v1.model.Request;
-import com.scottmo.core.config.ConfigService;
+import com.scottmo.config.ConfigService;
 import com.scottmo.core.google.api.GoogleCloudService;
 import com.scottmo.core.google.api.SlideConfig;
 

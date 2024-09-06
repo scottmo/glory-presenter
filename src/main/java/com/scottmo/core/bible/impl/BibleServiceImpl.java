@@ -8,12 +8,12 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
+import com.scottmo.config.ConfigService;
 import com.scottmo.core.bible.api.BibleService;
 import com.scottmo.core.bible.api.bibleMetadata.BibleVerse;
 import com.scottmo.core.bible.api.bibleOsis.Osis;
 import com.scottmo.core.bible.api.bibleReference.BibleReference;
 import com.scottmo.core.bible.impl.store.BibleStore;
-import com.scottmo.core.config.ConfigService;
 
 public class BibleServiceImpl implements BibleService {
     private ConfigService configService = ConfigService.get();

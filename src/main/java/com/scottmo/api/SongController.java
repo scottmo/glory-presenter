@@ -8,8 +8,8 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.scottmo.config.ConfigService;
 import com.scottmo.core.ServiceProvider;
-import com.scottmo.core.config.ConfigService;
 import com.scottmo.core.ppt.api.SongSlidesGenerator;
 import com.scottmo.core.songs.api.SongService;
 import com.scottmo.core.songs.api.song.Song;

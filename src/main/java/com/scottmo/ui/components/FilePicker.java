@@ -1,7 +1,7 @@
 package com.scottmo.ui.components;
 
 import com.scottmo.App;
-import com.scottmo.core.config.ConfigService;
+import com.scottmo.config.ConfigService;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;

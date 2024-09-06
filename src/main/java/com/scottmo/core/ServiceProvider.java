@@ -4,8 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
 
-import javax.swing.JFrame;
-
 import com.scottmo.core.bible.api.BibleService;
 import com.scottmo.core.bible.impl.BibleServiceImpl;
 import com.scottmo.core.google.api.GoogleCloudService;

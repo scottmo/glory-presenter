@@ -7,10 +7,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.scottmo.config.ConfigService;
 import com.scottmo.core.ServiceProvider;
 import com.scottmo.core.bible.api.BibleService;
 import com.scottmo.core.bible.api.bibleMetadata.BibleMetadata;
-import com.scottmo.core.config.ConfigService;
 import com.scottmo.core.ppt.api.BibleSlidesGenerator;
 import com.scottmo.shared.StringUtils;
 

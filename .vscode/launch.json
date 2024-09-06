@@ -6,16 +6,16 @@
     "configurations": [
         {
             "type": "java",
-            "name": "Current File",
+            "name": "App",
             "request": "launch",
-            "mainClass": "${file}"
+            "mainClass": "com.scottmo.App",
+            "projectName": "glory-presenter"
         },
         {
             "type": "java",
-            "name": "Main",
+            "name": "Current File",
             "request": "launch",
-            "mainClass": "com.scottmo.Main",
-            "projectName": "glory-presenter"
+            "mainClass": "${file}"
         }
     ]
 }

@@ -1,4 +1,4 @@
-package com.scottmo.core.config;
+package com.scottmo.config;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -8,7 +8,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.scottmo.core.bible.api.bibleMetadata.BibleMetadata;
+import com.scottmo.core.bible.api.bibleMetadata.BookMetadata;
 import com.scottmo.shared.LocaleUtil;
 
 public class ConfigService {
@@ -30,9 +33,10 @@ public class ConfigService {
 
     private Map<String, Object> labels;
     public String getLabel(String path) {
-        if (labels == null) {
-            try (BufferedReader bufferReader = Files.newBufferedReader(Path.of(Config.LABELS_PATH))) {
-                labels = new ObjectMapper().readValue(bufferReader, Map.class);
+            if (labels == null) {
+                try (InputStream in = ConfigService.class.getClassLoader().getResourceAsStream(Config.LABELS_PATH)){
+                ObjectMapper mapper = new ObjectMapper();
+                labels = mapper.readValue(in, Map.class);
             } catch (IOException e) {
                 throw new RuntimeException("Unable to load config file!", e);
             }

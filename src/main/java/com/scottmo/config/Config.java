@@ -1,4 +1,4 @@
-package com.scottmo.core.config;
+package com.scottmo.config;
 
 import java.util.ArrayList;
 import java.util.HashMap;
