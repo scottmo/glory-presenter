@@ -18,16 +18,15 @@ public class ListView extends JPanel {
     private static final Color DEFAULT_BACKGROUND = Color.WHITE;
     private static final Color SELECTED_BACKGROUND = new Color(173, 216, 230); // light blue
     
-    private List<JPanel> itemPanels;
-    private List<JCheckBox> checkBoxes;
-    private JPanel listPanel;
+    private List<JPanel> itemPanels = new ArrayList<>();
+    private List<JCheckBox> checkBoxes = new ArrayList<>();
+    private JPanel listPanel = new JPanel();
+
+    private List<String> selectedItems = new ArrayList<>();
+
     private SelectionListener listener;
 
     public ListView() {
-        itemPanels = new ArrayList<>();
-        checkBoxes = new ArrayList<>();
-
-        listPanel = new JPanel();
         listPanel.setLayout(new BoxLayout(listPanel, BoxLayout.Y_AXIS));
 
         JScrollPane scrollPane = new JScrollPane(listPanel);
@@ -46,6 +45,7 @@ public class ListView extends JPanel {
         listPanel.removeAll(); // Remove all current items
         itemPanels.clear();
         checkBoxes.clear();
+        selectedItems.clear();
 
         for (String item : items) {
             JPanel itemPanel = new JPanel(new BorderLayout());
@@ -66,12 +66,12 @@ public class ListView extends JPanel {
                 @Override
                 public void mouseClicked(MouseEvent e) {
                     checkBox.setSelected(!checkBox.isSelected());
-                    setSelected(item, checkBox, itemPanel);
+                    setSelected(checkBox, itemPanel, true);
                 }
             });
             // set item selection on checkbox clicked
             checkBox.addActionListener(e -> {
-                setSelected(item, checkBox, itemPanel);
+                setSelected(checkBox, itemPanel, true);
             });
 
             itemPanels.add(itemPanel);
@@ -83,9 +83,17 @@ public class ListView extends JPanel {
         listPanel.repaint();
     }
 
-    private void setSelected(String item, JCheckBox checkBox, JPanel itemPanel) {
+    private void setSelected(JCheckBox checkBox, JPanel itemPanel, boolean triggerListener) {
+        String item = checkBox.getText();
+        if (checkBox.isSelected()) {
+            selectedItems.add(item);
+        } else {
+            selectedItems.remove(item);
+        }
+
         updateBackground(itemPanel, checkBox.isSelected());
-        if (listener != null) {
+
+        if (triggerListener && listener != null) {
             listener.onItemSelected(item, checkBox.isSelected());
         }
     }
@@ -95,19 +103,17 @@ public class ListView extends JPanel {
     }
 
     public List<String> getSelectedItems() {
-        List<String> selectedItems = new ArrayList<>();
-        for (int i = 0; i < checkBoxes.size(); i++) {
-            if (checkBoxes.get(i).isSelected()) {
-                selectedItems.add(checkBoxes.get(i).getText());
-            }
-        }
         return selectedItems;
+    }
+
+    public int getSelectCount() {
+        return selectedItems.size();
     }
 
     public void selectAll(boolean select) {
         for (int i = 0; i < checkBoxes.size(); i++) {
             checkBoxes.get(i).setSelected(select);
-            updateBackground(itemPanels.get(i), select);
+            setSelected(checkBoxes.get(i), itemPanels.get(i), false);
         }
     }
 
