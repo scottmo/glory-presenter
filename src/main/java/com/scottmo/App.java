@@ -1,10 +1,13 @@
 package com.scottmo;
 
+import java.awt.KeyboardFocusManager;
+
 import javax.swing.JFrame;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
 
 import org.apache.log4j.Logger;
+import org.httprpc.sierra.ScrollingKeyboardFocusManager;
 
 import com.formdev.flatlaf.FlatLightLaf;
 import com.scottmo.config.Config;
@@ -38,6 +41,7 @@ public class App extends JFrame {
 
     public static void main(String[] args) {
         FlatLightLaf.setup();
+        KeyboardFocusManager.setCurrentKeyboardFocusManager(new ScrollingKeyboardFocusManager());
         SwingUtilities.invokeLater(() -> {
             Thread.setDefaultUncaughtExceptionHandler((Thread t, Throwable e) -> {
                 Logger.getLogger(App.class.getName())
