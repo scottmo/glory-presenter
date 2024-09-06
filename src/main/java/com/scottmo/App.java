@@ -31,9 +31,9 @@ public class App extends JFrame {
         setSize(Config.APP_WIDTH, Config.APP_HEIGHT);
 
         JTabbedPane tabs = new JTabbedPane();
-        tabs.addTab(configService.getLabel("tabs.songs"), new SongTab());
-        tabs.addTab(configService.getLabel("tabs.bible"), new BibleTab());
-        tabs.addTab(configService.getLabel("tabs.configs"), new SettingsTab());
+        tabs.addTab(configService.getLabel("songs.containerTitle"), new SongTab());
+        tabs.addTab(configService.getLabel("bible.containerTitle"), new BibleTab());
+        tabs.addTab(configService.getLabel("configs.containerTitle"), new SettingsTab());
         getContentPane().add(tabs);
 
         // pack(); // auto-resize to component, use setSize if need fixed size

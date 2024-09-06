@@ -1,8 +1,16 @@
 {
     "appName": "Glory Presenter",
-    "tabs": {
-        "songs": "Songs",
-        "bible": "Bible",
-        "configs": "Configurations"
+    "songs": {
+        "containerTitle": "Songs",
+        "buttonNewSong": "New",
+        "buttonEditSong": "Edit",
+        "buttonDeleteSong": "Delete",
+        "buttonDeselect": "Deselect"
+    },
+    "bible": {
+        "containerTitle": "Bible"
+    },
+    "configs": {
+        "containerTitle": "Configurations"
     }
 }
