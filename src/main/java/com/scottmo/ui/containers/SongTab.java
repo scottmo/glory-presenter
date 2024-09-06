@@ -23,6 +23,7 @@ import com.scottmo.config.ConfigService;
 import com.scottmo.core.ServiceProvider;
 import com.scottmo.core.songs.api.SongService;
 import com.scottmo.shared.Pair;
+import com.scottmo.ui.components.Dialog;
 import com.scottmo.ui.components.ListView;
 
 public final class SongTab extends JPanel {
@@ -48,6 +49,20 @@ public final class SongTab extends JPanel {
             @Override
             public void onItemSelected(String item, boolean isSelected) {
                 updateButtonState();
+            }
+        });
+
+        buttonDeleteSong.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                for (String songName : songList.getSelectedItems()) {
+                    Integer songId = songIdMap.get(songName);
+                    if (songId == null) {
+                        Dialog.error(String.format("Unable to delete %s. Song cannot be found!", songName));
+                    } else {
+                        songService.delete(songId);
+                    }
+                }
             }
         });
 
