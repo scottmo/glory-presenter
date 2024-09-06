@@ -35,41 +35,27 @@ public final class SongTab extends JPanel {
     private Map<String, Integer> songIdMap = new HashMap<>();
 
     private ListView songList = new ListView();
+    private JButton buttonNewSong = new JButton(configService.getLabel("songs.buttonNewSong"));
+    private JButton buttonEditSong = new JButton(configService.getLabel("songs.buttonEditSong"));
+    private JButton buttonDeleteSong = new JButton(configService.getLabel("songs.buttonDeleteSong"));
+    private JButton buttonDeselect = new JButton(configService.getLabel("songs.buttonDeselect"));
 
     public SongTab() {
         loadSongList();
+
+        updateButtonState();
         songList.setSelectionListener(new ListView.SelectionListener() {
             @Override
             public void onItemSelected(String item, boolean isSelected) {
-                System.out.println("Item selected: " + item + ", isSelected: " + isSelected);
+                updateButtonState();
             }
         });
 
-        // Button to get selected items
-        JButton getSelectedButton = new JButton("Get Selected Items");
-        getSelectedButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                List<String> selectedItems = songList.getSelectedItems();
-                JOptionPane.showMessageDialog(SongTab.this, "Selected Items: " + selectedItems);
-            }
-        });
-
-        // Button to select all items
-        JButton selectAllButton = new JButton("Select All");
-        selectAllButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                songList.selectAll(true);
-            }
-        });
-
-        // Button to deselect all items
-        JButton deselectAllButton = new JButton("Deselect All");
-        deselectAllButton.addActionListener(new ActionListener() {
+        buttonDeselect.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 songList.selectAll(false);
+                updateButtonState();
             }
         });
 
@@ -85,9 +71,10 @@ public final class SongTab extends JPanel {
             ).weightBy(4.0),
             column(UI_GAP,
                 strut(30),
-                cell(getSelectedButton),
-                cell(selectAllButton),
-                cell(deselectAllButton)
+                cell(buttonNewSong),
+                cell(buttonEditSong),
+                cell(buttonDeleteSong),
+                cell(buttonDeselect)
             ).weightBy(1.0),
             strut(UI_GAP)
         )
@@ -106,5 +93,11 @@ public final class SongTab extends JPanel {
         }
         Collections.sort(items);
         songList.setItems(items);
+    }
+
+    private void updateButtonState() {
+        buttonEditSong.setEnabled(songList.getSelectCount() == 1);
+        buttonDeleteSong.setEnabled(songList.getSelectCount() > 0);
+        buttonDeselect.setEnabled(songList.getSelectCount() > 0);
     }
 }
