@@ -14,7 +14,7 @@ import com.scottmo.config.Config;
 import com.scottmo.config.ConfigService;
 import com.scottmo.config.Labels;
 import com.scottmo.ui.containers.BibleTab;
-import com.scottmo.ui.containers.SettingsTab;
+import com.scottmo.ui.containers.ConfigsTab;
 import com.scottmo.ui.containers.SongTab;
 
 public class App extends JFrame {
@@ -34,7 +34,7 @@ public class App extends JFrame {
         JTabbedPane tabs = new JTabbedPane();
         tabs.addTab(Labels.get("songs.containerTitle"), new SongTab());
         tabs.addTab(Labels.get("bible.containerTitle"), new BibleTab());
-        tabs.addTab(Labels.get("configs.containerTitle"), new SettingsTab());
+        tabs.addTab(Labels.get("configs.containerTitle"), new ConfigsTab());
         getContentPane().add(tabs);
     }
 
