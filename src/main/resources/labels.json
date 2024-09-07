@@ -6,8 +6,13 @@
         "buttonEditSong": "Edit",
         "buttonDeleteSong": "Delete",
         "buttonDeselect": "Deselect",
+        "buttonDuplicate": "Duplicate",
         "buttonGenerateGSlide": "Generate GSlide",
         "buttonGeneratePPT": "Generate PPT",
+        "checkboxStartSlide": "Include Start Slide",
+        "checkboxEndSlide": "Include End Slide",
+        "inputLinesPerSlide": "Lines/Slide",
+        "inputTemplate": "PPT Template",
         "editor": {
             "titleNew": "New Song",
             "titleEdit": "Edit Song",
