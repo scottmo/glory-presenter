@@ -33,6 +33,7 @@
         "containerTitle": "Bible"
     },
     "configs": {
-        "containerTitle": "Configurations"
+        "containerTitle": "Configurations",
+        "buttonToggleDarkMode": "Toggle Dark Mode"
     }
 }
