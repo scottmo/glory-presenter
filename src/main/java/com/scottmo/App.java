@@ -9,7 +9,7 @@ import javax.swing.SwingUtilities;
 import org.apache.log4j.Logger;
 import org.httprpc.sierra.ScrollingKeyboardFocusManager;
 
-import com.formdev.flatlaf.FlatLightLaf;
+import com.formdev.flatlaf.FlatDarkLaf;
 import com.scottmo.config.Config;
 import com.scottmo.config.ConfigService;
 import com.scottmo.config.Labels;
@@ -36,12 +36,10 @@ public class App extends JFrame {
         tabs.addTab(Labels.get("bible.containerTitle"), new BibleTab());
         tabs.addTab(Labels.get("configs.containerTitle"), new SettingsTab());
         getContentPane().add(tabs);
-
-        // pack(); // auto-resize to component, use setSize if need fixed size
     }
 
     public static void main(String[] args) {
-        FlatLightLaf.setup();
+        FlatDarkLaf.setup();
         KeyboardFocusManager.setCurrentKeyboardFocusManager(new ScrollingKeyboardFocusManager());
         SwingUtilities.invokeLater(() -> {
             Thread.setDefaultUncaughtExceptionHandler((Thread t, Throwable e) -> {

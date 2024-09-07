@@ -13,11 +13,10 @@ import javax.swing.BoxLayout;
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 
 public class ListView extends JPanel {
-    private static final Color DEFAULT_BACKGROUND = Color.WHITE;
-    private static final Color SELECTED_BACKGROUND = new Color(173, 216, 230); // light blue
     private static final Dimension MIN_SIZE = new Dimension(200, 400);
     
     private List<JPanel> itemPanels = new ArrayList<>();
@@ -63,7 +62,7 @@ public class ListView extends JPanel {
             checkBoxes.add(checkBox);
 
             itemPanel.add(checkBox, BorderLayout.WEST);
-            itemPanel.setBackground(DEFAULT_BACKGROUND); // Default background
+            itemPanel.setBackground(getBackground()); // Use parent background
 
             // set item selection on single click
             itemPanel.addMouseListener(new MouseAdapter() {
@@ -103,7 +102,7 @@ public class ListView extends JPanel {
     }
 
     private void updateBackground(JPanel itemPanel, boolean isSelected) {
-        itemPanel.setBackground(isSelected ? SELECTED_BACKGROUND : DEFAULT_BACKGROUND);
+        itemPanel.setBackground(isSelected ? UIManager.getColor("List.selectionBackground") : getBackground());
     }
 
     public List<String> getSelectedItems() {
