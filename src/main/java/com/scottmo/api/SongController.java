@@ -45,7 +45,7 @@ public class SongController {
         return true;
     }
 
-    public boolean generatePPTX( Integer id, Integer linesPerSlide, String templatePath)
+    public String generatePPTX(Integer id, Integer linesPerSlide, String templatePath)
             throws MalformedURLException, IOException {
 
         Song song = getSong(id);
@@ -56,7 +56,7 @@ public class SongController {
         pptxGenerator.generate(song, templatePath, outputPath, configService.getConfig().getLocales(),
                 linesPerSlide);
     
-        return true;
+        return outputPath;
     }
 
     public boolean exportSong(Integer id) throws IOException {

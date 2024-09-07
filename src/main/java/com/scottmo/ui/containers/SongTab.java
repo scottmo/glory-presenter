@@ -7,8 +7,8 @@ import static org.httprpc.sierra.UIBuilder.row;
 import static org.httprpc.sierra.UIBuilder.strut;
 
 import java.awt.BorderLayout;
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -28,6 +28,7 @@ import javax.swing.border.EmptyBorder;
 import org.httprpc.sierra.SuggestionPicker;
 
 import com.scottmo.api.SongController;
+import com.scottmo.config.ConfigService;
 import com.scottmo.config.Labels;
 import com.scottmo.core.ServiceProvider;
 import com.scottmo.core.ppt.api.SongSlidesGenerator;
@@ -38,6 +39,7 @@ import com.scottmo.ui.components.ListView;
 import com.scottmo.ui.components.SongEditor;
 
 public final class SongTab extends JPanel {
+    private ConfigService configService = ConfigService.get();
     private SongController controller = new SongController(
         ServiceProvider.get(SongService.class).get(),
         ServiceProvider.get(SongSlidesGenerator.class).get());
@@ -96,12 +98,20 @@ public final class SongTab extends JPanel {
             updateButtonState();
         });
 
-        inputTemplate.setText("./template/song.ppt");
-        inputTemplate.setSuggestions(Arrays.asList(
-            "./template/song.ppt",
-            "./template/bible.ppt"
-        ));
-        inputTemplate.addActionListener(event -> System.out.println(inputTemplate.getText()));
+        buttonGeneratePPT.addActionListener(evt -> {
+            String songName = songList.getSelectedItems().get(0);
+            Integer songId = songIdMap.get(songName);
+            try {
+                String outputPath = controller.generatePPTX(songId, (Integer) inputLinesPerSlide.getValue(), inputTemplate.getText());
+                Dialog.info("Successfully generated ppt at " + outputPath);
+            } catch (IOException e) {
+                Dialog.error("Unable to generate ppt", e);
+            }
+        });
+
+        List<String> templatePaths = new ArrayList<>(configService.getConfig().getTemplatePaths());
+        inputTemplate.setText(templatePaths.stream().filter(path -> path.contains("song")).findFirst().orElse(""));
+        inputTemplate.setSuggestions(templatePaths);
 
         setLayout(new BorderLayout());
         add(row(UI_GAP,
