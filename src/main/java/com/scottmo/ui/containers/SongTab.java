@@ -27,32 +27,34 @@ import javax.swing.border.EmptyBorder;
 
 import org.httprpc.sierra.SuggestionPicker;
 
-import com.scottmo.config.ConfigService;
+import com.scottmo.api.SongController;
+import com.scottmo.config.Labels;
 import com.scottmo.core.ServiceProvider;
+import com.scottmo.core.ppt.api.SongSlidesGenerator;
 import com.scottmo.core.songs.api.SongService;
 import com.scottmo.core.songs.api.song.Song;
-import com.scottmo.shared.Pair;
 import com.scottmo.ui.components.Dialog;
 import com.scottmo.ui.components.ListView;
 import com.scottmo.ui.components.SongEditor;
 
 public final class SongTab extends JPanel {
-    private ConfigService configService = ConfigService.get();
-    private SongService songService = ServiceProvider.get(SongService.class).get();
+    private SongController controller = new SongController(
+        ServiceProvider.get(SongService.class).get(),
+        ServiceProvider.get(SongSlidesGenerator.class).get());
 
     // cache to look up song id
     private Map<String, Integer> songIdMap = new HashMap<>();
 
     private ListView songList = new ListView();
-    private JButton buttonNewSong = new JButton(configService.getLabel("songs.buttonNewSong"));
-    private JButton buttonEditSong = new JButton(configService.getLabel("songs.buttonEditSong"));
-    private JButton buttonDeleteSong = new JButton(configService.getLabel("songs.buttonDeleteSong"));
-    private JButton buttonDeselect = new JButton(configService.getLabel("songs.buttonDeselect"));
-    private JButton buttonDuplicate = new JButton(configService.getLabel("songs.buttonDuplicate"));
-    private JButton buttonGenerateGSlide = new JButton(configService.getLabel("songs.buttonGenerateGSlide"));
-    private JButton buttonGeneratePPT = new JButton(configService.getLabel("songs.buttonGeneratePPT"));
-    private JCheckBox checkboxStartSlide = new JCheckBox(configService.getLabel("songs.checkboxStartSlide"));
-    private JCheckBox checkboxEndSlide = new JCheckBox(configService.getLabel("songs.checkboxEndSlide"));
+    private JButton buttonNewSong = new JButton(Labels.get("songs.buttonNewSong"));
+    private JButton buttonEditSong = new JButton(Labels.get("songs.buttonEditSong"));
+    private JButton buttonDeleteSong = new JButton(Labels.get("songs.buttonDeleteSong"));
+    private JButton buttonDeselect = new JButton(Labels.get("songs.buttonDeselect"));
+    private JButton buttonDuplicate = new JButton(Labels.get("songs.buttonDuplicate"));
+    private JButton buttonGenerateGSlide = new JButton(Labels.get("songs.buttonGenerateGSlide"));
+    private JButton buttonGeneratePPT = new JButton(Labels.get("songs.buttonGeneratePPT"));
+    private JCheckBox checkboxStartSlide = new JCheckBox(Labels.get("songs.checkboxStartSlide"));
+    private JCheckBox checkboxEndSlide = new JCheckBox(Labels.get("songs.checkboxEndSlide"));
     private JSpinner inputLinesPerSlide = new JSpinner(new SpinnerNumberModel(2, 1, 10, 1));
     private SuggestionPicker inputTemplate = new SuggestionPicker(10);
 
@@ -84,7 +86,7 @@ public final class SongTab extends JPanel {
                 if (songId == null) {
                     Dialog.error(String.format("Unable to delete %s. Song cannot be found!", songName));
                 } else {
-                    songService.delete(songId);
+                    controller.deleteSong(songId);
                 }
             }
         });
@@ -117,9 +119,9 @@ public final class SongTab extends JPanel {
                 cell(new JSeparator()),
                 cell(checkboxStartSlide),
                 cell(checkboxEndSlide),
-                cell(new JLabel(configService.getLabel("songs.inputLinesPerSlide"))),
+                cell(new JLabel(Labels.get("songs.inputLinesPerSlide"))),
                 cell(inputLinesPerSlide),
-                cell(new JLabel(configService.getLabel("songs.inputTemplate"))),
+                cell(new JLabel(Labels.get("songs.inputTemplate"))),
                 cell(inputTemplate),
                 cell(buttonGeneratePPT),
                 cell(buttonGenerateGSlide)
@@ -129,15 +131,8 @@ public final class SongTab extends JPanel {
     }
 
     private void loadSongList() {
-        List<Pair<Integer, String>> songs = songService.getAllSongDescriptors(configService.getConfig().getLocales());
-        List<String> items = new ArrayList<>();
-        songIdMap.clear();
-        for (Pair<Integer,String> pair : songs) {
-            Integer songId = pair.key();
-            String songName = pair.value();
-            songIdMap.put(songName, songId);
-            items.add(songName);
-        }
+        songIdMap = controller.getSongs();
+        List<String> items = new ArrayList<>(songIdMap.keySet());
         Collections.sort(items);
         songList.setItems(items);
     }
@@ -159,13 +154,13 @@ public final class SongTab extends JPanel {
         String title = id == null ? "songs.editor.titleNew" : "songs.editor.titleEdit";
 
         SongEditor songEditor = new SongEditor();
-        JDialog modal = Dialog.newModal(configService.getLabel(title), songEditor);
+        JDialog modal = Dialog.newModal(Labels.get(title), songEditor);
 
         songEditor.addCancelListener(() -> {
             modal.dispose();
         });
         songEditor.addSaveListener((Song song) -> {
-            songService.store(song);
+            controller.saveSong(song);
         });
 
         modal.setVisible(true);

@@ -12,6 +12,7 @@ import org.httprpc.sierra.ScrollingKeyboardFocusManager;
 import com.formdev.flatlaf.FlatLightLaf;
 import com.scottmo.config.Config;
 import com.scottmo.config.ConfigService;
+import com.scottmo.config.Labels;
 import com.scottmo.ui.containers.BibleTab;
 import com.scottmo.ui.containers.SettingsTab;
 import com.scottmo.ui.containers.SongTab;
@@ -25,15 +26,15 @@ public class App extends JFrame {
     }
 
     public App() {
-        setTitle(configService.getLabel("appName"));
+        setTitle(Labels.get("appName"));
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setResizable(false);
         setSize(Config.APP_WIDTH, Config.APP_HEIGHT);
 
         JTabbedPane tabs = new JTabbedPane();
-        tabs.addTab(configService.getLabel("songs.containerTitle"), new SongTab());
-        tabs.addTab(configService.getLabel("bible.containerTitle"), new BibleTab());
-        tabs.addTab(configService.getLabel("configs.containerTitle"), new SettingsTab());
+        tabs.addTab(Labels.get("songs.containerTitle"), new SongTab());
+        tabs.addTab(Labels.get("bible.containerTitle"), new BibleTab());
+        tabs.addTab(Labels.get("configs.containerTitle"), new SettingsTab());
         getContentPane().add(tabs);
 
         // pack(); // auto-resize to component, use setSize if need fixed size

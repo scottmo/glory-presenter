@@ -17,6 +17,7 @@ import com.google.api.services.slides.v1.model.Page;
 import com.google.api.services.slides.v1.model.Presentation;
 import com.google.api.services.slides.v1.model.Request;
 import com.scottmo.config.ConfigService;
+import com.scottmo.config.Labels;
 import com.scottmo.core.google.api.GoogleCloudService;
 import com.scottmo.core.google.api.SlideConfig;
 
@@ -32,7 +33,7 @@ public class GoogleCloudServiceImpl implements GoogleCloudService {
             try {
                 HttpTransport httpTransport = GoogleNetHttpTransport.newTrustedTransport();
                 _slidesApi = new Slides.Builder(httpTransport, jsonFactory, auth.getRequestInitializer())
-                        .setApplicationName(configService.getLabel("appName"))
+                        .setApplicationName(Labels.get("appName"))
                         .build();
             } catch (IOException | GeneralSecurityException e) {
                 throw new RuntimeException("Unable to connect to Google Slides API!");
@@ -48,7 +49,7 @@ public class GoogleCloudServiceImpl implements GoogleCloudService {
             try {
                 NetHttpTransport httpTransport = GoogleNetHttpTransport.newTrustedTransport();
                 _driveApi = new Drive.Builder(httpTransport, jsonFactory, auth.getRequestInitializer())
-                        .setApplicationName(configService.getLabel("appName"))
+                        .setApplicationName(Labels.get("appName"))
                         .build();
             } catch (IOException | GeneralSecurityException e) {
                 throw new RuntimeException("Unable to connect to Google Drive API!");

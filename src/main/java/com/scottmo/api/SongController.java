@@ -9,7 +9,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.scottmo.config.ConfigService;
-import com.scottmo.core.ServiceProvider;
 import com.scottmo.core.ppt.api.SongSlidesGenerator;
 import com.scottmo.core.songs.api.SongService;
 import com.scottmo.core.songs.api.song.Song;
@@ -18,23 +17,23 @@ import com.scottmo.shared.StringUtils;
 public class SongController {
 
     private ConfigService configService = ConfigService.get();
-    private SongService songService = ServiceProvider.get(SongService.class).get();
-    private SongSlidesGenerator pptxGenerator = ServiceProvider.get(SongSlidesGenerator.class).get();
+    private SongService songService;
+    private SongSlidesGenerator pptxGenerator;
 
     public SongController(SongService songService, SongSlidesGenerator pptxGenerator) {
         this.songService = songService;
         this.pptxGenerator = pptxGenerator;
     }
 
-    Map<Integer, String> getSongs() {
-        Map<Integer, String> titles = new HashMap<>();
+    public Map<String, Integer> getSongs() {
+        Map<String, Integer> titles = new HashMap<>();
         for (var title : songService.getAllSongDescriptors(configService.getConfig().getLocales())) {
-            titles.put(title.key(), title.value());
+            titles.put(title.value(), title.key());
         }
         return titles;
     }
 
-    Song getSong(Integer id) {
+    public Song getSong(Integer id) {
         return songService.get(id);
     }
 

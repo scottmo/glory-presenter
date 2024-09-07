@@ -21,6 +21,7 @@ import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
 import com.scottmo.config.ConfigService;
+import com.scottmo.config.Labels;
 import com.scottmo.core.songs.api.song.Song;
 
 public class SongEditor extends JPanel {
@@ -40,9 +41,9 @@ public class SongEditor extends JPanel {
     private JTextField fieldVerseOrder = new JTextField(null, 24);
     private JTextArea fieldLyrics = new JTextArea(20, 30);
 
-    private JButton buttonSave = new JButton(configService.getLabel("songs.editor.buttonSave"));
-    private JButton buttonCancel = new JButton(configService.getLabel("songs.editor.buttonCancel"));
-    private JButton buttonUpdateVerseOrder = new JButton(configService.getLabel("songs.editor.buttonUpdateVerseOrder"));
+    private JButton buttonSave = new JButton(Labels.get("songs.editor.buttonSave"));
+    private JButton buttonCancel = new JButton(Labels.get("songs.editor.buttonCancel"));
+    private JButton buttonUpdateVerseOrder = new JButton(Labels.get("songs.editor.buttonUpdateVerseOrder"));
 
     public SongEditor() {
         setMinimumSize(MIN_SIZE);
@@ -62,32 +63,32 @@ public class SongEditor extends JPanel {
             glue(),
             column(UI_GAP, true,
                 row(UI_GAP, true,
-                    cell(new JLabel(configService.getLabel("songs.editor.fieldAuthor"))).with(labelStyle),
+                    cell(new JLabel(Labels.get("songs.editor.fieldAuthor"))).with(labelStyle),
                     cell(fieldAuthor).with(textFieldStyle)
                 ),
                 row(UI_GAP, true,
-                    cell(new JLabel(configService.getLabel("songs.editor.fieldPublisher"))).with(labelStyle),
+                    cell(new JLabel(Labels.get("songs.editor.fieldPublisher"))).with(labelStyle),
                     cell(fieldPublisher).with(textFieldStyle)
                 ),
                 row(UI_GAP, true,
-                    cell(new JLabel(configService.getLabel("songs.editor.fieldCopyright"))).with(labelStyle),
+                    cell(new JLabel(Labels.get("songs.editor.fieldCopyright"))).with(labelStyle),
                     cell(fieldCopyright).with(textFieldStyle)
                 ),
                 row(UI_GAP, true,
-                    cell(new JLabel(configService.getLabel("songs.editor.fieldBook"))).with(labelStyle),
+                    cell(new JLabel(Labels.get("songs.editor.fieldBook"))).with(labelStyle),
                     cell(fieldBook).with(textFieldStyle)
                 ),
                 row(UI_GAP, true,
-                    cell(new JLabel(configService.getLabel("songs.editor.fieldEntry"))).with(labelStyle),
+                    cell(new JLabel(Labels.get("songs.editor.fieldEntry"))).with(labelStyle),
                     cell(fieldEntry).with(textFieldStyle)
                 ),
                 row(UI_GAP, 
-                    cell(new JLabel(configService.getLabel("songs.editor.fieldComments"))).with(labelStyle)
+                    cell(new JLabel(Labels.get("songs.editor.fieldComments"))).with(labelStyle)
                         .with(label -> label.setAlignmentY(0.0f)),
                     cell(new JScrollPane(fieldComments))
                 ),
                 row(UI_GAP, true,
-                    cell(new JLabel(configService.getLabel("songs.editor.fieldVerseOrder"))).with(labelStyle),
+                    cell(new JLabel(Labels.get("songs.editor.fieldVerseOrder"))).with(labelStyle),
                     column(UI_GAP,
                         cell(fieldVerseOrder).with(textFieldStyle),
                         cell(buttonUpdateVerseOrder)
@@ -97,7 +98,7 @@ public class SongEditor extends JPanel {
             strut(UI_GAP),
             column(4,
                 column(
-                    cell(new JLabel(configService.getLabel("songs.editor.fieldLyrics"))).with(labelStyle),
+                    cell(new JLabel(Labels.get("songs.editor.fieldLyrics"))).with(labelStyle),
                     cell(new JScrollPane(fieldLyrics))
                 )
             ),
