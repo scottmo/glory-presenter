@@ -9,7 +9,10 @@ import static org.httprpc.sierra.UIBuilder.strut;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.util.List;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -23,6 +26,7 @@ import javax.swing.border.EmptyBorder;
 import com.scottmo.config.ConfigService;
 import com.scottmo.config.Labels;
 import com.scottmo.core.songs.api.song.Song;
+import com.scottmo.shared.StringUtils;
 
 public class SongEditor extends JPanel {
     private static final Dimension MIN_SIZE = new Dimension(790, 480);
@@ -45,14 +49,34 @@ public class SongEditor extends JPanel {
     private JButton buttonCancel = new JButton(Labels.get("songs.editor.buttonCancel"));
     private JButton buttonUpdateVerseOrder = new JButton(Labels.get("songs.editor.buttonUpdateVerseOrder"));
 
-    public SongEditor() {
+    public SongEditor(Song song) {
         setMinimumSize(MIN_SIZE);
 
         Consumer<JLabel> labelStyle = label -> label.setAlignmentX(1.0f);
         Consumer<JTextField> textFieldStyle = textField -> textField.setAlignmentX(0.0f);
 
+        if (song != null) {
+            fieldAuthor.setText(StringUtils.join(song.getAuthors()));
+            fieldPublisher.setText(song.getPublisher());
+            fieldCopyright.setText(song.getCopyright());
+            fieldBook.setText(song.getSongBook());
+            fieldEntry.setText(song.getEntry());
+            fieldComments.setText(song.getComments());
+            fieldVerseOrder.setText(StringUtils.join(song.getVerseOrder()));
+        }
+
         buttonSave.addActionListener(e -> {
-            if (saveListener != null) saveListener.onSave(null);
+            Song modifiedSong = new Song(song == null ? -1 : song.getId())
+                .setAuthors(StringUtils.split(fieldAuthor.getText()))
+                .setPublisher(fieldPublisher.getText())
+                .setCopyright(fieldCopyright.getText())
+                .setSongBook(fieldBook.getText())
+                .setEntry(fieldEntry.getText())
+                .setComments(fieldComments.getText())
+                .setVerseOrder(StringUtils.split(fieldVerseOrder.getText()))
+                ;
+
+            if (saveListener != null) saveListener.onSave(modifiedSong);
         });
 
         buttonCancel.addActionListener(e -> {

@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Song {
     private int id = -1;
@@ -47,8 +48,9 @@ public class Song {
         return locales.get(0);
     }
 
-    public void setDefaultLocale(String locale) {
+    public Song setDefaultLocale(String locale) {
         this.defaultLocale = locale;
+        return this;
     }
 
     public List<SongTitle> getTitles() {
@@ -70,17 +72,19 @@ public class Song {
         return null;
     }
 
-    public void setTitle(String title) {
+    public Song setTitle(String title) {
         setTitle(getPrimaryLocale(), title);
+        return this;
     }
 
-    public void setTitle(String locale, String title) {
+    public Song setTitle(String locale, String title) {
         if (locale == null) {
             locale = getPrimaryLocale();
         } else {
             locale = LocaleUtil.normalize(locale);
         }
         this.titles.add(new SongTitle(StringUtils.trim(title), locale));
+        return this;
     }
 
     @JsonIgnore
@@ -94,48 +98,54 @@ public class Song {
         return Collections.unmodifiableList(this.authors);
     }
 
-    public void setAuthors(List<String> authors) {
+    public Song setAuthors(List<String> authors) {
         this.authors = authors;
+        return this;
     }
 
     public String getPublisher() {
         return publisher;
     }
 
-    public void setPublisher(String publisher) {
+    public Song setPublisher(String publisher) {
         this.publisher = StringUtils.trim(publisher);
+        return this;
     }
 
     public String getCopyright() {
         return copyright;
     }
 
-    public void setCopyright(String copyright) {
+    public Song setCopyright(String copyright) {
         this.copyright = StringUtils.trim(copyright);
+        return this;
     }
 
     public String getSongBook() {
         return songBook;
     }
 
-    public void setSongBook(String songBook) {
+    public Song setSongBook(String songBook) {
         this.songBook = StringUtils.trim(songBook);
+        return this;
     }
 
     public String getEntry() {
         return entry;
     }
 
-    public void setEntry(String entry) {
+    public Song setEntry(String entry) {
         this.entry = StringUtils.trim(entry);
+        return this;
     }
 
     public String getComments() {
         return comments;
     }
 
-    public void setComments(String comments) {
+    public Song setComments(String comments) {
         this.comments = StringUtils.trim(comments);
+        return this;
     }
 
     public List<SongVerse> getVerses(String locale) {
@@ -161,11 +171,13 @@ public class Song {
         return verseOrder;
     }
 
-    public void setVerseOrder(List<String> verseOrder) {
+    public Song setVerseOrder(List<String> verseOrder) {
         this.verseOrder = verseOrder;
+        return this;
     }
 
-    public void setVerses(List<SongVerse> verses) {
+    public Song setVerses(List<SongVerse> verses) {
         this.verses = verses;
+        return this;
     }
 }

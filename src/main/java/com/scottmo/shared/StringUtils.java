@@ -171,6 +171,12 @@ public final class StringUtils {
         return Arrays.stream(str.split(sep)).map(String::trim).toList();
     }
 
+    public static String join(List<String> arr) {
+        if (arr == null || arr.isEmpty()) return "";
+
+        return arr.stream().collect(Collectors.joining(", "));
+    }
+
     public static String sanitizeFilename(String inputName) {
         return inputName.replaceAll("[^a-zA-Z0-9-_\\.]", "_");
     }
