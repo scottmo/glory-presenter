@@ -121,7 +121,8 @@ public class ListView extends JPanel {
         void onItemSelected(String item, boolean isSelected);
     }
 
-    public void setSelectionListener(SelectionListener listener) {
+    public ListView setSelectionListener(SelectionListener listener) {
         this.listener = listener;
+        return this;
     }
 }

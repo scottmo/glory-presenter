@@ -1,14 +1,12 @@
 package com.scottmo.ui.containers;
 
+import static com.scottmo.config.Config.UI_GAP;
 import static org.httprpc.sierra.UIBuilder.cell;
 import static org.httprpc.sierra.UIBuilder.column;
 import static org.httprpc.sierra.UIBuilder.row;
 import static org.httprpc.sierra.UIBuilder.strut;
-import static com.scottmo.config.Config.UI_GAP;
 
 import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -47,53 +45,38 @@ public final class SongTab extends JPanel {
         loadSongList();
 
         updateButtonState();
-        songList.setSelectionListener(new ListView.SelectionListener() {
-            @Override
-            public void onItemSelected(String item, boolean isSelected) {
-                updateButtonState();
+        songList.setSelectionListener((String item, boolean selected) -> {
+            updateButtonState();
+        });
+
+        buttonNewSong.addActionListener(e -> {
+            showSongEditor(null);
+        });
+
+        buttonEditSong.addActionListener(e -> {
+            String songName = songList.getSelectedItems().get(0);
+            Integer songId = songIdMap.get(songName);
+            if (songId == null) {
+                Dialog.error(String.format("Unable to edit %s. Song cannot be found!", songName));
+            } else {
+                showSongEditor(songId);
             }
         });
 
-        buttonNewSong.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                showSongEditor(null);
-            }
-        });
-
-        buttonEditSong.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String songName = songList.getSelectedItems().get(0);
+        buttonDeleteSong.addActionListener(e -> {
+            for (String songName : songList.getSelectedItems()) {
                 Integer songId = songIdMap.get(songName);
                 if (songId == null) {
-                    Dialog.error(String.format("Unable to edit %s. Song cannot be found!", songName));
+                    Dialog.error(String.format("Unable to delete %s. Song cannot be found!", songName));
                 } else {
-                    showSongEditor(songId);
+                    songService.delete(songId);
                 }
             }
         });
 
-        buttonDeleteSong.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                for (String songName : songList.getSelectedItems()) {
-                    Integer songId = songIdMap.get(songName);
-                    if (songId == null) {
-                        Dialog.error(String.format("Unable to delete %s. Song cannot be found!", songName));
-                    } else {
-                        songService.delete(songId);
-                    }
-                }
-            }
-        });
-
-        buttonDeselect.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                songList.selectAll(false);
-                updateButtonState();
-            }
+        buttonDeselect.addActionListener(e -> {
+            songList.selectAll(false);
+            updateButtonState();
         });
 
         setLayout(new BorderLayout());
@@ -137,15 +120,11 @@ public final class SongTab extends JPanel {
         String title = id == null ? "songs.editor.titleNew" : "songs.editor.titleEdit";
         SongEditor songEditor = new SongEditor();
         JDialog modal = Dialog.showModal(configService.getLabel(title), songEditor);
-        songEditor.setActionListener(new SongEditor.EditorActionListener() {
-            @Override
-            public void onSave(Song song) {
-                songService.store(song);
-            }
-            @Override
-            public void onCancel() {
-                modal.dispose();
-            }
+        songEditor.addCancelListener(() -> {
+            modal.dispose();
+        });
+        songEditor.addSaveListener((Song song) -> {
+            songService.store(song);
         });
     }
 }

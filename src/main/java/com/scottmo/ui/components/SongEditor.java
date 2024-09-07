@@ -26,7 +26,8 @@ import com.scottmo.core.songs.api.song.Song;
 public class SongEditor extends JPanel {
     private ConfigService configService = ConfigService.get();
 
-    private EditorActionListener listener;
+    private CancelListener cancelListener;
+    private SaveListener saveListener;
     
     private JTextField fieldAuthor = new JTextField(null, 24);
     private JTextField fieldPublisher = new JTextField(null, 24);
@@ -46,11 +47,11 @@ public class SongEditor extends JPanel {
         Consumer<JTextField> textFieldStyle = textField -> textField.setAlignmentX(0.0f);
 
         buttonSave.addActionListener(e -> {
-            if (listener != null) listener.onSave(null);
+            if (saveListener != null) saveListener.onSave(null);
         });
 
         buttonCancel.addActionListener(e -> {
-            if (listener != null) listener.onCancel();
+            if (cancelListener != null) cancelListener.onCancel();
         });
 
         var form = row(UI_GAP,
@@ -113,12 +114,21 @@ public class SongEditor extends JPanel {
         ).with(view -> view.setBorder(new EmptyBorder(UI_GAP, UI_GAP, UI_GAP, UI_GAP))).getComponent());
     }
 
-    public interface EditorActionListener {
-        void onSave(Song song);
+    public interface CancelListener {
         void onCancel();
     }
 
-    public void setActionListener(EditorActionListener listener) {
-        this.listener = listener;
+    public interface SaveListener {
+        void onSave(Song song);
+    }
+
+    public SongEditor addCancelListener(CancelListener listener) {
+        this.cancelListener = listener;
+        return this;
+    }
+
+    public SongEditor addSaveListener(SaveListener listener) {
+        this.saveListener = listener;
+        return this;
     }
 }
