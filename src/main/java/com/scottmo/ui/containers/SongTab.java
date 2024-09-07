@@ -19,6 +19,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
+import com.scottmo.App;
 import com.scottmo.config.ConfigService;
 import com.scottmo.core.ServiceProvider;
 import com.scottmo.core.songs.api.SongService;
@@ -118,13 +119,17 @@ public final class SongTab extends JPanel {
 
     private void showSongEditor(Integer id) {
         String title = id == null ? "songs.editor.titleNew" : "songs.editor.titleEdit";
+
         SongEditor songEditor = new SongEditor();
-        JDialog modal = Dialog.showModal(configService.getLabel(title), songEditor);
+        JDialog modal = Dialog.newModal(configService.getLabel(title), songEditor);
+
         songEditor.addCancelListener(() -> {
             modal.dispose();
         });
         songEditor.addSaveListener((Song song) -> {
             songService.store(song);
         });
+
+        modal.setVisible(true);
     }
 }

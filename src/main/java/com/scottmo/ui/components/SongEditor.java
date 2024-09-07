@@ -24,6 +24,8 @@ import com.scottmo.config.ConfigService;
 import com.scottmo.core.songs.api.song.Song;
 
 public class SongEditor extends JPanel {
+    private static final Dimension MIN_SIZE = new Dimension(790, 480);
+
     private ConfigService configService = ConfigService.get();
 
     private CancelListener cancelListener;
@@ -43,6 +45,8 @@ public class SongEditor extends JPanel {
     private JButton buttonUpdateVerseOrder = new JButton(configService.getLabel("songs.editor.buttonUpdateVerseOrder"));
 
     public SongEditor() {
+        setMinimumSize(MIN_SIZE);
+
         Consumer<JLabel> labelStyle = label -> label.setAlignmentX(1.0f);
         Consumer<JTextField> textFieldStyle = textField -> textField.setAlignmentX(0.0f);
 

@@ -1,9 +1,6 @@
 package com.scottmo.ui.components;
 
-import static com.scottmo.config.Config.APP_HEIGHT;
-import static com.scottmo.config.Config.APP_WIDTH;
-
-import java.awt.BorderLayout;
+import java.awt.GridBagLayout;
 
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
@@ -33,15 +30,14 @@ public class Dialog {
         error(msg, null);
     }
 
-    public static JDialog showModal(String title, JPanel content) {
+    public static JDialog newModal(String title, JPanel content) {
         JDialog modalDialog = new JDialog(App.get(), title, true); // 'true' makes it modal
-        modalDialog.setSize(APP_WIDTH - 100, APP_HEIGHT - 100);
+        // modalDialog.setSize(APP_WIDTH - 100, APP_HEIGHT - 100);
         modalDialog.setLocationRelativeTo(App.get()); // Center the dialog relative to the main frame
 
-        modalDialog.setLayout(new BorderLayout());
-        modalDialog.add(content, BorderLayout.CENTER);
-
-        modalDialog.setVisible(true);
+        modalDialog.setMinimumSize(content.getMinimumSize());
+        modalDialog.add(content);
+        modalDialog.pack();
 
         return modalDialog;
     }

@@ -2,6 +2,7 @@ package com.scottmo.ui.components;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -17,6 +18,7 @@ import javax.swing.border.EmptyBorder;
 public class ListView extends JPanel {
     private static final Color DEFAULT_BACKGROUND = Color.WHITE;
     private static final Color SELECTED_BACKGROUND = new Color(173, 216, 230); // light blue
+    private static final Dimension MIN_SIZE = new Dimension(200, 400);
     
     private List<JPanel> itemPanels = new ArrayList<>();
     private List<JCheckBox> checkBoxes = new ArrayList<>();
@@ -27,6 +29,8 @@ public class ListView extends JPanel {
     private SelectionListener listener;
 
     public ListView() {
+        setMinimumSize(MIN_SIZE);
+
         listPanel.setLayout(new BoxLayout(listPanel, BoxLayout.Y_AXIS));
 
         JScrollPane scrollPane = new JScrollPane(listPanel);
