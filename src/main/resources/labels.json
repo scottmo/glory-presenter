@@ -12,7 +12,16 @@
             "titleNew": "New Song",
             "titleEdit": "Edit Song",
             "buttonSave": "Save",
-            "buttonCancel": "Cancel"
+            "buttonCancel": "Cancel",
+            "buttonUpdateVerseOrder": "Update Verse Order",
+            "fieldAuthor": "Author",
+            "fieldPublisher": "Publisher",
+            "fieldCopyright": "Copyright",
+            "fieldBook": "Book",
+            "fieldEntry": "Entry",
+            "fieldComments": "Comments",
+            "fieldVerseOrder": "Verse Order",
+            "fieldLyrics": "Lyrics"
         }
     },
     "bible": {

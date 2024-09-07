@@ -19,6 +19,7 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.border.EmptyBorder;
 
 import com.scottmo.config.ConfigService;
 import com.scottmo.core.ServiceProvider;
@@ -97,23 +98,18 @@ public final class SongTab extends JPanel {
 
         setLayout(new BorderLayout());
         add(row(UI_GAP,
-            strut(UI_GAP),
             column(UI_GAP,
-                strut(UI_GAP),
                 cell(new JTextField()),
-                cell(songList)
-                    .weightBy(1.0), // take as much space as possible
-                strut(UI_GAP)
+                cell(songList).weightBy(1.0) // take as much space as possible
             ).weightBy(4.0),
             column(UI_GAP,
-                strut(35),
+                strut(25),
                 cell(buttonNewSong),
                 cell(buttonEditSong),
                 cell(buttonDeleteSong),
                 cell(buttonDeselect)
-            ).weightBy(1.0),
-            strut(UI_GAP)
-        )
+            ).weightBy(1.0)
+        ).with(view -> view.setBorder(new EmptyBorder(UI_GAP, UI_GAP, UI_GAP, UI_GAP)))
         .getComponent());
     }
 
@@ -141,7 +137,7 @@ public final class SongTab extends JPanel {
         String title = id == null ? "songs.editor.titleNew" : "songs.editor.titleEdit";
         SongEditor songEditor = new SongEditor();
         JDialog modal = Dialog.showModal(configService.getLabel(title), songEditor);
-        songEditor.setActionListener(new SongEditor.ActionListener() {
+        songEditor.setActionListener(new SongEditor.EditorActionListener() {
             @Override
             public void onSave(Song song) {
                 songService.store(song);
