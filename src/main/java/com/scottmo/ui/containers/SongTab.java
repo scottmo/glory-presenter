@@ -8,18 +8,25 @@ import static org.httprpc.sierra.UIBuilder.strut;
 
 import java.awt.BorderLayout;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JDialog;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JSeparator;
+import javax.swing.JSpinner;
 import javax.swing.JTextField;
+import javax.swing.SpinnerNumberModel;
 import javax.swing.border.EmptyBorder;
 
-import com.scottmo.App;
+import org.httprpc.sierra.SuggestionPicker;
+
 import com.scottmo.config.ConfigService;
 import com.scottmo.core.ServiceProvider;
 import com.scottmo.core.songs.api.SongService;
@@ -41,6 +48,13 @@ public final class SongTab extends JPanel {
     private JButton buttonEditSong = new JButton(configService.getLabel("songs.buttonEditSong"));
     private JButton buttonDeleteSong = new JButton(configService.getLabel("songs.buttonDeleteSong"));
     private JButton buttonDeselect = new JButton(configService.getLabel("songs.buttonDeselect"));
+    private JButton buttonDuplicate = new JButton(configService.getLabel("songs.buttonDuplicate"));
+    private JButton buttonGenerateGSlide = new JButton(configService.getLabel("songs.buttonGenerateGSlide"));
+    private JButton buttonGeneratePPT = new JButton(configService.getLabel("songs.buttonGeneratePPT"));
+    private JCheckBox checkboxStartSlide = new JCheckBox(configService.getLabel("songs.checkboxStartSlide"));
+    private JCheckBox checkboxEndSlide = new JCheckBox(configService.getLabel("songs.checkboxEndSlide"));
+    private JSpinner inputLinesPerSlide = new JSpinner(new SpinnerNumberModel(2, 1, 10, 1));
+    private SuggestionPicker inputTemplate = new SuggestionPicker(10);
 
     public SongTab() {
         loadSongList();
@@ -80,6 +94,13 @@ public final class SongTab extends JPanel {
             updateButtonState();
         });
 
+        inputTemplate.setText("./template/song.ppt");
+        inputTemplate.setSuggestions(Arrays.asList(
+            "./template/song.ppt",
+            "./template/bible.ppt"
+        ));
+        inputTemplate.addActionListener(event -> System.out.println(inputTemplate.getText()));
+
         setLayout(new BorderLayout());
         add(row(UI_GAP,
             column(UI_GAP,
@@ -90,8 +111,18 @@ public final class SongTab extends JPanel {
                 strut(25),
                 cell(buttonNewSong),
                 cell(buttonEditSong),
+                cell(buttonDuplicate),
                 cell(buttonDeleteSong),
-                cell(buttonDeselect)
+                cell(buttonDeselect),
+                cell(new JSeparator()),
+                cell(checkboxStartSlide),
+                cell(checkboxEndSlide),
+                cell(new JLabel(configService.getLabel("songs.inputLinesPerSlide"))),
+                cell(inputLinesPerSlide),
+                cell(new JLabel(configService.getLabel("songs.inputTemplate"))),
+                cell(inputTemplate),
+                cell(buttonGeneratePPT),
+                cell(buttonGenerateGSlide)
             ).weightBy(1.0)
         ).with(view -> view.setBorder(new EmptyBorder(UI_GAP, UI_GAP, UI_GAP, UI_GAP)))
         .getComponent());
@@ -112,9 +143,16 @@ public final class SongTab extends JPanel {
     }
 
     private void updateButtonState() {
-        buttonEditSong.setEnabled(songList.getSelectCount() == 1);
-        buttonDeleteSong.setEnabled(songList.getSelectCount() > 0);
-        buttonDeselect.setEnabled(songList.getSelectCount() > 0);
+        boolean oneSelected = songList.getSelectCount() == 1;
+        boolean moreThanOneSelected = songList.getSelectCount() == 1;
+
+        buttonEditSong.setEnabled(oneSelected);
+        buttonDuplicate.setEnabled(oneSelected);
+        buttonGenerateGSlide.setEnabled(oneSelected);
+        buttonGeneratePPT.setEnabled(oneSelected);
+
+        buttonDeleteSong.setEnabled(moreThanOneSelected);
+        buttonDeselect.setEnabled(moreThanOneSelected);
     }
 
     private void showSongEditor(Integer id) {
