@@ -139,7 +139,7 @@ public final class SongTab extends JPanel {
 
     private void updateButtonState() {
         boolean oneSelected = songList.getSelectCount() == 1;
-        boolean moreThanOneSelected = songList.getSelectCount() == 1;
+        boolean moreThanOneSelected = songList.getSelectCount() > 1;
 
         buttonEditSong.setEnabled(oneSelected);
         buttonDuplicate.setEnabled(oneSelected);
