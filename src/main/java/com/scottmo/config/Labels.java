@@ -14,7 +14,7 @@ public class Labels {
 
     public static String get(String path) {
         if (labels == null) {
-            try (InputStream in = Labels.class.getClassLoader().getResourceAsStream(Config.LABELS_PATH)){
+            try (InputStream in = Labels.class.getClassLoader().getResourceAsStream(Config.LABELS_FILENAME)){
                 ObjectMapper mapper = new ObjectMapper();
                 labels = mapper.readValue(in, Map.class);
             } catch (IOException e) {

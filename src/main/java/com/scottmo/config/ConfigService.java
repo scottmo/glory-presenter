@@ -29,9 +29,9 @@ public class ConfigService {
 
     // instantiate config
     public void reload() {
-        Path configPath = Path.of(Config.CONFIG_PATH);
+        Path configPath = Path.of("./" + Config.CONFIG_FILENAME);
         if (!Files.exists(configPath)) {
-            try (InputStream in = ConfigService.class.getClassLoader().getResourceAsStream("config.json")) {
+            try (InputStream in = ConfigService.class.getClassLoader().getResourceAsStream(Config.CONFIG_FILENAME)) {
                 Files.copy(in, configPath);
             } catch (IOException e) {
                 throw new RuntimeException("Unable to create config.json!");

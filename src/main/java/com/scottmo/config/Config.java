@@ -12,10 +12,10 @@ public class Config {
     public static final int APP_HEIGHT = 600;
     public static final int UI_GAP = 8;
 
-    public static final String CONFIG_PATH = "./config.json";
+    public static final String CONFIG_FILENAME = "config.json";
     public static final String TEMPLATE_DIR = "templates";
 
-    public static final String LABELS_PATH = "./labels.json";
+    public static final String LABELS_FILENAME = "labels.json";
 
     private String outputDir;
     private String dataDir;

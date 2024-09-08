@@ -22,7 +22,7 @@ public class AuthClient {
      * @throws IOException
      */
     public HttpRequestInitializer getRequestInitializer() throws IOException {
-        InputStream in = AuthClient.class.getResourceAsStream("/credentials.json");
+        InputStream in = AuthClient.class.getResourceAsStream("credentials.json");
         GoogleCredentials credential = ServiceAccountCredentials.fromStream(in).createScoped(SCOPES);
         return new HttpCredentialsAdapter(credential);
     }

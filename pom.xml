@@ -6,7 +6,7 @@
 
     <groupId>com.scottmo</groupId>
     <artifactId>glory-presenter</artifactId>
-    <version>3.1.3</version>
+    <version>4.0.0</version>
     <packaging>jar</packaging>
 
     <parent>
