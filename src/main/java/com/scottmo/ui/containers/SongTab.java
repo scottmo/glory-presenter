@@ -13,6 +13,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -47,6 +48,7 @@ public final class SongTab extends JPanel {
 
     // cache to look up song id
     private Map<String, Integer> songIdMap = new HashMap<>();
+    private List<String> songNames;
 
     private ListView songList = new ListView();
     private JButton buttonNewSong = new JButton(Labels.get("songs.buttonNewSong"));
@@ -63,8 +65,17 @@ public final class SongTab extends JPanel {
 
     public SongTab() {
         loadSongList();
-
         updateButtonState();
+
+        var inputSearch = new JTextField();
+        inputSearch.addActionListener(e -> { // on ENTER key
+            String searchText = inputSearch.getText().trim();
+            List<String> filteredSongNames = searchText.isEmpty()
+                ? songNames
+                : songNames.stream() .filter(s -> s.contains(searchText)) .collect(Collectors.toList());
+            songList.setItems(filteredSongNames);
+        });
+
         songList.setSelectionListener((String item, boolean selected) -> {
             updateButtonState();
         });
@@ -135,7 +146,7 @@ public final class SongTab extends JPanel {
         setLayout(new BorderLayout());
         add(row(UI_GAP,
             column(UI_GAP,
-                cell(new JTextField()),
+                cell(inputSearch),
                 cell(songList).weightBy(1.0) // take as much space as possible
             ).weightBy(4.0),
             column(UI_GAP,
@@ -161,9 +172,9 @@ public final class SongTab extends JPanel {
 
     private void loadSongList() {
         songIdMap = controller.getSongs();
-        List<String> items = new ArrayList<>(songIdMap.keySet());
-        Collections.sort(items);
-        songList.setItems(items);
+        songNames = new ArrayList<>(songIdMap.keySet());
+        Collections.sort(songNames);
+        songList.setItems(songNames);
     }
 
     private void updateButtonState() {
