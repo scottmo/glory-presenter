@@ -1,9 +1,5 @@
 # Glory Presenter
 
-## TODO
-
-- pass deps through constructor for services
-
 ## Introduction
 
 Glory presenter is an app that's solely focused on the power point experience.
@@ -62,6 +58,7 @@ them as I continue to improve it, but support will be limited.
 ```json
 {
   "dataDir": "./data",
+  "outputDir": "./output",
   "locales": [
     "zh_cn",
     "en_us"
