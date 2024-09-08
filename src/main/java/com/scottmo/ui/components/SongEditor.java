@@ -9,16 +9,20 @@ import static org.httprpc.sierra.UIBuilder.strut;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
+import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
@@ -26,6 +30,8 @@ import javax.swing.border.EmptyBorder;
 import com.scottmo.config.ConfigService;
 import com.scottmo.config.Labels;
 import com.scottmo.core.songs.api.song.Song;
+import com.scottmo.core.songs.api.song.SongTitle;
+import com.scottmo.core.songs.api.song.SongVerse;
 import com.scottmo.shared.StringUtils;
 
 public class SongEditor extends JPanel {
@@ -43,7 +49,8 @@ public class SongEditor extends JPanel {
     private JTextField fieldEntry = new JTextField(null, 12);
     private JTextArea fieldComments = new JTextArea(4, 20);
     private JTextField fieldVerseOrder = new JTextField(null, 24);
-    private JTextArea fieldLyrics = new JTextArea(20, 30);
+
+    private Map<String, LocalizedFields> localizedFields = new HashMap<>();
 
     private JButton buttonSave = new JButton(Labels.get("songs.editor.buttonSave"));
     private JButton buttonCancel = new JButton(Labels.get("songs.editor.buttonCancel"));
@@ -55,6 +62,9 @@ public class SongEditor extends JPanel {
         Consumer<JLabel> labelStyle = label -> label.setAlignmentX(1.0f);
         Consumer<JTextField> textFieldStyle = textField -> textField.setAlignmentX(0.0f);
 
+        var localizedFieldsPane = buildLocalizedFields();
+
+        // editing existing song
         if (song != null) {
             fieldAuthor.setText(StringUtils.join(song.getAuthors()));
             fieldPublisher.setText(song.getPublisher());
@@ -63,6 +73,13 @@ public class SongEditor extends JPanel {
             fieldEntry.setText(song.getEntry());
             fieldComments.setText(song.getComments());
             fieldVerseOrder.setText(StringUtils.join(song.getVerseOrder()));
+
+            for (var entry : localizedFields.entrySet()) {
+                String locale = entry.getKey();
+                LocalizedFields fields = entry.getValue();
+                fields.title().setText(song.getTitle(locale));
+                fields.lyrics().setText(getLyricsString(song, locale));
+            }
         }
 
         buttonSave.addActionListener(e -> {
@@ -74,6 +91,8 @@ public class SongEditor extends JPanel {
                 .setEntry(fieldEntry.getText())
                 .setComments(fieldComments.getText())
                 .setVerseOrder(StringUtils.split(fieldVerseOrder.getText()))
+                .setTitles(getTitlesFromForm())
+                .setVerses(getVersesFromForm())
                 ;
 
             if (saveListener != null) saveListener.onSave(modifiedSong);
@@ -84,7 +103,6 @@ public class SongEditor extends JPanel {
         });
 
         var form = row(UI_GAP,
-            glue(),
             column(UI_GAP, true,
                 row(UI_GAP, true,
                     cell(new JLabel(Labels.get("songs.editor.fieldAuthor"))).with(labelStyle),
@@ -120,13 +138,12 @@ public class SongEditor extends JPanel {
                 )
             ),
             strut(UI_GAP),
-            column(4,
+            column(UI_GAP,
                 column(
                     cell(new JLabel(Labels.get("songs.editor.fieldLyrics"))).with(labelStyle),
-                    cell(new JScrollPane(fieldLyrics))
+                    cell(localizedFieldsPane)
                 )
-            ),
-            glue()
+            ).weightBy(1.0)
         ).getComponent();
 
         var footer = row(UI_GAP,
@@ -160,4 +177,53 @@ public class SongEditor extends JPanel {
         this.saveListener = listener;
         return this;
     }
+
+    private String getLyricsString(Song song, String locale) {
+        return song.getVerses(locale).stream()
+            .map(verse -> String.format("# %s\n%s", verse.getName(), verse.getText()))
+            .collect(Collectors.joining("\n\n"));
+    }
+
+    private List<SongTitle> getTitlesFromForm() {
+        return localizedFields.entrySet().stream()
+            .map(entry -> new SongTitle(entry.getValue().title().getText(), entry.getKey()))
+            .collect(Collectors.toList());
+    }
+
+    private List<SongVerse> getVersesFromForm() {
+        List<SongVerse> verses = new ArrayList<>();
+        for (var entry : localizedFields.entrySet()) {
+            String locale = entry.getKey();
+            String lyrics = entry.getValue().lyrics().getText();
+            for (var verseText : StringUtils.split(lyrics, "#")) {
+                if (!verseText.isEmpty()) {
+                    List<String> lines = new ArrayList<>(StringUtils.split(verseText, "\n"));
+                    String verseName = lines.remove(0);
+                    verses.add(new SongVerse(verseName, StringUtils.join(lines, "\n"), locale));
+                }
+            }
+        }
+        return verses;
+    }
+
+    private JComponent buildLocalizedFields() {
+        JTabbedPane localizedFieldsPane = new JTabbedPane();
+        for (String locale : configService.getConfig().getLocales()) {
+            LocalizedFields fields = new LocalizedFields(new JTextField(), new JTextArea(15, 30));
+            localizedFields.put(locale, fields);
+
+            JPanel lyricPanel = new JPanel();
+            lyricPanel.setLayout(new BorderLayout());
+            lyricPanel.add(column(UI_GAP, true,
+                cell(new JLabel(Labels.get("songs.editor.fieldTitle"))),
+                cell(fields.title()),
+                cell(new JLabel(Labels.get("songs.editor.fieldLyrics"))),
+                cell(new JScrollPane(fields.lyrics()))
+            ).getComponent());
+            localizedFieldsPane.addTab(locale, lyricPanel);
+        }
+        return localizedFieldsPane;
+    }
+
+    private record LocalizedFields(JTextField title, JTextArea lyrics) {}
 }

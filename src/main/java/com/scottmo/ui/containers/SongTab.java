@@ -34,6 +34,7 @@ import com.scottmo.core.ServiceProvider;
 import com.scottmo.core.ppt.api.SongSlidesGenerator;
 import com.scottmo.core.songs.api.SongService;
 import com.scottmo.core.songs.api.song.Song;
+import com.scottmo.shared.StringUtils;
 import com.scottmo.ui.components.Dialog;
 import com.scottmo.ui.components.ListView;
 import com.scottmo.ui.components.SongEditor;
@@ -78,18 +79,36 @@ public final class SongTab extends JPanel {
             if (songId == null) {
                 Dialog.error(String.format("Unable to edit %s. Song cannot be found!", songName));
             } else {
-                showSongEditor(songId);
+                showSongEditor(controller.getSong(songId));
+            }
+        });
+
+        buttonDuplicate.addActionListener(e -> {
+            String songName = songList.getSelectedItems().get(0);
+            Integer songId = songIdMap.get(songName);
+            if (songId == null) {
+                Dialog.error(String.format("Unable to duplicate %s. Song cannot be found!", songName));
+            } else {
+                Song song = controller.getSong(songId);
+                song.resetId();
+                showSongEditor(song);
             }
         });
 
         buttonDeleteSong.addActionListener(e -> {
+            List<String> deletedSongs = new ArrayList<>();
             for (String songName : songList.getSelectedItems()) {
                 Integer songId = songIdMap.get(songName);
                 if (songId == null) {
                     Dialog.error(String.format("Unable to delete %s. Song cannot be found!", songName));
                 } else {
                     controller.deleteSong(songId);
+                    deletedSongs.add(songName);
                 }
+            }
+            if (deletedSongs.size() > 0) {
+                Dialog.info(String.format("Deleted songs: %s", StringUtils.join(deletedSongs)));
+                loadSongList();
             }
         });
 
@@ -148,29 +167,34 @@ public final class SongTab extends JPanel {
     }
 
     private void updateButtonState() {
-        boolean oneSelected = songList.getSelectCount() == 1;
-        boolean moreThanOneSelected = songList.getSelectCount() > 1;
+        boolean onlyOneSelected = songList.getSelectCount() == 1;
+        boolean hasSelection = songList.getSelectCount() > 0;
 
-        buttonEditSong.setEnabled(oneSelected);
-        buttonDuplicate.setEnabled(oneSelected);
-        buttonGenerateGSlide.setEnabled(oneSelected);
-        buttonGeneratePPT.setEnabled(oneSelected);
+        buttonEditSong.setEnabled(onlyOneSelected);
+        buttonDuplicate.setEnabled(onlyOneSelected);
+        buttonGenerateGSlide.setEnabled(onlyOneSelected);
+        buttonGeneratePPT.setEnabled(onlyOneSelected);
 
-        buttonDeleteSong.setEnabled(moreThanOneSelected);
-        buttonDeselect.setEnabled(moreThanOneSelected);
+        buttonDeleteSong.setEnabled(hasSelection);
+        buttonDeselect.setEnabled(hasSelection);
     }
 
-    private void showSongEditor(Integer id) {
-        String title = id == null ? "songs.editor.titleNew" : "songs.editor.titleEdit";
+    private void showSongEditor(Song song) {
+        String title = song == null || song.getId() == -1
+            ? "songs.editor.titleNew"
+            : "songs.editor.titleEdit";
 
-        SongEditor songEditor = new SongEditor();
+        SongEditor songEditor = new SongEditor(song);
         JDialog modal = Dialog.newModal(Labels.get(title), songEditor);
 
         songEditor.addCancelListener(() -> {
             modal.dispose();
         });
-        songEditor.addSaveListener((Song song) -> {
-            controller.saveSong(song);
+        songEditor.addSaveListener((Song modifiedSong) -> {
+            controller.saveSong(modifiedSong);
+            Dialog.info(String.format("Saved song '%s' successfully!", modifiedSong.getTitle()));
+            modal.dispose();
+            loadSongList(); // refresh song list
         });
 
         modal.setVisible(true);

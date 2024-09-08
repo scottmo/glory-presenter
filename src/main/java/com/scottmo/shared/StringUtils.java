@@ -172,9 +172,13 @@ public final class StringUtils {
     }
 
     public static String join(List<String> arr) {
+        return join(arr, ", ");
+    }
+
+    public static String join(List<String> arr, String sep) {
         if (arr == null || arr.isEmpty()) return "";
 
-        return arr.stream().collect(Collectors.joining(", "));
+        return arr.stream().collect(Collectors.joining(sep));
     }
 
     public static String sanitizeFilename(String inputName) {

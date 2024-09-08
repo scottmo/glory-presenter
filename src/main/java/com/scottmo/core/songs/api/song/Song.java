@@ -35,6 +35,10 @@ public class Song {
         return id;
     }
 
+    public void resetId() {
+        this.id = -1;
+    }
+
     /**
      * @return primary locale used in this song. If no locale or default locale is present, default locale
      * is the primary one, otherwise the first locale available.
@@ -84,6 +88,11 @@ public class Song {
             locale = LocaleUtil.normalize(locale);
         }
         this.titles.add(new SongTitle(StringUtils.trim(title), locale));
+        return this;
+    }
+
+    public Song setTitles(List<SongTitle> titles) {
+        this.titles = titles;
         return this;
     }
 

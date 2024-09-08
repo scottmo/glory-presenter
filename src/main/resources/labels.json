@@ -26,6 +26,7 @@
             "fieldEntry": "Entry",
             "fieldComments": "Comments",
             "fieldVerseOrder": "Verse Order",
+            "fieldTitle": "Title",
             "fieldLyrics": "Lyrics"
         }
     },
