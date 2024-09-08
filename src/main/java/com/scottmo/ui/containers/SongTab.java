@@ -147,6 +147,7 @@ public final class SongTab extends JPanel {
         add(row(UI_GAP,
             column(UI_GAP,
                 cell(inputSearch),
+                cell(new JLabel("Note: click on empty space of the row to select single row")),
                 cell(songList).weightBy(1.0) // take as much space as possible
             ).weightBy(4.0),
             column(UI_GAP,

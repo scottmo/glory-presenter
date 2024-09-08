@@ -68,6 +68,7 @@ public class ListView extends JPanel {
             itemPanel.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
+                    selectAll(false);
                     checkBox.setSelected(!checkBox.isSelected());
                     setSelected(checkBox, itemPanel, true);
                 }
@@ -115,8 +116,10 @@ public class ListView extends JPanel {
 
     public void selectAll(boolean select) {
         for (int i = 0; i < checkBoxes.size(); i++) {
-            checkBoxes.get(i).setSelected(select);
-            setSelected(checkBoxes.get(i), itemPanels.get(i), false);
+            if (checkBoxes.get(i).isSelected() != select) {
+                checkBoxes.get(i).setSelected(select);
+                setSelected(checkBoxes.get(i), itemPanels.get(i), false);
+            }
         }
     }
 
