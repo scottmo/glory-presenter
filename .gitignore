@@ -23,6 +23,10 @@ hs_err_pid*
 
 # Maven 
 target/
+dependency-reduced-pom.xml
+
+# vs code
+.vscode
 
 # IntelliJ project files 
 *.iml
@@ -32,3 +36,9 @@ target/
 
 # OS
 .DS_Store
+
+# Testing
+config.json
+credentials.json
+/data
+temp

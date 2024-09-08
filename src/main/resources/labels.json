@@ -1,0 +1,40 @@
+{
+    "appName": "Glory Presenter",
+    "songs": {
+        "containerTitle": "Songs",
+        "buttonNewSong": "New",
+        "buttonEditSong": "Edit",
+        "buttonDeleteSong": "Delete",
+        "buttonDeselect": "Deselect",
+        "buttonDuplicate": "Duplicate",
+        "buttonGenerateGSlide": "Generate GSlide",
+        "buttonGeneratePPT": "Generate PPT",
+        "checkboxStartSlide": "Include Start Slide",
+        "checkboxEndSlide": "Include End Slide",
+        "inputLinesPerSlide": "Lines/Slide",
+        "inputTemplate": "PPT Template",
+        "editor": {
+            "titleNew": "New Song",
+            "titleEdit": "Edit Song",
+            "buttonSave": "Save",
+            "buttonCancel": "Cancel",
+            "buttonUpdateVerseOrder": "Update Verse Order",
+            "fieldAuthor": "Author",
+            "fieldPublisher": "Publisher",
+            "fieldCopyright": "Copyright",
+            "fieldBook": "Collection",
+            "fieldEntry": "Entry",
+            "fieldComments": "Comments",
+            "fieldVerseOrder": "Verse Order",
+            "fieldTitle": "Title",
+            "fieldLyrics": "Lyrics"
+        }
+    },
+    "bible": {
+        "containerTitle": "Bible"
+    },
+    "configs": {
+        "containerTitle": "Configurations",
+        "buttonToggleDarkMode": "Toggle Dark Mode"
+    }
+}

@@ -1,4 +1,5 @@
 {
+  "outputDir": "./output",
   "dataDir": "./data",
   "locales": [
     "zh_cn",

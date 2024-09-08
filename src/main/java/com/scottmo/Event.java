@@ -7,8 +7,6 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 public final class Event {
-    public static final String DATA_DIR = "dataDir";
-
     private static final Map<String, List<Consumer<String>>> handlers = new HashMap<>();
     private static final Map<String, String> lastValues = new HashMap<>();
 
