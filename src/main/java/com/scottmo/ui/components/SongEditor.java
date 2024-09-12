@@ -66,40 +66,25 @@ public class SongEditor extends JPanel {
 
         // editing existing song
         if (song != null) {
-            fieldAuthor.setText(StringUtils.join(song.getAuthors()));
-            fieldPublisher.setText(song.getPublisher());
-            fieldCopyright.setText(song.getCopyright());
-            fieldBook.setText(song.getSongBook());
-            fieldEntry.setText(song.getEntry());
-            fieldComments.setText(song.getComments());
-            fieldVerseOrder.setText(StringUtils.join(song.getVerseOrder()));
-
-            for (var entry : localizedFields.entrySet()) {
-                String locale = entry.getKey();
-                LocalizedFields fields = entry.getValue();
-                fields.title().setText(song.getTitle(locale));
-                fields.lyrics().setText(getLyricsString(song, locale));
-            }
+            populateForm(song);
         }
 
-        buttonSave.addActionListener(e -> {
-            Song modifiedSong = new Song(song == null ? -1 : song.getId())
-                .setAuthors(StringUtils.split(fieldAuthor.getText()))
-                .setPublisher(fieldPublisher.getText())
-                .setCopyright(fieldCopyright.getText())
-                .setSongBook(fieldBook.getText())
-                .setEntry(fieldEntry.getText())
-                .setComments(fieldComments.getText())
-                .setVerseOrder(StringUtils.split(fieldVerseOrder.getText()))
-                .setTitles(getTitlesFromForm())
-                .setVerses(getVersesFromForm())
-                ;
-
-            if (saveListener != null) saveListener.onSave(modifiedSong);
+        buttonUpdateVerseOrder.addActionListener(evt -> {
+            List<String> verseOrder = generateVerseOrderFromLyrics();
+            fieldVerseOrder.setText(StringUtils.join(verseOrder));
         });
 
-        buttonCancel.addActionListener(e -> {
-            if (cancelListener != null) cancelListener.onCancel();
+        buttonSave.addActionListener(evt -> {
+            if (saveListener != null) {
+                Song modifiedSong = getSongFromForm(song == null ? -1 : song.getId());
+                saveListener.onSave(modifiedSong);
+            }
+        });
+
+        buttonCancel.addActionListener(evt -> {
+            if (cancelListener != null) {
+                cancelListener.onCancel();
+            }
         });
 
         var form = row(UI_GAP,
@@ -178,6 +163,39 @@ public class SongEditor extends JPanel {
         return this;
     }
 
+    // helpers
+
+    private void populateForm(Song song) {
+        fieldAuthor.setText(StringUtils.join(song.getAuthors()));
+        fieldPublisher.setText(song.getPublisher());
+        fieldCopyright.setText(song.getCopyright());
+        fieldBook.setText(song.getSongBook());
+        fieldEntry.setText(song.getEntry());
+        fieldComments.setText(song.getComments());
+        fieldVerseOrder.setText(StringUtils.join(song.getVerseOrder()));
+
+        for (var entry : localizedFields.entrySet()) {
+            String locale = entry.getKey();
+            LocalizedFields fields = entry.getValue();
+            fields.title().setText(song.getTitle(locale));
+            fields.lyrics().setText(getLyricsString(song, locale));
+        }
+    }
+
+    private Song getSongFromForm(int id) {
+        return new Song(id)
+                .setAuthors(StringUtils.split(fieldAuthor.getText()))
+                .setPublisher(fieldPublisher.getText())
+                .setCopyright(fieldCopyright.getText())
+                .setSongBook(fieldBook.getText())
+                .setEntry(fieldEntry.getText())
+                .setComments(fieldComments.getText())
+                .setVerseOrder(StringUtils.split(fieldVerseOrder.getText()))
+                .setTitles(getTitlesFromForm())
+                .setVerses(getVersesFromForm())
+                ;
+    }
+
     private String getLyricsString(Song song, String locale) {
         return song.getVerses(locale).stream()
             .map(verse -> String.format("# %s\n%s", verse.getName(), verse.getText()))
@@ -223,6 +241,28 @@ public class SongEditor extends JPanel {
             localizedFieldsPane.addTab(locale, lyricPanel);
         }
         return localizedFieldsPane;
+    }
+
+    private List<String> generateVerseOrderFromLyrics() {
+        List<String> verseOrder = new ArrayList<>();
+        List<String> verseNames = new ArrayList<>();
+        List<String> chorusNames = new ArrayList<>();
+
+        getVersesFromForm().stream()
+            .map(SongVerse::getName)
+            .distinct()
+            .sorted()
+            .forEach(name -> {
+                if (name.startsWith("v")) verseNames.add(name);
+                else if (name.startsWith("c")) chorusNames.add(name);
+            });
+
+        // one verse followed by all choruses
+        for (String verseName : verseNames) {
+            verseOrder.add(verseName);
+            verseOrder.addAll(chorusNames);
+        }
+        return verseOrder;
     }
 
     private record LocalizedFields(JTextField title, JTextArea lyrics) {}
