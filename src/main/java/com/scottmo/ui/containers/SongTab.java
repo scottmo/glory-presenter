@@ -128,6 +128,26 @@ public final class SongTab extends JPanel {
             }
         });
 
+        buttonExport.addActionListener(evt -> {
+            List<String> exportedSongs = new ArrayList<>();
+            for (String songName : songList.getSelectedItems()) {
+                Integer songId = songIdMap.get(songName);
+                if (songId == null) {
+                    Dialog.error(String.format("Unable to export %s. Song cannot be found!", songName));
+                } else {
+                    try {
+                        controller.exportSong(songId);
+                        exportedSongs.add(songName);
+                    } catch (IOException ioe) {
+                        Dialog.error(String.format("Failed to export %s!", songName), ioe);
+                    }
+                }
+            }
+            if (exportedSongs.size() > 0) {
+                Dialog.info(String.format("Exported songs: %s", StringUtils.join(exportedSongs)));
+            }
+        });
+
         buttonDeselect.addActionListener(e -> {
             songList.selectAll(false);
             updateButtonState();
