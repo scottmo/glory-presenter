@@ -23,17 +23,6 @@ public class Config {
     private Map<String, String> bibleVersionToLocale = new HashMap<>();
     private Set<String> templatePaths = new HashSet<>();
 
-    // public AppConfig(
-    //         String dataDir,
-    //         List<String> locales,
-    //         Map<String, String> bibleVersionToLocale,
-    //         Set<String> templatePaths) {
-    //     this.dataDir = dataDir;
-    //     this.locales = (locales == null) ? new ArrayList<>() : locales;
-    //     this.bibleVersionToLocale = (bibleVersionToLocale == null) ? new HashMap<>() : bibleVersionToLocale;
-    //     this.templatePaths = (templatePaths == null) ? new HashSet<>() : templatePaths;
-    // }
-
     public String getDataDir() {
         return dataDir;
     }
