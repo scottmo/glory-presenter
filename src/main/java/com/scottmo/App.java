@@ -40,15 +40,14 @@ public class App extends JFrame {
         setSize(Config.APP_WIDTH, Config.APP_HEIGHT);
 
         JTabbedPane tabs = new JTabbedPane();
-        List<Pair<String, JPanel>> tabCmps = Pair.ofList(
+        Pair.<String, JPanel>ofList(
             "songs.containerTitle", new SongTab(),
             "bible.containerTitle", new BibleTab(),
             "configs.containerTitle", new ConfigsTab()
-        );
-        for (var tabCmp : tabCmps) {
+        ).forEach(tabCmp -> {
             tabCmp.value().setBorder(new EmptyBorder(MARGIN, MARGIN, MARGIN, MARGIN));
             tabs.addTab(Labels.get(tabCmp.key()), tabCmp.value());
-        }
+        });
         getContentPane().add(tabs);
     }
 
