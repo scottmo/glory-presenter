@@ -1,14 +1,12 @@
 package com.scottmo.ui.components;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
@@ -21,7 +19,8 @@ import com.scottmo.config.Config;
 public class ListView extends JPanel {
     private static final Dimension MIN_SIZE = new Dimension(200, 400);
     private static final Dimension MAX_ITEM_SIZE = new Dimension(Config.APP_WIDTH, 32);
-    
+    private static final int ITEM_PADDING = 5;
+
     private List<JPanel> itemPanels = new ArrayList<>();
     private List<JCheckBox> checkBoxes = new ArrayList<>();
     private JPanel listPanel = new JPanel();
@@ -56,7 +55,7 @@ public class ListView extends JPanel {
         for (String item : items) {
             JPanel itemPanel = new JPanel(new BorderLayout());
             itemPanel.setMaximumSize(MAX_ITEM_SIZE);
-            itemPanel.setBorder(new EmptyBorder(5, 5, 5, 5)); // padding
+            itemPanel.setBorder(new EmptyBorder(ITEM_PADDING, ITEM_PADDING, ITEM_PADDING, ITEM_PADDING)); // padding
 
             JCheckBox checkBox = new JCheckBox(item);
             checkBox.setOpaque(false); // Make checkbox background transparent

@@ -1,24 +1,31 @@
 package com.scottmo;
 
+import static com.scottmo.config.Config.UI_GAP;
+
 import java.awt.KeyboardFocusManager;
+import java.util.List;
 
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
+import javax.swing.border.EmptyBorder;
 
-import org.apache.log4j.Logger;
 import org.httprpc.sierra.ScrollingKeyboardFocusManager;
 
 import com.formdev.flatlaf.FlatDarkLaf;
 import com.scottmo.config.Config;
 import com.scottmo.config.ConfigService;
 import com.scottmo.config.Labels;
+import com.scottmo.shared.Pair;
 import com.scottmo.ui.components.Dialog;
 import com.scottmo.ui.containers.BibleTab;
 import com.scottmo.ui.containers.ConfigsTab;
 import com.scottmo.ui.containers.SongTab;
 
 public class App extends JFrame {
+    private static final int MARGIN = UI_GAP * 2;
+
     ConfigService configService = ConfigService.get();
 
     private static App INSTANCE;
@@ -33,9 +40,15 @@ public class App extends JFrame {
         setSize(Config.APP_WIDTH, Config.APP_HEIGHT);
 
         JTabbedPane tabs = new JTabbedPane();
-        tabs.addTab(Labels.get("songs.containerTitle"), new SongTab());
-        tabs.addTab(Labels.get("bible.containerTitle"), new BibleTab());
-        tabs.addTab(Labels.get("configs.containerTitle"), new ConfigsTab());
+        List<Pair<String, JPanel>> tabCmps = Pair.ofList(
+            "songs.containerTitle", new SongTab(),
+            "bible.containerTitle", new BibleTab(),
+            "configs.containerTitle", new ConfigsTab()
+        );
+        for (var tabCmp : tabCmps) {
+            tabCmp.value().setBorder(new EmptyBorder(MARGIN, MARGIN, MARGIN, MARGIN));
+            tabs.addTab(Labels.get(tabCmp.key()), tabCmp.value());
+        }
         getContentPane().add(tabs);
     }
 

@@ -51,11 +51,16 @@ public final class SongTab extends JPanel {
     private List<String> songNames;
 
     private ListView songList = new ListView();
+
     private JButton buttonNewSong = new JButton(Labels.get("songs.buttonNewSong"));
     private JButton buttonEditSong = new JButton(Labels.get("songs.buttonEditSong"));
     private JButton buttonDeleteSong = new JButton(Labels.get("songs.buttonDeleteSong"));
     private JButton buttonDeselect = new JButton(Labels.get("songs.buttonDeselect"));
     private JButton buttonDuplicate = new JButton(Labels.get("songs.buttonDuplicate"));
+
+    private JButton buttonImport = new JButton(Labels.get("songs.buttonImport"));
+    private JButton buttonExport = new JButton(Labels.get("songs.buttonExport"));
+
     private JButton buttonGenerateGSlide = new JButton(Labels.get("songs.buttonGenerateGSlide"));
     private JButton buttonGeneratePPT = new JButton(Labels.get("songs.buttonGeneratePPT"));
     private JCheckBox checkboxStartSlide = new JCheckBox(Labels.get("songs.checkboxStartSlide"));
@@ -158,6 +163,9 @@ public final class SongTab extends JPanel {
                 cell(buttonDeleteSong),
                 cell(buttonDeselect),
                 cell(new JSeparator()),
+                cell(buttonImport),
+                cell(buttonExport),
+                cell(new JSeparator()),
                 cell(checkboxStartSlide),
                 cell(checkboxEndSlide),
                 cell(new JLabel(Labels.get("songs.inputLinesPerSlide"))),
@@ -167,8 +175,7 @@ public final class SongTab extends JPanel {
                 cell(buttonGeneratePPT),
                 cell(buttonGenerateGSlide)
             ).weightBy(1.0)
-        ).with(view -> view.setBorder(new EmptyBorder(UI_GAP, UI_GAP, UI_GAP, UI_GAP)))
-        .getComponent());
+        ).getComponent());
     }
 
     private void loadSongList() {
@@ -189,6 +196,7 @@ public final class SongTab extends JPanel {
 
         buttonDeleteSong.setEnabled(hasSelection);
         buttonDeselect.setEnabled(hasSelection);
+        buttonExport.setEnabled(hasSelection);
     }
 
     private void showSongEditor(Song song) {
