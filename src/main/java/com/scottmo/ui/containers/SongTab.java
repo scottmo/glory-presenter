@@ -178,7 +178,7 @@ public final class SongTab extends JPanel {
         });
 
         List<String> templatePaths = new ArrayList<>(configService.getConfig().getTemplatePaths());
-        inputTemplate.setText(templatePaths.stream().filter(path -> path.contains("song")).findFirst().orElse(""));
+        inputTemplate.setText(templatePaths.stream().filter(path -> path.toLowerCase().contains("song")).findFirst().orElse(""));
         inputTemplate.setSuggestions(templatePaths);
 
         setLayout(new BorderLayout());

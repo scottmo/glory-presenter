@@ -33,7 +33,14 @@
         }
     },
     "bible": {
-        "containerTitle": "Bible"
+        "containerTitle": "Bible",
+        "availableVersions": "Available Bible Versions: ",
+        "bookKeys": "Books: ",
+        "buttonGenerateGSlide": "Generate GSlide",
+        "buttonGeneratePPT": "Generate PPT",
+        "buttonImport": "Import",
+        "inputBibleRef": "Bible Reference",
+        "inputTemplate": "PPT Template"
     },
     "configs": {
         "containerTitle": "Configurations",
