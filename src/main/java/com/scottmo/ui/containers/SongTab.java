@@ -37,6 +37,7 @@ import com.scottmo.core.songs.api.SongService;
 import com.scottmo.core.songs.api.song.Song;
 import com.scottmo.shared.StringUtils;
 import com.scottmo.ui.components.Dialog;
+import com.scottmo.ui.components.FilePicker;
 import com.scottmo.ui.components.ListView;
 import com.scottmo.ui.components.SongEditor;
 
@@ -126,6 +127,18 @@ public final class SongTab extends JPanel {
                 Dialog.info(String.format("Deleted songs: %s", StringUtils.join(deletedSongs)));
                 loadSongList();
             }
+        });
+
+        buttonImport.addActionListener(evt -> {
+            FilePicker.show(selectedFilePath -> {
+                try {
+                    controller.importSongs(selectedFilePath);
+                    Dialog.info("Import success!");
+                    loadSongList();
+                } catch (Exception e) {
+                    Dialog.error("Error importing " + selectedFilePath, e);
+                }
+            });
         });
 
         buttonExport.addActionListener(evt -> {
