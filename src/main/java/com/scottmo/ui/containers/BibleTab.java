@@ -1,26 +1,22 @@
 package com.scottmo.ui.containers;
 
 import static com.scottmo.config.Config.UI_GAP;
-import static org.httprpc.sierra.UIBuilder.*;
+import static org.httprpc.sierra.UIBuilder.cell;
+import static org.httprpc.sierra.UIBuilder.column;
 
 import java.awt.BorderLayout;
-import java.io.IOException;
-import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 import javax.swing.JButton;
 import javax.swing.JComponent;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
 import org.httprpc.sierra.SuggestionPicker;
-import org.httprpc.sierra.TextPane;
 
 import com.scottmo.api.BibleController;
 import com.scottmo.config.ConfigService;

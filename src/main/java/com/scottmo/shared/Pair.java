@@ -9,6 +9,7 @@ public record Pair<K, V>(K key, V value) {
     }
 
     @SafeVarargs
+    @SuppressWarnings("unchecked")
     public static <K, V> List<Pair<K, V>> ofList(Object... keyValues) {
         if (keyValues.length % 2 != 0) {
             throw new IllegalArgumentException("There must be an even number of arguments (key-value pairs).");

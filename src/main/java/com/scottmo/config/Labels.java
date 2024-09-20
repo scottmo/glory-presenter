@@ -12,6 +12,7 @@ public class Labels {
 
     private static Map<String, Object> labels;
 
+    @SuppressWarnings("unchecked")
     public static String get(String path) {
         if (labels == null) {
             try (InputStream in = Labels.class.getClassLoader().getResourceAsStream(Config.LABELS_FILENAME)){

@@ -8,8 +8,9 @@ import java.util.Map;
 import java.util.Set;
 
 public class Config {
-    public static final int APP_WIDTH = 900;
-    public static final int APP_HEIGHT = 600;
+    public static final AppSize COMPACT_SIZE = new AppSize(900, 600, 13);
+    public static final AppSize COMFORT_SIZE = new AppSize(1100, 800, 16);
+
     public static final int UI_GAP = 8;
 
     public static final String CONFIG_FILENAME = "config.json";
@@ -17,11 +18,20 @@ public class Config {
 
     public static final String LABELS_FILENAME = "labels.json";
 
+    private AppSize appSize = COMPACT_SIZE;
     private String outputDir;
     private String dataDir;
     private List<String> locales = new ArrayList<>();; // order matters to which locale comes first
     private Map<String, String> bibleVersionToLocale = new HashMap<>();
     private Set<String> templatePaths = new HashSet<>();
+
+    public AppSize getAppSize() {
+        return appSize;
+    }
+
+    public void setAppSize(AppSize appSize) {
+        this.appSize = appSize;
+    }
 
     public String getDataDir() {
         return dataDir;
@@ -62,4 +72,6 @@ public class Config {
     public void setTemplatePaths(Set<String> templatePaths) {
         this.templatePaths = templatePaths;
     }
+
+    public record AppSize(int width, int height, int font) {}
 }

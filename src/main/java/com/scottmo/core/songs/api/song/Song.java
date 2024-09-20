@@ -1,14 +1,13 @@
 package com.scottmo.core.songs.api.song;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.scottmo.shared.LocaleUtil;
-import com.scottmo.shared.StringUtils;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.scottmo.shared.LocaleUtil;
+import com.scottmo.shared.StringUtils;
 
 public class Song {
     private int id = -1;

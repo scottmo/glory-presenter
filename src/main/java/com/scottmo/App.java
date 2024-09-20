@@ -3,7 +3,6 @@ package com.scottmo;
 import static com.scottmo.config.Config.UI_GAP;
 
 import java.awt.KeyboardFocusManager;
-import java.util.List;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -14,6 +13,7 @@ import javax.swing.border.EmptyBorder;
 import org.httprpc.sierra.ScrollingKeyboardFocusManager;
 
 import com.formdev.flatlaf.FlatDarkLaf;
+import com.scottmo.api.ConfigsController;
 import com.scottmo.config.Config;
 import com.scottmo.config.ConfigService;
 import com.scottmo.config.Labels;
@@ -37,8 +37,9 @@ public class App extends JFrame {
         setTitle(Labels.get("appName"));
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setResizable(false);
-        setSize(Config.APP_WIDTH, Config.APP_HEIGHT);
+    }
 
+    private void render() {
         JTabbedPane tabs = new JTabbedPane();
         Pair.<String, JPanel>ofList(
             "songs.containerTitle", new SongTab(),
@@ -49,6 +50,7 @@ public class App extends JFrame {
             tabs.addTab(Labels.get(tabCmp.key()), tabCmp.value());
         });
         getContentPane().add(tabs);
+        this.setVisible(true);
     }
 
     public static void main(String[] args) {
@@ -60,7 +62,7 @@ public class App extends JFrame {
             });
 
             INSTANCE = new App();
-            INSTANCE.setVisible(true);
+            INSTANCE.render();
         });
     }
 }

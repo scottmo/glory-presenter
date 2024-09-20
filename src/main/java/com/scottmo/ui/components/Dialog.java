@@ -1,7 +1,5 @@
 package com.scottmo.ui.components;
 
-import java.awt.GridBagLayout;
-
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;

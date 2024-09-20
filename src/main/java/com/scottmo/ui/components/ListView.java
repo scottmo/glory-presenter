@@ -14,11 +14,8 @@ import javax.swing.JScrollPane;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 
-import com.scottmo.config.Config;
-
 public class ListView extends JPanel {
     private static final Dimension MIN_SIZE = new Dimension(200, 400);
-    private static final Dimension MAX_ITEM_SIZE = new Dimension(Config.APP_WIDTH, 32);
     private static final int ITEM_PADDING = 5;
 
     private List<JPanel> itemPanels = new ArrayList<>();
@@ -54,7 +51,7 @@ public class ListView extends JPanel {
 
         for (String item : items) {
             JPanel itemPanel = new JPanel(new BorderLayout());
-            itemPanel.setMaximumSize(MAX_ITEM_SIZE);
+            itemPanel.setMaximumSize(new Dimension(getMaximumSize().width, 40));
             itemPanel.setBorder(new EmptyBorder(ITEM_PADDING, ITEM_PADDING, ITEM_PADDING, ITEM_PADDING)); // padding
 
             JCheckBox checkBox = new JCheckBox(item);

@@ -44,6 +44,7 @@
     },
     "configs": {
         "containerTitle": "Configurations",
-        "buttonToggleDarkMode": "Toggle Dark Mode"
+        "buttonToggleDarkMode": "Toggle Dark Mode",
+        "buttonChangeSize": "Comfort/Compact"
     }
 }
