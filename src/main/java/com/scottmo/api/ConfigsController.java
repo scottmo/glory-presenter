@@ -1,10 +1,12 @@
 package com.scottmo.api;
 
+import java.awt.Font;
 import java.util.Enumeration;
 
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.plaf.FontUIResource;
+import javax.swing.text.StyleContext;
 
 import com.formdev.flatlaf.FlatDarkLaf;
 import com.formdev.flatlaf.FlatLightLaf;
@@ -51,7 +53,14 @@ public class ConfigsController {
             Object value = UIManager.get(key);
             if (value != null && value instanceof FontUIResource) {
                 FontUIResource oldFont = (FontUIResource) value;
-                FontUIResource newFont = new FontUIResource(oldFont.getFamily(), oldFont.getStyle(), newSize);
+                // Default font may not support CJK characters, so this creates a composite font
+                // that fallbacks to a different font for rendering CJK characters instead of squares.
+                Font compositeNewFont = StyleContext.getDefaultStyleContext()
+                        .getFont(oldFont.getFamily(), oldFont.getStyle(), newSize);
+                // Need to use FontUIResource instead of Font otherwise the font cannot be changed
+                // multiple times during runtime.
+                FontUIResource newFont = new FontUIResource(compositeNewFont);
+                
                 UIManager.put(key, newFont);
             }
         }
