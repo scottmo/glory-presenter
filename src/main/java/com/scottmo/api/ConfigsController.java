@@ -38,8 +38,8 @@ public class ConfigsController {
     public void setAppSize(Config.AppSize appSize) {
         SwingUtilities.invokeLater(() -> {
             configService.getConfig().setAppSize(appSize);
-            App.get().setSize(appSize.width(), appSize.height());
             setUIFontSize(appSize.font());
+            App.get().setSize(appSize.width(), appSize.height());
             SwingUtilities.updateComponentTreeUI(App.get());
         });
     }
@@ -49,9 +49,10 @@ public class ConfigsController {
         while (keys.hasMoreElements()) {
             Object key = keys.nextElement();
             Object value = UIManager.get(key);
-            if (value != null && value instanceof javax.swing.plaf.FontUIResource) {
+            if (value != null && value instanceof FontUIResource) {
                 FontUIResource oldFont = (FontUIResource) value;
-                UIManager.put(key, oldFont.deriveFont((float) newSize));
+                FontUIResource newFont = new FontUIResource(oldFont.getFamily(), oldFont.getStyle(), newSize);
+                UIManager.put(key, newFont);
             }
         }
     }
