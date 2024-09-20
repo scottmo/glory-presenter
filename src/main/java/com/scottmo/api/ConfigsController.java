@@ -13,8 +13,8 @@ import com.formdev.flatlaf.FlatLightLaf;
 import com.scottmo.App;
 import com.scottmo.config.Config;
 import com.scottmo.config.Config.AppSize;
+import com.scottmo.ui.utils.Dialog;
 import com.scottmo.config.ConfigService;
-import com.scottmo.ui.components.Dialog;
 
 public class ConfigsController {
     private ConfigService configService = ConfigService.get();

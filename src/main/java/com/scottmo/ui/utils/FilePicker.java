@@ -1,4 +1,4 @@
-package com.scottmo.ui.components;
+package com.scottmo.ui.utils;
 
 import com.scottmo.App;
 import com.scottmo.config.ConfigService;

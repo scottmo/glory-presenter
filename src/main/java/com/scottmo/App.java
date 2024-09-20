@@ -18,10 +18,10 @@ import com.scottmo.config.Config;
 import com.scottmo.config.ConfigService;
 import com.scottmo.config.Labels;
 import com.scottmo.shared.Pair;
-import com.scottmo.ui.components.Dialog;
 import com.scottmo.ui.containers.BibleTab;
 import com.scottmo.ui.containers.ConfigsTab;
 import com.scottmo.ui.containers.SongTab;
+import com.scottmo.ui.utils.Dialog;
 
 public class App extends JFrame {
     private static final int MARGIN = UI_GAP * 2;

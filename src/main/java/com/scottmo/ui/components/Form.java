@@ -17,6 +17,9 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
+import com.scottmo.ui.utils.Dialog;
+import com.scottmo.ui.utils.FilePicker;
+
 public final class Form {
     private static final Map<String, Integer> FILE_PICKER_TYPE_MAP = Map.of(
             "file", FilePicker.FILES,

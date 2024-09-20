@@ -1,6 +1,8 @@
 package com.scottmo.ui.containers;
 
 import static com.scottmo.config.Config.UI_GAP;
+import static com.scottmo.ui.utils.ComponentBuilder.label;
+import static com.scottmo.ui.utils.ComponentBuilder.namedLabel;
 import static org.httprpc.sierra.UIBuilder.cell;
 import static org.httprpc.sierra.UIBuilder.column;
 
@@ -22,9 +24,8 @@ import com.scottmo.api.BibleController;
 import com.scottmo.config.ConfigService;
 import com.scottmo.config.Labels;
 import com.scottmo.shared.StringUtils;
-import com.scottmo.ui.components.C;
-import com.scottmo.ui.components.Dialog;
-import com.scottmo.ui.components.FilePicker;
+import com.scottmo.ui.utils.Dialog;
+import com.scottmo.ui.utils.FilePicker;
 
 public final class BibleTab extends JPanel {
     private ConfigService configService = ConfigService.get();
@@ -65,14 +66,14 @@ public final class BibleTab extends JPanel {
  
         setLayout(new BorderLayout());
         add(column(UI_GAP,
-            cell(C.namedLabel("bible.availableVersions")),
-            cell(C.label(StringUtils.join(controller.getVersions()))).with(indentation),
-            cell(C.namedLabel("bible.bookKeys")),
-            cell(C.label(StringUtils.join(controller.getBooks()))).with(indentation),
+            cell(namedLabel("bible.availableVersions")),
+            cell(label(StringUtils.join(controller.getVersions()))).with(indentation),
+            cell(namedLabel("bible.bookKeys")),
+            cell(label(StringUtils.join(controller.getBooks()))).with(indentation),
             cell(new JSeparator()),
-            cell(C.namedLabel("bible.inputBibleRef")),
+            cell(namedLabel("bible.inputBibleRef")),
             cell(inputBibleRef),
-            cell(C.namedLabel("bible.inputTemplate")),
+            cell(namedLabel("bible.inputTemplate")),
             cell(inputTemplate),
             cell(buttonGeneratePPT),
             cell(buttonGenerateGSlide),

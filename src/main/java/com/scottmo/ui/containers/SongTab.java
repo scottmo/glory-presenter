@@ -35,10 +35,10 @@ import com.scottmo.core.ppt.api.SongSlidesGenerator;
 import com.scottmo.core.songs.api.SongService;
 import com.scottmo.core.songs.api.song.Song;
 import com.scottmo.shared.StringUtils;
-import com.scottmo.ui.components.Dialog;
-import com.scottmo.ui.components.FilePicker;
 import com.scottmo.ui.components.ListView;
 import com.scottmo.ui.components.SongEditor;
+import com.scottmo.ui.utils.Dialog;
+import com.scottmo.ui.utils.FilePicker;
 
 public final class SongTab extends JPanel {
     private ConfigService configService = ConfigService.get();

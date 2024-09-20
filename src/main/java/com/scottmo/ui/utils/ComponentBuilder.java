@@ -1,4 +1,4 @@
-package com.scottmo.ui.components;
+package com.scottmo.ui.utils;
 
 import java.awt.Font;
 
@@ -12,7 +12,7 @@ import com.scottmo.config.Labels;
 /**
  * Component builder helper
  */
-public final class C {
+public final class ComponentBuilder {
     private static JComponent splitPane(int orientation, JComponent ... components) {
         JComponent tail = new JScrollPane(components[0]);
         for (int i = 1; i < components.length; i++) {

@@ -1,4 +1,4 @@
-package com.scottmo.ui.components;
+package com.scottmo.ui.utils;
 
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
