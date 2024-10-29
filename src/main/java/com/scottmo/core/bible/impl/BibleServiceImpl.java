@@ -1,15 +1,16 @@
 package com.scottmo.core.bible.impl;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import com.scottmo.config.ConfigService;
 import com.scottmo.core.bible.api.BibleService;
+import com.scottmo.core.bible.api.bibleMetadata.BibleMetadata;
 import com.scottmo.core.bible.api.bibleMetadata.BibleVerse;
 import com.scottmo.core.bible.api.bibleOsis.Osis;
 import com.scottmo.core.bible.api.bibleReference.BibleReference;
@@ -42,14 +43,36 @@ public class BibleServiceImpl implements BibleService {
     }
 
     @Override
+    public List<String> getBooks() {
+        return new ArrayList<>(BibleMetadata.getBookInfoMap().keySet());
+    }
+
+    @Override
     public Map<String, String> getBookNames(String bookId) {
         return getStore().getBookNames(bookId);
     }
 
     @Override
-    public void importOsisBible(File osisFile) throws IOException {
-        String osisXML = Files.readString(osisFile.toPath(), StandardCharsets.UTF_8);
+    public void importBible(String osisFilePath) throws IOException {
+        String osisXML = Files.readString(Path.of(osisFilePath), StandardCharsets.UTF_8);
         Osis bibleOsis = Osis.of(osisXML);
         store.insert(bibleOsis.getVerses(), bibleOsis.getId());
+    }
+
+    @Override
+    public List<String> importBibles(List<String> oasisFilePaths) {
+        List<String> failedImports = new ArrayList<>();
+        if (oasisFilePaths == null || oasisFilePaths.isEmpty()) {
+            throw new IllegalArgumentException("No file to import!");
+        }
+        oasisFilePaths.stream().forEach(filePath -> {
+            try {
+                importBible(filePath);
+            } catch (IOException e) {
+                failedImports.add(filePath);
+                e.printStackTrace();
+            }
+        });
+        return failedImports;
     }
 }

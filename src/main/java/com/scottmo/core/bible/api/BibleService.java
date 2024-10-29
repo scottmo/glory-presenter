@@ -17,8 +17,11 @@ public interface BibleService extends Service {
 
     List<String> getAvailableVersions();
 
+    List<String> getBooks();
+
     Map<String, String> getBookNames(String bookId);
 
-    void importOsisBible(File osisFile) throws IOException;
+    void importBible(String filePath) throws IOException;
 
+    List<String> importBibles(List<String> filePaths);
 }

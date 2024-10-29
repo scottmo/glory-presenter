@@ -29,19 +29,7 @@ public class BibleController {
     }
 
     public boolean importBibles(List<String> biblePaths) {
-        if (biblePaths == null || biblePaths.isEmpty()) {
-            throw new IllegalArgumentException("No file to import!");
-        }
-        List<File> osisXMLFiles = biblePaths.stream()
-                .map(path -> new File(path))
-                .collect(Collectors.toList());
-        for (File file : osisXMLFiles) {
-            try {
-                bibleService.importOsisBible(file);
-            } catch (IOException e) {
-                throw new RuntimeException("Failed to import bible [%s]!".formatted(file.getName()), e);
-            }
-        }
+        bibleService.importBibles(biblePaths);
         return true;
     }
 
