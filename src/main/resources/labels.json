@@ -42,6 +42,10 @@
         "inputBibleRef": "Bible Reference",
         "inputTemplate": "PPT Template"
     },
+    "program": {
+        "containerTitle": "Program",
+        "buttonGeneratePPT": "Generate PPT"
+    },
     "configs": {
         "containerTitle": "Configurations",
         "buttonToggleDarkMode": "Toggle Dark Mode",

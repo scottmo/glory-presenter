@@ -13,13 +13,12 @@ import javax.swing.border.EmptyBorder;
 import org.httprpc.sierra.ScrollingKeyboardFocusManager;
 
 import com.formdev.flatlaf.FlatDarkLaf;
-import com.scottmo.api.ConfigsController;
-import com.scottmo.config.Config;
 import com.scottmo.config.ConfigService;
 import com.scottmo.config.Labels;
 import com.scottmo.shared.Pair;
 import com.scottmo.ui.containers.BibleTab;
 import com.scottmo.ui.containers.ConfigsTab;
+import com.scottmo.ui.containers.ProgramTab;
 import com.scottmo.ui.containers.SongTab;
 import com.scottmo.ui.utils.Dialog;
 
@@ -44,6 +43,7 @@ public class App extends JFrame {
         Pair.<String, JPanel>ofList(
             "songs.containerTitle", new SongTab(),
             "bible.containerTitle", new BibleTab(),
+            "program.containerTitle", new ProgramTab(),
             "configs.containerTitle", new ConfigsTab()
         ).forEach(tabCmp -> {
             tabCmp.value().setBorder(new EmptyBorder(MARGIN, MARGIN, MARGIN, MARGIN));
