@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.scottmo.core.ServiceProvider;
 import com.scottmo.core.bible.api.BibleService;
 import com.scottmo.core.bible.api.bibleMetadata.BibleVerse;
 import com.scottmo.core.bible.api.bibleReference.BibleReference;
@@ -21,7 +22,7 @@ public final class BibleSlidesGeneratorImpl implements BibleSlidesGenerator {
     private static final String VERSE_RANGE = "verses";
     private static final String BOOK = "book.%s";
 
-    private BibleService bibleService;
+    private BibleService bibleService = ServiceProvider.get(BibleService.class).get();
 
     @Override
     public void generate(String bibleRefString, String tmplFilePath, String outputFilePath) throws IOException {
@@ -31,9 +32,19 @@ public final class BibleSlidesGeneratorImpl implements BibleSlidesGenerator {
     @Override
     public void generate(String bibleRefString, String tmplFilePath, String outputFilePath,
             boolean hasStartSlide, boolean hasEndSlide) throws IOException {
-        BibleReference bibleReference = new BibleReference(bibleRefString);
+
+        List<Map<String, String>> slideContents = toSlideContents(bibleRefString, hasStartSlide, hasEndSlide);
+
+        TemplatingUtil.generateSlideShow(slideContents, hasStartSlide, hasEndSlide,
+                PLACEHOLDER_TEMPLATE, tmplFilePath, outputFilePath);
+    }
+
+    private List<Map<String, String>> toSlideContents(String bibleRefString,
+            boolean hasStartSlide, boolean hasEndSlide) {
+
         List<Map<String, String>> slideContents = new ArrayList<>();
 
+        BibleReference bibleReference = new BibleReference(bibleRefString);
         Map<String, List<BibleVerse>> bibleVerses = bibleService.getBibleVerses(bibleReference);
         Map<String, String> bookNames = bibleService.getBookNames(bibleReference.getBook());
 
@@ -64,7 +75,6 @@ public final class BibleSlidesGeneratorImpl implements BibleSlidesGenerator {
             slideContents.add(bibleMetadata);
         }
 
-        TemplatingUtil.generateSlideShow(slideContents, hasStartSlide, hasEndSlide,
-                PLACEHOLDER_TEMPLATE, tmplFilePath, outputFilePath);
+        return slideContents;
     }
 }

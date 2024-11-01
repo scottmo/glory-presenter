@@ -34,6 +34,16 @@ public final class SongSlidesGeneratorImpl implements SongSlidesGenerator {
     @Override
     public void generate(Song song, String tmplFilePath, String outputFilePath, List<String> locales,
             int maxLines, boolean hasStartSlide, boolean hasEndSlide) throws IOException {
+
+        List<Map<String, String>> slideContents = toSlideContents(song, locales, maxLines, hasStartSlide, hasEndSlide);
+
+        TemplatingUtil.generateSlideShow(slideContents, hasStartSlide, hasEndSlide,
+                PLACEHOLDER_TEMPLATE, tmplFilePath, outputFilePath);
+    }
+
+    private List<Map<String, String>> toSlideContents(Song song, List<String> locales,
+            int maxLines, boolean hasStartSlide, boolean hasEndSlide) {
+
         // song metadata for all slides
         Map<String, String> songMetadata = new HashMap<>();
         songMetadata.put(SONGBOOK, song.getSongBook());
@@ -60,9 +70,7 @@ public final class SongSlidesGeneratorImpl implements SongSlidesGenerator {
         if (hasEndSlide) {
             slideContents.add(songMetadata);
         }
-
-        TemplatingUtil.generateSlideShow(slideContents, hasStartSlide, hasEndSlide,
-                PLACEHOLDER_TEMPLATE, tmplFilePath, outputFilePath);
+        return slideContents;
     }
 
     /**
