@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 final class TemplatingUtil {
     static final String PLACEHOLDER_TEMPLATE = "{%s}";
 
-    public static String getText(XSLFSlide slide) {
+    static String getText(XSLFSlide slide) {
         return slide.getShapes().stream()
                 .filter(s -> s instanceof XSLFTextShape)
                 .map(s -> ((XSLFTextShape)s).getTextParagraphs().stream()
@@ -28,7 +28,7 @@ final class TemplatingUtil {
                 .collect(Collectors.joining("\n"));
     }
 
-    public static void removeAllTexts(XSLFSlide slide, String regex) {
+    static void removeAllTexts(XSLFSlide slide, String regex) {
         slide.getShapes().stream()
                 .filter(s -> s instanceof XSLFTextShape)
                 .forEach(s -> {
@@ -42,7 +42,7 @@ final class TemplatingUtil {
                 });
     }
 
-    public static void replaceText(XSLFSlide slide, Map<String, String> replacements) {
+    static void replaceText(XSLFSlide slide, Map<String, String> replacements) {
         slide.getShapes().stream()
                 .filter(s -> s instanceof XSLFTextShape)
                 .forEach(s -> replaceText((XSLFTextShape) s, replacements));
@@ -68,7 +68,7 @@ final class TemplatingUtil {
         pp.setLineSpacing(100.0);
     }
 
-    public static void appendText(XSLFTextShape textShape, String text) {
+    static void appendText(XSLFTextShape textShape, String text) {
         String[] lines = text.trim().split("\n");
         var pps = textShape.getTextParagraphs();
         var pp = pps.get(pps.size() - 1);
@@ -84,7 +84,7 @@ final class TemplatingUtil {
     /**
      * setText that handles "\n" properly
      */
-    public static void setText(XSLFTextParagraph pp, String text) {
+    static void setText(XSLFTextParagraph pp, String text) {
         var baseTextRun = pp.getTextRuns().isEmpty()
                 ? pp.addNewTextRun()
                 : pp.getTextRuns().get(0);
@@ -105,11 +105,11 @@ final class TemplatingUtil {
      * Helper to remove all texts and new lines.
      * XSLFTextShape.setText("") is bugged when there's new line
      */
-    public static void clearText(XSLFTextShape textShape) {
+    static void clearText(XSLFTextShape textShape) {
         textShape.getTextParagraphs().forEach(TemplatingUtil::clearText);
     }
 
-    public static void clearText(XSLFTextParagraph pp) {
+    static void clearText(XSLFTextParagraph pp) {
         for (var textRun : pp.getTextRuns()) {
             if (!textRun.getRawText().equals("\n")) {
                 textRun.setText("");
@@ -123,7 +123,7 @@ final class TemplatingUtil {
         }
     }
 
-    public static void replacePlaceholders(XSLFSlide slide, Map<String, String> replacements) {
+    static void replacePlaceholders(XSLFSlide slide, Map<String, String> replacements) {
         for (var textShape : slide.getPlaceholders()) {
             String text = textShape.getText();
             for (var entry : replacements.entrySet()) {
@@ -136,11 +136,11 @@ final class TemplatingUtil {
         }
     }
 
-    public static void replacePlaceholders(XSLFSlide slide, String searchText, String replacement) {
+    static void replacePlaceholders(XSLFSlide slide, String searchText, String replacement) {
         replacePlaceholders(slide, Map.of(searchText, replacement));
     }
 
-    public static String findPlaceholderText(XSLFSlide slide, String searchText) {
+    static String findPlaceholderText(XSLFSlide slide, String searchText) {
         for (var placeholder : slide.getPlaceholders()) {
             String text = placeholder.getText();
             if (text.contains(searchText)) {
@@ -150,14 +150,14 @@ final class TemplatingUtil {
         return null;
     }
 
-    public static XSLFSlideMaster getSlideMaster(XMLSlideShow ppt, String name) {
+    static XSLFSlideMaster getSlideMaster(XMLSlideShow ppt, String name) {
         return ppt.getSlideMasters().stream()
                 .filter(master -> name.equals(master.getTheme().getName()))
                 .findFirst()
                 .orElse(null);
     }
 
-    public static XSLFSlideLayout getSlideMasterLayout(XMLSlideShow ppt, String name, String layout) {
+    static XSLFSlideLayout getSlideMasterLayout(XMLSlideShow ppt, String name, String layout) {
         return Optional.ofNullable(getSlideMaster(ppt, name))
                 .map(master -> master.getLayout(layout))
                 .orElse(null);
@@ -166,6 +166,30 @@ final class TemplatingUtil {
     private static void duplicateSlide(XMLSlideShow slides, XSLFSlide srcSlide) {
         var slide = slides.createSlide(srcSlide.getSlideLayout());
         slide.importContent(srcSlide);
+    }
+
+    static void generateSlideShow(List<Map<String, String>> contents, String tmplFilePath, String outputFilePath,
+            boolean hasStartSlide, boolean hasEndSlide) throws IOException {
+        generateSlideShow(contents, tmplFilePath, outputFilePath, PLACEHOLDER_TEMPLATE, hasStartSlide, hasEndSlide);
+    }
+
+    static void generateSlideShow(List<Map<String, String>> contents, String tmplFilePath, String outputFilePath) throws IOException {
+        generateSlideShow(contents, tmplFilePath, outputFilePath, PLACEHOLDER_TEMPLATE);
+    }
+
+    static void generateSlideShow(List<Map<String, String>> contents, String tmplFilePath, String outputFilePath, String placeholder) throws IOException {
+        boolean hasStartSlide;
+        boolean hasEndSlide;
+        try (var inStream = new FileInputStream(tmplFilePath)) {
+            var tmplSlides = new XMLSlideShow(inStream);
+            int numPlaceholderSlides = tmplSlides.getSlides().size();
+            tmplSlides.close();
+
+            hasStartSlide = numPlaceholderSlides > 1;
+            hasEndSlide = numPlaceholderSlides == 3;
+        }
+
+        generateSlideShow(contents, tmplFilePath, outputFilePath, placeholder, hasStartSlide, hasEndSlide);
     }
 
     /**
@@ -181,15 +205,15 @@ final class TemplatingUtil {
      * @param contents k,v placeholder value maps, each map represent 1 slide.
      *                 First k,v map will be used as start slide if present.
      *                 Last k,v map will be used as end slide if present.
-     * @param hasStartSlide whether there's a start slide
-     * @param hasEndSlide whether there's an end slide
-     * @param placeholderTemplate placeholder format string. e.g. {%s}
      * @param tmplFilePath template pptx
      * @param outputFilePath output pptx
+     * @param placeholderTemplate placeholder format string. e.g. {%s}
+     * @param hasStartSlide whether there's a start slide
+     * @param hasEndSlide whether there's an end slide
      * @throws IOException
      */
-    public static void generateSlideShow(List<Map<String, String>> contents, boolean hasStartSlide, boolean hasEndSlide,
-                                         String placeholderTemplate, String tmplFilePath, String outputFilePath) throws IOException {
+    static void generateSlideShow(List<Map<String, String>> contents, String tmplFilePath, String outputFilePath,
+                                         String placeholderTemplate, boolean hasStartSlide, boolean hasEndSlide) throws IOException {
         List<Map<String, String>> preppedContents = new ArrayList<>();
 
         // make copies of template slides first and write
@@ -253,5 +277,23 @@ final class TemplatingUtil {
             }
             ppt.close();
         }
+    }
+
+    static void mergeSlideShows(List<String> filePaths, String outputFilePath) throws IOException {
+        XMLSlideShow mergedPPT = new XMLSlideShow();
+        
+        for (String filePath : filePaths) {
+            try (var inputStream = new FileInputStream(filePath)) {
+                XMLSlideShow ppt = new XMLSlideShow(inputStream);
+                for (XSLFSlide slide : ppt.getSlides()) {
+                    mergedPPT.createSlide().importContent(slide);
+                }
+                ppt.close();
+            }
+        }
+        try (var outStream = new FileOutputStream(outputFilePath)) {
+            mergedPPT.write(outStream);
+        }
+        mergedPPT.close();
     }
 }

@@ -8,10 +8,8 @@ import com.scottmo.core.bible.api.BibleService;
 import com.scottmo.core.bible.impl.BibleServiceImpl;
 import com.scottmo.core.google.api.GoogleCloudService;
 import com.scottmo.core.google.impl.GoogleCloudServiceImpl;
-import com.scottmo.core.ppt.api.BibleSlidesGenerator;
-import com.scottmo.core.ppt.api.SongSlidesGenerator;
-import com.scottmo.core.ppt.impl.BibleSlidesGeneratorImpl;
-import com.scottmo.core.ppt.impl.SongSlidesGeneratorImpl;
+import com.scottmo.core.ppt.api.PowerpointService;
+import com.scottmo.core.ppt.impl.PowerpointServiceImpl;
 import com.scottmo.core.security.api.CipherService;
 import com.scottmo.core.security.impl.CipherServiceImpl;
 import com.scottmo.core.songs.api.SongService;
@@ -49,11 +47,8 @@ public class ServiceProvider {
         if (CipherService.class.isAssignableFrom(clazz)) {
             return (T) new CipherServiceImpl();
         }
-        if (BibleSlidesGenerator.class.isAssignableFrom(clazz)) {
-            return (T) new BibleSlidesGeneratorImpl();
-        }
-        if (SongSlidesGenerator.class.isAssignableFrom(clazz)) {
-            return (T) new SongSlidesGeneratorImpl();
+        if (PowerpointService.class.isAssignableFrom(clazz)) {
+            return (T) new PowerpointServiceImpl();
         }
         return null;
     }

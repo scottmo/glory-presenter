@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.scottmo.config.ConfigService;
-import com.scottmo.core.ppt.api.SongSlidesGenerator;
+import com.scottmo.core.ppt.api.PowerpointService;
 import com.scottmo.core.songs.api.SongService;
 import com.scottmo.core.songs.api.song.Song;
 import com.scottmo.shared.StringUtils;
@@ -18,11 +18,11 @@ public class SongController {
 
     private ConfigService configService = ConfigService.get();
     private SongService songService;
-    private SongSlidesGenerator pptxGenerator;
+    private PowerpointService powerpointService;
 
-    public SongController(SongService songService, SongSlidesGenerator pptxGenerator) {
+    public SongController(SongService songService, PowerpointService powerpointService) {
         this.songService = songService;
-        this.pptxGenerator = pptxGenerator;
+        this.powerpointService = powerpointService;
     }
 
     public Map<String, Integer> getSongs() {
@@ -53,7 +53,7 @@ public class SongController {
         if (!templatePath.contains("/")) {
             templatePath = configService.getPPTXTemplate(templatePath);
         }
-        pptxGenerator.generate(song, templatePath, outputPath, configService.getConfig().getLocales(),
+        powerpointService.generate(song, templatePath, outputPath, configService.getConfig().getLocales(),
                 linesPerSlide);
     
         return outputPath;

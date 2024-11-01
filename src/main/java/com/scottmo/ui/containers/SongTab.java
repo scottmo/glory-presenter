@@ -31,7 +31,7 @@ import com.scottmo.api.SongController;
 import com.scottmo.config.ConfigService;
 import com.scottmo.config.Labels;
 import com.scottmo.core.ServiceProvider;
-import com.scottmo.core.ppt.api.SongSlidesGenerator;
+import com.scottmo.core.ppt.api.PowerpointService;
 import com.scottmo.core.songs.api.SongService;
 import com.scottmo.core.songs.api.song.Song;
 import com.scottmo.shared.StringUtils;
@@ -44,7 +44,7 @@ public final class SongTab extends JPanel {
     private ConfigService configService = ConfigService.get();
     private SongController controller = new SongController(
         ServiceProvider.get(SongService.class).get(),
-        ServiceProvider.get(SongSlidesGenerator.class).get());
+        ServiceProvider.get(PowerpointService.class).get());
 
     // cache to look up song id
     private Map<String, Integer> songIdMap = new HashMap<>();

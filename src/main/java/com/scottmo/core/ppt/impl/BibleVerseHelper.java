@@ -1,8 +1,5 @@
 package com.scottmo.core.ppt.impl;
 
-import static com.scottmo.core.ppt.impl.TemplatingUtil.PLACEHOLDER_TEMPLATE;
-
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -12,9 +9,8 @@ import com.scottmo.core.ServiceProvider;
 import com.scottmo.core.bible.api.BibleService;
 import com.scottmo.core.bible.api.bibleMetadata.BibleVerse;
 import com.scottmo.core.bible.api.bibleReference.BibleReference;
-import com.scottmo.core.ppt.api.BibleSlidesGenerator;
 
-public final class BibleSlidesGeneratorImpl implements BibleSlidesGenerator {
+class BibleVerseHelper {
     // placeholder keys
     private static final String VERSE_CHAPTER = "verse.chapter";
     private static final String VERSE_NUMBER = "verse.number";
@@ -24,22 +20,7 @@ public final class BibleSlidesGeneratorImpl implements BibleSlidesGenerator {
 
     private BibleService bibleService = ServiceProvider.get(BibleService.class).get();
 
-    @Override
-    public void generate(String bibleRefString, String tmplFilePath, String outputFilePath) throws IOException {
-        generate(bibleRefString, tmplFilePath, outputFilePath, true, false);
-    }
-
-    @Override
-    public void generate(String bibleRefString, String tmplFilePath, String outputFilePath,
-            boolean hasStartSlide, boolean hasEndSlide) throws IOException {
-
-        List<Map<String, String>> slideContents = toSlideContents(bibleRefString, hasStartSlide, hasEndSlide);
-
-        TemplatingUtil.generateSlideShow(slideContents, hasStartSlide, hasEndSlide,
-                PLACEHOLDER_TEMPLATE, tmplFilePath, outputFilePath);
-    }
-
-    private List<Map<String, String>> toSlideContents(String bibleRefString,
+    List<Map<String, String>> toSlideContents(String bibleRefString,
             boolean hasStartSlide, boolean hasEndSlide) {
 
         List<Map<String, String>> slideContents = new ArrayList<>();

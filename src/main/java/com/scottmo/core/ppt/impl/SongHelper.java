@@ -1,8 +1,5 @@
 package com.scottmo.core.ppt.impl;
 
-import static com.scottmo.core.ppt.impl.TemplatingUtil.PLACEHOLDER_TEMPLATE;
-
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -11,12 +8,13 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import com.scottmo.core.ppt.api.SongSlidesGenerator;
+import com.scottmo.core.ServiceProvider;
+import com.scottmo.core.songs.api.SongService;
 import com.scottmo.core.songs.api.song.Song;
 import com.scottmo.core.songs.api.song.SongVerse;
 import com.scottmo.shared.StringUtils;
 
-public final class SongSlidesGeneratorImpl implements SongSlidesGenerator {
+class SongHelper {
     // placeholder keys
     private static final String VERSE_PREFIX = "verse.";
     private static final String TITLE_PREFIX = "title.";
@@ -25,23 +23,15 @@ public final class SongSlidesGeneratorImpl implements SongSlidesGenerator {
     private static final String COPYRIGHT = "copyright";
     private static final String PUBLISHER = "publisher";
 
-    @Override
-    public void generate(Song song, String tmplFilePath, String outputFilePath, List<String> locales,
-            int maxLines) throws IOException {
-        generate(song, tmplFilePath, outputFilePath, locales, maxLines, true, false);
+    private SongService songService = ServiceProvider.get(SongService.class).get();
+
+    List<Map<String, String>> toSlideContents(int songId, List<String> locales,
+            int maxLines, boolean hasStartSlide, boolean hasEndSlide) {
+        Song song = songService.get(songId);
+        return toSlideContents(song, locales, maxLines, hasStartSlide, hasEndSlide);
     }
 
-    @Override
-    public void generate(Song song, String tmplFilePath, String outputFilePath, List<String> locales,
-            int maxLines, boolean hasStartSlide, boolean hasEndSlide) throws IOException {
-
-        List<Map<String, String>> slideContents = toSlideContents(song, locales, maxLines, hasStartSlide, hasEndSlide);
-
-        TemplatingUtil.generateSlideShow(slideContents, hasStartSlide, hasEndSlide,
-                PLACEHOLDER_TEMPLATE, tmplFilePath, outputFilePath);
-    }
-
-    private List<Map<String, String>> toSlideContents(Song song, List<String> locales,
+    List<Map<String, String>> toSlideContents(Song song, List<String> locales,
             int maxLines, boolean hasStartSlide, boolean hasEndSlide) {
 
         // song metadata for all slides
