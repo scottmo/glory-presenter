@@ -1,4 +1,4 @@
-package com.scottmo.api;
+package com.scottmo.ui.utils;
 
 import java.awt.Font;
 import java.util.Enumeration;
@@ -13,10 +13,9 @@ import com.formdev.flatlaf.FlatLightLaf;
 import com.scottmo.App;
 import com.scottmo.config.Config;
 import com.scottmo.config.Config.AppSize;
-import com.scottmo.ui.utils.Dialog;
 import com.scottmo.config.ConfigService;
 
-public class ConfigsController {
+public class UiConfigurator {
     private ConfigService configService = ConfigService.get();
 
     private boolean isDarkMode = true;
