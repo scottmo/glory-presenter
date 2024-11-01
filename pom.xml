@@ -56,12 +56,12 @@
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.dataformat</groupId>
-            <artifactId>jackson-dataformat-toml</artifactId>
+            <artifactId>jackson-dataformat-xml</artifactId>
             <version>2.14.0</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.dataformat</groupId>
-            <artifactId>jackson-dataformat-xml</artifactId>
+            <artifactId>jackson-dataformat-yaml</artifactId>
             <version>2.14.0</version>
         </dependency>
         <!-- db -->
@@ -105,7 +105,7 @@
             <groupId>com.google.apis</groupId>
             <artifactId>google-api-services-drive</artifactId>
             <version>v3-rev20220815-2.0.0</version>
-        </dependency>              
+        </dependency>
         <!-- testing -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
