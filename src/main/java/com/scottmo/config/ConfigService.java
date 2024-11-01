@@ -82,7 +82,7 @@ public class ConfigService {
         }
     }
 
-    public String getPPTXTemplate(String fileName) {
+    public String getPowerpointTemplate(String fileName) {
         return getRelativePath(Path.of(Config.TEMPLATE_DIR, fileName).toString());
     }
 

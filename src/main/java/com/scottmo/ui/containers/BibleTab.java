@@ -7,6 +7,8 @@ import static org.httprpc.sierra.UIBuilder.cell;
 import static org.httprpc.sierra.UIBuilder.column;
 
 import java.awt.BorderLayout;
+import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -20,16 +22,19 @@ import javax.swing.border.EmptyBorder;
 
 import org.httprpc.sierra.SuggestionPicker;
 
-import com.scottmo.api.BibleController;
 import com.scottmo.config.ConfigService;
 import com.scottmo.config.Labels;
+import com.scottmo.core.ServiceProvider;
+import com.scottmo.core.bible.api.BibleService;
+import com.scottmo.core.ppt.api.PowerpointService;
 import com.scottmo.shared.StringUtils;
 import com.scottmo.ui.utils.Dialog;
 import com.scottmo.ui.utils.FilePicker;
 
 public final class BibleTab extends JPanel {
     private ConfigService configService = ConfigService.get();
-    private BibleController controller = new BibleController();
+    private BibleService bibleService = ServiceProvider.get(BibleService.class).get();
+    private PowerpointService powerpointService = ServiceProvider.get(PowerpointService.class).get();
 
     private JButton buttonImport = new JButton(Labels.get("bible.buttonImport"));
     private JButton buttonGenerateGSlide = new JButton(Labels.get("bible.buttonGenerateGSlide"));
@@ -42,7 +47,7 @@ public final class BibleTab extends JPanel {
 
         buttonGeneratePPT.addActionListener(evt -> {
             try {
-                controller.generatePPTX(inputBibleRef.getText(), inputTemplate.getText());
+                generatePowerpoint(inputBibleRef.getText(), inputTemplate.getText());
             } catch (Exception e) {
                 Dialog.error("Unable to generate pptx for " + inputBibleRef.getText(), e);
                 e.printStackTrace();
@@ -52,7 +57,7 @@ public final class BibleTab extends JPanel {
         buttonImport.addActionListener(evt -> {
             FilePicker.show(selectedFilePath -> {
                 try {
-                    controller.importBibles(List.of(selectedFilePath));
+                    bibleService.importBibles(List.of(selectedFilePath));
                     Dialog.info("Import success! Please restart for it to be loaded!");
                 } catch (Exception e) {
                     Dialog.error("Error importing " + selectedFilePath, e);
@@ -67,9 +72,9 @@ public final class BibleTab extends JPanel {
         setLayout(new BorderLayout());
         add(column(UI_GAP,
             cell(namedLabel("bible.availableVersions")),
-            cell(label(StringUtils.join(controller.getVersions()))).with(indentation),
+            cell(label(StringUtils.join(bibleService.getAvailableVersions()))).with(indentation),
             cell(namedLabel("bible.bookKeys")),
-            cell(label(StringUtils.join(controller.getBooks()))).with(indentation),
+            cell(label(StringUtils.join(bibleService.getBooks()))).with(indentation),
             cell(new JSeparator()),
             cell(namedLabel("bible.inputBibleRef")),
             cell(inputBibleRef),
@@ -80,5 +85,13 @@ public final class BibleTab extends JPanel {
             cell(new JSeparator()),
             cell(buttonImport)
         ).getComponent());
+    }
+
+    private void generatePowerpoint(String bibleRef, String templatePath) throws MalformedURLException, IOException {
+        String outputPath = configService.getOutputPath(StringUtils.sanitizeFilename(bibleRef) + ".pptx");
+        if (!templatePath.contains("/")) {
+            templatePath = configService.getPowerpointTemplate(templatePath);
+        }
+        powerpointService.generate(bibleRef, templatePath, outputPath.toString());
     }
 }

@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.scottmo.config.ConfigService;
 import com.scottmo.core.ServiceProvider;
 import com.scottmo.core.bible.api.BibleService;
 import com.scottmo.core.bible.api.bibleMetadata.BibleVerse;
@@ -18,12 +19,18 @@ class BibleVerseHelper {
     private static final String VERSE_RANGE = "verses";
     private static final String BOOK = "book.%s";
 
+    private ConfigService configService = ConfigService.get();
     private BibleService bibleService = ServiceProvider.get(BibleService.class).get();
 
     List<Map<String, String>> toSlideContents(String bibleRefString,
             boolean hasStartSlide, boolean hasEndSlide) {
 
         List<Map<String, String>> slideContents = new ArrayList<>();
+
+        // missing version
+        if (!bibleRefString.contains(BibleReference.VERSION_SEPERATOR)) {
+            bibleRefString = getBibleVersionsString() + BibleReference.VERSION_SEPERATOR + bibleRefString;
+        }
 
         BibleReference bibleReference = new BibleReference(bibleRefString);
         Map<String, List<BibleVerse>> bibleVerses = bibleService.getBibleVerses(bibleReference);
@@ -57,5 +64,9 @@ class BibleVerseHelper {
         }
 
         return slideContents;
+    }
+
+    private String getBibleVersionsString() {
+        return String.join(",", new ArrayList<>(configService.getConfig().getBibleVersionToLocale().keySet()));
     }
 }

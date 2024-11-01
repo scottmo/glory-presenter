@@ -10,6 +10,8 @@ import java.util.stream.Collectors;
  * e.g. cuv,niv - john 1:2-3;3:4;5:1-3
  */
 public class BibleReference {
+    public static final String VERSION_SEPERATOR = " - ";
+
     private static final Pattern RE_VERSE_NOTATION = Pattern.compile("(\\d?[A-z\\s]+)\\s+([\\d,;:\\-\\s]+)");
 
     private List<String> versions;
@@ -20,7 +22,7 @@ public class BibleReference {
         assert !bibleReferenceStr.isEmpty() : "BibleReference is missing completely!";
         String refString = bibleReferenceStr;
 
-        String[] bibleReferenceStrParts = refString.split(" - ");
+        String[] bibleReferenceStrParts = refString.split(VERSION_SEPERATOR);
         if (bibleReferenceStrParts.length > 1) {
             versions = List.of(bibleReferenceStrParts[0].split(","));
             refString = bibleReferenceStrParts[1];

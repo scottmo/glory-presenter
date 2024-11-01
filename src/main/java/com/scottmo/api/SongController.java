@@ -51,7 +51,7 @@ public class SongController {
         Song song = getSong(id);
         String outputPath = configService.getOutputPath(StringUtils.sanitizeFilename(song.getTitle()) + ".pptx");
         if (!templatePath.contains("/")) {
-            templatePath = configService.getPPTXTemplate(templatePath);
+            templatePath = configService.getPowerpointTemplate(templatePath);
         }
         powerpointService.generate(song, templatePath, outputPath, configService.getConfig().getLocales(),
                 linesPerSlide);
