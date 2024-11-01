@@ -13,35 +13,25 @@ public class PowerpointServiceImpl implements PowerpointService {
 
     @Override
     public void generate(List<Map<String, String>> contents, String tmplFilePath, String outputFilePath) throws IOException {
-        generate(contents, tmplFilePath, outputFilePath);
+        TemplatingUtil.generateSlideShow(contents, tmplFilePath, outputFilePath);
     }
-    @Override
-    public void generate(List<Map<String, String>> contents, String tmplFilePath, String outputFilePath,
-            boolean hasStartSlide, boolean hasEndSlide) throws IOException {
-        TemplatingUtil.generateSlideShow(contents, tmplFilePath, outputFilePath, hasStartSlide, hasEndSlide);
-    }
+
 
     @Override
     public void generate(String bibleRefString, String tmplFilePath, String outputFilePath) throws IOException {
-        generate(bibleRefString, tmplFilePath, outputFilePath, true, false);
-    }
-    @Override
-    public void generate(String bibleRefString, String tmplFilePath, String outputFilePath,
-            boolean hasStartSlide, boolean hasEndSlide) throws IOException {
-        List<Map<String, String>> slideContents = bibleVerseHelper.toSlideContents(bibleRefString, hasStartSlide, hasEndSlide);
-        generate(slideContents, tmplFilePath, outputFilePath, hasStartSlide, hasEndSlide);
+        List<Map<String, String>> slideContents = bibleVerseHelper.toSlideContents(bibleRefString);
+        generate(slideContents, tmplFilePath, outputFilePath);
     }
 
     @Override
-    public void generate(Song song, String tmplFilePath, String outputFilePath, List<String> locales,
-            int maxLines) throws IOException {
-        generate(song, tmplFilePath, outputFilePath, locales, maxLines, true, false);
+    public void generate(Integer songId, String tmplFilePath, String outputFilePath, int maxLines) throws IOException {
+        List<Map<String, String>> slideContents = songHelper.toSlideContents(songId, maxLines);
+        generate(slideContents, tmplFilePath, outputFilePath);
     }
     @Override
-    public void generate(Song song, String tmplFilePath, String outputFilePath, List<String> locales,
-            int maxLines, boolean hasStartSlide, boolean hasEndSlide) throws IOException {
-        List<Map<String, String>> slideContents = songHelper.toSlideContents(song, locales, maxLines, hasStartSlide, hasEndSlide);
-        generate(slideContents, tmplFilePath, outputFilePath, hasStartSlide, hasEndSlide);
+    public void generate(Song song, String tmplFilePath, String outputFilePath, int maxLines) throws IOException {
+        List<Map<String, String>> slideContents = songHelper.toSlideContents(song, maxLines);
+        generate(slideContents, tmplFilePath, outputFilePath);
     }
 
     @Override

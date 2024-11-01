@@ -8,6 +8,10 @@ import static org.httprpc.sierra.UIBuilder.strut;
 
 import java.awt.BorderLayout;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -16,7 +20,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -27,7 +30,6 @@ import javax.swing.SpinnerNumberModel;
 
 import org.httprpc.sierra.SuggestionPicker;
 
-import com.scottmo.api.SongController;
 import com.scottmo.config.ConfigService;
 import com.scottmo.config.Labels;
 import com.scottmo.core.ServiceProvider;
@@ -42,9 +44,8 @@ import com.scottmo.ui.utils.FilePicker;
 
 public final class SongTab extends JPanel {
     private ConfigService configService = ConfigService.get();
-    private SongController controller = new SongController(
-        ServiceProvider.get(SongService.class).get(),
-        ServiceProvider.get(PowerpointService.class).get());
+    private SongService songService = ServiceProvider.get(SongService.class).get();
+    private PowerpointService powerpointService = ServiceProvider.get(PowerpointService.class).get();
 
     // cache to look up song id
     private Map<String, Integer> songIdMap = new HashMap<>();
@@ -63,8 +64,6 @@ public final class SongTab extends JPanel {
 
     private JButton buttonGenerateGSlide = new JButton(Labels.get("songs.buttonGenerateGSlide"));
     private JButton buttonGeneratePPT = new JButton(Labels.get("songs.buttonGeneratePPT"));
-    private JCheckBox checkboxStartSlide = new JCheckBox(Labels.get("songs.checkboxStartSlide"));
-    private JCheckBox checkboxEndSlide = new JCheckBox(Labels.get("songs.checkboxEndSlide"));
     private JSpinner inputLinesPerSlide = new JSpinner(new SpinnerNumberModel(2, 1, 10, 1));
     private SuggestionPicker inputTemplate = new SuggestionPicker(10);
 
@@ -95,7 +94,7 @@ public final class SongTab extends JPanel {
             if (songId == null) {
                 Dialog.error(String.format("Unable to edit %s. Song cannot be found!", songName));
             } else {
-                showSongEditor(controller.getSong(songId));
+                showSongEditor(songService.get(songId));
             }
         });
 
@@ -105,7 +104,7 @@ public final class SongTab extends JPanel {
             if (songId == null) {
                 Dialog.error(String.format("Unable to duplicate %s. Song cannot be found!", songName));
             } else {
-                Song song = controller.getSong(songId);
+                Song song = songService.get(songId);
                 song.resetId();
                 showSongEditor(song);
             }
@@ -118,7 +117,7 @@ public final class SongTab extends JPanel {
                 if (songId == null) {
                     Dialog.error(String.format("Unable to delete %s. Song cannot be found!", songName));
                 } else {
-                    controller.deleteSong(songId);
+                    songService.delete(songId);
                     deletedSongs.add(songName);
                 }
             }
@@ -131,7 +130,7 @@ public final class SongTab extends JPanel {
         buttonImport.addActionListener(evt -> {
             FilePicker.show(selectedFilePath -> {
                 try {
-                    controller.importSongs(selectedFilePath);
+                    importSongs(selectedFilePath);
                     Dialog.info("Import success!");
                     loadSongList();
                 } catch (Exception e) {
@@ -148,7 +147,7 @@ public final class SongTab extends JPanel {
                     Dialog.error(String.format("Unable to export %s. Song cannot be found!", songName));
                 } else {
                     try {
-                        controller.exportSong(songId);
+                        exportSong(songId);
                         exportedSongs.add(songName);
                     } catch (IOException ioe) {
                         Dialog.error(String.format("Failed to export %s!", songName), ioe);
@@ -169,7 +168,7 @@ public final class SongTab extends JPanel {
             String songName = songList.getSelectedItems().get(0);
             Integer songId = songIdMap.get(songName);
             try {
-                String outputPath = controller.generatePPTX(songId, (Integer) inputLinesPerSlide.getValue(), inputTemplate.getText());
+                String outputPath = generatePowerpoint(songId, getLinesPerSlide(), inputTemplate.getText());
                 Dialog.info("Successfully generated ppt at " + outputPath);
             } catch (IOException e) {
                 Dialog.error("Unable to generate ppt", e);
@@ -198,8 +197,6 @@ public final class SongTab extends JPanel {
                 cell(buttonImport),
                 cell(buttonExport),
                 cell(new JSeparator()),
-                cell(checkboxStartSlide),
-                cell(checkboxEndSlide),
                 cell(new JLabel(Labels.get("songs.inputLinesPerSlide"))),
                 cell(inputLinesPerSlide),
                 cell(new JLabel(Labels.get("songs.inputTemplate"))),
@@ -210,8 +207,12 @@ public final class SongTab extends JPanel {
         ).getComponent());
     }
 
+    private int getLinesPerSlide() {
+        return (Integer) inputLinesPerSlide.getValue();
+    }
+
     private void loadSongList() {
-        songIdMap = controller.getSongs();
+        songIdMap = getSongIdMap();
         songNames = new ArrayList<>(songIdMap.keySet());
         Collections.sort(songNames);
         songList.setItems(songNames);
@@ -243,12 +244,53 @@ public final class SongTab extends JPanel {
             modal.dispose();
         });
         songEditor.addSaveListener((Song modifiedSong) -> {
-            controller.saveSong(modifiedSong);
+            songService.store(modifiedSong);
             Dialog.info(String.format("Saved song '%s' successfully!", modifiedSong.getTitle()));
             modal.dispose();
             loadSongList(); // refresh song list
         });
 
         modal.setVisible(true);
+    }
+
+    private void importSongs(String filePath) {
+        if (filePath == null || filePath.isEmpty()) {
+            throw new IllegalArgumentException("Please select a file to upload");
+        }
+
+        // TODO handle importing a zip of songs
+        try {
+            String content = Files.readString(Path.of(filePath));
+            songService.importSong(content);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to import song [%s]!".formatted(filePath), e);
+        }
+    }
+
+    private void exportSong(Integer id) throws IOException {
+        Song song = songService.get(id);
+        String outputPath = configService.getOutputPath(StringUtils.sanitizeFilename(song.getTitle()) + ".xml");
+        String songXML = songService.serialize(song);
+        Files.writeString(Path.of(outputPath), songXML, StandardCharsets.UTF_8);
+    }
+
+    private Map<String, Integer> getSongIdMap() {
+        Map<String, Integer> titles = new HashMap<>();
+        for (var title : songService.getAllSongDescriptors(configService.getConfig().getLocales())) {
+            titles.put(title.value(), title.key());
+        }
+        return titles;
+    }
+
+    private String generatePowerpoint(Integer id, Integer linesPerSlide, String templatePath)
+            throws MalformedURLException, IOException {
+        Song song = songService.get(id);
+        String outputPath = configService.getOutputPath(StringUtils.sanitizeFilename(song.getTitle()) + ".pptx");
+        if (!templatePath.contains("/")) {
+            templatePath = configService.getPowerpointTemplate(templatePath);
+        }
+        powerpointService.generate(song, templatePath, outputPath, linesPerSlide);
+    
+        return outputPath;
     }
 }

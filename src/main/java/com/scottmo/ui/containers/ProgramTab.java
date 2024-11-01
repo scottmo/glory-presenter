@@ -13,19 +13,14 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
-import com.scottmo.api.SongController;
 import com.scottmo.config.ConfigService;
 import com.scottmo.config.Labels;
 import com.scottmo.core.ServiceProvider;
 import com.scottmo.core.ppt.api.PowerpointService;
-import com.scottmo.core.songs.api.SongService;
 
 public class ProgramTab extends JPanel {
     private ConfigService configService = ConfigService.get();
     private PowerpointService powerpointService = ServiceProvider.get(PowerpointService.class).get();
-    private SongController songController = new SongController(
-        ServiceProvider.get(SongService.class).get(),
-        powerpointService);
 
     private JTextArea fieldInput = new JTextArea(30, 30);
     private JButton buttonGeneratePPT = new JButton(Labels.get("program.buttonGeneratePPT"));
@@ -57,10 +52,10 @@ public class ProgramTab extends JPanel {
                 switch (config.type().toLowerCase()) {
                     case "ppt":
                         List<Map<String, String>> values = config.values() == null ? List.of() : List.of(config.values());
-                        powerpointService.generate(values, templatePath, tempFilePath, false, false);
+                        powerpointService.generate(values, templatePath, tempFilePath);
                         break;
                     case "song":
-                        tempFilePath = songController.generatePPTX(config.id(), 2, templatePath);
+                        powerpointService.generate(config.id(), templatePath, tempFilePath, 2);
                         break;
                     case "bible":
                         powerpointService.generate(config.verses(), templatePath, tempFilePath);

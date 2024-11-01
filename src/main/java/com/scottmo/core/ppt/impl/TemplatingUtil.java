@@ -168,28 +168,8 @@ final class TemplatingUtil {
         slide.importContent(srcSlide);
     }
 
-    static void generateSlideShow(List<Map<String, String>> contents, String tmplFilePath, String outputFilePath,
-            boolean hasStartSlide, boolean hasEndSlide) throws IOException {
-        generateSlideShow(contents, tmplFilePath, outputFilePath, PLACEHOLDER_TEMPLATE, hasStartSlide, hasEndSlide);
-    }
-
     static void generateSlideShow(List<Map<String, String>> contents, String tmplFilePath, String outputFilePath) throws IOException {
         generateSlideShow(contents, tmplFilePath, outputFilePath, PLACEHOLDER_TEMPLATE);
-    }
-
-    static void generateSlideShow(List<Map<String, String>> contents, String tmplFilePath, String outputFilePath, String placeholder) throws IOException {
-        boolean hasStartSlide;
-        boolean hasEndSlide;
-        try (var inStream = new FileInputStream(tmplFilePath)) {
-            var tmplSlides = new XMLSlideShow(inStream);
-            int numPlaceholderSlides = tmplSlides.getSlides().size();
-            tmplSlides.close();
-
-            hasStartSlide = numPlaceholderSlides > 1;
-            hasEndSlide = numPlaceholderSlides == 3;
-        }
-
-        generateSlideShow(contents, tmplFilePath, outputFilePath, placeholder, hasStartSlide, hasEndSlide);
     }
 
     /**
@@ -203,17 +183,14 @@ final class TemplatingUtil {
      * need to be delimited by a new line in order of have different styles.
      *
      * @param contents k,v placeholder value maps, each map represent 1 slide.
-     *                 First k,v map will be used as start slide if present.
-     *                 Last k,v map will be used as end slide if present.
+     *                 First k,v map is the metadata, which will be used for start/end slide if present.
      * @param tmplFilePath template pptx
      * @param outputFilePath output pptx
      * @param placeholderTemplate placeholder format string. e.g. {%s}
-     * @param hasStartSlide whether there's a start slide
-     * @param hasEndSlide whether there's an end slide
      * @throws IOException
      */
     static void generateSlideShow(List<Map<String, String>> contents, String tmplFilePath, String outputFilePath,
-                                         String placeholderTemplate, boolean hasStartSlide, boolean hasEndSlide) throws IOException {
+            String placeholderTemplate) throws IOException {
         List<Map<String, String>> preppedContents = new ArrayList<>();
 
         // make copies of template slides first and write
@@ -221,6 +198,9 @@ final class TemplatingUtil {
         try (var inStream = new FileInputStream(tmplFilePath)) {
             var tmplSlides = new XMLSlideShow(inStream);
             int numPlaceholderSlides = tmplSlides.getSlides().size();
+            boolean hasStartSlide = numPlaceholderSlides > 1;
+            boolean hasEndSlide = numPlaceholderSlides == 3;
+
             // start slide if present
             XSLFSlide srcSlide;
             if (hasStartSlide) {
@@ -230,7 +210,7 @@ final class TemplatingUtil {
             }
 
             // content slides, use all content template slides for each content value map
-            int contentStartIndex = hasStartSlide ? 1 : 0;
+            int contentStartIndex = 1; // content data starts at index 1
             int contentEndIndex = hasEndSlide ? contents.size() - 1 : contents.size();
             int contentTmplEndIndex = hasEndSlide ? numPlaceholderSlides - 1 : numPlaceholderSlides;
             for (int j = contentStartIndex; j < contentEndIndex; j++) {
@@ -245,7 +225,7 @@ final class TemplatingUtil {
             if (hasEndSlide) {
                 srcSlide = tmplSlides.getSlides().get(numPlaceholderSlides - 1);
                 duplicateSlide(tmplSlides, srcSlide);
-                preppedContents.add(contents.get(contents.size() - 1));
+                preppedContents.add(contents.get(0));
             }
 
             // remove template slides

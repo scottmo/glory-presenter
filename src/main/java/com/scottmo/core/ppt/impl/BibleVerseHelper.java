@@ -22,8 +22,7 @@ class BibleVerseHelper {
     private ConfigService configService = ConfigService.get();
     private BibleService bibleService = ServiceProvider.get(BibleService.class).get();
 
-    List<Map<String, String>> toSlideContents(String bibleRefString,
-            boolean hasStartSlide, boolean hasEndSlide) {
+    List<Map<String, String>> toSlideContents(String bibleRefString) {
 
         List<Map<String, String>> slideContents = new ArrayList<>();
 
@@ -42,10 +41,10 @@ class BibleVerseHelper {
         }
         bibleMetadata.put(VERSE_RANGE, bibleReference.getRangesString());
 
-        if (hasStartSlide) {
-            slideContents.add(bibleMetadata);
-        }
+        // title/end slide
+        slideContents.add(bibleMetadata);
 
+        // verse slides
         int numVerses = bibleVerses.values().iterator().next().size();
         for (int i = 0; i < numVerses; i++) {
             Map<String, String> verseMap = new HashMap<>();
@@ -57,10 +56,6 @@ class BibleVerseHelper {
             verseMap.put(VERSE_NUMBER, String.valueOf(verse.index()));
             verseMap.putAll(bibleMetadata);
             slideContents.add(verseMap);
-        }
-
-        if (hasEndSlide) {
-            slideContents.add(bibleMetadata);
         }
 
         return slideContents;

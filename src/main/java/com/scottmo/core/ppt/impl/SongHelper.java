@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import com.scottmo.config.ConfigService;
 import com.scottmo.core.ServiceProvider;
 import com.scottmo.core.songs.api.SongService;
 import com.scottmo.core.songs.api.song.Song;
@@ -23,17 +24,15 @@ class SongHelper {
     private static final String COPYRIGHT = "copyright";
     private static final String PUBLISHER = "publisher";
 
+    private ConfigService configService = ConfigService.get();
     private SongService songService = ServiceProvider.get(SongService.class).get();
 
-    List<Map<String, String>> toSlideContents(int songId, List<String> locales,
-            int maxLines, boolean hasStartSlide, boolean hasEndSlide) {
+    List<Map<String, String>> toSlideContents(int songId, int maxLines) {
         Song song = songService.get(songId);
-        return toSlideContents(song, locales, maxLines, hasStartSlide, hasEndSlide);
+        return toSlideContents(song, maxLines);
     }
 
-    List<Map<String, String>> toSlideContents(Song song, List<String> locales,
-            int maxLines, boolean hasStartSlide, boolean hasEndSlide) {
-
+    List<Map<String, String>> toSlideContents(Song song, int maxLines) {
         // song metadata for all slides
         Map<String, String> songMetadata = new HashMap<>();
         songMetadata.put(SONGBOOK, song.getSongBook());
@@ -45,7 +44,7 @@ class SongHelper {
         }
 
         // lyrics
-        List<String> textGroups = locales.stream().map(s -> VERSE_PREFIX + s).toList();
+        List<String> textGroups = configService.getConfig().getLocales().stream().map(s -> VERSE_PREFIX + s).toList();
         List<Map<String, String>> lyrics = getSectionTexts(getOrderedVerses(song), textGroups, maxLines);
         // make song metadata also available to verse slides
         for (Map<String, String> verse : lyrics) {
@@ -53,13 +52,8 @@ class SongHelper {
         }
 
         List<Map<String, String>> slideContents = new ArrayList<>();
-        if (hasStartSlide) {
-            slideContents.add(songMetadata);
-        }
+        slideContents.add(songMetadata);
         slideContents.addAll(lyrics);
-        if (hasEndSlide) {
-            slideContents.add(songMetadata);
-        }
         return slideContents;
     }
 

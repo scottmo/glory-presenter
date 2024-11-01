@@ -11,8 +11,6 @@
         "buttonGeneratePPT": "Generate PPT",
         "buttonImport": "Import",
         "buttonExport": "Export",
-        "checkboxStartSlide": "Include Start Slide",
-        "checkboxEndSlide": "Include End Slide",
         "inputLinesPerSlide": "Lines/Slide",
         "inputTemplate": "PPT Template",
         "editor": {

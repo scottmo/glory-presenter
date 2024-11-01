@@ -18,10 +18,10 @@ public interface SongService extends Service {
 
     boolean delete(int songId);
 
-    String serializeToOpenLyrics(Song song);
+    String serialize(Song song);
 
-    void importOpenLyricSong(File openLyricsFile) throws IOException;
+    void importSong(File file) throws IOException;
 
-    void importOpenLyricSong(String openLyricsXML) throws IOException;
+    void importSong(String filePath) throws IOException;
 
 }

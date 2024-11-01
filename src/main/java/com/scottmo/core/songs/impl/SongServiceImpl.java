@@ -47,18 +47,18 @@ public class SongServiceImpl implements SongService {
     }
 
     @Override
-    public String serializeToOpenLyrics(Song song) {
+    public String serialize(Song song) {
         return openLyricsConverter.serialize(song);
     }
 
     @Override
-    public void importOpenLyricSong(File openLyricsFile) throws IOException {
+    public void importSong(File openLyricsFile) throws IOException {
         String openLyricsXML = Files.readString(openLyricsFile.toPath(), StandardCharsets.UTF_8);
-        importOpenLyricSong(openLyricsXML);
+        importSong(openLyricsXML);
     }
 
     @Override
-    public void importOpenLyricSong(String openLyricsXML) throws IOException {
+    public void importSong(String openLyricsXML) throws IOException {
         Song song = openLyricsConverter.deserialize(openLyricsXML);
         store.store(song);
     }
