@@ -13,6 +13,7 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
+import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import com.scottmo.config.ConfigService;
 import com.scottmo.config.Labels;
 import com.scottmo.core.ServiceProvider;
@@ -24,6 +25,7 @@ public class ProgramTab extends JPanel {
 
     private JTextArea fieldInput = new JTextArea(30, 30);
     private JButton buttonGeneratePPT = new JButton(Labels.get("program.buttonGeneratePPT"));
+    private YAMLMapper yamlMapper = new YAMLMapper();
 
     public ProgramTab() {
         buttonGeneratePPT.addActionListener(evt -> {
@@ -39,8 +41,8 @@ public class ProgramTab extends JPanel {
 
     private void generatePPT(String yamlConfigs) {
         try {
-            var mapper = new com.fasterxml.jackson.dataformat.yaml.YAMLMapper();
-            List<PPTConfig> configs = mapper.readValue(yamlConfigs, mapper.getTypeFactory().constructCollectionType(List.class, PPTConfig.class));
+            List<PPTConfig> configs = yamlMapper.readValue(yamlConfigs,
+                yamlMapper.getTypeFactory().constructCollectionType(List.class, PPTConfig.class));
             List<String> tempFiles = new ArrayList<>();
 
             // Generate individual PPT files
@@ -48,17 +50,20 @@ public class ProgramTab extends JPanel {
             for (PPTConfig config : configs) {
                 String tempFilePath = System.getProperty("java.io.tmpdir") + "/" + config.type() + i + ".pptx";
                 i++;
-                String templatePath = configService.getRelativePath(config.path());
+                String templatePath = configService.getRelativePath(config.template());
                 switch (config.type().toLowerCase()) {
                     case "ppt":
-                        List<Map<String, String>> values = config.values() == null ? List.of() : List.of(config.values());
+                        List<Map<String, String>> values = yamlMapper.readValue(config.content(),
+                            yamlMapper.getTypeFactory().constructCollectionType(List.class, Map.class));
                         powerpointService.generate(values, templatePath, tempFilePath);
                         break;
                     case "song":
-                        powerpointService.generate(config.id(), templatePath, tempFilePath, 2);
+                        int songId = Integer.parseInt(config.content());
+                        powerpointService.generate(songId, templatePath, tempFilePath, 2);
                         break;
                     case "bible":
-                        powerpointService.generate(config.verses(), templatePath, tempFilePath);
+                        String verses = config.content();
+                        powerpointService.generate(verses, templatePath, tempFilePath);
                         break;
                     default:
                         throw new IllegalArgumentException("Unknown generator type: " + config.type());
@@ -73,9 +78,7 @@ public class ProgramTab extends JPanel {
 
     public record PPTConfig(
         String type,
-        String path,
-        Map<String, String> values,
-        String verses,
-        Integer id
+        String template,
+        String content
     ) {}
 }
