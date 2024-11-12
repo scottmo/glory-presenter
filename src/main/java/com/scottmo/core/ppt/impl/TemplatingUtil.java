@@ -1,6 +1,7 @@
 package com.scottmo.core.ppt.impl;
 
 import org.apache.poi.xslf.usermodel.XMLSlideShow;
+import org.apache.poi.xslf.usermodel.XSLFBackground;
 import org.apache.poi.xslf.usermodel.XSLFSlide;
 import org.apache.poi.xslf.usermodel.XSLFSlideLayout;
 import org.apache.poi.xslf.usermodel.XSLFSlideMaster;
@@ -168,6 +169,14 @@ final class TemplatingUtil {
         slide.importContent(srcSlide);
     }
 
+    private static void importSlide(XMLSlideShow slides, XSLFSlide srcSlide) {
+        var toSlide = slides.createSlide();
+        toSlide.getSlideLayout().importContent(srcSlide.getSlideLayout());
+        toSlide.getSlideMaster().importContent(srcSlide.getSlideMaster());
+        toSlide.getBackground().setFillColor(srcSlide.getBackground().getFillColor());
+        toSlide.importContent(srcSlide);
+    }
+
     static void generateSlideShow(List<Map<String, String>> contents, String tmplFilePath, String outputFilePath) throws IOException {
         generateSlideShow(contents, tmplFilePath, outputFilePath, PLACEHOLDER_TEMPLATE);
     }
@@ -264,21 +273,26 @@ final class TemplatingUtil {
     }
 
     static void mergeSlideShows(List<String> filePaths, String outputFilePath) throws IOException {
-        XMLSlideShow mergedPPT = new XMLSlideShow();
-        
-        for (String filePath : filePaths) {
-            try (var inputStream = new FileInputStream(filePath)) {
-                XMLSlideShow ppt = new XMLSlideShow(inputStream);
-                for (XSLFSlide slide : ppt.getSlides()) {
-                    mergedPPT.createSlide().importContent(slide);
+        // use first src as base to maintain ppt size and other attributes
+        String basePpt = filePaths.get(0);
+        filePaths = filePaths.subList(1, filePaths.size());
+        try (var baseInputStream = new FileInputStream(basePpt)) {
+            XMLSlideShow mergedPPT = new XMLSlideShow(baseInputStream);
+
+            for (String filePath : filePaths) {
+                try (var inputStream = new FileInputStream(filePath)) {
+                    XMLSlideShow ppt = new XMLSlideShow(inputStream);
+                    for (XSLFSlide srcSlide : ppt.getSlides()) {
+                        importSlide(mergedPPT, srcSlide);
+                    }
+                    ppt.close();
                 }
-                ppt.close();
             }
+            try (var outStream = new FileOutputStream(outputFilePath)) {
+                mergedPPT.write(outStream);
+            }
+            mergedPPT.close();
         }
-        try (var outStream = new FileOutputStream(outputFilePath)) {
-            mergedPPT.write(outStream);
-        }
-        mergedPPT.close();
     }
 
     static void copySlideShow(String tmplFilePath, String outputFilePath) throws IOException {
