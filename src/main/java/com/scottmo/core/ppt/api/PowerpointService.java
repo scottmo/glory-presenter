@@ -15,7 +15,7 @@ public interface PowerpointService extends Service {
     public void generate(Integer songId, String tmplFilePath, String outputFilePath, int maxLines) throws IOException;
     public void generate(Song song, String tmplFilePath, String outputFilePath, int maxLines) throws IOException;
 
-    public void generateFromYamlConfigs(String yamlConfigs) throws IOException;
+    public void generateFromYamlConfigs(String yamlConfigs, String outputFilePath) throws IOException;
 
     public void mergeSlideShows(List<String> filePaths, String outputFilePath) throws IOException;
 }

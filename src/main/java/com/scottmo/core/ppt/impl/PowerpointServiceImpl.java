@@ -53,7 +53,7 @@ public class PowerpointServiceImpl implements PowerpointService {
     }
 
     @Override
-    public void generateFromYamlConfigs(String yamlConfigs) throws IOException {
+    public void generateFromYamlConfigs(String yamlConfigs, String outputFilePath) throws IOException {
         List<PowerpointConfig> configs = yamlMapper.readValue(yamlConfigs,
                 yamlMapper.getTypeFactory().constructCollectionType(List.class, PowerpointConfig.class));
 
@@ -61,7 +61,7 @@ public class PowerpointServiceImpl implements PowerpointService {
         List<String> tempFiles = new ArrayList<>();
         for (int i = 0; i < configs.size(); i++) {
             PowerpointConfig config = configs.get(i);
-            String tempFilePath = System.getProperty("java.io.tmpdir") + "/" + config.type() + i + ".pptx";
+            String tempFilePath = System.getProperty("java.io.tmpdir") + config.type() + i + ".pptx";
             String templatePath = configService.getRelativePath(config.template());
             String type = config.type() == null ? "default" : config.type().toLowerCase();
 
@@ -81,15 +81,16 @@ public class PowerpointServiceImpl implements PowerpointService {
                     generate(verses, templatePath, tempFilePath);
                     break;
                 default:
-                    List<Map<String, String>> values = yamlMapper.readValue(config.content(),
+                    List<Map<String, String>> values = config.content() == null
+                        ? List.of()
+                        : yamlMapper.readValue(config.content(),
                             yamlMapper.getTypeFactory().constructCollectionType(List.class, Map.class));
                     generate(values, templatePath, tempFilePath);
                     break;
             }
             tempFiles.add(tempFilePath);
         }
-        String outputPath = configService.getOutputPath("slidesShow.ppt");
-        logger.info("Merging temporary powerpoints into " + outputPath);
-        mergeSlideShows(tempFiles, outputPath);
+        logger.info("Merging temporary powerpoints into " + outputFilePath);
+        mergeSlideShows(tempFiles, outputFilePath);
     }
 }

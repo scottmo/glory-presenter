@@ -11,12 +11,14 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
+import com.scottmo.config.ConfigService;
 import com.scottmo.config.Labels;
 import com.scottmo.core.ServiceProvider;
 import com.scottmo.core.ppt.api.PowerpointService;
 import com.scottmo.ui.utils.Dialog;
 
 public class ProgramTab extends JPanel {
+    private ConfigService configService = ConfigService.get();
     private PowerpointService powerpointService = ServiceProvider.get(PowerpointService.class).get();
 
     private JTextArea fieldInput = new JTextArea(30, 30);
@@ -25,9 +27,11 @@ public class ProgramTab extends JPanel {
     public ProgramTab() {
         buttonGeneratePPT.addActionListener(evt -> {
             try {
-                powerpointService.generateFromYamlConfigs(fieldInput.getText());
+                String outPath = configService.getOutputPath("slidesShow.ppt");
+                powerpointService.generateFromYamlConfigs(fieldInput.getText(), outPath);
+                Dialog.info("Generated slides at " + outPath);
             } catch (IOException e) {
-                Dialog.error("Error generating program slides", e);
+                Dialog.error("Error generating program slides", e); 
             }
         });
 

@@ -191,45 +191,53 @@ final class TemplatingUtil {
      */
     static void generateSlideShow(List<Map<String, String>> contents, String tmplFilePath, String outputFilePath,
             String placeholderTemplate) throws IOException {
+
+        if (contents == null || contents.isEmpty()) {
+            copySlideShow(tmplFilePath, outputFilePath);
+            return;
+        }
+
+        Map<String, String> metadata = contents.get(0);
+        contents = contents.subList(1, contents.size());
+
         List<Map<String, String>> preppedContents = new ArrayList<>();
 
         // make copies of template slides first and write
         // since for some reason the pptx reference is not able to modify the new copies in memory
         try (var inStream = new FileInputStream(tmplFilePath)) {
             var tmplSlides = new XMLSlideShow(inStream);
-            int numPlaceholderSlides = tmplSlides.getSlides().size();
-            boolean hasStartSlide = numPlaceholderSlides > 1;
-            boolean hasEndSlide = numPlaceholderSlides == 3;
+            int numTmplSlides = tmplSlides.getSlides().size();
+            boolean hasStartSlide = numTmplSlides > 1;
+            boolean hasEndSlide = numTmplSlides == 3;
 
             // start slide if present
             XSLFSlide srcSlide;
             if (hasStartSlide) {
                 srcSlide = tmplSlides.getSlides().get(0);
                 duplicateSlide(tmplSlides, srcSlide);
-                preppedContents.add(contents.get(0));
+                preppedContents.add(metadata);
             }
 
             // content slides, use all content template slides for each content value map
-            int contentStartIndex = 1; // content data starts at index 1
-            int contentEndIndex = hasEndSlide ? contents.size() - 1 : contents.size();
-            int contentTmplEndIndex = hasEndSlide ? numPlaceholderSlides - 1 : numPlaceholderSlides;
-            for (int j = contentStartIndex; j < contentEndIndex; j++) {
-                for (int k = contentStartIndex; k < contentTmplEndIndex; k++) {
-                    srcSlide = tmplSlides.getSlides().get(k);
+            int contentTmplStartIndex = hasStartSlide ? 1 : 0;
+            int contentTmplEndIndex = hasEndSlide ? numTmplSlides - 1 : numTmplSlides;
+            for (int c = 0; c < contents.size(); c++) {
+                for (int t = contentTmplStartIndex; t < contentTmplEndIndex; t++) {
+                    srcSlide = tmplSlides.getSlides().get(t);
                     duplicateSlide(tmplSlides, srcSlide);
-                    preppedContents.add(contents.get(j));
+                    preppedContents.add(contents.get(c));
                 }
             }
 
             // end slide if present
             if (hasEndSlide) {
-                srcSlide = tmplSlides.getSlides().get(numPlaceholderSlides - 1);
+                srcSlide = tmplSlides.getSlides().get(numTmplSlides - 1);
                 duplicateSlide(tmplSlides, srcSlide);
-                preppedContents.add(contents.get(0));
+                preppedContents.add(metadata);
             }
 
             // remove template slides
-            for (int i = 0; i < numPlaceholderSlides; i++) {
+            for (int i = 0; i < numTmplSlides; i++) {
                 tmplSlides.removeSlide(0);
             }
             try (var outStream = new FileOutputStream(outputFilePath)) {
@@ -275,5 +283,15 @@ final class TemplatingUtil {
             mergedPPT.write(outStream);
         }
         mergedPPT.close();
+    }
+
+    static void copySlideShow(String tmplFilePath, String outputFilePath) throws IOException {
+        try (var inStream = new FileInputStream(tmplFilePath)) {
+            var tmplSlides = new XMLSlideShow(inStream);
+            try (var outStream = new FileOutputStream(outputFilePath)) {
+                tmplSlides.write(outStream);
+            }
+            tmplSlides.close();
+        }
     }
 }
