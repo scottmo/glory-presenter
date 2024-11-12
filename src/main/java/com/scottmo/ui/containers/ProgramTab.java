@@ -17,6 +17,26 @@ import com.scottmo.core.ServiceProvider;
 import com.scottmo.core.ppt.api.PowerpointService;
 import com.scottmo.ui.utils.Dialog;
 
+/*
+Sample program template:
+- type: default
+  template: /templates/gcbc-start.pptx
+- type: default
+  template: /templates/gcbc-title.pptx
+  content: |
+    - metadata: none
+    - title_zh: 序樂
+      title_en: Prelude
+    - title_zh: 宣召
+      title_en: Call to Worship
+- type: bible
+  template: /templates/template-bible.pptx
+  content: psalms 51:10-14
+- type: song
+  template: /templates/template-song.pptx
+  content: 321
+ */
+
 public class ProgramTab extends JPanel {
     private ConfigService configService = ConfigService.get();
     private PowerpointService powerpointService = ServiceProvider.get(PowerpointService.class).get();
