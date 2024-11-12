@@ -207,20 +207,18 @@ final class TemplatingUtil {
         try (var inStream = new FileInputStream(tmplFilePath)) {
             var tmplSlides = new XMLSlideShow(inStream);
             int numTmplSlides = tmplSlides.getSlides().size();
-            boolean hasStartSlide = numTmplSlides > 1;
-            boolean hasEndSlide = numTmplSlides == 3;
 
             // start slide if present
             XSLFSlide srcSlide;
-            if (hasStartSlide) {
-                srcSlide = tmplSlides.getSlides().get(0);
-                duplicateSlide(tmplSlides, srcSlide);
-                preppedContents.add(metadata);
-            }
+
+            // start slide
+            srcSlide = tmplSlides.getSlides().get(0);
+            duplicateSlide(tmplSlides, srcSlide);
+            preppedContents.add(metadata);
 
             // content slides, use all content template slides for each content value map
-            int contentTmplStartIndex = hasStartSlide ? 1 : 0;
-            int contentTmplEndIndex = hasEndSlide ? numTmplSlides - 1 : numTmplSlides;
+            int contentTmplStartIndex = 1;
+            int contentTmplEndIndex = numTmplSlides - 1;
             for (int c = 0; c < contents.size(); c++) {
                 for (int t = contentTmplStartIndex; t < contentTmplEndIndex; t++) {
                     srcSlide = tmplSlides.getSlides().get(t);
@@ -229,12 +227,10 @@ final class TemplatingUtil {
                 }
             }
 
-            // end slide if present
-            if (hasEndSlide) {
-                srcSlide = tmplSlides.getSlides().get(numTmplSlides - 1);
-                duplicateSlide(tmplSlides, srcSlide);
-                preppedContents.add(metadata);
-            }
+            // end slide
+            srcSlide = tmplSlides.getSlides().get(numTmplSlides - 1);
+            duplicateSlide(tmplSlides, srcSlide);
+            preppedContents.add(metadata);
 
             // remove template slides
             for (int i = 0; i < numTmplSlides; i++) {
