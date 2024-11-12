@@ -168,7 +168,7 @@ public final class SongTab extends JPanel {
             String songName = songList.getSelectedItems().get(0);
             Integer songId = songIdMap.get(songName);
             try {
-                String outputPath = generatePowerpoint(songId, getLinesPerSlide(), inputTemplate.getText());
+                String outputPath = generatePowerpoint(songId, songName, getLinesPerSlide(), inputTemplate.getText());
                 Dialog.info("Successfully generated ppt at " + outputPath);
             } catch (IOException e) {
                 Dialog.error("Unable to generate ppt", e);
@@ -282,10 +282,10 @@ public final class SongTab extends JPanel {
         return titles;
     }
 
-    private String generatePowerpoint(Integer id, Integer linesPerSlide, String templatePath)
+    private String generatePowerpoint(Integer id, String songName, Integer linesPerSlide, String templatePath)
             throws MalformedURLException, IOException {
         Song song = songService.get(id);
-        String outputPath = configService.getOutputPath(StringUtils.sanitizeFilename(song.getTitle()) + ".pptx");
+        String outputPath = configService.getOutputPath(StringUtils.sanitizeFilename(songName) + ".pptx");
         if (!templatePath.contains("/")) {
             templatePath = configService.getPowerpointTemplate(templatePath);
         }
