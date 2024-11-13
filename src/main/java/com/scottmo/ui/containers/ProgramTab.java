@@ -34,7 +34,9 @@ Sample program template:
   content: psalms 51:10-14
 - type: song
   template: /templates/gcbc-song.pptx
-  content: 321
+  content: |
+    linesPerSlide: 2
+    songId: 321
  */
 
 public class ProgramTab extends JPanel {

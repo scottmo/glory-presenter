@@ -73,8 +73,9 @@ public class PowerpointServiceImpl implements PowerpointService {
 
             switch (type) {
                 case "song":
-                    int songId = Integer.parseInt(config.content());
-                    generate(songId, templatePath, tempFilePath, 2);
+                    @SuppressWarnings("unchecked")
+                    Map<String, Integer> songConfig = yamlMapper.readValue(config.content(), Map.class);
+                    generate(songConfig.get("songId"), templatePath, tempFilePath, songConfig.get("linesPerSlide"));
                     break;
                 case "bible":
                     String verses = config.content();
