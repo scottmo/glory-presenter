@@ -170,11 +170,22 @@ final class TemplatingUtil {
     }
 
     private static void importSlide(XMLSlideShow slides, XSLFSlide srcSlide) {
-        var toSlide = slides.createSlide();
-        toSlide.getSlideLayout().importContent(srcSlide.getSlideLayout());
-        toSlide.getSlideMaster().importContent(srcSlide.getSlideMaster());
+        var slideLayout = findMatchingLayout(slides, srcSlide.getSlideLayout());
+        var toSlide = slides.createSlide(slideLayout);
         toSlide.getBackground().setFillColor(srcSlide.getBackground().getFillColor());
         toSlide.importContent(srcSlide);
+    }
+
+    private static XSLFSlideLayout findMatchingLayout(XMLSlideShow slides, XSLFSlideLayout srcLayout) {
+        for (XSLFSlideMaster master : slides.getSlideMasters()) {
+            for (XSLFSlideLayout layout : master.getSlideLayouts()) {
+                if (layout.getName().equals(srcLayout.getName())) {
+                    return layout;
+                }
+            }
+        }
+        // If no matching layout found, return the first available layout
+        return slides.getSlideMasters().get(0).getSlideLayouts()[0];
     }
 
     static void generateSlideShow(List<Map<String, String>> contents, String tmplFilePath, String outputFilePath) throws IOException {
@@ -278,7 +289,6 @@ final class TemplatingUtil {
         filePaths = filePaths.subList(1, filePaths.size());
         try (var baseInputStream = new FileInputStream(basePpt)) {
             XMLSlideShow mergedPPT = new XMLSlideShow(baseInputStream);
-
             for (String filePath : filePaths) {
                 try (var inputStream = new FileInputStream(filePath)) {
                     XMLSlideShow ppt = new XMLSlideShow(inputStream);

@@ -30,10 +30,10 @@ Sample program template:
     - title_zh: 宣召
       title_en: Call to Worship
 - type: bible
-  template: /templates/template-bible.pptx
+  template: /templates/gcbc-bible.pptx
   content: psalms 51:10-14
 - type: song
-  template: /templates/template-song.pptx
+  template: /templates/gcbc-song.pptx
   content: 321
  */
 
