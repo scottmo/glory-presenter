@@ -2,6 +2,8 @@ package com.scottmo.core.ppt.impl;
 
 import org.apache.poi.xslf.usermodel.XMLSlideShow;
 import org.apache.poi.xslf.usermodel.XSLFBackground;
+import org.apache.poi.xslf.usermodel.XSLFPictureShape;
+import org.apache.poi.xslf.usermodel.XSLFShape;
 import org.apache.poi.xslf.usermodel.XSLFSlide;
 import org.apache.poi.xslf.usermodel.XSLFSlideLayout;
 import org.apache.poi.xslf.usermodel.XSLFSlideMaster;
@@ -164,13 +166,11 @@ final class TemplatingUtil {
                 .orElse(null);
     }
 
-    private static void duplicateSlide(XMLSlideShow slides, XSLFSlide srcSlide) {
-        var slide = slides.createSlide(srcSlide.getSlideLayout());
-        slide.importContent(srcSlide);
-    }
-
-    private static void importSlide(XMLSlideShow slides, XSLFSlide srcSlide) {
-        var slideLayout = findMatchingLayout(slides, srcSlide.getSlideLayout());
+    private static void duplicateSlide(XMLSlideShow slides, XSLFSlide srcSlide, boolean isExternal) {
+        var slideLayout = srcSlide.getSlideLayout();
+        if (isExternal) {
+            slideLayout = findMatchingLayout(slides, slideLayout);
+        }
         var toSlide = slides.createSlide(slideLayout);
         toSlide.getBackground().setFillColor(srcSlide.getBackground().getFillColor());
         toSlide.importContent(srcSlide);
@@ -233,7 +233,7 @@ final class TemplatingUtil {
 
             // start slide
             srcSlide = tmplSlides.getSlides().get(0);
-            duplicateSlide(tmplSlides, srcSlide);
+            duplicateSlide(tmplSlides, srcSlide, false);
             preppedContents.add(metadata);
 
             // content slides, use all content template slides for each content value map
@@ -242,14 +242,14 @@ final class TemplatingUtil {
             for (int c = 0; c < contents.size(); c++) {
                 for (int t = contentTmplStartIndex; t < contentTmplEndIndex; t++) {
                     srcSlide = tmplSlides.getSlides().get(t);
-                    duplicateSlide(tmplSlides, srcSlide);
+                    duplicateSlide(tmplSlides, srcSlide, false);
                     preppedContents.add(contents.get(c));
                 }
             }
 
             // end slide
             srcSlide = tmplSlides.getSlides().get(numTmplSlides - 1);
-            duplicateSlide(tmplSlides, srcSlide);
+            duplicateSlide(tmplSlides, srcSlide, false);
             preppedContents.add(metadata);
 
             // remove template slides
@@ -293,7 +293,7 @@ final class TemplatingUtil {
                 try (var inputStream = new FileInputStream(filePath)) {
                     XMLSlideShow ppt = new XMLSlideShow(inputStream);
                     for (XSLFSlide srcSlide : ppt.getSlides()) {
-                        importSlide(mergedPPT, srcSlide);
+                        duplicateSlide(mergedPPT, srcSlide, true);
                     }
                     ppt.close();
                 }
