@@ -2,7 +2,7 @@ package com.scottmo.ui.containers;
 
 import static com.scottmo.config.Config.UI_GAP;
 import static org.httprpc.sierra.UIBuilder.cell;
-import static org.httprpc.sierra.UIBuilder.row;
+import static org.httprpc.sierra.UIBuilder.column;
 
 import java.awt.BorderLayout;
 import java.io.IOException;
@@ -58,7 +58,7 @@ public class ProgramTab extends JPanel {
         });
 
         setLayout(new BorderLayout());
-        add(row(UI_GAP,
+        add(column(UI_GAP,
             cell(fieldInput),
             cell(buttonGeneratePPT)
         ).getComponent());
