@@ -1,6 +1,9 @@
 package com.scottmo.core.ppt.impl;
 
+import java.io.File;
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -57,41 +60,72 @@ public class PowerpointServiceImpl implements PowerpointService {
         List<PowerpointConfig> configs = yamlMapper.readValue(yamlConfigs,
                 yamlMapper.getTypeFactory().constructCollectionType(List.class, PowerpointConfig.class));
 
-        // Generate individual PPT files
-        List<String> tempFiles = new ArrayList<>();
-        for (int i = 0; i < configs.size(); i++) {
-            PowerpointConfig config = configs.get(i);
-            String tempFilePath = System.getProperty("java.io.tmpdir") + config.type() + i + ".pptx";
-            String templatePath = configService.getRelativePath(config.template());
-            String type = config.type() == null ? "default" : config.type().toLowerCase();
+        Map<String, String> defaultTemplates = configService.getConfig().getDefaultTemplates();
 
-            logger.info("Generating temporary powerpoint:"
-                + "\n- type: " + type
-                + "\n- template: " + templatePath
-                + "\n- out: " + tempFilePath
-                + "\n- content:\n" + config.content());
+        try {
+            // Generate individual PPT files
+            List<String> tempFiles = new ArrayList<>();
+            for (int i = 0; i < configs.size(); i++) {
+                PowerpointConfig config = configs.get(i);
+                String type = config.type() == null ? "default" : config.type().toLowerCase();
+                String tempFilePath = getTemporaryFilePath(type);
 
-            switch (type) {
-                case "song":
-                    @SuppressWarnings("unchecked")
-                    Map<String, Integer> songConfig = yamlMapper.readValue(config.content(), Map.class);
-                    generate(songConfig.get("songId"), templatePath, tempFilePath, songConfig.get("linesPerSlide"));
-                    break;
-                case "bible":
-                    String verses = config.content();
-                    generate(verses, templatePath, tempFilePath);
-                    break;
-                default:
-                    List<Map<String, String>> values = config.content() == null
-                        ? List.of()
-                        : yamlMapper.readValue(config.content(),
-                            yamlMapper.getTypeFactory().constructCollectionType(List.class, Map.class));
-                    generate(values, templatePath, tempFilePath);
-                    break;
+                String templatePath;
+                if (config.template() != null) {
+                    templatePath = configService.getPowerpointTemplate(config.template());
+                } else if (defaultTemplates.containsKey(type)) {
+                    templatePath = configService.getPowerpointTemplate(defaultTemplates.get(type));
+                } else {
+                    throw new IllegalArgumentException("No defined template for slide set " + i + "!");
+                }
+
+                logger.info("Generating temporary powerpoint:"
+                    + "\n- type: " + type
+                    + "\n- template: " + templatePath
+                    + "\n- out: " + tempFilePath
+                    + "\n- content:\n" + config.content());
+
+                switch (type) {
+                    case "song":
+                        @SuppressWarnings("unchecked")
+                        Map<String, Integer> songConfig = yamlMapper.readValue(config.content(), Map.class);
+                        generate(songConfig.get("songId"), templatePath, tempFilePath, songConfig.get("linesPerSlide"));
+                        break;
+                    case "bible":
+                        String verses = config.content();
+                        generate(verses, templatePath, tempFilePath);
+                        break;
+                    default:
+                        List<Map<String, String>> values = config.content() == null
+                            ? List.of()
+                            : yamlMapper.readValue(config.content(),
+                                yamlMapper.getTypeFactory().constructCollectionType(List.class, Map.class));
+                        generate(values, templatePath, tempFilePath);
+                        break;
+                }
+                tempFiles.add(tempFilePath);
             }
-            tempFiles.add(tempFilePath);
+            logger.info("Merging temporary powerpoints into " + outputFilePath);
+            mergeSlideShows(tempFiles, outputFilePath);
+        } finally {
+            cleanupTemporaryFiles();
         }
-        logger.info("Merging temporary powerpoints into " + outputFilePath);
-        mergeSlideShows(tempFiles, outputFilePath);
+    }
+
+    private List<String> tempFiles = new ArrayList<>();
+    private String getTemporaryFilePath(String prefix) {
+        String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
+        String path = System.getProperty("java.io.tmpdir") + prefix + "_" + timestamp + ".pptx";
+        tempFiles.add(path);
+        return path;
+    }
+    private void cleanupTemporaryFiles() {
+        for (String path : tempFiles) {
+            File file = new File(path);
+            if (!file.delete()) {
+                logger.error("Unable to delete temporary file: " + path);
+            }
+        }
+        tempFiles.clear();
     }
 }

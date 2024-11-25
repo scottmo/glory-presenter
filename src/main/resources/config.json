@@ -8,5 +8,10 @@
   "bibleVersionToLocale": {
     "cuv": "zh_cn",
     "niv": "en_us"
+  },
+  "defaultTemplates": {
+    "bible": "start.pptx",
+    "song": "song.pptx",
+    "default": "default.pptx"
   }
 }

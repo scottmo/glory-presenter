@@ -23,6 +23,7 @@ public class Config {
     private String dataDir;
     private List<String> locales = new ArrayList<>();; // order matters to which locale comes first
     private Map<String, String> bibleVersionToLocale = new HashMap<>();
+    private Map<String, String> defaultTemplates = new HashMap<>();
     private Set<String> templatePaths = new HashSet<>();
 
     public AppSize getAppSize() {
@@ -63,6 +64,14 @@ public class Config {
 
     public void setBibleVersionToLocale(Map<String, String> bibleVersionToLocale) {
         this.bibleVersionToLocale = bibleVersionToLocale;
+    }
+
+    public Map<String, String> getDefaultTemplates() {
+        return defaultTemplates;
+    }
+
+    public void setDefaultTemplates(Map<String, String> defaultTemplates) {
+        this.defaultTemplates = defaultTemplates;
     }
 
     public Set<String> getTemplatePaths() {
