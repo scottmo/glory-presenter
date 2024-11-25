@@ -17,12 +17,11 @@ import com.scottmo.core.ServiceProvider;
 import com.scottmo.core.ppt.api.PowerpointService;
 import com.scottmo.ui.utils.Dialog;
 
-/*
-Sample program template:
+public class ProgramTab extends JPanel {
+
+    private static final String SAMPLE_INPUT = """
 - type: default
-  template: /templates/gcbc-start.pptx
-- type: default
-  template: /templates/gcbc-title.pptx
+  template: default.pptx
   content: |
     - metadata: none
     - title_zh: 序樂
@@ -30,20 +29,21 @@ Sample program template:
     - title_zh: 宣召
       title_en: Call to Worship
 - type: bible
-  template: /templates/gcbc-bible.pptx
+  template: bible-en-only.pptx
   content: psalms 51:10-14
+- type: bible
+  content: john 1:1;mark 3:1
 - type: song
-  template: /templates/gcbc-song.pptx
+  template: song.pptx
   content: |
     linesPerSlide: 2
     songId: 321
- */
+""";
 
-public class ProgramTab extends JPanel {
     private ConfigService configService = ConfigService.get();
     private PowerpointService powerpointService = ServiceProvider.get(PowerpointService.class).get();
 
-    private JTextArea fieldInput = new JTextArea(30, 30);
+    private JTextArea fieldInput = new JTextArea(SAMPLE_INPUT, 30, 30);
     private JButton buttonGeneratePPT = new JButton(Labels.get("program.buttonGeneratePPT"));
 
     public ProgramTab() {
