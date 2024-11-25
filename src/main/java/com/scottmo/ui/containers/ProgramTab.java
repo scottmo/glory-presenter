@@ -5,6 +5,7 @@ import static org.httprpc.sierra.UIBuilder.cell;
 import static org.httprpc.sierra.UIBuilder.column;
 
 import java.awt.BorderLayout;
+import java.awt.Font;
 import java.io.IOException;
 
 import javax.swing.JButton;
@@ -59,7 +60,8 @@ public class ProgramTab extends JPanel {
 
         setLayout(new BorderLayout());
         add(column(UI_GAP,
-            cell(fieldInput),
+            cell(fieldInput).with(input ->
+                input.setFont(new Font(Font.MONOSPACED, Font.PLAIN, configService.getConfig().getAppSize().font()))),
             cell(buttonGeneratePPT)
         ).getComponent());
     }
