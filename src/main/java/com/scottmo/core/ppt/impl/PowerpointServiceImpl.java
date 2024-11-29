@@ -68,7 +68,7 @@ public class PowerpointServiceImpl implements PowerpointService {
             for (int i = 0; i < configs.size(); i++) {
                 PowerpointConfig config = configs.get(i);
                 String type = config.type() == null ? "default" : config.type().toLowerCase();
-                String tempFilePath = getTemporaryFilePath(type);
+                String tempFilePath = getTemporaryFilePath(type + i);
 
                 String templatePath;
                 if (config.template() != null) {
