@@ -13,5 +13,37 @@
     "bible": "start.pptx",
     "song": "song.pptx",
     "default": "default.pptx"
+  },
+  "googleSlides": {
+    "styles": {
+      "default": {
+        "x": 0,
+        "y": 0,
+        "width": 960,
+        "height": 540,
+        "alignment": "CENTER",
+        "indentation": 0,
+        "bold": true
+      },
+      "title": {
+        "fontSize": 60
+      },
+      "content": {
+        "fontSize": 24,
+        "fontFamily": "Arial"
+      },
+      "footer": {
+        "fontSize": 24,
+        "fontFamily": "Arial"
+      },
+      "zh_font": {
+        "fontSize": 24,
+        "fontFamily": "Kaiti"
+      },
+      "en_font": {
+        "fontSize": 24,
+        "fontFamily": "Arial"
+      }
+    }
   }
 }
