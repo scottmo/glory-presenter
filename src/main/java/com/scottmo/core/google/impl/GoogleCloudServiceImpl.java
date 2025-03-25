@@ -110,7 +110,7 @@ public class GoogleCloudServiceImpl implements GoogleCloudService {
         Presentation ppt = getPresentation(presentationId);
         RequestBuilder requestBuilder = new RequestBuilder(ppt, slideConfig, configService.getConfig().getLocales());
         ppt.getSlides().forEach(slide -> {
-            requestBuilder.setBaseFont(slide, slideConfig.getFontConfigs());
+            requestBuilder.setBaseFont(slide, slideConfig.getFont());
         });
         updateSlides(presentationId, requestBuilder.build());
     }

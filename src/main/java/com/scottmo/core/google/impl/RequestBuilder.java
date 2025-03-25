@@ -35,7 +35,7 @@ import com.google.api.services.slides.v1.model.UpdateShapePropertiesRequest;
 import com.google.api.services.slides.v1.model.UpdateTextStyleRequest;
 import com.google.api.services.slides.v1.model.WeightedFontFamily;
 import com.scottmo.core.google.api.SlideConfig;
-import com.scottmo.core.google.api.SlideConfig.FontConfig;
+import com.scottmo.core.google.api.SlideConfig.Font;
 import com.scottmo.shared.StringSegment;
 import com.scottmo.shared.StringUtils;
 
@@ -64,7 +64,7 @@ public final class RequestBuilder {
     /**
      * set base font for a slide
      */
-    public void setBaseFont(Page slide, Map<String, FontConfig> textConfigs) {
+    public void setBaseFont(Page slide, Map<String, Font> textConfigs) {
         for (PageElement pageElement : slide.getPageElements()) {
             if (pageElement.getObjectId() == null) continue;
             for (TextElement textElement : SlidesUtil.getTextElements(pageElement)) {
@@ -81,13 +81,13 @@ public final class RequestBuilder {
      * set base font for a text run
      */
     private void setBaseFontForText(String pageElementId, TextRun textRun,
-                Map<String, FontConfig> textConfigs, int startIndex) {
+                Map<String, Font> textConfigs, int startIndex) {
         String content = textRun.getContent();
         if (content == null || content.isEmpty()) return;
 
         for (StringSegment contentSegment : StringUtils.splitByCharset(content, true)) {
             String textConfigName = getTextConfigName(contentSegment);
-            FontConfig textConfig = textConfigs.get(textConfigName);
+            Font textConfig = textConfigs.get(textConfigName);
             requests.add(new Request()
                     .setUpdateTextStyle(new UpdateTextStyleRequest()
                             .setObjectId(pageElementId)
@@ -100,20 +100,20 @@ public final class RequestBuilder {
         }
     }
 
-    private TextStyle applyTextStyle(TextRun textRun, FontConfig fontConfig) {
+    private TextStyle applyTextStyle(TextRun textRun, Font fontConfig) {
         TextStyle newStyle = textRun.getStyle().clone();
 
-        if (fontConfig.getFontColor() != null) {
+        if (fontConfig.getColor() != null) {
             newStyle.setForegroundColor(new OptionalColor()
-                    .setOpaqueColor(SlidesUtil.getRGBColor(fontConfig.getFontColor())));
+                    .setOpaqueColor(SlidesUtil.getRGBColor(fontConfig.getColor())));
         }
-        if (fontConfig.getFontFamily() != null) {
+        if (fontConfig.getFamily() != null) {
             // regular font family
-            newStyle.setFontFamily(fontConfig.getFontFamily());
+            newStyle.setFontFamily(fontConfig.getFamily());
             // if bold, apply font family to bold font family
             if (textRun.getStyle().getWeightedFontFamily() != null) {
                 WeightedFontFamily weightedStyle = textRun.getStyle().getWeightedFontFamily().clone();
-                weightedStyle.setFontFamily(fontConfig.getFontFamily());
+                weightedStyle.setFontFamily(fontConfig.getFamily());
                 newStyle.setWeightedFontFamily(weightedStyle);
             }
         }
@@ -170,11 +170,11 @@ public final class RequestBuilder {
         return textBoxId;
     }
 
-    public void insertText(String textBoxId, String textContent, FontConfig textConfig) {
+    public void insertText(String textBoxId, String textContent, Font textConfig) {
         insertText(textBoxId, textContent, textConfig, 0);
     }
 
-    public void insertText(String textBoxId, String textContent, FontConfig textConfig, int textInsertionIndex) {
+    public void insertText(String textBoxId, String textContent, Font textConfig, int textInsertionIndex) {
         // text
         requests.add(new Request()
                 .setInsertText(new InsertTextRequest()
@@ -211,30 +211,30 @@ public final class RequestBuilder {
         // text style
         boolean hasTextStyle = false;
         TextStyle textStyle = new TextStyle();
-        if (!textConfig.getFontStyles().isEmpty()) {
+        if (!textConfig.getStyles().isEmpty()) {
             hasTextStyle = true;
-            textStyle.setSmallCaps(textConfig.getFontStyles().contains("smallCaps"))
-                    .setStrikethrough(textConfig.getFontStyles().contains("strikethrough"))
-                    .setUnderline(textConfig.getFontStyles().contains("underline"))
-                    .setBold(textConfig.getFontStyles().contains("bold"))
-                    .setItalic(textConfig.getFontStyles().contains("italic"));
+            textStyle.setSmallCaps(textConfig.getStyles().contains("smallCaps"))
+                    .setStrikethrough(textConfig.getStyles().contains("strikethrough"))
+                    .setUnderline(textConfig.getStyles().contains("underline"))
+                    .setBold(textConfig.getStyles().contains("bold"))
+                    .setItalic(textConfig.getStyles().contains("italic"));
         }
-        if (!textConfig.getFontColor().isEmpty()) {
+        if (!textConfig.getColor().isEmpty()) {
             hasTextStyle = true;
             textStyle.setForegroundColor(new OptionalColor()
-                    .setOpaqueColor(SlidesUtil.getRGBColor(textConfig.getFontColor())));
+                    .setOpaqueColor(SlidesUtil.getRGBColor(textConfig.getColor())));
         }
-        if (textConfig.getFontSize() > 0) {
+        if (textConfig.getSize() > 0) {
             hasTextStyle = true;
-            textStyle.setFontSize(SlidesUtil.getDimension(textConfig.getFontSize()));
+            textStyle.setFontSize(SlidesUtil.getDimension(textConfig.getSize()));
         }
-        if (!textConfig.getFontFamily().isEmpty()) {
+        if (!textConfig.getFamily().isEmpty()) {
             hasTextStyle = true;
-            textStyle.setFontFamily(textConfig.getFontFamily());
+            textStyle.setFontFamily(textConfig.getFamily());
         }
-        if (textConfig.getFontStyles().contains("bold")) {
+        if (textConfig.getStyles().contains("bold")) {
             textStyle.setWeightedFontFamily(new WeightedFontFamily()
-                    .setFontFamily(textConfig.getFontFamily())
+                    .setFontFamily(textConfig.getFamily())
                     .setWeight(700));
         }
 
@@ -256,24 +256,24 @@ public final class RequestBuilder {
         // we push the text down
         List<String> textConfigsOrder = locales.stream()
                 .sorted(Collections.reverseOrder())
-                .filter(slideConfig.getFontConfigs()::containsKey)
+                .filter(slideConfig.getFont()::containsKey)
                 .toList();
         for (int i = 0; i < textConfigsOrder.size(); i++) {
             String configName = textConfigsOrder.get(i);
             String ln = i == 0 ? "" : "\n";
-            insertText(textBoxId, slideConfig.getFontConfigs().get(configName) + ln,
-                slideConfig.getFontConfigs().get(configName));
+            insertText(textBoxId, slideConfig.getFont().get(configName) + ln,
+                slideConfig.getFont().get(configName));
         }
     }
 
     public String createText(String pageElementId, String textContent,
-            FontConfig textConfig, boolean isFullPage) {
+            Font textConfig, boolean isFullPage) {
         Size pageSize = ppt.getPageSize();
         // TODO: do i need to divide 1000000
         double textBoxW = pageSize.getWidth().getMagnitude();
-        double textBoxH = (isFullPage || textConfig.getFontSize() <= 0)
+        double textBoxH = (isFullPage || textConfig.getSize() <= 0)
                 ? pageSize.getHeight().getMagnitude()
-                : textConfig.getFontSize() * 2;
+                : textConfig.getSize() * 2;
 
         String textBoxId = createTextBox(pageElementId, textBoxW, textBoxH, slideConfig.getX(), slideConfig.getY());
         insertText(textBoxId);

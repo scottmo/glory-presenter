@@ -7,63 +7,55 @@ public class SlideConfig {
     private final double indentation;
     private final double x;
     private final double y;
-    private final Map<String, FontConfig> fontConfigs;
+    private final Map<String, Font> font;
 
-    public SlideConfig(String alignment, double indentation, double x, double y, Map<String, FontConfig> fontConfigs) {
+    public SlideConfig(String alignment, double indentation, double x, double y, Map<String, Font> font) {
         this.alignment = alignment;
         this.indentation = indentation;
         this.x = x;
         this.y = y;
-        this.fontConfigs = fontConfigs;
+        this.font = font;
     }
 
     public String getAlignment() {
         return alignment;
     }
-
     public double getIndentation() {
         return indentation;
     }
-
     public double getX() {
         return x;
     }
-
     public double getY() {
         return y;
     }
-
-    public Map<String, FontConfig> getFontConfigs() {
-        return fontConfigs;
+    public Map<String, Font> getFont() {
+        return font;
     }
 
-    public static class FontConfig {
-        private final String fontFamily;
-        private final double fontSize;
-        private final String fontColor;
-        private final String fontStyles;
+    public static class Font {
+        private final String family;
+        private final double size;
+        private final String color;
+        private final String styles;
     
-        public FontConfig(String fontFamily, double fontSize, String fontColor, String fontStyles) {
-            this.fontFamily = fontFamily;
-            this.fontSize = fontSize;
-            this.fontColor = fontColor;
-            this.fontStyles = fontStyles;
+        public Font(String family, double size, String color, String styles) {
+            this.family = family;
+            this.size = size;
+            this.color = color;
+            this.styles = styles;
         }
-    
-        public String getFontFamily() {
-            return fontFamily;
+        public String getFamily() {
+            return family;
         }
-    
-        public double getFontSize() {
-            return fontSize;
+        public double getSize() {
+            return size;
         }
-    
-        public String getFontColor() {
-            return fontColor;
+        public String getColor() {
+            return color;
         }
-    
-        public String getFontStyles() {
-            return fontStyles;
+        public String getStyles() {
+            return styles;
         }
     }
 }
