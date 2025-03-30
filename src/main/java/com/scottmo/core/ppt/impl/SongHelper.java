@@ -24,8 +24,8 @@ class SongHelper {
     private static final String COPYRIGHT = "copyright";
     private static final String PUBLISHER = "publisher";
 
-    private ConfigService configService = ConfigService.get();
-    private SongService songService = ServiceProvider.get(SongService.class).get();
+    private final ConfigService configService = ConfigService.get();
+    private final SongService songService = ServiceProvider.get(SongService.class).get();
 
     List<Map<String, String>> toSlideContents(int songId, int maxLines) {
         Song song = songService.get(songId);
@@ -100,16 +100,16 @@ class SongHelper {
             while (numSlidePerThisSection * maxLines < numSectionLines) {
                 for (String group : textGroups) {
                     List<String> lines = data.getOrDefault(group, new ArrayList<>());
-                    String line = "";
+                    StringBuilder line = new StringBuilder();
                     List<String> sectionLines = sectionTexts.get(group);
                     if (sectionLines != null && !sectionLines.isEmpty()) {
                         for (int i = 0; i < maxLines; i++) {
                             int currLineInSection = numSlidePerThisSection * maxLines + i;
                             if (currLineInSection < sectionLines.size()) {
-                                line += sectionLines.get(currLineInSection) + "\n";
+                                line.append(sectionLines.get(currLineInSection)).append("\n");
                             }
                         }
-                        lines.add(line.trim());
+                        lines.add(line.toString().trim());
                         data.put(group, lines);
                     }
                 }

@@ -19,8 +19,8 @@ class BibleVerseHelper {
     private static final String VERSE_RANGE = "verses";
     private static final String BOOK = "book.%s";
 
-    private ConfigService configService = ConfigService.get();
-    private BibleService bibleService = ServiceProvider.get(BibleService.class).get();
+    private final ConfigService configService = ConfigService.get();
+    private final BibleService bibleService = ServiceProvider.get(BibleService.class).get();
 
     List<Map<String, String>> toSlideContents(String bibleRefString) {
 

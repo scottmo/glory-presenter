@@ -207,7 +207,6 @@ final class TemplatingUtil {
      * @param tmplFilePath template pptx
      * @param outputFilePath output pptx
      * @param placeholderTemplate placeholder format string. e.g. {%s}
-     * @throws IOException
      */
     static void generateSlideShow(List<Map<String, String>> contents, String tmplFilePath, String outputFilePath,
             String placeholderTemplate) throws IOException {
@@ -239,11 +238,11 @@ final class TemplatingUtil {
             // content slides, use all content template slides for each content value map
             int contentTmplStartIndex = 1;
             int contentTmplEndIndex = numTmplSlides - 1;
-            for (int c = 0; c < contents.size(); c++) {
+            for (Map<String, String> content : contents) {
                 for (int t = contentTmplStartIndex; t < contentTmplEndIndex; t++) {
                     srcSlide = tmplSlides.getSlides().get(t);
                     duplicateSlide(tmplSlides, srcSlide, false);
-                    preppedContents.add(contents.get(c));
+                    preppedContents.add(content);
                 }
             }
 

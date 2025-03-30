@@ -18,13 +18,13 @@ import com.scottmo.core.songs.api.song.Song;
 
 public class PowerpointServiceImpl implements PowerpointService {
 
-    private ConfigService configService = ConfigService.get();
-    private BibleVerseHelper bibleVerseHelper = new BibleVerseHelper();
-    private SongHelper songHelper = new SongHelper();
+    private final ConfigService configService = ConfigService.get();
+    private final BibleVerseHelper bibleVerseHelper = new BibleVerseHelper();
+    private final SongHelper songHelper = new SongHelper();
 
-    private YAMLMapper yamlMapper = new YAMLMapper();
+    private final YAMLMapper yamlMapper = new YAMLMapper();
 
-    private Logger logger = Logger.getLogger(PowerpointServiceImpl.class.getName());
+    private final Logger logger = Logger.getLogger(PowerpointServiceImpl.class.getName());
 
     @Override
     public void generate(List<Map<String, String>> contents, String tmplFilePath, String outputFilePath)
@@ -67,14 +67,14 @@ public class PowerpointServiceImpl implements PowerpointService {
             List<String> tempFiles = new ArrayList<>();
             for (int i = 0; i < configs.size(); i++) {
                 PowerpointConfig config = configs.get(i);
-                String type = config.type() == null ? "default" : config.type().toLowerCase();
-                String tempFilePath = getTemporaryFilePath(type + i);
+                PowerpointConfig.Type type = config.getType() == null ? PowerpointConfig.Type.DEFAULT : config.getType();
+                String tempFilePath = getTemporaryFilePath(type.name() + i);
 
                 String templatePath;
-                if (config.template() != null) {
-                    templatePath = configService.getPowerpointTemplate(config.template());
-                } else if (defaultTemplates.containsKey(type)) {
-                    templatePath = configService.getPowerpointTemplate(defaultTemplates.get(type));
+                if (config.getTemplate() != null) {
+                    templatePath = configService.getPowerpointTemplate(config.getTemplate());
+                } else if (defaultTemplates.containsKey(type.toValue())) {
+                    templatePath = configService.getPowerpointTemplate(defaultTemplates.get(type.toValue()));
                 } else {
                     throw new IllegalArgumentException("No defined template for slide set " + i + "!");
                 }
@@ -83,22 +83,22 @@ public class PowerpointServiceImpl implements PowerpointService {
                     + "\n- type: " + type
                     + "\n- template: " + templatePath
                     + "\n- out: " + tempFilePath
-                    + "\n- content:\n" + config.content());
+                    + "\n- content:\n" + config.getContent());
 
                 switch (type) {
-                    case "song":
+                    case SONG:
                         @SuppressWarnings("unchecked")
-                        Map<String, Integer> songConfig = yamlMapper.readValue(config.content(), Map.class);
+                        Map<String, Integer> songConfig = yamlMapper.readValue(config.getContent(), Map.class);
                         generate(songConfig.get("songId"), templatePath, tempFilePath, songConfig.get("linesPerSlide"));
                         break;
-                    case "bible":
-                        String verses = config.content();
+                    case BIBLE:
+                        String verses = config.getContent();
                         generate(verses, templatePath, tempFilePath);
                         break;
                     default:
-                        List<Map<String, String>> values = config.content() == null
+                        List<Map<String, String>> values = config.getContent() == null
                             ? List.of()
-                            : yamlMapper.readValue(config.content(),
+                            : yamlMapper.readValue(config.getContent(),
                                 yamlMapper.getTypeFactory().constructCollectionType(List.class, Map.class));
                         generate(values, templatePath, tempFilePath);
                         break;
@@ -112,7 +112,7 @@ public class PowerpointServiceImpl implements PowerpointService {
         }
     }
 
-    private List<String> tempFiles = new ArrayList<>();
+    private final List<String> tempFiles = new ArrayList<>();
     private String getTemporaryFilePath(String prefix) {
         String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
         String path = System.getProperty("java.io.tmpdir") + prefix + "_" + timestamp + ".pptx";
