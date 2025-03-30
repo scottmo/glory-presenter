@@ -103,22 +103,22 @@ public final class StringUtils {
         String quotes = "'\"‘“"; // both Chinese and English
 
         List<String> sentences = new ArrayList<>();
-        String sentence = String.valueOf(str.charAt(0));
+        StringBuilder sentence = new StringBuilder(String.valueOf(str.charAt(0)));
         for (int i = 1; i < str.length(); i++) {
             String ch = String.valueOf(str.charAt(i));
             String prevChar = String.valueOf(str.charAt(i - 1));
-            sentence += ch;
+            sentence.append(ch);
             if (sentenceDelimiters.contains(prevChar)) {
                 if (quotes.contains(ch)) {
-                    sentence += ch;
+                    sentence.append(ch);
                 }
-                sentences.add(sentence);
-                sentence = "";
+                sentences.add(sentence.toString());
+                sentence = new StringBuilder();
             }
         }
         // left over
         if (!sentence.isEmpty()) {
-            sentences.add(sentence);
+            sentences.add(sentence.toString());
         }
         return sentences;
     }
@@ -178,10 +178,10 @@ public final class StringUtils {
     public static String join(List<String> arr, String sep) {
         if (arr == null || arr.isEmpty()) return "";
 
-        return arr.stream().collect(Collectors.joining(sep));
+        return String.join(sep, arr);
     }
 
     public static String sanitizeFilename(String inputName) {
-        return inputName.replaceAll("[^a-zA-Z0-9-_\\.]", "_");
+        return inputName.replaceAll("\\p{P}", "_");
     }
 }
