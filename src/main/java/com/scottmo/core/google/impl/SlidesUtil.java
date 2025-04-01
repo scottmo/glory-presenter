@@ -13,9 +13,8 @@ import com.google.api.services.slides.v1.model.RgbColor;
 import com.google.api.services.slides.v1.model.Shape;
 import com.google.api.services.slides.v1.model.TextContent;
 import com.google.api.services.slides.v1.model.TextElement;
-import com.google.common.base.Strings;
 
-import java.util.Arrays;
+import java.awt.*;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -82,17 +81,12 @@ public final class SlidesUtil {
                 .setUnit("PT");
     }
 
-    public static OpaqueColor getRGBColor(String rgbValues) {
-        String rgbString = Strings.isNullOrEmpty(rgbValues) ? "255, 255, 255" : rgbValues;
-        List<Float> rgb = Arrays.stream(rgbString.split(","))
-                .map(String::trim)
-                .map(v -> Float.parseFloat(v)/255)
-                .toList();
+    public static OpaqueColor getOpaqueColor(Color color) {
         return new OpaqueColor()
                 .setRgbColor(new RgbColor()
-                        .setRed(rgb.get(0))
-                        .setGreen(rgb.get(1))
-                        .setBlue(rgb.get(2)));
+                        .setRed((float) color.getRed())
+                        .setGreen((float) color.getGreen())
+                        .setBlue((float) color.getBlue()));
     }
 
     public static <T> T deepClone(T slideObject) throws JsonProcessingException {

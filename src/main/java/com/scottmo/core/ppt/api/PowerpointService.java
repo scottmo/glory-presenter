@@ -6,6 +6,7 @@ import java.util.Map;
 
 import com.scottmo.core.Service;
 import com.scottmo.core.songs.api.song.Song;
+import com.scottmo.shared.Range;
 
 public interface PowerpointService extends Service {
     void generate(List<Map<String, String>> contents, String tmplFilePath, String outputFilePath) throws IOException;
@@ -19,5 +20,5 @@ public interface PowerpointService extends Service {
 
     void mergeSlideShows(List<String> filePaths, String outputFilePath) throws IOException;
 
-
+    void updateTextFormats(String filePath, Range range, List<String> textFormatPresets) throws IOException;
 }

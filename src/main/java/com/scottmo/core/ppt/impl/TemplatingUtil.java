@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 final class TemplatingUtil {
@@ -266,41 +267,43 @@ final class TemplatingUtil {
                 .replace("}", "\\}");
 
         // now do the modifications
-        try (var inStream = new FileInputStream(outputFilePath)) {
-            var ppt = new XMLSlideShow(inStream);
+        loadSlideShow(outputFilePath, ppt -> {
             for (int i = 0; i < preppedContents.size(); i++) {
                 var slide = ppt.getSlides().get(i);
                 Map<String, String> values = preppedContents.get(i).entrySet().stream()
-                                .collect(Collectors.toMap(e -> placeholderTemplate.formatted(e.getKey()), e -> e.getValue()));
+                    .collect(Collectors.toMap(e -> placeholderTemplate.formatted(e.getKey()), e -> e.getValue()));
                 replaceText(slide, values);
                 removeAllTexts(slide, placeholderTemplateRegex);
             }
             try (var outStream = new FileOutputStream(outputFilePath)) {
                 ppt.write(outStream);
             }
-            ppt.close();
-        }
+        });
     }
 
     static void mergeSlideShows(List<String> filePaths, String outputFilePath) throws IOException {
         // use first src as base to maintain ppt size and other attributes
-        String basePpt = filePaths.get(0);
-        filePaths = filePaths.subList(1, filePaths.size());
-        try (var baseInputStream = new FileInputStream(basePpt)) {
-            XMLSlideShow mergedPPT = new XMLSlideShow(baseInputStream);
-            for (String filePath : filePaths) {
-                try (var inputStream = new FileInputStream(filePath)) {
-                    XMLSlideShow ppt = new XMLSlideShow(inputStream);
+        String basePPTPath = filePaths.get(0);
+        List<String> restPPTPaths =  filePaths.subList(1, filePaths.size());;
+        loadSlideShow(basePPTPath, mergedPPT -> {
+            for (String filePath : restPPTPaths) {
+                loadSlideShow(filePath, ppt -> {
                     for (XSLFSlide srcSlide : ppt.getSlides()) {
                         duplicateSlide(mergedPPT, srcSlide, true);
                     }
-                    ppt.close();
-                }
+                });
             }
             try (var outStream = new FileOutputStream(outputFilePath)) {
                 mergedPPT.write(outStream);
             }
-            mergedPPT.close();
+        });
+    }
+
+    static void loadSlideShow(String filePath, IOConsumer<XMLSlideShow> onLoad) throws IOException {
+        try (var is = new FileInputStream(filePath)) {
+            XMLSlideShow ppt = new XMLSlideShow(is);
+            onLoad.accept(ppt);
+            ppt.close();
         }
     }
 
@@ -312,5 +315,10 @@ final class TemplatingUtil {
             }
             tmplSlides.close();
         }
+    }
+
+    @FunctionalInterface
+    interface IOConsumer<T> {
+        void accept(T t) throws IOException;
     }
 }

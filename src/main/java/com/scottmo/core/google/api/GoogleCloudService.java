@@ -7,6 +7,7 @@ import com.google.api.services.slides.v1.model.Page;
 import com.google.api.services.slides.v1.model.Presentation;
 import com.google.api.services.slides.v1.model.Request;
 import com.scottmo.core.Service;
+import com.scottmo.shared.TextFormat;
 
 public interface GoogleCloudService extends Service {
 
@@ -18,8 +19,8 @@ public interface GoogleCloudService extends Service {
 
     boolean updateSlides(String presentationId, List<Request> updateRequests) throws IOException;
 
-    void setDefaultTitleText(String presentationId, SlideConfig slideConfig) throws IOException;
+    void setDefaultTitleText(String presentationId, TextFormat textFormat) throws IOException;
 
-    void setBaseFont(String presentationId, SlideConfig slideConfig) throws IOException;
+    void setBaseFont(String presentationId, TextFormat textFormat) throws IOException;
 
 }

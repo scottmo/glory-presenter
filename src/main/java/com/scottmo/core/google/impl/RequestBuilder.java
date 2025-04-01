@@ -34,8 +34,8 @@ import com.google.api.services.slides.v1.model.UpdateParagraphStyleRequest;
 import com.google.api.services.slides.v1.model.UpdateShapePropertiesRequest;
 import com.google.api.services.slides.v1.model.UpdateTextStyleRequest;
 import com.google.api.services.slides.v1.model.WeightedFontFamily;
-import com.scottmo.core.google.api.SlideConfig;
-import com.scottmo.core.google.api.SlideConfig.Font;
+import com.scottmo.shared.TextFormat;
+import com.scottmo.shared.TextFormat.Font;
 import com.scottmo.shared.StringSegment;
 import com.scottmo.shared.StringUtils;
 
@@ -48,12 +48,12 @@ public final class RequestBuilder {
     private final List<Request> requests = new ArrayList<>();
 
     private final Presentation ppt;
-    private final SlideConfig slideConfig;
+    private final TextFormat textFormat;
     private final List<String> locales;
 
-    public RequestBuilder(Presentation ppt, SlideConfig slideConfig, List<String> locales) {
+    public RequestBuilder(Presentation ppt, TextFormat textFormat, List<String> locales) {
         this.ppt = ppt;
-        this.slideConfig = slideConfig;
+        this.textFormat = textFormat;
         this.locales = locales;
     }
 
@@ -105,7 +105,7 @@ public final class RequestBuilder {
 
         if (fontConfig.getColor() != null) {
             newStyle.setForegroundColor(new OptionalColor()
-                    .setOpaqueColor(SlidesUtil.getRGBColor(fontConfig.getColor())));
+                    .setOpaqueColor(SlidesUtil.getOpaqueColor(fontConfig.getColor())));
         }
         if (fontConfig.getFamily() != null) {
             // regular font family
@@ -187,13 +187,13 @@ public final class RequestBuilder {
         // paragraph style
         boolean hasParagraphStyle = false;
         ParagraphStyle ppStyle = new ParagraphStyle();
-        if (!slideConfig.getAlignment().isEmpty()) {
+        if (!textFormat.getAlignment().isEmpty()) {
             hasParagraphStyle = true;
-            ppStyle.setAlignment(slideConfig.getAlignment());
+            ppStyle.setAlignment(textFormat.getAlignment());
         }
-        if (slideConfig.getIndentation() > 0) {
+        if (textFormat.getIndentation() > 0) {
             hasParagraphStyle = true;
-            Dimension indent = SlidesUtil.getDimension(slideConfig.getIndentation());
+            Dimension indent = SlidesUtil.getDimension(textFormat.getIndentation());
             ppStyle.setIndentFirstLine(indent)
                     .setIndentStart(indent)
                     .setIndentEnd(indent);
@@ -219,10 +219,10 @@ public final class RequestBuilder {
                     .setBold(textConfig.getStyles().contains("bold"))
                     .setItalic(textConfig.getStyles().contains("italic"));
         }
-        if (!textConfig.getColor().isEmpty()) {
+        if (textConfig.getColor() != null) {
             hasTextStyle = true;
             textStyle.setForegroundColor(new OptionalColor()
-                    .setOpaqueColor(SlidesUtil.getRGBColor(textConfig.getColor())));
+                    .setOpaqueColor(SlidesUtil.getOpaqueColor(textConfig.getColor())));
         }
         if (textConfig.getSize() > 0) {
             hasTextStyle = true;
@@ -256,13 +256,13 @@ public final class RequestBuilder {
         // we push the text down
         List<String> textConfigsOrder = locales.stream()
                 .sorted(Collections.reverseOrder())
-                .filter(slideConfig.getFont()::containsKey)
+                .filter(textFormat.getFont()::containsKey)
                 .toList();
         for (int i = 0; i < textConfigsOrder.size(); i++) {
             String configName = textConfigsOrder.get(i);
             String ln = i == 0 ? "" : "\n";
-            insertText(textBoxId, slideConfig.getFont().get(configName) + ln,
-                slideConfig.getFont().get(configName));
+            insertText(textBoxId, textFormat.getFont().get(configName) + ln,
+                textFormat.getFont().get(configName));
         }
     }
 
@@ -275,7 +275,7 @@ public final class RequestBuilder {
                 ? pageSize.getHeight().getMagnitude()
                 : textConfig.getSize() * 2;
 
-        String textBoxId = createTextBox(pageElementId, textBoxW, textBoxH, slideConfig.getX(), slideConfig.getY());
+        String textBoxId = createTextBox(pageElementId, textBoxW, textBoxH, textFormat.getDimension().getX(), textFormat.getDimension().getY());
         insertText(textBoxId);
         return textBoxId;
     }

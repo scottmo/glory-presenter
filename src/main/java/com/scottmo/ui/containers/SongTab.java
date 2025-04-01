@@ -43,29 +43,29 @@ import com.scottmo.ui.utils.Dialog;
 import com.scottmo.ui.utils.FilePicker;
 
 public final class SongTab extends JPanel {
-    private ConfigService configService = ConfigService.get();
-    private SongService songService = ServiceProvider.get(SongService.class).get();
-    private PowerpointService powerpointService = ServiceProvider.get(PowerpointService.class).get();
+    private final ConfigService configService = ConfigService.get();
+    private final SongService songService = ServiceProvider.get(SongService.class).get();
+    private final PowerpointService powerpointService = ServiceProvider.get(PowerpointService.class).get();
 
     // cache to look up song id
     private Map<String, Integer> songIdMap = new HashMap<>();
     private List<String> songNames;
 
-    private ListView songList = new ListView();
+    private final ListView songList = new ListView();
 
-    private JButton buttonNewSong = new JButton(Labels.get("songs.buttonNewSong"));
-    private JButton buttonEditSong = new JButton(Labels.get("songs.buttonEditSong"));
-    private JButton buttonDeleteSong = new JButton(Labels.get("songs.buttonDeleteSong"));
-    private JButton buttonDeselect = new JButton(Labels.get("songs.buttonDeselect"));
-    private JButton buttonDuplicate = new JButton(Labels.get("songs.buttonDuplicate"));
+    private final JButton buttonNewSong = new JButton(Labels.get("songs.buttonNewSong"));
+    private final JButton buttonEditSong = new JButton(Labels.get("songs.buttonEditSong"));
+    private final JButton buttonDeleteSong = new JButton(Labels.get("songs.buttonDeleteSong"));
+    private final JButton buttonDeselect = new JButton(Labels.get("songs.buttonDeselect"));
+    private final JButton buttonDuplicate = new JButton(Labels.get("songs.buttonDuplicate"));
 
-    private JButton buttonImport = new JButton(Labels.get("songs.buttonImport"));
-    private JButton buttonExport = new JButton(Labels.get("songs.buttonExport"));
+    private final JButton buttonImport = new JButton(Labels.get("songs.buttonImport"));
+    private final JButton buttonExport = new JButton(Labels.get("songs.buttonExport"));
 
-    private JButton buttonGenerateGSlide = new JButton(Labels.get("songs.buttonGenerateGSlide"));
-    private JButton buttonGeneratePPT = new JButton(Labels.get("songs.buttonGeneratePPT"));
-    private JSpinner inputLinesPerSlide = new JSpinner(new SpinnerNumberModel(2, 1, 10, 1));
-    private SuggestionPicker inputTemplate = new SuggestionPicker(10);
+    private final JButton buttonGenerateGSlide = new JButton(Labels.get("songs.buttonGenerateGSlide"));
+    private final JButton buttonGeneratePPT = new JButton(Labels.get("songs.buttonGeneratePPT"));
+    private final JSpinner inputLinesPerSlide = new JSpinner(new SpinnerNumberModel(2, 1, 10, 1));
+    private final SuggestionPicker inputTemplate = new SuggestionPicker(10);
 
     public SongTab() {
         loadSongList();
@@ -121,7 +121,7 @@ public final class SongTab extends JPanel {
                     deletedSongs.add(songName);
                 }
             }
-            if (deletedSongs.size() > 0) {
+            if (!deletedSongs.isEmpty()) {
                 Dialog.info(String.format("Deleted songs: %s", StringUtils.join(deletedSongs)));
                 loadSongList();
             }
@@ -154,7 +154,7 @@ public final class SongTab extends JPanel {
                     }
                 }
             }
-            if (exportedSongs.size() > 0) {
+            if (!exportedSongs.isEmpty()) {
                 Dialog.info(String.format("Exported songs: %s", StringUtils.join(exportedSongs)));
             }
         });
@@ -240,9 +240,7 @@ public final class SongTab extends JPanel {
         SongEditor songEditor = new SongEditor(song);
         JDialog modal = Dialog.newModal(Labels.get(title), songEditor);
 
-        songEditor.addCancelListener(() -> {
-            modal.dispose();
-        });
+        songEditor.addCancelListener(modal::dispose);
         songEditor.addSaveListener((Song modifiedSong) -> {
             songService.store(modifiedSong);
             Dialog.info(String.format("Saved song '%s' successfully!", modifiedSong.getTitle()));
@@ -283,7 +281,7 @@ public final class SongTab extends JPanel {
     }
 
     private String generatePowerpoint(Integer id, String songName, Integer linesPerSlide, String templatePath)
-            throws MalformedURLException, IOException {
+            throws IOException {
         Song song = songService.get(id);
         String outputPath = configService.getOutputPath(StringUtils.sanitizeFilename(songName) + ".pptx");
         if (!templatePath.contains("/")) {

@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.scottmo.shared.Range;
 import org.apache.log4j.Logger;
 
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
@@ -15,6 +16,8 @@ import com.scottmo.config.ConfigService;
 import com.scottmo.core.ppt.api.PowerpointConfig;
 import com.scottmo.core.ppt.api.PowerpointService;
 import com.scottmo.core.songs.api.song.Song;
+import org.apache.poi.xslf.usermodel.XSLFSlide;
+import org.apache.poi.xslf.usermodel.XSLFTextShape;
 
 public class PowerpointServiceImpl implements PowerpointService {
 
@@ -110,6 +113,29 @@ public class PowerpointServiceImpl implements PowerpointService {
         } finally {
             cleanupTemporaryFiles();
         }
+    }
+
+    @Override
+    public void updateTextFormats(String filePath, Range range, List<String> textFormatPresets) throws IOException {
+        // TODO: load presets
+        TemplatingUtil.loadSlideShow(filePath, ppt -> {
+            List<XSLFSlide> slides = range.endIndex() == -1
+                ? ppt.getSlides()
+                : ppt.getSlides().subList(range.startIndex(), range.endIndex());
+            for (var slide : slides) {
+                for (var shape: slide.getShapes()) {
+                    if (!(shape instanceof XSLFTextShape)) {
+                        continue;
+                    }
+                    for (var pp : ((XSLFTextShape) shape).getTextParagraphs()) {
+                        for (var textRun : pp.getTextRuns()) {
+                            // TODO: set styles
+
+                        }
+                    }
+                }
+            }
+        });
     }
 
     private final List<String> tempFiles = new ArrayList<>();

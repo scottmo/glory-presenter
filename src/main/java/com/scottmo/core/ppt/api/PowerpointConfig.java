@@ -47,6 +47,7 @@ public class PowerpointConfig {
 
     public enum Type {
         DEFAULT,
+        STYLES,
         SONG,
         BIBLE;
 
