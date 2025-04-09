@@ -32,6 +32,12 @@ final class TemplatingUtil {
                 .collect(Collectors.joining("\n"));
     }
 
+    /**
+     * Replace all texts in slide matching regex with empty string.
+     *
+     * @param slide slide to remove texts
+     * @param regex regex to match what texts to remove
+     */
     static void removeAllTexts(XSLFSlide slide, String regex) {
         slide.getShapes().stream()
                 .filter(s -> s instanceof XSLFTextShape)
@@ -46,12 +52,24 @@ final class TemplatingUtil {
                 });
     }
 
+    /**
+     * Replace texts in slide matching keys in {@param replacements} with the corresponding values.
+     *
+     * @param slide slide to replace texts
+     * @param replacements replacement texts, keys are the ones to replace and values are the replacements
+     */
     static void replaceText(XSLFSlide slide, Map<String, String> replacements) {
         slide.getShapes().stream()
                 .filter(s -> s instanceof XSLFTextShape)
                 .forEach(s -> replaceText((XSLFTextShape) s, replacements));
     }
 
+    /**
+     * Replace texts in shape matching keys in {@param replacements} with the corresponding values.
+     *
+     * @param shape shape to replace texts
+     * @param replacements replacement texts, keys are the ones to replace and values are the replacements
+     */
     private static void replaceText(XSLFTextShape shape, Map<String, String> replacements) {
         for (var pp : shape.getTextParagraphs()) {
             String text = pp.getText();
@@ -72,6 +90,12 @@ final class TemplatingUtil {
         pp.setLineSpacing(100.0);
     }
 
+    /**
+     * Append text to textbox. Each new line is inserted into its own text run.
+     *
+     * @param textShape text box to append text
+     * @param text text to append
+     */
     static void appendText(XSLFTextShape textShape, String text) {
         String[] lines = text.trim().split("\n");
         var pps = textShape.getTextParagraphs();
@@ -86,7 +110,10 @@ final class TemplatingUtil {
     }
 
     /**
-     * setText that handles "\n" properly
+     * Set paragraph with text. Each new line is inserted into its own text run. Original font styling is used.
+     *
+     * @param pp paragraph object to set text
+     * @param text text to set
      */
     static void setText(XSLFTextParagraph pp, String text) {
         var baseTextRun = pp.getTextRuns().isEmpty()
