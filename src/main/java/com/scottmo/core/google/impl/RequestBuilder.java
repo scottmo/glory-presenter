@@ -211,13 +211,28 @@ public final class RequestBuilder {
         // text style
         boolean hasTextStyle = false;
         TextStyle textStyle = new TextStyle();
-        if (!textConfig.getStyles().isEmpty()) {
+        if (textConfig.isBold()) {
             hasTextStyle = true;
-            textStyle.setSmallCaps(textConfig.getStyles().contains("smallCaps"))
-                    .setStrikethrough(textConfig.getStyles().contains("strikethrough"))
-                    .setUnderline(textConfig.getStyles().contains("underline"))
-                    .setBold(textConfig.getStyles().contains("bold"))
-                    .setItalic(textConfig.getStyles().contains("italic"));
+            textStyle.setBold(true);
+            textStyle.setWeightedFontFamily(new WeightedFontFamily()
+                .setFontFamily(textConfig.getFamily())
+                .setWeight(700));
+        }
+        if (textConfig.isItalic()) {
+            hasTextStyle = true;
+            textStyle.setItalic(true);
+        }
+        if (textConfig.isUnderlined()) {
+            hasTextStyle = true;
+            textStyle.setUnderline(true);
+        }
+        if (textConfig.isStrikethrough()) {
+            hasTextStyle = true;
+            textStyle.setStrikethrough(true);
+        }
+        if (textConfig.isSmallCaps()) {
+            hasTextStyle = true;
+            textStyle.setSmallCaps(true);
         }
         if (textConfig.getColor() != null) {
             hasTextStyle = true;
@@ -231,11 +246,6 @@ public final class RequestBuilder {
         if (!textConfig.getFamily().isEmpty()) {
             hasTextStyle = true;
             textStyle.setFontFamily(textConfig.getFamily());
-        }
-        if (textConfig.getStyles().contains("bold")) {
-            textStyle.setWeightedFontFamily(new WeightedFontFamily()
-                    .setFontFamily(textConfig.getFamily())
-                    .setWeight(700));
         }
 
         if (hasTextStyle) {

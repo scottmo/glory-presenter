@@ -65,13 +65,22 @@ public class TextFormat {
         private final String family;
         private final double size;
         private final Color color;
-        private final String styles;
-    
-        public Font(String family, double size, String color, String styles) {
+        private final boolean isBold;
+        private final boolean isItalic;
+        private final boolean isUnderlined;
+        private final boolean isStrikethrough;
+        private final boolean isSmallCaps;
+
+        public Font(String family, double size, String color, boolean isBold, boolean isItalic, boolean isUnderlined,
+                    boolean isStrikethrough, boolean isSmallCaps) {
             this.family = family;
             this.size = size;
             this.color = parseColor(color);
-            this.styles = styles;
+            this.isBold = isBold;
+            this.isItalic = isItalic;
+            this.isUnderlined = isUnderlined;
+            this.isStrikethrough = isStrikethrough;
+            this.isSmallCaps = isSmallCaps;
         }
         public String getFamily() {
             return family;
@@ -82,8 +91,20 @@ public class TextFormat {
         public Color getColor() {
             return color;
         }
-        public String getStyles() {
-            return styles;
+        public boolean isBold() {
+            return isBold;
+        }
+        public boolean isItalic() {
+            return isItalic;
+        }
+        public boolean isUnderlined() {
+            return isUnderlined;
+        }
+        public boolean isStrikethrough() {
+            return isStrikethrough;
+        }
+        public boolean isSmallCaps() {
+            return isSmallCaps;
         }
 
         private static Color parseColor(String rgbValues) {
