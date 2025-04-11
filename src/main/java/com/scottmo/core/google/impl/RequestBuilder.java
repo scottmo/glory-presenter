@@ -34,8 +34,8 @@ import com.google.api.services.slides.v1.model.UpdateParagraphStyleRequest;
 import com.google.api.services.slides.v1.model.UpdateShapePropertiesRequest;
 import com.google.api.services.slides.v1.model.UpdateTextStyleRequest;
 import com.google.api.services.slides.v1.model.WeightedFontFamily;
-import com.scottmo.shared.TextFormat;
-import com.scottmo.shared.TextFormat.Font;
+import com.scottmo.shared.ParagraphFormat;
+import com.scottmo.shared.ParagraphFormat.TextFormat;
 import com.scottmo.shared.StringSegment;
 import com.scottmo.shared.StringUtils;
 
@@ -48,10 +48,10 @@ public final class RequestBuilder {
     private final List<Request> requests = new ArrayList<>();
 
     private final Presentation ppt;
-    private final TextFormat textFormat;
+    private final ParagraphFormat textFormat;
     private final List<String> locales;
 
-    public RequestBuilder(Presentation ppt, TextFormat textFormat, List<String> locales) {
+    public RequestBuilder(Presentation ppt, ParagraphFormat textFormat, List<String> locales) {
         this.ppt = ppt;
         this.textFormat = textFormat;
         this.locales = locales;
@@ -64,7 +64,7 @@ public final class RequestBuilder {
     /**
      * set base font for a slide
      */
-    public void setBaseFont(Page slide, Map<String, Font> textConfigs) {
+    public void setBaseFont(Page slide, Map<String, TextFormat> textConfigs) {
         for (PageElement pageElement : slide.getPageElements()) {
             if (pageElement.getObjectId() == null) continue;
             for (TextElement textElement : SlidesUtil.getTextElements(pageElement)) {
@@ -81,13 +81,13 @@ public final class RequestBuilder {
      * set base font for a text run
      */
     private void setBaseFontForText(String pageElementId, TextRun textRun,
-                Map<String, Font> textConfigs, int startIndex) {
+                Map<String, TextFormat> textConfigs, int startIndex) {
         String content = textRun.getContent();
         if (content == null || content.isEmpty()) return;
 
         for (StringSegment contentSegment : StringUtils.splitByCharset(content, true)) {
             String textConfigName = getTextConfigName(contentSegment);
-            Font textConfig = textConfigs.get(textConfigName);
+            TextFormat textConfig = textConfigs.get(textConfigName);
             requests.add(new Request()
                     .setUpdateTextStyle(new UpdateTextStyleRequest()
                             .setObjectId(pageElementId)
@@ -100,7 +100,7 @@ public final class RequestBuilder {
         }
     }
 
-    private TextStyle applyTextStyle(TextRun textRun, Font fontConfig) {
+    private TextStyle applyTextStyle(TextRun textRun, TextFormat fontConfig) {
         TextStyle newStyle = textRun.getStyle().clone();
 
         if (fontConfig.getColor() != null) {
@@ -170,11 +170,11 @@ public final class RequestBuilder {
         return textBoxId;
     }
 
-    public void insertText(String textBoxId, String textContent, Font textConfig) {
+    public void insertText(String textBoxId, String textContent, TextFormat textConfig) {
         insertText(textBoxId, textContent, textConfig, 0);
     }
 
-    public void insertText(String textBoxId, String textContent, Font textConfig, int textInsertionIndex) {
+    public void insertText(String textBoxId, String textContent, TextFormat textConfig, int textInsertionIndex) {
         // text
         requests.add(new Request()
                 .setInsertText(new InsertTextRequest()
@@ -266,18 +266,18 @@ public final class RequestBuilder {
         // we push the text down
         List<String> textConfigsOrder = locales.stream()
                 .sorted(Collections.reverseOrder())
-                .filter(textFormat.getFont()::containsKey)
+                .filter(textFormat.getTextFormats()::containsKey)
                 .toList();
         for (int i = 0; i < textConfigsOrder.size(); i++) {
             String configName = textConfigsOrder.get(i);
             String ln = i == 0 ? "" : "\n";
-            insertText(textBoxId, textFormat.getFont().get(configName) + ln,
-                textFormat.getFont().get(configName));
+            insertText(textBoxId, textFormat.getTextFormats().get(configName) + ln,
+                textFormat.getTextFormats().get(configName));
         }
     }
 
     public String createText(String pageElementId, String textContent,
-            Font textConfig, boolean isFullPage) {
+            TextFormat textConfig, boolean isFullPage) {
         Size pageSize = ppt.getPageSize();
         // TODO: do i need to divide 1000000
         double textBoxW = pageSize.getWidth().getMagnitude();
