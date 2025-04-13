@@ -388,11 +388,17 @@ public final class RequestBuilder {
         return titleId;
     }
 
+    /**
+     * Move the first text of the slide to the title placeholder text box
+     * so that slide preview can have a title.
+     * @param slide slide to be processed
+     */
     public void setDefaultTitleText(Page slide) {
         SlidesUtil.getFirstText(slide).ifPresent(firstText -> {
             if (firstText.getObjectId() == null) return;
 
             SlidesUtil.getTitlePlaceholder(slide).ifPresent(title -> {
+                // only placeholder title is present, no need to move text
                 if (firstText == title) return;
 
                 this.copyText(firstText, title, true);
