@@ -35,7 +35,7 @@ import com.google.api.services.slides.v1.model.UpdateShapePropertiesRequest;
 import com.google.api.services.slides.v1.model.UpdateTextStyleRequest;
 import com.google.api.services.slides.v1.model.WeightedFontFamily;
 import com.scottmo.shared.ParagraphFormat;
-import com.scottmo.shared.ParagraphFormat.TextFormat;
+import com.scottmo.shared.TextFormat;
 import com.scottmo.shared.StringSegment;
 import com.scottmo.shared.StringUtils;
 
