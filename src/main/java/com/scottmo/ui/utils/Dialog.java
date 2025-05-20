@@ -1,12 +1,12 @@
 package com.scottmo.ui.utils;
 
-import javax.swing.JDialog;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
+import javax.swing.*;
 
 import org.apache.log4j.Logger;
 
 import com.scottmo.App;
+
+import java.awt.*;
 
 public class Dialog {
 
@@ -29,14 +29,10 @@ public class Dialog {
     }
 
     public static JDialog newModal(String title, JPanel content) {
-        JDialog modalDialog = new JDialog(App.get(), title, true); // 'true' makes it modal
-        // modalDialog.setSize(APP_WIDTH - 100, APP_HEIGHT - 100);
-        modalDialog.setLocationRelativeTo(App.get()); // Center the dialog relative to the main frame
-
+        JDialog modalDialog = new JDialog(App.get(), title, true); // 'true' makes it modalSwingU
+        modalDialog.setSize(App.get().getWidth() - 100, App.get().getHeight() - 100);
         modalDialog.setMinimumSize(content.getMinimumSize());
         modalDialog.add(content);
-        modalDialog.pack();
-
         return modalDialog;
     }
 }
