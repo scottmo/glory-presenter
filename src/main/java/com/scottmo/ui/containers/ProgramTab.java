@@ -61,7 +61,7 @@ public class ProgramTab extends JPanel {
         setLayout(new BorderLayout());
         add(column(UI_GAP,
             cell(fieldInput).with(input ->
-                input.setFont(new Font(Font.MONOSPACED, Font.PLAIN, configService.getConfig().getAppSize().font()))),
+                input.setFont(new Font(Font.MONOSPACED, Font.BOLD, configService.getConfig().getAppSize().font()))),
             cell(buttonGeneratePPT)
         ).getComponent());
     }
