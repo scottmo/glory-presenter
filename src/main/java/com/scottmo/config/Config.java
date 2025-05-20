@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.Set;
 
 public class Config {
-    public static final AppSize COMPACT_SIZE = new AppSize(900, 600, 13);
+    public static final AppSize COMPACT_SIZE = new AppSize(900, 600, 14);
     public static final AppSize COMFORT_SIZE = new AppSize(1100, 800, 16);
 
     public static final int UI_GAP = 8;
