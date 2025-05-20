@@ -35,7 +35,6 @@ public class App extends JFrame {
     public App() {
         setTitle(Labels.get("appName"));
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setResizable(false);
     }
 
     private void render() {
@@ -54,6 +53,8 @@ public class App extends JFrame {
     }
 
     public static void main(String[] args) {
+        System.setProperty("awt.useSystemAAFontSettings", "on");
+        System.setProperty("swing.aatext", "true");
         FlatDarkLaf.setup();
         KeyboardFocusManager.setCurrentKeyboardFocusManager(new ScrollingKeyboardFocusManager());
         SwingUtilities.invokeLater(() -> {
