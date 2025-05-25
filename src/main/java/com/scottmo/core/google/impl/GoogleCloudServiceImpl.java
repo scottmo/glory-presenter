@@ -19,7 +19,7 @@ import com.google.api.services.slides.v1.model.Request;
 import com.scottmo.config.ConfigService;
 import com.scottmo.config.Labels;
 import com.scottmo.core.google.api.GoogleCloudService;
-import com.scottmo.shared.TextFormat;
+import com.scottmo.shared.ParagraphFormat;
 
 public class GoogleCloudServiceImpl implements GoogleCloudService {
     private ConfigService configService = ConfigService.get();
@@ -98,7 +98,7 @@ public class GoogleCloudServiceImpl implements GoogleCloudService {
     }
 
     @Override
-    public void setDefaultTitleText(String presentationId, TextFormat textFormat) throws IOException {
+    public void setDefaultTitleText(String presentationId, ParagraphFormat textFormat) throws IOException {
         Presentation ppt = getPresentation(presentationId);
         RequestBuilder requestBuilder = new RequestBuilder(ppt, textFormat, configService.getConfig().getLocales());
         ppt.getSlides().forEach(requestBuilder::setDefaultTitleText);
@@ -106,11 +106,11 @@ public class GoogleCloudServiceImpl implements GoogleCloudService {
     }
 
     @Override
-    public void setBaseFont(String presentationId, TextFormat textFormat) throws IOException {
+    public void setBaseFont(String presentationId, ParagraphFormat textFormat) throws IOException {
         Presentation ppt = getPresentation(presentationId);
         RequestBuilder requestBuilder = new RequestBuilder(ppt, textFormat, configService.getConfig().getLocales());
         ppt.getSlides().forEach(slide -> {
-            requestBuilder.setBaseFont(slide, textFormat.getFont());
+            requestBuilder.setBaseFont(slide, textFormat.getTextFormats());
         });
         updateSlides(presentationId, requestBuilder.build());
     }

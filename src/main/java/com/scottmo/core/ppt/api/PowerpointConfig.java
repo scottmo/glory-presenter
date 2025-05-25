@@ -9,6 +9,8 @@ public class PowerpointConfig {
     private String template;
     private String content;
 
+    public PowerpointConfig() {}
+
     public PowerpointConfig(Type type, String template, String content) {
         this.type = type;
         this.template = template;
