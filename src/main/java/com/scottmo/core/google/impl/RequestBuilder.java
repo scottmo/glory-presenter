@@ -103,17 +103,17 @@ public final class RequestBuilder {
     private TextStyle applyTextStyle(TextRun textRun, TextFormat fontConfig) {
         TextStyle newStyle = textRun.getStyle().clone();
 
-        if (fontConfig.getColor() != null) {
+        if (fontConfig.getFontColor() != null) {
             newStyle.setForegroundColor(new OptionalColor()
-                    .setOpaqueColor(SlidesUtil.getOpaqueColor(fontConfig.getColor())));
+                    .setOpaqueColor(SlidesUtil.getOpaqueColor(fontConfig.getFontColor())));
         }
-        if (fontConfig.getFamily() != null) {
+        if (fontConfig.getFontFamily() != null) {
             // regular font family
-            newStyle.setFontFamily(fontConfig.getFamily());
+            newStyle.setFontFamily(fontConfig.getFontFamily());
             // if bold, apply font family to bold font family
             if (textRun.getStyle().getWeightedFontFamily() != null) {
                 WeightedFontFamily weightedStyle = textRun.getStyle().getWeightedFontFamily().clone();
-                weightedStyle.setFontFamily(fontConfig.getFamily());
+                weightedStyle.setFontFamily(fontConfig.getFontFamily());
                 newStyle.setWeightedFontFamily(weightedStyle);
             }
         }
@@ -215,7 +215,7 @@ public final class RequestBuilder {
             hasTextStyle = true;
             textStyle.setBold(true);
             textStyle.setWeightedFontFamily(new WeightedFontFamily()
-                .setFontFamily(textConfig.getFamily())
+                .setFontFamily(textConfig.getFontFamily())
                 .setWeight(700));
         }
         if (textConfig.isItalic()) {
@@ -234,18 +234,18 @@ public final class RequestBuilder {
             hasTextStyle = true;
             textStyle.setSmallCaps(true);
         }
-        if (textConfig.getColor() != null) {
+        if (textConfig.getFontColor() != null) {
             hasTextStyle = true;
             textStyle.setForegroundColor(new OptionalColor()
-                    .setOpaqueColor(SlidesUtil.getOpaqueColor(textConfig.getColor())));
+                    .setOpaqueColor(SlidesUtil.getOpaqueColor(textConfig.getFontColor())));
         }
-        if (textConfig.getSize() > 0) {
+        if (textConfig.getFontSize() > 0) {
             hasTextStyle = true;
-            textStyle.setFontSize(SlidesUtil.getDimension(textConfig.getSize()));
+            textStyle.setFontSize(SlidesUtil.getDimension(textConfig.getFontSize()));
         }
-        if (!textConfig.getFamily().isEmpty()) {
+        if (!textConfig.getFontFamily().isEmpty()) {
             hasTextStyle = true;
-            textStyle.setFontFamily(textConfig.getFamily());
+            textStyle.setFontFamily(textConfig.getFontFamily());
         }
 
         if (hasTextStyle) {
@@ -281,9 +281,9 @@ public final class RequestBuilder {
         Size pageSize = ppt.getPageSize();
         // TODO: do i need to divide 1000000
         double textBoxW = pageSize.getWidth().getMagnitude();
-        double textBoxH = (isFullPage || textConfig.getSize() <= 0)
+        double textBoxH = (isFullPage || textConfig.getFontSize() <= 0)
                 ? pageSize.getHeight().getMagnitude()
-                : textConfig.getSize() * 2;
+                : textConfig.getFontSize() * 2;
 
         String textBoxId = createTextBox(pageElementId, textBoxW, textBoxH, textFormat.getDimension().getX(), textFormat.getDimension().getY());
         insertText(textBoxId);

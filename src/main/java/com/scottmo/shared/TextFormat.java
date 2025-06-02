@@ -5,49 +5,78 @@ import java.util.List;
 import java.util.Arrays;
 
 public class TextFormat {
-    private final String family;
-    private final double size;
-    private final Color color;
-    private final boolean isBold;
-    private final boolean isItalic;
-    private final boolean isUnderlined;
-    private final boolean isStrikethrough;
-    private final boolean isSmallCaps;
+    private String fontFamily;
 
-    public TextFormat(String family, double size, String color, boolean isBold, boolean isItalic, 
-                boolean isUnderlined, boolean isStrikethrough, boolean isSmallCaps) {
-        this.family = family;
-        this.size = size;
-        this.color = parseColor(color);
-        this.isBold = isBold;
-        this.isItalic = isItalic;
-        this.isUnderlined = isUnderlined;
-        this.isStrikethrough = isStrikethrough;
-        this.isSmallCaps = isSmallCaps;
+    private Double fontSize;
+    private Color fontColor;
+    private boolean isBold;
+    private boolean isItalic;
+    private boolean isUnderlined;
+    private boolean isStrikethrough;
+    private boolean isSmallCaps;
+
+    public String getFontFamily() {
+        return fontFamily;
     }
-    public String getFamily() {
-        return family;
+
+    public void setFontFamily(String fontFamily) {
+        this.fontFamily = fontFamily;
     }
-    public double getSize() {
-        return size;
+
+    public Double getFontSize() {
+        return fontSize;
     }
-    public Color getColor() {
-        return color;
+
+    public void setFontSize(Double fontSize) {
+        this.fontSize = fontSize;
     }
+
+    public Color getFontColor() {
+        return fontColor;
+    }
+
+    public void setFontColor(String fontColor) {
+        this.fontColor = parseColor(fontColor);
+    }
+
     public boolean isBold() {
         return isBold;
     }
+
+    public void setBold(boolean bold) {
+        isBold = bold;
+    }
+
     public boolean isItalic() {
         return isItalic;
     }
+
+    public void setItalic(boolean italic) {
+        isItalic = italic;
+    }
+
     public boolean isUnderlined() {
         return isUnderlined;
     }
+
+    public void setUnderlined(boolean underlined) {
+        isUnderlined = underlined;
+    }
+
     public boolean isStrikethrough() {
         return isStrikethrough;
     }
+
+    public void setStrikethrough(boolean strikethrough) {
+        isStrikethrough = strikethrough;
+    }
+
     public boolean isSmallCaps() {
         return isSmallCaps;
+    }
+
+    public void setSmallCaps(boolean smallCaps) {
+        isSmallCaps = smallCaps;
     }
 
     private static Color parseColor(String rgbValues) {

@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.scottmo.shared.Range;
+import com.scottmo.shared.TextFormat;
 import org.apache.log4j.Logger;
 
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
@@ -17,6 +18,7 @@ import com.scottmo.core.ppt.api.PowerpointConfig;
 import com.scottmo.core.ppt.api.PowerpointService;
 import com.scottmo.core.songs.api.song.Song;
 import org.apache.poi.xslf.usermodel.XSLFSlide;
+import org.apache.poi.xslf.usermodel.XSLFTextRun;
 import org.apache.poi.xslf.usermodel.XSLFTextShape;
 
 public class PowerpointServiceImpl implements PowerpointService {
@@ -119,6 +121,7 @@ public class PowerpointServiceImpl implements PowerpointService {
     public void updateTextFormats(String filePath, Range range, List<String> textFormatPresets) throws IOException {
         // TODO: load presets
         TemplatingUtil.loadSlideShow(filePath, ppt -> {
+            Map<String, TextFormat> formatPresets = configService.getConfig().getTextFormatPresets();
             List<XSLFSlide> slides = range.endIndex() == -1
                 ? ppt.getSlides()
                 : ppt.getSlides().subList(range.startIndex(), range.endIndex());
@@ -129,13 +132,28 @@ public class PowerpointServiceImpl implements PowerpointService {
                     }
                     for (var pp : ((XSLFTextShape) shape).getTextParagraphs()) {
                         for (var textRun : pp.getTextRuns()) {
-                            // TODO: set styles
-
+                            for (String presetName : textFormatPresets) {
+                                applyTextFormats(textRun, formatPresets.get(presetName));
+                            }
                         }
                     }
                 }
             }
         });
+    }
+
+    private void applyTextFormats(XSLFTextRun textRun, TextFormat formats) {
+        if (formats != null) {
+            if (formats.getFontFamily() != null) {
+                textRun.setFontFamily(formats.getFontFamily());
+            }
+            if (formats.getFontSize() != null) {
+                textRun.setFontSize(formats.getFontSize());
+            }
+            if (formats.getFontColor() != null) {
+                textRun.setFontColor(formats.getFontColor());
+            }
+        }
     }
 
     private final List<String> tempFiles = new ArrayList<>();

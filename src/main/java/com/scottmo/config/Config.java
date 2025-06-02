@@ -1,5 +1,7 @@
 package com.scottmo.config;
 
+import com.scottmo.shared.TextFormat;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -25,6 +27,7 @@ public class Config {
     private Map<String, String> bibleVersionToLocale = new HashMap<>();
     private Map<String, String> defaultTemplates = new HashMap<>();
     private Set<String> templatePaths = new HashSet<>();
+    private Map<String, TextFormat> textFormatPresets = new HashMap<>();
 
     public AppSize getAppSize() {
         return appSize;
@@ -80,6 +83,14 @@ public class Config {
 
     public void setTemplatePaths(Set<String> templatePaths) {
         this.templatePaths = templatePaths;
+    }
+
+    public Map<String, TextFormat> getTextFormatPresets() {
+        return textFormatPresets;
+    }
+
+    public void setTextFormatPresets(Map<String, TextFormat> textFormatPresets) {
+        this.textFormatPresets = textFormatPresets;
     }
 
     public record AppSize(int width, int height, int font) {}
