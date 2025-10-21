@@ -14,7 +14,7 @@
         "song": "song.pptx",
         "default": "default.pptx"
     },
-    "stylePresets": {
+    "textFormatPresets": {
         "title": {
             "fontSize": 60
         },

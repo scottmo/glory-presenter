@@ -3,10 +3,12 @@ package com.scottmo.core.ppt.api;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import com.scottmo.core.Service;
 import com.scottmo.core.songs.api.song.Song;
 import com.scottmo.shared.Range;
+import com.scottmo.shared.TextFormat;
 
 public interface PowerpointService extends Service {
     void generate(List<Map<String, String>> contents, String tmplFilePath, String outputFilePath) throws IOException;
@@ -20,5 +22,5 @@ public interface PowerpointService extends Service {
 
     void mergeSlideShows(List<String> filePaths, String outputFilePath) throws IOException;
 
-    void updateTextFormats(String filePath, Range range, List<String> textFormatPresets) throws IOException;
+    void updateTextFormats(String filePath, Range range, Pattern textMatchPattern, TextFormat textFormats) throws IOException;
 }

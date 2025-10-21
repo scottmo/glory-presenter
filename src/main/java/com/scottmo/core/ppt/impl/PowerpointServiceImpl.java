@@ -7,6 +7,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import com.scottmo.shared.Range;
 import com.scottmo.shared.TextFormat;
@@ -118,10 +119,8 @@ public class PowerpointServiceImpl implements PowerpointService {
     }
 
     @Override
-    public void updateTextFormats(String filePath, Range range, List<String> textFormatPresets) throws IOException {
-        // TODO: load presets
+    public void updateTextFormats(String filePath, Range range, Pattern textMatchPattern, TextFormat textFormats) throws IOException {
         TemplatingUtil.loadSlideShow(filePath, ppt -> {
-            Map<String, TextFormat> formatPresets = configService.getConfig().getTextFormatPresets();
             List<XSLFSlide> slides = range.endIndex() == -1
                 ? ppt.getSlides()
                 : ppt.getSlides().subList(range.startIndex(), range.endIndex());
@@ -132,8 +131,9 @@ public class PowerpointServiceImpl implements PowerpointService {
                     }
                     for (var pp : ((XSLFTextShape) shape).getTextParagraphs()) {
                         for (var textRun : pp.getTextRuns()) {
-                            for (String presetName : textFormatPresets) {
-                                applyTextFormats(textRun, formatPresets.get(presetName));
+                            String text = textRun.getRawText();
+                            if (textMatchPattern.matcher(text).find()) {
+                                applyTextFormats(textRun, textFormats);
                             }
                         }
                     }
