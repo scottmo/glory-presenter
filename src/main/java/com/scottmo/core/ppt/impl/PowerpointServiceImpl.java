@@ -1,6 +1,7 @@
 package com.scottmo.core.ppt.impl;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -139,6 +140,10 @@ public class PowerpointServiceImpl implements PowerpointService {
                     }
                 }
             }
+
+            try (var outStream = new FileOutputStream(filePath.replace(".pptx", ".mod.pptx"))) {
+                ppt.write(outStream);
+            }
         });
     }
 
@@ -153,6 +158,10 @@ public class PowerpointServiceImpl implements PowerpointService {
             if (formats.getFontColor() != null) {
                 textRun.setFontColor(formats.getFontColor());
             }
+            textRun.setBold(formats.isBold());
+            textRun.setItalic(formats.isItalic());
+            textRun.setUnderlined(formats.isUnderlined());
+            textRun.setStrikethrough(formats.isStrikethrough());
         }
     }
 

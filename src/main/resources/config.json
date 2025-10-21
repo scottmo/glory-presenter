@@ -14,6 +14,10 @@
         "song": "song.pptx",
         "default": "default.pptx"
     },
+    "patternPresets": {
+        "zh": "\\p{IsHan}+",
+        "en": "[A-Za-z,.!:\"'?]"
+    },
     "textFormatPresets": {
         "title": {
             "fontSize": 60
@@ -33,19 +37,6 @@
         "en_font": {
             "fontSize": 24,
             "fontFamily": "Arial"
-        }
-    },
-    "googleSlides": {
-        "styles": {
-            "default": {
-                "x": 0,
-                "y": 0,
-                "width": 960,
-                "height": 540,
-                "alignment": "CENTER",
-                "indentation": 0,
-                "bold": true
-            }
         }
     }
 }

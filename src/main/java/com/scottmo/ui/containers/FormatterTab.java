@@ -14,6 +14,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -21,6 +22,16 @@ import static com.scottmo.config.Config.UI_GAP;
 import static org.httprpc.sierra.UIBuilder.*;
 
 public class FormatterTab extends JPanel {
+
+    private static final String SAMPLE_FORMATS = """
+fontFamily: KaiTi
+fontSize: 12
+fontColor: 255, 255, 255
+italic: false
+bold: false
+underlined: false
+strikethrough: false
+""";
 
     private final ConfigService configService = ConfigService.get();
     private final PowerpointService powerpointService = ServiceProvider.get(PowerpointService.class).get();
@@ -64,7 +75,10 @@ public class FormatterTab extends JPanel {
 
             TextFormat textFormats;
             try {
-                textFormats = yamlMapper.readValue(textFormatsStr, TextFormat.class);
+                Map<String, TextFormat> textFormatPresets = configService.getConfig().getTextFormatPresets();
+                textFormats = textFormatPresets.containsKey(textFormatsStr)
+                    ? textFormatPresets.get(textFormatsStr)
+                    : yamlMapper.readValue(textFormatsStr, TextFormat.class);
             } catch (Exception e) {
                 Dialog.error("Invalid format: " + e.getMessage());
                 return;
@@ -72,7 +86,11 @@ public class FormatterTab extends JPanel {
 
             Pattern textMatchPattern;
             try {
-                textMatchPattern = Pattern.compile(inputMatcher.getText());
+                String inputMatcherText = inputMatcher.getText();
+                Map<String, String> patternPresets = configService.getConfig().getPatternPresets();
+                textMatchPattern = (patternPresets.containsKey(inputMatcherText))
+                    ? Pattern.compile(patternPresets.get(inputMatcherText))
+                    : Pattern.compile(inputMatcherText);
             } catch (PatternSyntaxException e) {
                 Dialog.error("Invalid text pattern!");
                 return;
@@ -82,11 +100,13 @@ public class FormatterTab extends JPanel {
                 int start = (Integer) inputStartSlide.getValue();
                 int end = (Integer) inputEndSlide.getValue();
                 powerpointService.updateTextFormats(targetFilePath, new Range(start, end), textMatchPattern, textFormats);
+                Dialog.info("Update success!");
             } catch (IOException e) {
                 Dialog.error("Failed to update file: " + e.getMessage());
             }
         });
 
+        inputFormats.setText(SAMPLE_FORMATS);
         inputFormats.setLineWrap(true);
         inputFormats.setWrapStyleWord(true);
 

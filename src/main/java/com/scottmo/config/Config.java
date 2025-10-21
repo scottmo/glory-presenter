@@ -28,6 +28,7 @@ public class Config {
     private Map<String, String> defaultTemplates = new HashMap<>();
     private Set<String> templatePaths = new HashSet<>();
     private Map<String, TextFormat> textFormatPresets = new HashMap<>();
+    private Map<String, String> patternPresets = new HashMap<>();
 
     public AppSize getAppSize() {
         return appSize;
@@ -91,6 +92,14 @@ public class Config {
 
     public void setTextFormatPresets(Map<String, TextFormat> textFormatPresets) {
         this.textFormatPresets = textFormatPresets;
+    }
+
+    public Map<String, String> getPatternPresets() {
+        return patternPresets;
+    }
+
+    public void setPatternPresets(Map<String, String> patternPresets) {
+        this.patternPresets = patternPresets;
     }
 
     public record AppSize(int width, int height, int font) {}
