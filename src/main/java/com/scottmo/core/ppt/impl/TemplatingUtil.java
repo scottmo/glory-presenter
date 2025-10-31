@@ -1,6 +1,8 @@
 package com.scottmo.core.ppt.impl;
 
 import org.apache.poi.xslf.usermodel.*;
+import org.openxmlformats.schemas.drawingml.x2006.main.CTTextCharacterProperties;
+import org.openxmlformats.schemas.drawingml.x2006.main.CTTextParagraphProperties;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;

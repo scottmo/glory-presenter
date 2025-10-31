@@ -22,5 +22,7 @@ public interface PowerpointService extends Service {
 
     void mergeSlideShows(List<String> filePaths, String outputFilePath) throws IOException;
 
-    void updateTextFormats(String filePath, Range range, Pattern textMatchPattern, TextFormat textFormats) throws IOException;
+    void updateTextFormats(String filePath, String outputFilePath, Range range, Pattern textMatchPattern, TextFormat textFormats) throws IOException;
+
+    void normalizeNewLines(String filePath, String outputFilePath) throws IOException;
 }

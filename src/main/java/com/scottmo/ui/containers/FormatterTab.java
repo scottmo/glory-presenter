@@ -44,6 +44,7 @@ strikethrough: false
     private final JTextField inputMatcher = new JTextField();
     private final JTextArea inputFormats = new JTextArea(5, 20);
     private final JButton buttonUpdate = new JButton(Labels.get("formatter.buttonUpdate"));
+    private final JButton buttonNormalizeNewLine = new JButton(Labels.get("formatter.buttonNormalizeNewLine"));
 
     private String targetFilePath;
 
@@ -99,7 +100,21 @@ strikethrough: false
             try {
                 int start = (Integer) inputStartSlide.getValue();
                 int end = (Integer) inputEndSlide.getValue();
-                powerpointService.updateTextFormats(targetFilePath, new Range(start, end), textMatchPattern, textFormats);
+                powerpointService.updateTextFormats(targetFilePath, getOutputPath(), new Range(start, end), textMatchPattern, textFormats);
+                Dialog.info("Update success!");
+            } catch (IOException e) {
+                Dialog.error("Failed to update file: " + e.getMessage());
+            }
+        });
+
+        buttonNormalizeNewLine.addActionListener(evt -> {
+            if (targetFilePath == null) {
+                Dialog.error("No file selected!");
+                return;
+            }
+
+            try {
+                powerpointService.normalizeNewLines(targetFilePath, getOutputPath());
                 Dialog.info("Update success!");
             } catch (IOException e) {
                 Dialog.error("Failed to update file: " + e.getMessage());
@@ -123,7 +138,12 @@ strikethrough: false
             cell(inputMatcher),
             cell(new JLabel(Labels.get("formatter.inputFormats"))),
             cell(new JScrollPane(inputFormats)),
-            cell(buttonUpdate)
+            cell(buttonUpdate),
+            cell(buttonNormalizeNewLine)
         ).getComponent());
+    }
+
+    private String getOutputPath() {
+        return targetFilePath.replace(".pptx", ".mod.pptx");
     }
 }

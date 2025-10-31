@@ -47,6 +47,7 @@
     "formatter": {
         "containerTitle": "Formatter",
         "buttonUpdate": "Update",
+        "buttonNormalizeNewLine": "Normalize New Lines",
         "filePicker": "Select File",
         "rangeStart": "Start Slide",
         "rangeEnd": "End Slide",
