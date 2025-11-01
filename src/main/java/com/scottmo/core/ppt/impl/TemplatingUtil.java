@@ -315,6 +315,7 @@ final class TemplatingUtil {
                     .collect(Collectors.toMap(e -> placeholderTemplate.formatted(e.getKey()), e -> e.getValue()));
                 replaceText(slide, values);
                 removeAllTexts(slide, placeholderTemplateRegex);
+                convertNewlinesIntoParagraphs(slide);
             }
             try (var outStream = new FileOutputStream(outputFilePath)) {
                 ppt.write(outStream);
@@ -387,6 +388,22 @@ final class TemplatingUtil {
             XSLFTextParagraph p = shape.addNewTextParagraph();
             paragraphData.apply(p);
         }
+    }
+
+    /**
+     * Splits all paragraphs within the given XSLFTextShape that contain newline characters
+     * into multiple, correctly styled XSLFTextParagraphs.
+     * This is useful because sometimes line breaks don't display correctly in pptx.
+     *
+     * @param slide The XSLFSlide whose content needs to be processed and reorganized.
+     */
+    static void convertNewlinesIntoParagraphs(XSLFSlide slide) {
+        slide.getShapes().stream()
+            .filter(s -> s instanceof XSLFTextShape)
+            .forEach(s -> {
+                XSLFTextShape shape = (XSLFTextShape) s;
+                TemplatingUtil.convertNewlinesIntoParagraphs(shape);
+            });
     }
 
     @FunctionalInterface

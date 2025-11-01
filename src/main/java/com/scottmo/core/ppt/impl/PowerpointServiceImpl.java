@@ -150,13 +150,7 @@ public class PowerpointServiceImpl implements PowerpointService {
     public void normalizeNewLines(String filePath, String outputFilePath) throws IOException {
         TemplatingUtil.loadSlideShow(filePath, ppt -> {
             for (var slide : ppt.getSlides()) {
-                // convert \n to new pp
-                slide.getShapes().stream()
-                    .filter(s -> s instanceof XSLFTextShape)
-                    .forEach(s -> {
-                        XSLFTextShape shape = (XSLFTextShape) s;
-                        TemplatingUtil.convertNewlinesIntoParagraphs(shape);
-                    });
+                TemplatingUtil.convertNewlinesIntoParagraphs(slide);
             }
             try (var outStream = new FileOutputStream(outputFilePath)) {
                 ppt.write(outStream);
