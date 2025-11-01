@@ -155,7 +155,7 @@ public class PowerpointServiceImpl implements PowerpointService {
                     .filter(s -> s instanceof XSLFTextShape)
                     .forEach(s -> {
                         XSLFTextShape shape = (XSLFTextShape) s;
-                        NewLineUtil.splitNewlinesIntoParagraphs(shape);
+                        TemplatingUtil.convertNewlinesIntoParagraphs(shape);
                     });
             }
             try (var outStream = new FileOutputStream(outputFilePath)) {

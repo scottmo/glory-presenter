@@ -358,6 +358,37 @@ final class TemplatingUtil {
         }
     }
 
+    /**
+     * Splits all paragraphs within the given XSLFTextShape that contain newline characters
+     * into multiple, correctly styled XSLFTextParagraphs.
+     * This is useful because sometimes line breaks don't display correctly in pptx.
+     *
+     * @param shape The XSLFTextShape whose content needs to be processed and reorganized.
+     */
+    static void convertNewlinesIntoParagraphs(XSLFTextShape shape) {
+        if (shape == null) return;
+
+        List<ParagraphData> paragraphDataList = new ArrayList<>();
+        for (XSLFTextParagraph p : shape.getTextParagraphs()) {
+            if (!p.getTextRuns().isEmpty()) {
+                String text = p.getText();
+                XSLFTextRun textRun = p.getTextRuns().get(0); // use it for styling
+                String[] lines = text.split("\n");
+
+                for (String line : lines) {
+                    ParagraphData paragraphData = new ParagraphData(p, textRun, line);
+                    paragraphDataList.add(paragraphData);
+                }
+            }
+        }
+
+        shape.clearText();
+        for (ParagraphData paragraphData : paragraphDataList) {
+            XSLFTextParagraph p = shape.addNewTextParagraph();
+            paragraphData.apply(p);
+        }
+    }
+
     @FunctionalInterface
     interface IOConsumer<T> {
         void accept(T t) throws IOException;
