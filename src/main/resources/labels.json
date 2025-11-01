@@ -44,6 +44,16 @@
         "containerTitle": "Program",
         "buttonGeneratePPT": "Generate PPT"
     },
+    "formatter": {
+        "containerTitle": "Formatter",
+        "buttonUpdate": "Update",
+        "buttonNormalizeNewLine": "Normalize New Lines",
+        "filePicker": "Select File",
+        "rangeStart": "Start Slide",
+        "rangeEnd": "End Slide",
+        "inputMatcher": "Text Match Pattern",
+        "inputFormats": "Formats"
+    },
     "configs": {
         "containerTitle": "Configurations",
         "buttonToggleDarkMode": "Toggle Dark Mode",

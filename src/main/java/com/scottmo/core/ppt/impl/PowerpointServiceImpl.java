@@ -1,20 +1,26 @@
 package com.scottmo.core.ppt.impl;
 
+import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
+import com.scottmo.config.ConfigService;
+import com.scottmo.core.ppt.api.PowerpointConfig;
+import com.scottmo.core.ppt.api.PowerpointService;
+import com.scottmo.core.songs.api.song.Song;
+import com.scottmo.shared.Range;
+import com.scottmo.shared.TextFormat;
+import org.apache.log4j.Logger;
+import org.apache.poi.xslf.usermodel.XSLFSlide;
+import org.apache.poi.xslf.usermodel.XSLFTextRun;
+import org.apache.poi.xslf.usermodel.XSLFTextShape;
+
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import org.apache.log4j.Logger;
-
-import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
-import com.scottmo.config.ConfigService;
-import com.scottmo.core.ppt.api.PowerpointConfig;
-import com.scottmo.core.ppt.api.PowerpointService;
-import com.scottmo.core.songs.api.song.Song;
+import java.util.regex.Pattern;
 
 public class PowerpointServiceImpl implements PowerpointService {
 
@@ -109,6 +115,64 @@ public class PowerpointServiceImpl implements PowerpointService {
             mergeSlideShows(tempFiles, outputFilePath);
         } finally {
             cleanupTemporaryFiles();
+        }
+    }
+
+    @Override
+    public void updateTextFormats(String filePath, String outputFilePath, Range range, Pattern textMatchPattern, TextFormat textFormats) throws IOException {
+        TemplatingUtil.loadSlideShow(filePath, ppt -> {
+            List<XSLFSlide> slides = range.endIndex() == -1
+                ? ppt.getSlides()
+                : ppt.getSlides().subList(range.startIndex(), range.endIndex());
+            for (var slide : slides) {
+                for (var shape: slide.getShapes()) {
+                    if (!(shape instanceof XSLFTextShape)) {
+                        continue;
+                    }
+                    for (var pp : ((XSLFTextShape) shape).getTextParagraphs()) {
+                        for (var textRun : pp.getTextRuns()) {
+                            String text = textRun.getRawText();
+                            if (textMatchPattern.matcher(text).find()) {
+                                applyTextFormats(textRun, textFormats);
+                            }
+                        }
+                    }
+                }
+            }
+
+            try (var outStream = new FileOutputStream(outputFilePath)) {
+                ppt.write(outStream);
+            }
+        });
+    }
+
+    @Override
+    public void normalizeNewLines(String filePath, String outputFilePath) throws IOException {
+        TemplatingUtil.loadSlideShow(filePath, ppt -> {
+            for (var slide : ppt.getSlides()) {
+                TemplatingUtil.convertNewlinesIntoParagraphs(slide);
+            }
+            try (var outStream = new FileOutputStream(outputFilePath)) {
+                ppt.write(outStream);
+            }
+        });
+    }
+
+    private void applyTextFormats(XSLFTextRun textRun, TextFormat formats) {
+        if (formats != null) {
+            if (formats.getFontFamily() != null) {
+                textRun.setFontFamily(formats.getFontFamily());
+            }
+            if (formats.getFontSize() != null) {
+                textRun.setFontSize(formats.getFontSize());
+            }
+            if (formats.getFontColor() != null) {
+                textRun.setFontColor(formats.getFontColor());
+            }
+            textRun.setBold(formats.isBold());
+            textRun.setItalic(formats.isItalic());
+            textRun.setUnderlined(formats.isUnderlined());
+            textRun.setStrikethrough(formats.isStrikethrough());
         }
     }
 

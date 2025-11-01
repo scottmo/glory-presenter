@@ -10,16 +10,13 @@ import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 
+import com.scottmo.ui.containers.*;
 import org.httprpc.sierra.ScrollingKeyboardFocusManager;
 
 import com.formdev.flatlaf.FlatDarkLaf;
 import com.scottmo.config.ConfigService;
 import com.scottmo.config.Labels;
 import com.scottmo.shared.Pair;
-import com.scottmo.ui.containers.BibleTab;
-import com.scottmo.ui.containers.ConfigsTab;
-import com.scottmo.ui.containers.ProgramTab;
-import com.scottmo.ui.containers.SongTab;
 import com.scottmo.ui.utils.Dialog;
 
 public class App extends JFrame {
@@ -35,7 +32,6 @@ public class App extends JFrame {
     public App() {
         setTitle(Labels.get("appName"));
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setResizable(false);
     }
 
     private void render() {
@@ -44,6 +40,7 @@ public class App extends JFrame {
             "songs.containerTitle", new SongTab(),
             "bible.containerTitle", new BibleTab(),
             "program.containerTitle", new ProgramTab(),
+            "formatter.containerTitle", new FormatterTab(),
             "configs.containerTitle", new ConfigsTab()
         ).forEach(tabCmp -> {
             tabCmp.value().setBorder(new EmptyBorder(MARGIN, MARGIN, MARGIN, MARGIN));
@@ -54,6 +51,8 @@ public class App extends JFrame {
     }
 
     public static void main(String[] args) {
+        System.setProperty("awt.useSystemAAFontSettings", "on");
+        System.setProperty("swing.aatext", "true");
         FlatDarkLaf.setup();
         KeyboardFocusManager.setCurrentKeyboardFocusManager(new ScrollingKeyboardFocusManager());
         SwingUtilities.invokeLater(() -> {

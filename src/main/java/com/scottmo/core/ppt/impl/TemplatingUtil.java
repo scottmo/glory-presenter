@@ -1,22 +1,13 @@
 package com.scottmo.core.ppt.impl;
 
-import org.apache.poi.xslf.usermodel.XMLSlideShow;
-import org.apache.poi.xslf.usermodel.XSLFBackground;
-import org.apache.poi.xslf.usermodel.XSLFPictureShape;
-import org.apache.poi.xslf.usermodel.XSLFShape;
-import org.apache.poi.xslf.usermodel.XSLFSlide;
-import org.apache.poi.xslf.usermodel.XSLFSlideLayout;
-import org.apache.poi.xslf.usermodel.XSLFSlideMaster;
-import org.apache.poi.xslf.usermodel.XSLFTextParagraph;
-import org.apache.poi.xslf.usermodel.XSLFTextShape;
+import org.apache.poi.xslf.usermodel.*;
+import org.openxmlformats.schemas.drawingml.x2006.main.CTTextCharacterProperties;
+import org.openxmlformats.schemas.drawingml.x2006.main.CTTextParagraphProperties;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 final class TemplatingUtil {
@@ -31,6 +22,12 @@ final class TemplatingUtil {
                 .collect(Collectors.joining("\n"));
     }
 
+    /**
+     * Replace all texts in slide matching regex with empty string.
+     *
+     * @param slide slide to remove texts
+     * @param regex regex to match what texts to remove
+     */
     static void removeAllTexts(XSLFSlide slide, String regex) {
         slide.getShapes().stream()
                 .filter(s -> s instanceof XSLFTextShape)
@@ -45,12 +42,24 @@ final class TemplatingUtil {
                 });
     }
 
+    /**
+     * Replace texts in slide matching keys in {@param replacements} with the corresponding values.
+     *
+     * @param slide slide to replace texts
+     * @param replacements replacement texts, keys are the ones to replace and values are the replacements
+     */
     static void replaceText(XSLFSlide slide, Map<String, String> replacements) {
         slide.getShapes().stream()
                 .filter(s -> s instanceof XSLFTextShape)
                 .forEach(s -> replaceText((XSLFTextShape) s, replacements));
     }
 
+    /**
+     * Replace texts in shape matching keys in {@param replacements} with the corresponding values.
+     *
+     * @param shape shape to replace texts
+     * @param replacements replacement texts, keys are the ones to replace and values are the replacements
+     */
     private static void replaceText(XSLFTextShape shape, Map<String, String> replacements) {
         for (var pp : shape.getTextParagraphs()) {
             String text = pp.getText();
@@ -64,6 +73,19 @@ final class TemplatingUtil {
         }
     }
 
+    private static boolean isStyleMatched(XSLFTextRun run1, XSLFTextRun run2) {
+        if (run1 == null || run2 == null) return false;
+
+        return Objects.equals(run1.getFontColor(), run2.getFontColor())
+            && Objects.equals(run1.getFontSize(), run2.getFontSize())
+            && Objects.equals(run1.getFontFamily(), run2.getFontFamily())
+            && run1.isBold() == run2.isBold()
+            && run1.isItalic() == run2.isItalic()
+            && run1.isUnderlined() == run2.isUnderlined()
+            && run1.isStrikethrough() == run2.isStrikethrough()
+            && Objects.equals(run1.getCharacterSpacing(), run2.getCharacterSpacing());
+    }
+
     private static void resetSpacing(XSLFTextParagraph pp) {
         pp.setSpaceBefore(0.0);
         pp.setSpaceAfter(0.0);
@@ -71,6 +93,12 @@ final class TemplatingUtil {
         pp.setLineSpacing(100.0);
     }
 
+    /**
+     * Append text to textbox. Each new line is inserted into its own text run.
+     *
+     * @param textShape text box to append text
+     * @param text text to append
+     */
     static void appendText(XSLFTextShape textShape, String text) {
         String[] lines = text.trim().split("\n");
         var pps = textShape.getTextParagraphs();
@@ -85,7 +113,10 @@ final class TemplatingUtil {
     }
 
     /**
-     * setText that handles "\n" properly
+     * Set paragraph with text. Each new line is inserted into its own text run. Original font styling is used.
+     *
+     * @param pp paragraph object to set text
+     * @param text text to set
      */
     static void setText(XSLFTextParagraph pp, String text) {
         var baseTextRun = pp.getTextRuns().isEmpty()
@@ -97,11 +128,22 @@ final class TemplatingUtil {
             pp.addLineBreak();
             var newTextRun = pp.addNewTextRun();
             newTextRun.setText(lines[i]);
-            newTextRun.setFontColor(baseTextRun.getFontColor());
-            newTextRun.setFontFamily(baseTextRun.getFontFamily());
-            newTextRun.setFontSize(baseTextRun.getFontSize());
+            copyStyles(newTextRun, baseTextRun);
         }
         resetSpacing(pp);
+    }
+
+    private static void copyStyles(XSLFTextRun run1, XSLFTextRun run2) {
+        if (run1 == null || run2 == null) return;
+
+        run1.setFontColor(run2.getFontColor());
+        run1.setFontFamily(run2.getFontFamily());
+        run1.setFontSize(run2.getFontSize());
+        run1.setBold(run2.isBold());
+        run1.setItalic(run2.isItalic());
+        run1.setUnderlined(run2.isUnderlined());
+        run1.setStrikethrough(run2.isStrikethrough());
+        run1.setCharacterSpacing(run2.getCharacterSpacing());
     }
 
     /**
@@ -114,7 +156,7 @@ final class TemplatingUtil {
 
     static void clearText(XSLFTextParagraph pp) {
         for (var textRun : pp.getTextRuns()) {
-            if (!textRun.getRawText().equals("\n")) {
+            if (!"\n".equals(textRun.getRawText())) {
                 textRun.setText("");
             }
         }
@@ -266,41 +308,44 @@ final class TemplatingUtil {
                 .replace("}", "\\}");
 
         // now do the modifications
-        try (var inStream = new FileInputStream(outputFilePath)) {
-            var ppt = new XMLSlideShow(inStream);
+        loadSlideShow(outputFilePath, ppt -> {
             for (int i = 0; i < preppedContents.size(); i++) {
                 var slide = ppt.getSlides().get(i);
                 Map<String, String> values = preppedContents.get(i).entrySet().stream()
-                                .collect(Collectors.toMap(e -> placeholderTemplate.formatted(e.getKey()), e -> e.getValue()));
+                    .collect(Collectors.toMap(e -> placeholderTemplate.formatted(e.getKey()), e -> e.getValue()));
                 replaceText(slide, values);
                 removeAllTexts(slide, placeholderTemplateRegex);
+                convertNewlinesIntoParagraphs(slide);
             }
             try (var outStream = new FileOutputStream(outputFilePath)) {
                 ppt.write(outStream);
             }
-            ppt.close();
-        }
+        });
     }
 
     static void mergeSlideShows(List<String> filePaths, String outputFilePath) throws IOException {
         // use first src as base to maintain ppt size and other attributes
-        String basePpt = filePaths.get(0);
-        filePaths = filePaths.subList(1, filePaths.size());
-        try (var baseInputStream = new FileInputStream(basePpt)) {
-            XMLSlideShow mergedPPT = new XMLSlideShow(baseInputStream);
-            for (String filePath : filePaths) {
-                try (var inputStream = new FileInputStream(filePath)) {
-                    XMLSlideShow ppt = new XMLSlideShow(inputStream);
+        String basePPTPath = filePaths.get(0);
+        List<String> restPPTPaths =  filePaths.subList(1, filePaths.size());;
+        loadSlideShow(basePPTPath, mergedPPT -> {
+            for (String filePath : restPPTPaths) {
+                loadSlideShow(filePath, ppt -> {
                     for (XSLFSlide srcSlide : ppt.getSlides()) {
                         duplicateSlide(mergedPPT, srcSlide, true);
                     }
-                    ppt.close();
-                }
+                });
             }
             try (var outStream = new FileOutputStream(outputFilePath)) {
                 mergedPPT.write(outStream);
             }
-            mergedPPT.close();
+        });
+    }
+
+    static void loadSlideShow(String filePath, IOConsumer<XMLSlideShow> onLoad) throws IOException {
+        try (var is = new FileInputStream(filePath)) {
+            XMLSlideShow ppt = new XMLSlideShow(is);
+            onLoad.accept(ppt);
+            ppt.close();
         }
     }
 
@@ -312,5 +357,57 @@ final class TemplatingUtil {
             }
             tmplSlides.close();
         }
+    }
+
+    /**
+     * Splits all paragraphs within the given XSLFTextShape that contain newline characters
+     * into multiple, correctly styled XSLFTextParagraphs.
+     * This is useful because sometimes line breaks don't display correctly in pptx.
+     *
+     * @param shape The XSLFTextShape whose content needs to be processed and reorganized.
+     */
+    static void convertNewlinesIntoParagraphs(XSLFTextShape shape) {
+        if (shape == null) return;
+
+        List<ParagraphData> paragraphDataList = new ArrayList<>();
+        for (XSLFTextParagraph p : shape.getTextParagraphs()) {
+            if (!p.getTextRuns().isEmpty()) {
+                String text = p.getText();
+                XSLFTextRun textRun = p.getTextRuns().get(0); // use it for styling
+                String[] lines = text.split("\n");
+
+                for (String line : lines) {
+                    ParagraphData paragraphData = new ParagraphData(p, textRun, line);
+                    paragraphDataList.add(paragraphData);
+                }
+            }
+        }
+
+        shape.clearText();
+        for (ParagraphData paragraphData : paragraphDataList) {
+            XSLFTextParagraph p = shape.addNewTextParagraph();
+            paragraphData.apply(p);
+        }
+    }
+
+    /**
+     * Splits all paragraphs within the given XSLFTextShape that contain newline characters
+     * into multiple, correctly styled XSLFTextParagraphs.
+     * This is useful because sometimes line breaks don't display correctly in pptx.
+     *
+     * @param slide The XSLFSlide whose content needs to be processed and reorganized.
+     */
+    static void convertNewlinesIntoParagraphs(XSLFSlide slide) {
+        slide.getShapes().stream()
+            .filter(s -> s instanceof XSLFTextShape)
+            .forEach(s -> {
+                XSLFTextShape shape = (XSLFTextShape) s;
+                TemplatingUtil.convertNewlinesIntoParagraphs(shape);
+            });
+    }
+
+    @FunctionalInterface
+    interface IOConsumer<T> {
+        void accept(T t) throws IOException;
     }
 }
