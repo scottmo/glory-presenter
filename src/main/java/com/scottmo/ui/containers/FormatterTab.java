@@ -8,12 +8,15 @@ import com.scottmo.core.ppt.api.PowerpointService;
 import com.scottmo.shared.Range;
 import com.scottmo.shared.TextFormat;
 import com.scottmo.ui.utils.Dialog;
+import org.httprpc.sierra.SuggestionPicker;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -40,15 +43,20 @@ strikethrough: false
     private final JFileChooser fileChooser = new JFileChooser();
     private final JButton buttonFilePicker = new JButton(Labels.get("formatter.filePicker"));
     private final JSpinner inputStartSlide = new JSpinner(new SpinnerNumberModel(0, 0, Integer.MAX_VALUE, 1));
-    private final JSpinner inputEndSlide = new JSpinner(new SpinnerNumberModel(5, 0, Integer.MAX_VALUE, 1));
-    private final JTextField inputMatcher = new JTextField();
+    private final JSpinner inputEndSlide = new JSpinner(new SpinnerNumberModel(0, 0, Integer.MAX_VALUE, 1));
     private final JTextArea inputFormats = new JTextArea(5, 20);
+    private final SuggestionPicker inputMatcher = new SuggestionPicker(10);
     private final JButton buttonUpdate = new JButton(Labels.get("formatter.buttonUpdate"));
     private final JButton buttonNormalizeNewLine = new JButton(Labels.get("formatter.buttonNormalizeNewLine"));
 
     private String targetFilePath;
 
     public FormatterTab() {
+        Map<String, String> patternPresets = configService.getConfig().getPatternPresets();
+        List<String> patternPresetNames = new ArrayList<>(patternPresets.keySet());
+        inputMatcher.setText(patternPresetNames.get(0));
+        inputMatcher.setSuggestions(patternPresetNames);
+
         fileChooser.setFileFilter(new FileNameExtensionFilter("PowerPoint Files (*.pptx)", "pptx"));
         fileChooser.setAcceptAllFileFilterUsed(false);
 
@@ -88,7 +96,6 @@ strikethrough: false
             Pattern textMatchPattern;
             try {
                 String inputMatcherText = inputMatcher.getText();
-                Map<String, String> patternPresets = configService.getConfig().getPatternPresets();
                 textMatchPattern = (patternPresets.containsKey(inputMatcherText))
                     ? Pattern.compile(patternPresets.get(inputMatcherText))
                     : Pattern.compile(inputMatcherText);
