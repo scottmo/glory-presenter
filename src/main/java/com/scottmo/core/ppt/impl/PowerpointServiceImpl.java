@@ -121,7 +121,7 @@ public class PowerpointServiceImpl implements PowerpointService {
     @Override
     public void updateTextFormats(String filePath, String outputFilePath, Range range, Pattern textMatchPattern, TextFormat textFormats) throws IOException {
         TemplatingUtil.loadSlideShow(filePath, ppt -> {
-            List<XSLFSlide> slides = range.endIndex() == -1
+            List<XSLFSlide> slides = range.endIndex() == 0
                 ? ppt.getSlides()
                 : ppt.getSlides().subList(range.startIndex(), range.endIndex());
             for (var slide : slides) {

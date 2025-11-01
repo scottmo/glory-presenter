@@ -50,7 +50,7 @@
         "buttonNormalizeNewLine": "Normalize New Lines",
         "filePicker": "Select File",
         "rangeStart": "Start Slide",
-        "rangeEnd": "End Slide",
+        "rangeEnd": "End Slide (Exclusive. 0 means all slides)",
         "inputMatcher": "Text Match Pattern",
         "inputFormats": "Formats"
     },
