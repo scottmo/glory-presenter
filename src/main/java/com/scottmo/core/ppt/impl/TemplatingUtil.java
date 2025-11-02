@@ -374,9 +374,10 @@ final class TemplatingUtil {
             if (!p.getTextRuns().isEmpty()) {
                 String text = p.getText();
                 XSLFTextRun textRun = p.getTextRuns().get(0); // use it for styling
-                String[] lines = text.split("\n");
+                String[] lines = text.replace("\n\n", "\n").split("\n");
 
                 for (String line : lines) {
+                    line = line.trim();
                     ParagraphData paragraphData = new ParagraphData(p, textRun, line);
                     paragraphDataList.add(paragraphData);
                 }
