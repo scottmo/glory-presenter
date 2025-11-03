@@ -76,7 +76,7 @@ public final class SongTab extends JPanel {
             String searchText = inputSearch.getText().trim();
             List<String> filteredSongNames = searchText.isEmpty()
                 ? songNames
-                : songNames.stream() .filter(s -> s.contains(searchText)) .collect(Collectors.toList());
+                : songNames.stream() .filter(s -> s.toLowerCase().contains(searchText.toLowerCase())) .collect(Collectors.toList());
             songList.setItems(filteredSongNames);
         });
 
