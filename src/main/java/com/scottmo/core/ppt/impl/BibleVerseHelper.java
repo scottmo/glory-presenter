@@ -31,6 +31,11 @@ class BibleVerseHelper {
             bibleRefString = getBibleVersionsString() + BibleReference.VERSION_SEPERATOR + bibleRefString;
         }
 
+        // normalize
+        bibleRefString = bibleRefString.toLowerCase()
+            .replaceAll("proverb ", "proverbs ")
+            .replaceAll("psalms", "psalm");
+
         BibleReference bibleReference = new BibleReference(bibleRefString);
         Map<String, List<BibleVerse>> bibleVerses = bibleService.getBibleVerses(bibleReference);
         Map<String, String> bookNames = bibleService.getBookNames(bibleReference.getBook());
