@@ -48,6 +48,7 @@ public final class BibleTab extends JPanel {
         buttonGeneratePPT.addActionListener(evt -> {
             try {
                 generatePowerpoint(inputBibleRef.getText(), inputTemplate.getText());
+                Dialog.info("Generation success!");
             } catch (Exception e) {
                 Dialog.error("Unable to generate pptx for " + inputBibleRef.getText(), e);
                 e.printStackTrace();
