@@ -62,8 +62,8 @@ public class ParagraphData {
         if (fontAlign != null)
             p.setFontAlign(this.fontAlign);
 
+        p.setBullet(this.isBullet);
         if (this.isBullet) {
-            p.setBullet(this.isBullet);
             if (bulletFont != null)
                 p.setBulletFont(this.bulletFont);
             if (bulletFontColor != null)
