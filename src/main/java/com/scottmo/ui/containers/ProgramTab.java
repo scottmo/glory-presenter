@@ -12,6 +12,7 @@ import java.io.IOException;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
 import java.nio.file.Path;
@@ -94,8 +95,8 @@ public class ProgramTab extends JPanel {
                 cell(bookComboBox),
                 cell(buttonPickFile)
             ),
-            cell(fieldInput).with(input ->
-                input.setFont(new Font(Font.MONOSPACED, Font.BOLD, configService.getConfig().getAppSize().font()))),
+            cell(new JScrollPane(fieldInput)).with(scrollPane -> 
+                fieldInput.setFont(new Font(Font.MONOSPACED, Font.BOLD, configService.getConfig().getAppSize().font()))).weightBy(1),
             cell(buttonGeneratePPT)
         ).getComponent());
     }
