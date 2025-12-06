@@ -15,11 +15,14 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
+
+import com.scottmo.config.Config;
 
 import static com.scottmo.config.Config.UI_GAP;
 import static org.httprpc.sierra.UIBuilder.*;
@@ -61,6 +64,8 @@ strikethrough: false
         fileChooser.setAcceptAllFileFilterUsed(false);
 
         buttonFilePicker.addActionListener(evt -> {
+            Path templateDir = Path.of(configService.getConfig().getDataDir(), Config.TEMPLATE_DIR);
+            fileChooser.setCurrentDirectory(templateDir.toFile());
             int result = fileChooser.showOpenDialog(this);
 
             if (result == JFileChooser.APPROVE_OPTION) {
