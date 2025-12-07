@@ -46,7 +46,7 @@
     },
     "formatter": {
         "containerTitle": "Formatter",
-        "buttonUpdate": "Update",
+        "buttonUpdate": "Format Texts",
         "buttonNormalizeNewLine": "Normalize New Lines",
         "filePicker": "Select File",
         "rangeStart": "Start Slide",

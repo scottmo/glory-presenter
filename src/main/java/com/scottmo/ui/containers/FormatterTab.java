@@ -17,6 +17,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -52,7 +53,7 @@ strikethrough: false
     private final JButton buttonUpdate = new JButton(Labels.get("formatter.buttonUpdate"));
     private final JButton buttonNormalizeNewLine = new JButton(Labels.get("formatter.buttonNormalizeNewLine"));
 
-    private String targetFilePath;
+    private List<String> targetFilePaths = new ArrayList<>();
 
     public FormatterTab() {
         Map<String, String> patternPresets = configService.getConfig().getPatternPresets();
@@ -62,6 +63,7 @@ strikethrough: false
 
         fileChooser.setFileFilter(new FileNameExtensionFilter("PowerPoint Files (*.pptx)", "pptx"));
         fileChooser.setAcceptAllFileFilterUsed(false);
+        fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
 
         buttonFilePicker.addActionListener(evt -> {
             Path templateDir = Path.of(configService.getConfig().getDataDir(), Config.TEMPLATE_DIR);
@@ -69,14 +71,23 @@ strikethrough: false
             int result = fileChooser.showOpenDialog(this);
 
             if (result == JFileChooser.APPROVE_OPTION) {
-                File selectedFile = fileChooser.getSelectedFile();
-                targetFilePath = selectedFile.getAbsolutePath();
-                buttonFilePicker.setText(targetFilePath);
+                File selected = fileChooser.getSelectedFile();
+                targetFilePaths.clear();
+                if (selected.isDirectory()) {
+                    File[] pptxFiles = selected.listFiles((dir, name) -> name.toLowerCase().endsWith(".pptx"));
+                    if (pptxFiles != null) {
+                        Arrays.stream(pptxFiles).map(File::getAbsolutePath).forEach(targetFilePaths::add);
+                    }
+                    buttonFilePicker.setText(selected.getAbsolutePath() + " (" + targetFilePaths.size() + " files)");
+                } else {
+                    targetFilePaths.add(selected.getAbsolutePath());
+                    buttonFilePicker.setText(selected.getAbsolutePath());
+                }
             }
         });
 
         buttonUpdate.addActionListener(evt -> {
-            if (targetFilePath == null) {
+            if (targetFilePaths.isEmpty()) {
                 Dialog.error("No file selected!");
                 return;
             }
@@ -109,27 +120,41 @@ strikethrough: false
                 return;
             }
 
-            try {
-                int start = (Integer) inputStartSlide.getValue();
-                int end = (Integer) inputEndSlide.getValue();
-                powerpointService.updateTextFormats(targetFilePath, getOutputPath(), new Range(start, end), textMatchPattern, textFormats);
-                Dialog.info("Update success!");
-            } catch (IOException e) {
-                Dialog.error("Failed to update file: " + e.getMessage());
+            List<String> errors = new ArrayList<>();
+            int start = (Integer) inputStartSlide.getValue();
+            int end = (Integer) inputEndSlide.getValue();
+            for (String filePath : targetFilePaths) {
+                try {
+                    powerpointService.updateTextFormats(filePath, getOutputPath(filePath), new Range(start, end), textMatchPattern, textFormats);
+                } catch (IOException e) {
+                    errors.add(filePath + ": " + e.getMessage());
+                }
+            }
+            if (errors.isEmpty()) {
+                Dialog.info("Updated " + targetFilePaths.size() + " file(s) successfully!");
+            } else {
+                Dialog.error("Failed to update " + errors.size() + " file(s):\n" + String.join("\n", errors));
             }
         });
 
         buttonNormalizeNewLine.addActionListener(evt -> {
-            if (targetFilePath == null) {
+            if (targetFilePaths.isEmpty()) {
                 Dialog.error("No file selected!");
                 return;
             }
 
-            try {
-                powerpointService.normalizeNewLines(targetFilePath, getOutputPath());
-                Dialog.info("Update success!");
-            } catch (IOException e) {
-                Dialog.error("Failed to update file: " + e.getMessage());
+            List<String> errors = new ArrayList<>();
+            for (String filePath : targetFilePaths) {
+                try {
+                    powerpointService.normalizeNewLines(filePath, getOutputPath(filePath));
+                } catch (IOException e) {
+                    errors.add(filePath + ": " + e.getMessage());
+                }
+            }
+            if (errors.isEmpty()) {
+                Dialog.info("Updated " + targetFilePaths.size() + " file(s) successfully!");
+            } else {
+                Dialog.error("Failed to update " + errors.size() + " file(s):\n" + String.join("\n", errors));
             }
         });
 
@@ -155,7 +180,7 @@ strikethrough: false
         ).getComponent());
     }
 
-    private String getOutputPath() {
-        return targetFilePath.replace(".pptx", ".mod.pptx");
+    private String getOutputPath(String filePath) {
+        return filePath.replace(".pptx", ".mod.pptx");
     }
 }
