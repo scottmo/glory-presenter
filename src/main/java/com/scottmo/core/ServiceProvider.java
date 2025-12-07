@@ -6,8 +6,6 @@ import java.util.function.Supplier;
 
 import com.scottmo.core.bible.api.BibleService;
 import com.scottmo.core.bible.impl.BibleServiceImpl;
-import com.scottmo.core.google.api.GoogleCloudService;
-import com.scottmo.core.google.impl.GoogleCloudServiceImpl;
 import com.scottmo.core.ppt.api.PowerpointService;
 import com.scottmo.core.ppt.impl.PowerpointServiceImpl;
 import com.scottmo.core.security.api.CipherService;
@@ -37,9 +35,6 @@ public class ServiceProvider {
     private static <T extends Service> T getRaw(Class<T> clazz) {
         if (SongService.class.isAssignableFrom(clazz)) {
             return (T) new SongServiceImpl();
-        }
-        if (GoogleCloudService.class.isAssignableFrom(clazz)) {
-            return (T) new GoogleCloudServiceImpl();
         }
         if (BibleService.class.isAssignableFrom(clazz)) {
             return (T) new BibleServiceImpl();
