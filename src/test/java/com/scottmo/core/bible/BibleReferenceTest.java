@@ -1,22 +1,22 @@
-package com.scottmo.data.bibleReference;
+package com.scottmo.core.bible;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.scottmo.core.bible.api.bibleReference.BibleReference;
 
 import java.util.List;
 
-public class BibleReferenceUnitTest {
+class BibleReferenceTest {
     @Test
-    public void parseBibleVersions() {
+    void parseBibleVersions() {
         var br = new BibleReference("cuv,niv - john 1");
         assertEquals(List.of("cuv", "niv"), br.getVersions());
     }
 
     @Test
-    public void parseBookChapter() {
+    void parseBookChapter() {
         var br = new BibleReference("john 1");
         assertEquals("john", br.getBook());
         assertEquals(1, br.getRanges().size());
@@ -24,7 +24,7 @@ public class BibleReferenceUnitTest {
     }
 
     @Test
-    public void parseBookChapterVerse() {
+    void parseBookChapterVerse() {
         var br = new BibleReference("john 1:5");
         assertEquals("john", br.getBook());
         assertEquals(1, br.getRanges().size());
@@ -33,7 +33,7 @@ public class BibleReferenceUnitTest {
     }
 
     @Test
-    public void parseBookChapterVerses() {
+    void parseBookChapterVerses() {
         var br = new BibleReference("john 1:5,8,10");
         assertEquals("john", br.getBook());
         assertEquals(1, br.getRanges().size());
@@ -42,7 +42,7 @@ public class BibleReferenceUnitTest {
     }
 
     @Test
-    public void parseBookChapterVerseRange() {
+    void parseBookChapterVerseRange() {
         var br = new BibleReference("john 1:2,5-7,9");
         assertEquals("john", br.getBook());
         assertEquals(1, br.getRanges().size());
@@ -51,7 +51,7 @@ public class BibleReferenceUnitTest {
     }
 
     @Test
-    public void parseBookChapterVerseRanges() {
+    void parseBookChapterVerseRanges() {
         var br = new BibleReference("john 1:5-7;7:3-5");
         assertEquals("john", br.getBook());
         assertEquals(2, br.getRanges().size());
@@ -62,32 +62,33 @@ public class BibleReferenceUnitTest {
     }
 
     @Test
-    public void formatBookChapter() {
+    void formatBookChapter() {
         var brStr = "john 1";
         assertEquals(brStr, new BibleReference(brStr).toString());
     }
 
     @Test
-    public void formatBookChapterVerse() {
+    void formatBookChapterVerse() {
         var brStr = "john 1:5";
         assertEquals(brStr, new BibleReference(brStr).toString());
     }
 
     @Test
-    public void formatBookChapterVerses() {
+    void formatBookChapterVerses() {
         var brStr = "john 1:5,8,10";
         assertEquals(brStr, new BibleReference(brStr).toString());
     }
 
     @Test
-    public void formatBookChapterVerseRange() {
+    void formatBookChapterVerseRange() {
         var brStr = "john 1:2,5-7,9";
         assertEquals(brStr, new BibleReference(brStr).toString());
     }
 
     @Test
-    public void formatBookChapterVerseRanges() {
+    void formatBookChapterVerseRanges() {
         var brStr = "john 1:5-7;7:3-5";
         assertEquals(brStr, new BibleReference(brStr).toString());
     }
 }
+
