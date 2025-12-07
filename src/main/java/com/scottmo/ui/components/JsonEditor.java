@@ -98,7 +98,7 @@ public class JsonEditor extends JPanel {
         fieldMap.clear();
         
         for (Map.Entry<String, Object> entry : json.entrySet()) {
-            JPanel fieldPanel = createFieldPanel(entry.getKey(), entry.getValue(), 0);
+            JPanel fieldPanel = createFieldPanel(entry.getKey(), entry.getValue(), 0, entry.getKey());
             fieldsPanel.add(fieldPanel);
             fieldsPanel.add(Box.createVerticalStrut(UI_GAP));
         }
@@ -108,7 +108,7 @@ public class JsonEditor extends JPanel {
     }
 
     @SuppressWarnings("unchecked")
-    private JPanel createFieldPanel(String key, Object value, int indentLevel) {
+    private JPanel createFieldPanel(String key, Object value, int indentLevel, String path) {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setAlignmentX(LEFT_ALIGNMENT);
@@ -129,7 +129,8 @@ public class JsonEditor extends JPanel {
             groupPanel.setAlignmentX(LEFT_ALIGNMENT);
             
             for (Map.Entry<String, Object> nested : nestedMap.entrySet()) {
-                JPanel nestedPanel = createFieldPanel(nested.getKey(), nested.getValue(), indentLevel + 1);
+                JPanel nestedPanel = createFieldPanel(nested.getKey(), nested.getValue(), indentLevel + 1,
+                        path + "." + nested.getKey());
                 groupPanel.add(nestedPanel);
             }
             
@@ -138,17 +139,17 @@ public class JsonEditor extends JPanel {
             // Array - comma separated input
             List<?> list = (List<?>) value;
             String csvValue = String.join(", ", list.stream().map(Object::toString).toList());
-            panel.add(createLabeledField(key, csvValue, FieldType.ARRAY));
+            panel.add(createLabeledField(key, csvValue, FieldType.ARRAY, path));
         } else {
             // Simple value (string or number)
             FieldType type = (value instanceof Number) ? FieldType.NUMBER : FieldType.STRING;
-            panel.add(createLabeledField(key, String.valueOf(value), type));
+            panel.add(createLabeledField(key, String.valueOf(value), type, path));
         }
         
         return panel;
     }
 
-    private JPanel createLabeledField(String key, String value, FieldType type) {
+    private JPanel createLabeledField(String key, String value, FieldType type, String path) {
         JPanel rowPanel = new JPanel();
         rowPanel.setLayout(new BoxLayout(rowPanel, BoxLayout.X_AXIS));
         rowPanel.setAlignmentX(LEFT_ALIGNMENT);
@@ -161,7 +162,7 @@ public class JsonEditor extends JPanel {
         JTextField textField = new JTextField(value);
         textField.setMaximumSize(new java.awt.Dimension(Integer.MAX_VALUE, 25));
         
-        fieldMap.put(key, new FieldEntry(textField, type));
+        fieldMap.put(path, new FieldEntry(textField, type));
         
         rowPanel.add(label);
         rowPanel.add(Box.createHorizontalStrut(UI_GAP));
@@ -184,7 +185,7 @@ public class JsonEditor extends JPanel {
             Map<String, Object> json = objectMapper.readValue(originalContent, new TypeReference<LinkedHashMap<String, Object>>() {});
             
             // Update values from fields
-            updateJsonFromFields(json);
+            updateJsonFromFields(json, "");
             
             // Write back
             String newContent = objectMapper.writeValueAsString(json);
@@ -202,15 +203,17 @@ public class JsonEditor extends JPanel {
     }
 
     @SuppressWarnings("unchecked")
-    private void updateJsonFromFields(Map<String, Object> json) {
+    private void updateJsonFromFields(Map<String, Object> json, String parentPath) {
         for (Map.Entry<String, Object> entry : json.entrySet()) {
             String key = entry.getKey();
             Object value = entry.getValue();
             
+            String currentPath = parentPath.isEmpty() ? key : parentPath + "." + key;
+
             if (value instanceof Map) {
-                updateJsonFromFields((Map<String, Object>) value);
-            } else if (fieldMap.containsKey(key)) {
-                FieldEntry fieldEntry = fieldMap.get(key);
+                updateJsonFromFields((Map<String, Object>) value, currentPath);
+            } else if (fieldMap.containsKey(currentPath)) {
+                FieldEntry fieldEntry = fieldMap.get(currentPath);
                 String textValue = fieldEntry.field.getText().trim();
                 
                 json.put(key, switch (fieldEntry.type) {
