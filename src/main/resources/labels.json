@@ -57,6 +57,11 @@
     "configs": {
         "containerTitle": "Configurations",
         "buttonToggleDarkMode": "Toggle Dark Mode",
-        "buttonChangeSize": "Large UI/Small UI"
+        "buttonChangeSize": "Large UI/Small UI",
+        "settingsEditorTitle": "Settings"
+    },
+    "jsonEditor": {
+        "buttonReload": "Reload",
+        "buttonSave": "Save"
     }
 }

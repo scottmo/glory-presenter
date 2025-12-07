@@ -29,7 +29,7 @@ public class ConfigService {
 
     // instantiate config
     public void reload() {
-        Path configPath = Path.of("./" + Config.CONFIG_FILENAME);
+        Path configPath = getConfigPath();
         if (!Files.exists(configPath)) {
             try (InputStream in = ConfigService.class.getClassLoader().getResourceAsStream(Config.CONFIG_FILENAME)) {
                 Files.copy(in, configPath);
@@ -88,5 +88,9 @@ public class ConfigService {
 
     public String getPrimaryLocale() {
         return appConfig.getLocales().get(0);
+    }
+
+    public Path getConfigPath() {
+        return Path.of("./" + Config.CONFIG_FILENAME);
     }
 }
