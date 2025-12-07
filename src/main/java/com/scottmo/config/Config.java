@@ -10,8 +10,9 @@ import java.util.Map;
 import java.util.Set;
 
 public class Config {
-    public static final AppSize COMPACT_SIZE = new AppSize(900, 600, 14);
-    public static final AppSize COMFORT_SIZE = new AppSize(1100, 800, 16);
+    private static final AppSize APP_SIZE = new AppSize(1024, 768, 14);
+    // default to slightly larger scale since swing was pre-HDPI days and makes things look smaller now
+    private static final String UI_SCALE = "1.2";
 
     public static final int UI_GAP = 8;
 
@@ -20,7 +21,8 @@ public class Config {
 
     public static final String LABELS_FILENAME = "labels.json";
 
-    private AppSize appSize = COMPACT_SIZE;
+    private AppSize appSize = APP_SIZE;
+    private String uiScale = UI_SCALE;
     private String outputDir;
     private String dataDir;
     private List<String> locales = new ArrayList<>();; // order matters to which locale comes first
@@ -36,6 +38,14 @@ public class Config {
 
     public void setAppSize(AppSize appSize) {
         this.appSize = appSize;
+    }
+
+    public String getUiScale() {
+        return uiScale;
+    }
+
+    public void setUiScale(String uiScale) {
+        this.uiScale = uiScale;
     }
 
     public String getDataDir() {

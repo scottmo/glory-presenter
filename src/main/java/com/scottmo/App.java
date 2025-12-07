@@ -84,7 +84,7 @@ public class App extends JFrame {
     public static void main(String[] args) {
         System.setProperty("awt.useSystemAAFontSettings", "on");
         System.setProperty("swing.aatext", "true");
-        System.setProperty("flatlaf.uiScale", "1.2");
+        System.setProperty("flatlaf.uiScale", ConfigService.get().getConfig().getUiScale());
         FlatDarkLaf.setup();
         KeyboardFocusManager.setCurrentKeyboardFocusManager(new ScrollingKeyboardFocusManager());
         SwingUtilities.invokeLater(() -> {
