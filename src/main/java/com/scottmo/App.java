@@ -3,6 +3,8 @@ package com.scottmo;
 import static com.scottmo.config.Config.UI_GAP;
 
 import java.awt.KeyboardFocusManager;
+import java.util.List;
+import java.util.function.Supplier;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -36,23 +38,53 @@ public class App extends JFrame {
 
     private void render() {
         JTabbedPane tabs = new JTabbedPane();
-        Pair.<String, JPanel>ofList(
-            "songs.containerTitle", new SongTab(),
-            "bible.containerTitle", new BibleTab(),
-            "program.containerTitle", new ProgramTab(),
-            "formatter.containerTitle", new FormatterTab(),
-            "configs.containerTitle", new ConfigsTab()
-        ).forEach(tabCmp -> {
-            tabCmp.value().setBorder(new EmptyBorder(MARGIN, MARGIN, MARGIN, MARGIN));
-            tabs.addTab(Labels.get(tabCmp.key()), tabCmp.value());
+
+        // Define tab info: label key -> tab factory
+        List<Pair<String, Supplier<JPanel>>> tabFactories = List.of(
+            new Pair<>("songs.containerTitle", SongTab::new),
+            new Pair<>("bible.containerTitle", BibleTab::new),
+            new Pair<>("program.containerTitle", ProgramTab::new),
+            new Pair<>("formatter.containerTitle", FormatterTab::new),
+            new Pair<>("configs.containerTitle", ConfigsTab::new)
+        );
+
+        // Track which tabs have been loaded
+        boolean[] loaded = new boolean[tabFactories.size()];
+
+        // Add placeholder panels
+        for (var tabFactory : tabFactories) {
+            tabs.addTab(Labels.get(tabFactory.key()), new JPanel());
+        }
+
+        // Lazy load on tab selection
+        tabs.addChangeListener(e -> {
+            int index = tabs.getSelectedIndex();
+            if (index >= 0 && !loaded[index]) {
+                JPanel actualTab = tabFactories.get(index).value().get();
+                actualTab.setBorder(new EmptyBorder(MARGIN, MARGIN, MARGIN, MARGIN));
+                tabs.setComponentAt(index, actualTab);
+                loaded[index] = true;
+            }
         });
+
+        // Load first tab immediately
+        JPanel firstTab = tabFactories.get(0).value().get();
+        firstTab.setBorder(new EmptyBorder(MARGIN, MARGIN, MARGIN, MARGIN));
+        tabs.setComponentAt(0, firstTab);
+        loaded[0] = true;
+
         getContentPane().add(tabs);
+
+        var appSize = configService.getConfig().getAppSize();
+        setSize(appSize.width(), appSize.height());
+        setLocationRelativeTo(null); // center on screen
         this.setVisible(true);
     }
 
     public static void main(String[] args) {
         System.setProperty("awt.useSystemAAFontSettings", "on");
         System.setProperty("swing.aatext", "true");
+        System.setProperty("flatlaf.uiScale", "1.2");
         FlatDarkLaf.setup();
         KeyboardFocusManager.setCurrentKeyboardFocusManager(new ScrollingKeyboardFocusManager());
         SwingUtilities.invokeLater(() -> {

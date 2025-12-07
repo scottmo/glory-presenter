@@ -8,7 +8,6 @@ import static org.httprpc.sierra.UIBuilder.strut;
 
 import java.awt.BorderLayout;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
