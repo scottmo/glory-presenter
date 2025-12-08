@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.Set;
 
 public class Config {
-    private static final AppSize APP_SIZE = new AppSize(1024, 768, 14);
+
     // default to slightly larger scale since swing was pre-HDPI days and makes things look smaller now
     private static final String UI_SCALE = "1.2";
 
@@ -21,7 +21,8 @@ public class Config {
 
     public static final String LABELS_FILENAME = "labels.json";
 
-    private AppSize appSize = APP_SIZE;
+    private String appDimensions = "1024x768";
+    private int appFontSize = 14;
     private String uiScale = UI_SCALE;
     private String outputDir;
     private String dataDir;
@@ -33,11 +34,41 @@ public class Config {
     private Map<String, String> patternPresets = new HashMap<>();
 
     public AppSize getAppSize() {
-        return appSize;
+        int width = 1024;
+        int height = 768;
+        if (appDimensions != null && appDimensions.contains("x")) {
+            String[] parts = appDimensions.split("x");
+            if (parts.length == 2) {
+                try {
+                    width = Integer.parseInt(parts[0].trim());
+                    height = Integer.parseInt(parts[1].trim());
+                } catch (NumberFormatException e) {
+                    // ignore and use defaults
+                }
+            }
+        }
+        return new AppSize(width, height, appFontSize);
     }
 
     public void setAppSize(AppSize appSize) {
-        this.appSize = appSize;
+        this.appDimensions = appSize.width() + "x" + appSize.height();
+        this.appFontSize = appSize.font();
+    }
+
+    public String getAppDimensions() {
+        return appDimensions;
+    }
+
+    public void setAppDimensions(String appDimensions) {
+        this.appDimensions = appDimensions;
+    }
+
+    public int getAppFontSize() {
+        return appFontSize;
+    }
+
+    public void setAppFontSize(int appFontSize) {
+        this.appFontSize = appFontSize;
     }
 
     public String getUiScale() {

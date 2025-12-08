@@ -1,5 +1,7 @@
 {
     "uiScale": "1.2",
+    "appDimensions": "1024x768",
+    "appFontSize": 14,
     "outputDir": "./output",
     "dataDir": "./data",
     "locales": [
