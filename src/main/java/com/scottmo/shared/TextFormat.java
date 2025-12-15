@@ -3,6 +3,7 @@ package com.scottmo.shared;
 import java.awt.Color;
 import java.util.List;
 import java.util.Arrays;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class TextFormat {
     private String fontFamily;
@@ -31,8 +32,16 @@ public class TextFormat {
         this.fontSize = fontSize;
     }
 
-    public Color getFontColor() {
+    @JsonIgnore
+    public Color getFontColorObject() {
         return fontColor;
+    }
+
+    public String getFontColor() {
+        if (fontColor == null) {
+            return null;
+        }
+        return fontColor.getRed() + ", " + fontColor.getGreen() + ", " + fontColor.getBlue();
     }
 
     public void setFontColor(String fontColor) {

@@ -6,8 +6,6 @@ import org.apache.log4j.Logger;
 
 import com.scottmo.App;
 
-import java.awt.*;
-
 public class Dialog {
 
     public static void info(String msg) {

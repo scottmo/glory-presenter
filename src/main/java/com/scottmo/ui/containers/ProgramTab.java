@@ -95,8 +95,7 @@ public class ProgramTab extends JPanel {
                 cell(bookComboBox),
                 cell(buttonPickFile)
             ),
-            cell(new JScrollPane(fieldInput)).with(scrollPane -> 
-                fieldInput.setFont(new Font(Font.MONOSPACED, Font.BOLD, configService.getConfig().getAppSize().font()))).weightBy(1),
+                cell(new JScrollPane(fieldInput)).weightBy(1),
             cell(buttonGeneratePPT)
         ).getComponent());
     }

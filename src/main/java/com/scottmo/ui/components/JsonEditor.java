@@ -195,7 +195,7 @@ public class JsonEditor extends JPanel {
             if (onSave != null) {
                 onSave.accept(newContent);
             }
-            Dialog.info("Configuration saved. Some changes may require app restart.");
+            Dialog.info("Saved successfully. Some changes may require app restart.");
         } catch (IOException e) {
             setStatus("Failed to save: " + e.getMessage(), true);
             Dialog.error("Failed to save: " + e.getMessage());

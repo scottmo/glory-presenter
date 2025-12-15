@@ -26,6 +26,7 @@ public class Config {
     private String uiScale = UI_SCALE;
     private String outputDir;
     private String dataDir;
+    private String uiFontFamily = "Segoe UI, .AppleSystemUIFont, Helvetica Neue, SansSerif";
     private List<String> locales = new ArrayList<>();; // order matters to which locale comes first
     private Map<String, String> bibleVersionToLocale = new HashMap<>();
     private Map<String, String> defaultTemplates = new HashMap<>();
@@ -93,6 +94,14 @@ public class Config {
 
     public void setOutputDir(String outputDir) {
         this.outputDir = outputDir;
+    }
+
+    public String getUiFontFamily() {
+        return uiFontFamily;
+    }
+
+    public void setUiFontFamily(String uiFontFamily) {
+        this.uiFontFamily = uiFontFamily;
     }
 
     public List<String> getLocales() {

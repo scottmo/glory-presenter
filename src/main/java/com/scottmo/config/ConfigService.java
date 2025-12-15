@@ -8,6 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.scottmo.shared.LocaleUtil;
 
 public class ConfigService {
@@ -64,6 +65,7 @@ public class ConfigService {
         } else {
             throw new Error("Unable to load pptx templates! Please fix templates dir and restart!");
         }
+        save();
     }
 
     public String getRelativePath(String fileName) {
@@ -92,5 +94,14 @@ public class ConfigService {
 
     public Path getConfigPath() {
         return Path.of("./" + Config.CONFIG_FILENAME);
+    }
+
+    public void save() {
+        try {
+            new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT)
+                    .writeValue(getConfigPath().toFile(), appConfig);
+        } catch (IOException e) {
+            throw new RuntimeException("Unable to save config file!", e);
+        }
     }
 }

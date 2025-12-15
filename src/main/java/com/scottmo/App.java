@@ -2,15 +2,21 @@ package com.scottmo;
 
 import static com.scottmo.config.Config.UI_GAP;
 
+import java.awt.Font;
+import java.awt.GraphicsEnvironment;
 import java.awt.KeyboardFocusManager;
+import java.util.Enumeration;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Supplier;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
+import javax.swing.plaf.FontUIResource;
 
 import com.scottmo.ui.containers.*;
 import org.httprpc.sierra.ScrollingKeyboardFocusManager;
@@ -20,6 +26,7 @@ import com.scottmo.config.ConfigService;
 import com.scottmo.config.Labels;
 import com.scottmo.shared.Pair;
 import com.scottmo.ui.utils.Dialog;
+import com.scottmo.ui.utils.UiConfigurator;
 
 public class App extends JFrame {
     private static final int MARGIN = UI_GAP * 2;
@@ -86,7 +93,11 @@ public class App extends JFrame {
         System.setProperty("swing.aatext", "true");
         System.setProperty("flatlaf.uiScale", ConfigService.get().getConfig().getUiScale());
         FlatDarkLaf.setup();
+
+        UiConfigurator.initializeGlobalFont();
+
         KeyboardFocusManager.setCurrentKeyboardFocusManager(new ScrollingKeyboardFocusManager());
+
         SwingUtilities.invokeLater(() -> {
             Thread.setDefaultUncaughtExceptionHandler((Thread t, Throwable e) -> {
                 Dialog.error(String.format("[Error] %s (see error.log for details)", e.getMessage()), e);

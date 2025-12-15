@@ -17,11 +17,9 @@ import com.scottmo.ui.components.JsonEditor;
 import com.scottmo.ui.utils.UiConfigurator;
 
 public final class ConfigsTab extends JPanel {
-    private UiConfigurator uiConfigurator = new UiConfigurator();
-
     public ConfigsTab() {
         JButton buttonToggleDarkMode = new JButton(Labels.get("configs.buttonToggleDarkMode"));
-        buttonToggleDarkMode.addActionListener(evt -> uiConfigurator.toggleDarkMode());
+        buttonToggleDarkMode.addActionListener(evt -> UiConfigurator.toggleDarkMode());
 
         Path configPath = ConfigService.get().getConfigPath();
         JsonEditor jsonEditor = new JsonEditor(configPath, Labels.get("configs.settingsEditorTitle"));

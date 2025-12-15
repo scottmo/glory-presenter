@@ -166,8 +166,8 @@ public class PowerpointServiceImpl implements PowerpointService {
             if (formats.getFontSize() != null) {
                 textRun.setFontSize(formats.getFontSize());
             }
-            if (formats.getFontColor() != null) {
-                textRun.setFontColor(formats.getFontColor());
+            if (formats.getFontColorObject() != null) {
+                textRun.setFontColor(formats.getFontColorObject());
             }
             textRun.setBold(formats.isBold());
             textRun.setItalic(formats.isItalic());
