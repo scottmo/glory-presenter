@@ -35,14 +35,14 @@ import com.scottmo.core.songs.api.song.SongVerse;
 import com.scottmo.shared.StringUtils;
 
 public class SongEditor extends JPanel {
-    private static final Dimension MIN_SIZE = new Dimension(790, 480);
-
     private ConfigService configService = ConfigService.get();
 
     private CancelListener cancelListener;
     private SaveListener saveListener;
-    
-    private JTextField fieldAuthor = new JTextField(null, 24);
+
+    private Map<String, LocalizedFields> localizedFields = new HashMap<>();
+
+    private JTextField fieldAuthor = new JTextField(null);
     private JTextField fieldPublisher = new JTextField(null, 24);
     private JTextField fieldCopyright = new JTextField(null, 24);
     private JTextField fieldBook = new JTextField(null, 24);
@@ -50,15 +50,11 @@ public class SongEditor extends JPanel {
     private JTextArea fieldComments = new JTextArea(4, 20);
     private JTextField fieldVerseOrder = new JTextField(null, 24);
 
-    private Map<String, LocalizedFields> localizedFields = new HashMap<>();
-
     private JButton buttonSave = new JButton(Labels.get("songs.editor.buttonSave"));
     private JButton buttonCancel = new JButton(Labels.get("songs.editor.buttonCancel"));
     private JButton buttonUpdateVerseOrder = new JButton(Labels.get("songs.editor.buttonUpdateVerseOrder"));
 
     public SongEditor(Song song) {
-        setMinimumSize(MIN_SIZE);
-
         Consumer<JLabel> labelStyle = label -> label.setAlignmentX(1.0f);
         Consumer<JTextField> textFieldStyle = textField -> textField.setAlignmentX(0.0f);
 
@@ -91,43 +87,43 @@ public class SongEditor extends JPanel {
             column(UI_GAP, true,
                 row(UI_GAP, true,
                     cell(new JLabel(Labels.get("songs.editor.fieldAuthor"))).with(labelStyle),
-                    cell(fieldAuthor).with(textFieldStyle)
+                    cell(fieldAuthor).weightBy(1.0).with(textFieldStyle)
                 ),
                 row(UI_GAP, true,
                     cell(new JLabel(Labels.get("songs.editor.fieldPublisher"))).with(labelStyle),
-                    cell(fieldPublisher).with(textFieldStyle)
+                    cell(fieldPublisher).weightBy(1.0).with(textFieldStyle)
                 ),
                 row(UI_GAP, true,
                     cell(new JLabel(Labels.get("songs.editor.fieldCopyright"))).with(labelStyle),
-                    cell(fieldCopyright).with(textFieldStyle)
+                    cell(fieldCopyright).weightBy(1.0).with(textFieldStyle)
                 ),
                 row(UI_GAP, true,
                     cell(new JLabel(Labels.get("songs.editor.fieldBook"))).with(labelStyle),
-                    cell(fieldBook).with(textFieldStyle)
+                    cell(fieldBook).weightBy(1.0).with(textFieldStyle)
                 ),
                 row(UI_GAP, true,
                     cell(new JLabel(Labels.get("songs.editor.fieldEntry"))).with(labelStyle),
-                    cell(fieldEntry).with(textFieldStyle)
+                    cell(fieldEntry).weightBy(1.0).with(textFieldStyle)
                 ),
                 row(UI_GAP, 
                     cell(new JLabel(Labels.get("songs.editor.fieldComments"))).with(labelStyle)
                         .with(label -> label.setAlignmentY(0.0f)),
-                    cell(new JScrollPane(fieldComments))
+                    cell(new JScrollPane(fieldComments)).weightBy(1.0)
                 ),
                 row(UI_GAP, true,
                     cell(new JLabel(Labels.get("songs.editor.fieldVerseOrder"))).with(labelStyle),
                     column(UI_GAP,
                         cell(fieldVerseOrder).with(textFieldStyle),
                         cell(buttonUpdateVerseOrder)
-                    )
+                    ).weightBy(1.0)
                 )
-            ),
+            ).weightBy(1.0),
             strut(UI_GAP),
             column(UI_GAP,
                 column(
                     cell(new JLabel(Labels.get("songs.editor.fieldLyrics"))).with(labelStyle),
-                    cell(localizedFieldsPane)
-                )
+                    cell(localizedFieldsPane).weightBy(1.0)
+                ).weightBy(1.0)
             ).weightBy(1.0)
         ).getComponent();
 
@@ -227,7 +223,7 @@ public class SongEditor extends JPanel {
     private JComponent buildLocalizedFields() {
         JTabbedPane localizedFieldsPane = new JTabbedPane();
         for (String locale : configService.getConfig().getLocales()) {
-            LocalizedFields fields = new LocalizedFields(new JTextField(), new JTextArea(15, 30));
+            LocalizedFields fields = new LocalizedFields(new JTextField(), new JTextArea());
             localizedFields.put(locale, fields);
 
             JPanel lyricPanel = new JPanel();
@@ -236,7 +232,7 @@ public class SongEditor extends JPanel {
                 cell(new JLabel(Labels.get("songs.editor.fieldTitle"))),
                 cell(fields.title()),
                 cell(new JLabel(Labels.get("songs.editor.fieldLyrics"))),
-                cell(new JScrollPane(fields.lyrics()))
+                cell(new JScrollPane(fields.lyrics())).weightBy(1.0)
             ).getComponent());
             localizedFieldsPane.addTab(locale, lyricPanel);
         }

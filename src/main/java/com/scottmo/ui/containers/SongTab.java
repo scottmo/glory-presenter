@@ -235,8 +235,6 @@ public final class SongTab extends JPanel {
     }
 
     private void showSongEditor(Song song) {
-
-
         SongEditor songEditor = new SongEditor(song);
 
         songEditor.addCancelListener(this::restoreMainView);
