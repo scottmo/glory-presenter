@@ -9,8 +9,8 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.plaf.FontUIResource;
 
-import com.formdev.flatlaf.FlatDarkLaf;
-import com.formdev.flatlaf.FlatLightLaf;
+import com.formdev.flatlaf.intellijthemes.FlatCarbonIJTheme;
+import com.formdev.flatlaf.intellijthemes.FlatCyanLightIJTheme;
 import com.scottmo.App;
 import com.scottmo.config.ConfigService;
 
@@ -20,7 +20,7 @@ public class UiConfigurator {
     public static void toggleDarkMode() {
         try {
             isDarkMode = !isDarkMode;
-            UIManager.setLookAndFeel(isDarkMode ? new FlatDarkLaf() : new FlatLightLaf());
+            UIManager.setLookAndFeel(isDarkMode ? new FlatCarbonIJTheme() : new FlatCyanLightIJTheme());
             SwingUtilities.updateComponentTreeUI(App.get()); 
         } catch (Exception e) {
             Dialog.error("Unable to toggle dark mode", e);

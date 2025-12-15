@@ -2,26 +2,19 @@ package com.scottmo;
 
 import static com.scottmo.config.Config.UI_GAP;
 
-import java.awt.Font;
-import java.awt.GraphicsEnvironment;
 import java.awt.KeyboardFocusManager;
-import java.util.Enumeration;
 import java.util.List;
-import java.util.Set;
 import java.util.function.Supplier;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
-import javax.swing.plaf.FontUIResource;
-
 import com.scottmo.ui.containers.*;
 import org.httprpc.sierra.ScrollingKeyboardFocusManager;
 
-import com.formdev.flatlaf.FlatDarkLaf;
+import com.formdev.flatlaf.intellijthemes.FlatCarbonIJTheme;
 import com.scottmo.config.ConfigService;
 import com.scottmo.config.Labels;
 import com.scottmo.shared.Pair;
@@ -92,7 +85,7 @@ public class App extends JFrame {
         System.setProperty("awt.useSystemAAFontSettings", "on");
         System.setProperty("swing.aatext", "true");
         System.setProperty("flatlaf.uiScale", ConfigService.get().getConfig().getUiScale());
-        FlatDarkLaf.setup();
+        FlatCarbonIJTheme.setup();
 
         UiConfigurator.initializeGlobalFont();
 

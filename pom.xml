@@ -6,7 +6,7 @@
 
     <groupId>com.scottmo</groupId>
     <artifactId>glory-presenter</artifactId>
-    <version>5.8.0</version>
+    <version>6.0.0</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -23,6 +23,11 @@
         <dependency>
 			<groupId>com.formdev</groupId>
 			<artifactId>flatlaf</artifactId>
+			<version>1.6.5</version>
+		</dependency>
+        <dependency>
+			<groupId>com.formdev</groupId>
+			<artifactId>flatlaf-intellij-themes</artifactId>
 			<version>1.6.5</version>
 		</dependency>
         <dependency>

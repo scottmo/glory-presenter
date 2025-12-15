@@ -35,7 +35,7 @@ import com.scottmo.ui.utils.Dialog;
 
 public class JsonEditor extends JPanel {
     private static final int INDENT_WIDTH = 20;
-    
+
     // private final ObjectMapper objectMapper = new
     // ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
     private final Path filePath;
@@ -46,15 +46,15 @@ public class JsonEditor extends JPanel {
 
     public JsonEditor(Path filePath, String title) {
         this.filePath = filePath;
-        
+
         JLabel titleLabel = new JLabel(title);
         titleLabel.setFont(titleLabel.getFont().deriveFont(Font.BOLD, titleLabel.getFont().getSize() + 6f));
-        
+
         fieldsPanel = new JPanel();
         fieldsPanel.setLayout(new BoxLayout(fieldsPanel, BoxLayout.Y_AXIS));
-        
+
         statusLabel = new JLabel(" ");
-        
+
         JButton buttonReload = new JButton(Labels.get("jsonEditor.buttonReload"));
         JButton buttonSave = new JButton(Labels.get("jsonEditor.buttonSave"));
 
@@ -99,13 +99,13 @@ public class JsonEditor extends JPanel {
     private void buildFields(Map<String, Object> json) {
         fieldsPanel.removeAll();
         fieldMap.clear();
-        
+
         for (Map.Entry<String, Object> entry : json.entrySet()) {
             JPanel fieldPanel = createFieldPanel(entry.getKey(), entry.getValue(), 0, entry.getKey());
             fieldsPanel.add(fieldPanel);
             fieldsPanel.add(Box.createVerticalStrut(UI_GAP));
         }
-        
+
         fieldsPanel.revalidate();
         fieldsPanel.repaint();
     }
@@ -115,7 +115,7 @@ public class JsonEditor extends JPanel {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setAlignmentX(LEFT_ALIGNMENT);
-        
+
         if (indentLevel > 0) {
             panel.setBorder(BorderFactory.createEmptyBorder(0, INDENT_WIDTH, 0, 0));
         }
@@ -130,13 +130,13 @@ public class JsonEditor extends JPanel {
                 TitledBorder.LEFT, TitledBorder.TOP
             ));
             groupPanel.setAlignmentX(LEFT_ALIGNMENT);
-            
+
             for (Map.Entry<String, Object> nested : nestedMap.entrySet()) {
                 JPanel nestedPanel = createFieldPanel(nested.getKey(), nested.getValue(), indentLevel + 1,
                         path + "." + nested.getKey());
                 groupPanel.add(nestedPanel);
             }
-            
+
             panel.add(groupPanel);
         } else if (value instanceof List) {
             // Array - comma separated input
@@ -148,7 +148,7 @@ public class JsonEditor extends JPanel {
             FieldType type = (value instanceof Number) ? FieldType.NUMBER : FieldType.STRING;
             panel.add(createLabeledField(key, String.valueOf(value), type, path));
         }
-        
+
         return panel;
     }
 
@@ -156,21 +156,20 @@ public class JsonEditor extends JPanel {
         JPanel rowPanel = new JPanel();
         rowPanel.setLayout(new BoxLayout(rowPanel, BoxLayout.X_AXIS));
         rowPanel.setAlignmentX(LEFT_ALIGNMENT);
-        
+
         JLabel label = new JLabel(formatLabel(key, type));
         label.setPreferredSize(new java.awt.Dimension(180, 25));
         label.setMinimumSize(new java.awt.Dimension(180, 25));
         label.setMaximumSize(new java.awt.Dimension(180, 25));
-        
+
         JTextField textField = new JTextField(value);
-        textField.setMaximumSize(new java.awt.Dimension(Integer.MAX_VALUE, 25));
-        
+
         fieldMap.put(path, new FieldEntry(textField, type));
-        
+
         rowPanel.add(label);
         rowPanel.add(Box.createHorizontalStrut(UI_GAP));
         rowPanel.add(textField);
-        
+
         return rowPanel;
     }
 
@@ -189,15 +188,15 @@ public class JsonEditor extends JPanel {
             Map<String, Object> json = JsonUtil.mapper().readValue(originalContent,
                     new TypeReference<LinkedHashMap<String, Object>>() {
                     });
-            
+
             // Update values from fields
             updateJsonFromFields(json, "");
-            
+
             // Write back
             // Write back
             String newContent = JsonUtil.saveToString(json);
             Files.writeString(filePath, newContent);
-            
+
             setStatus("Saved to " + filePath.getFileName(), false);
             if (onSave != null) {
                 onSave.accept(newContent);
@@ -214,7 +213,7 @@ public class JsonEditor extends JPanel {
         for (Map.Entry<String, Object> entry : json.entrySet()) {
             String key = entry.getKey();
             Object value = entry.getValue();
-            
+
             String currentPath = parentPath.isEmpty() ? key : parentPath + "." + key;
 
             if (value instanceof Map) {
@@ -222,7 +221,7 @@ public class JsonEditor extends JPanel {
             } else if (fieldMap.containsKey(currentPath)) {
                 FieldEntry fieldEntry = fieldMap.get(currentPath);
                 String textValue = fieldEntry.field.getText().trim();
-                
+
                 json.put(key, switch (fieldEntry.type) {
                     case ARRAY -> parseArray(textValue);
                     case NUMBER -> parseNumber(textValue);
@@ -256,8 +255,8 @@ public class JsonEditor extends JPanel {
 
     private void setStatus(String message, boolean isError) {
         statusLabel.setText(message);
-        statusLabel.setForeground(isError 
-            ? Color.RED 
+        statusLabel.setForeground(isError
+                ? Color.RED
             : javax.swing.UIManager.getColor("Label.foreground"));
     }
 
