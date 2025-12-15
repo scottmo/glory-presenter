@@ -1,11 +1,15 @@
 package com.scottmo.ui.utils;
 
+import static com.scottmo.config.Config.UI_GAP;
+
 import java.awt.Font;
 
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
+import javax.swing.border.Border;
+import javax.swing.border.EmptyBorder;
 
 import com.scottmo.config.Labels;
 
@@ -54,5 +58,9 @@ public final class ComponentBuilder {
             label.setFont(label.getFont().deriveFont(Font.BOLD, 14f));
         }
         return label;
+    }
+
+    public static Border gapBorder(int gap) {
+        return new EmptyBorder(UI_GAP, UI_GAP, UI_GAP, UI_GAP);
     }
 }

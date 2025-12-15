@@ -1,6 +1,7 @@
 package com.scottmo;
 
 import static com.scottmo.config.Config.UI_GAP;
+import static com.scottmo.ui.utils.ComponentBuilder.gapBorder;
 
 import java.awt.KeyboardFocusManager;
 import java.util.List;
@@ -61,7 +62,7 @@ public class App extends JFrame {
             int index = tabs.getSelectedIndex();
             if (index >= 0 && !loaded[index]) {
                 JPanel actualTab = tabFactories.get(index).value().get();
-                actualTab.setBorder(new EmptyBorder(MARGIN, MARGIN, MARGIN, MARGIN));
+                actualTab.setBorder(gapBorder(MARGIN));
                 tabs.setComponentAt(index, actualTab);
                 loaded[index] = true;
             }
@@ -69,7 +70,7 @@ public class App extends JFrame {
 
         // Load first tab immediately
         JPanel firstTab = tabFactories.get(0).value().get();
-        firstTab.setBorder(new EmptyBorder(MARGIN, MARGIN, MARGIN, MARGIN));
+        firstTab.setBorder(gapBorder(MARGIN));
         tabs.setComponentAt(0, firstTab);
         loaded[0] = true;
 

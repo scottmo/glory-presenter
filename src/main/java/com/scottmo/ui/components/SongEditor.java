@@ -6,9 +6,9 @@ import static org.httprpc.sierra.UIBuilder.column;
 import static org.httprpc.sierra.UIBuilder.glue;
 import static org.httprpc.sierra.UIBuilder.row;
 import static org.httprpc.sierra.UIBuilder.strut;
+import static com.scottmo.ui.utils.ComponentBuilder.gapBorder;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -25,8 +25,6 @@ import javax.swing.JSeparator;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import javax.swing.border.EmptyBorder;
-
 import com.scottmo.config.ConfigService;
 import com.scottmo.config.Labels;
 import com.scottmo.core.songs.api.song.Song;
@@ -138,7 +136,7 @@ public class SongEditor extends JPanel {
             cell(form).weightBy(1.0),
             cell(new JSeparator()),
             cell(footer)
-        ).with(view -> view.setBorder(new EmptyBorder(UI_GAP, UI_GAP, UI_GAP, UI_GAP))).getComponent());
+        ).with(view -> view.setBorder(gapBorder(UI_GAP))).getComponent());
     }
 
     public interface CancelListener {

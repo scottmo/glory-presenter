@@ -1,5 +1,7 @@
 package com.scottmo.ui.components;
 
+import static com.scottmo.ui.utils.ComponentBuilder.gapBorder;
+
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.MouseAdapter;
@@ -12,7 +14,6 @@ import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.UIManager;
-import javax.swing.border.EmptyBorder;
 
 public class ListView extends JPanel {
     private static final Dimension MIN_SIZE = new Dimension(200, 400);
@@ -52,7 +53,7 @@ public class ListView extends JPanel {
         for (String item : items) {
             JPanel itemPanel = new JPanel(new BorderLayout());
             itemPanel.setMaximumSize(new Dimension(getMaximumSize().width, 40));
-            itemPanel.setBorder(new EmptyBorder(ITEM_PADDING, ITEM_PADDING, ITEM_PADDING, ITEM_PADDING)); // padding
+            itemPanel.setBorder(gapBorder(ITEM_PADDING)); // padding
 
             JCheckBox checkBox = new JCheckBox(item);
             checkBox.setOpaque(false); // Make checkbox background transparent

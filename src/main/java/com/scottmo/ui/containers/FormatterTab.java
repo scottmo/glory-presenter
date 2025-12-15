@@ -48,7 +48,7 @@ strikethrough: false
     private final JButton buttonFilePicker = new JButton(Labels.get("formatter.filePicker"));
     private final JSpinner inputStartSlide = new JSpinner(new SpinnerNumberModel(0, 0, Integer.MAX_VALUE, 1));
     private final JSpinner inputEndSlide = new JSpinner(new SpinnerNumberModel(0, 0, Integer.MAX_VALUE, 1));
-    private final JTextArea inputFormats = new JTextArea(5, 20);
+    private final JTextArea inputFormats = new JTextArea(10, 20);
     private final SuggestionPicker inputMatcher = new SuggestionPicker(10);
     private final JButton buttonUpdate = new JButton(Labels.get("formatter.buttonUpdate"));
     private final JButton buttonNormalizeNewLine = new JButton(Labels.get("formatter.buttonNormalizeNewLine"));
