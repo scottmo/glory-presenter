@@ -19,7 +19,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.swing.JButton;
-import javax.swing.JDialog;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
@@ -65,6 +65,8 @@ public final class SongTab extends JPanel {
     private final JButton buttonGeneratePPT = new JButton(Labels.get("songs.buttonGeneratePPT"));
     private final JSpinner inputLinesPerSlide = new JSpinner(new SpinnerNumberModel(2, 1, 10, 1));
     private final SuggestionPicker inputTemplate = new SuggestionPicker(10);
+
+    private final JComponent mainView;
 
     public SongTab() {
         loadSongList();
@@ -179,7 +181,7 @@ public final class SongTab extends JPanel {
         inputTemplate.setSuggestions(templatePaths);
 
         setLayout(new BorderLayout());
-        add(row(UI_GAP,
+        mainView = row(UI_GAP,
             column(UI_GAP,
                 cell(inputSearch),
                 cell(new JLabel("Note: click on empty space of the row to select single row")),
@@ -203,7 +205,8 @@ public final class SongTab extends JPanel {
                 cell(buttonGeneratePPT),
                 cell(buttonGenerateGSlide)
             ).weightBy(1.0)
-        ).getComponent());
+        ).getComponent();
+        add(mainView, BorderLayout.CENTER);
     }
 
     private int getLinesPerSlide() {
@@ -232,22 +235,31 @@ public final class SongTab extends JPanel {
     }
 
     private void showSongEditor(Song song) {
-        String title = song == null || song.getId() == -1
-            ? "songs.editor.titleNew"
-            : "songs.editor.titleEdit";
+
 
         SongEditor songEditor = new SongEditor(song);
-        JDialog modal = Dialog.newModal(Labels.get(title), songEditor);
 
-        songEditor.addCancelListener(modal::dispose);
+        songEditor.addCancelListener(this::restoreMainView);
         songEditor.addSaveListener((Song modifiedSong) -> {
             songService.store(modifiedSong);
             Dialog.info(String.format("Saved song '%s' successfully!", modifiedSong.getTitle()));
-            modal.dispose();
+            restoreMainView();
             loadSongList(); // refresh song list
         });
 
-        modal.setVisible(true);
+        switchView(songEditor);
+    }
+
+    private void switchView(JComponent component) {
+        removeAll();
+        add(component, BorderLayout.CENTER);
+        revalidate();
+        repaint();
+        component.requestFocusInWindow();
+    }
+
+    private void restoreMainView() {
+        switchView(mainView);
     }
 
     private void importSongs(String filePath) {
