@@ -28,15 +28,16 @@ import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
+
 import com.scottmo.config.Labels;
+import com.scottmo.shared.JsonUtil;
 import com.scottmo.ui.utils.Dialog;
 
 public class JsonEditor extends JPanel {
     private static final int INDENT_WIDTH = 20;
     
-    private final ObjectMapper objectMapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
+    // private final ObjectMapper objectMapper = new
+    // ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
     private final Path filePath;
     private final JPanel fieldsPanel;
     private final JLabel statusLabel;
@@ -85,7 +86,9 @@ public class JsonEditor extends JPanel {
     private void reloadJson() {
         try {
             String content = Files.readString(filePath);
-            Map<String, Object> json = objectMapper.readValue(content, new TypeReference<LinkedHashMap<String, Object>>() {});
+            Map<String, Object> json = JsonUtil.mapper().readValue(content,
+                    new TypeReference<LinkedHashMap<String, Object>>() {
+                    });
             buildFields(json);
             setStatus("Loaded from " + filePath.getFileName(), false);
         } catch (IOException e) {
@@ -181,14 +184,18 @@ public class JsonEditor extends JPanel {
     private void saveJson() {
         try {
             // Read original to preserve structure
+            // Read original to preserve structure
             String originalContent = Files.readString(filePath);
-            Map<String, Object> json = objectMapper.readValue(originalContent, new TypeReference<LinkedHashMap<String, Object>>() {});
+            Map<String, Object> json = JsonUtil.mapper().readValue(originalContent,
+                    new TypeReference<LinkedHashMap<String, Object>>() {
+                    });
             
             // Update values from fields
             updateJsonFromFields(json, "");
             
             // Write back
-            String newContent = objectMapper.writeValueAsString(json);
+            // Write back
+            String newContent = JsonUtil.saveToString(json);
             Files.writeString(filePath, newContent);
             
             setStatus("Saved to " + filePath.getFileName(), false);

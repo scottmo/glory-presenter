@@ -1,5 +1,6 @@
 package com.scottmo.config;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.scottmo.shared.TextFormat;
 
 import java.util.ArrayList;
@@ -34,6 +35,7 @@ public class Config {
     private Map<String, TextFormat> textFormatPresets = new HashMap<>();
     private Map<String, String> patternPresets = new HashMap<>();
 
+    @JsonIgnore
     public AppSize getAppSize() {
         int width = 1024;
         int height = 768;
@@ -128,6 +130,7 @@ public class Config {
         this.defaultTemplates = defaultTemplates;
     }
 
+    @JsonIgnore
     public Set<String> getTemplatePaths() {
         return templatePaths;
     }

@@ -8,7 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
+import com.scottmo.shared.JsonUtil;
 import com.scottmo.shared.LocaleUtil;
 
 public class ConfigService {
@@ -98,8 +98,7 @@ public class ConfigService {
 
     public void save() {
         try {
-            new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT)
-                    .writeValue(getConfigPath().toFile(), appConfig);
+            JsonUtil.save(getConfigPath().toFile(), appConfig);
         } catch (IOException e) {
             throw new RuntimeException("Unable to save config file!", e);
         }
