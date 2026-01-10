@@ -24,7 +24,8 @@ import com.scottmo.core.ServiceProvider;
 import com.scottmo.core.bible.api.BibleService;
 import com.scottmo.core.ppt.api.PowerpointService;
 import com.scottmo.ui.utils.Dialog;
-import com.scottmo.ui.utils.FilePicker;
+import com.scottmo.ui.utils.SearchableListDialog;
+
 
 public class ProgramTab extends JPanel {
 
@@ -71,12 +72,24 @@ public class ProgramTab extends JPanel {
 
         buttonPickFile.addActionListener(evt -> {
             Path templateDir = Path.of(configService.getConfig().getDataDir(), Config.TEMPLATE_DIR);
-            FilePicker.show(FilePicker.FILES_AND_DIRECTORIES, templateDir.toString(), selectedPath -> {
-                String relativePath = getRelativeTemplatePath(selectedPath);
-                if (relativePath != null) {
-                    insertTextAtCursor(relativePath);
-                }
-            });
+            try (java.util.stream.Stream<Path> stream = java.nio.file.Files.walk(templateDir)) {
+                java.util.List<String> files = stream
+                    .filter(java.nio.file.Files::isRegularFile)
+                    .map(templateDir::relativize)
+                    .map(Path::toString)
+                    .map(s -> s.replace('\\', '/'))
+                    .sorted()
+                    .collect(java.util.stream.Collectors.toList());
+
+                SearchableListDialog.show(
+                    javax.swing.SwingUtilities.getWindowAncestor(this),
+                    "Select Template", 
+                    files, 
+                    this::insertTextAtCursor
+                );
+            } catch (IOException e) {
+                Dialog.error("Error listing templates", e);
+            }
         });
 
         buttonGeneratePPT.addActionListener(evt -> {
@@ -121,20 +134,7 @@ public class ProgramTab extends JPanel {
         fieldInput.setCaretPosition(insertPos + bibleBlock.length());
     }
 
-    private String getRelativeTemplatePath(String filePath) {
-        try {
-            Path templateDir = Path.of(configService.getConfig().getDataDir(), Config.TEMPLATE_DIR).toAbsolutePath().normalize();
-            Path selectedPath = Path.of(filePath).toAbsolutePath().normalize();
-            
-            if (selectedPath.startsWith(templateDir)) {
-                Path relativePath = templateDir.relativize(selectedPath);
-                return relativePath.toString().replace('\\', '/');
-            }
-            return null;
-        } catch (Exception e) {
-            return null;
-        }
-    }
+
 
     private void insertTextAtCursor(String text) {
         String content = fieldInput.getText();
