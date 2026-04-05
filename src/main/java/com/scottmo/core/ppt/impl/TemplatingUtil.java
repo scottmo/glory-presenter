@@ -1,8 +1,7 @@
 package com.scottmo.core.ppt.impl;
 
 import org.apache.poi.xslf.usermodel.*;
-import org.openxmlformats.schemas.drawingml.x2006.main.CTTextCharacterProperties;
-import org.openxmlformats.schemas.drawingml.x2006.main.CTTextParagraphProperties;
+import org.apache.poi.common.usermodel.fonts.FontGroup;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -137,7 +136,12 @@ final class TemplatingUtil {
         if (run1 == null || run2 == null) return;
 
         run1.setFontColor(run2.getFontColor());
-        run1.setFontFamily(run2.getFontFamily());
+        for (FontGroup group : FontGroup.values()) {
+            String family = run2.getFontFamily(group);
+            if (family != null) {
+                run1.setFontFamily(family, group);
+            }
+        }
         run1.setFontSize(run2.getFontSize());
         run1.setBold(run2.isBold());
         run1.setItalic(run2.isItalic());

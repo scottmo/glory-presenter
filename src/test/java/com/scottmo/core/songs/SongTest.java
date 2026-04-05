@@ -6,7 +6,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.scottmo.core.songs.api.song.Song;
-import com.scottmo.core.songs.api.song.SongTitle;
 import com.scottmo.core.songs.api.song.SongVerse;
 
 import java.util.List;

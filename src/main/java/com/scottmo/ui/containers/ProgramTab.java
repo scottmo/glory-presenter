@@ -6,7 +6,6 @@ import static org.httprpc.sierra.UIBuilder.column;
 import static org.httprpc.sierra.UIBuilder.row;
 
 import java.awt.BorderLayout;
-import java.awt.Font;
 import java.io.IOException;
 
 import javax.swing.JButton;

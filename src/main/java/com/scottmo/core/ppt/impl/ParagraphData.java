@@ -5,7 +5,11 @@ import org.apache.poi.sl.usermodel.TextParagraph;
 import org.apache.poi.xslf.usermodel.XSLFTextParagraph;
 import org.apache.poi.xslf.usermodel.XSLFTextRun;
 
+import org.apache.poi.common.usermodel.fonts.FontGroup;
+
 import java.awt.*;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ParagraphData {
     private boolean isBullet;
@@ -81,7 +85,7 @@ public class ParagraphData {
 
     private static class TextRunData {
         private PaintStyle fontColor;
-        private String fontFamily;
+        private Map<FontGroup, String> fontFamilies;
         private Double characterSpacing;
         private Double fontSize;
         private PaintStyle highlightColor;
@@ -94,7 +98,13 @@ public class ParagraphData {
 
         public TextRunData(XSLFTextRun textRun) {
             this.fontColor = textRun.getFontColor();
-            this.fontFamily = textRun.getFontFamily();
+            this.fontFamilies = new HashMap<>();
+            for (FontGroup group : FontGroup.values()) {
+                String family = textRun.getFontFamily(group);
+                if (family != null) {
+                    this.fontFamilies.put(group, family);
+                }
+            }
             this.characterSpacing = textRun.getCharacterSpacing();
             this.fontSize = textRun.getFontSize();
             this.highlightColor = textRun.getHighlightColor();
@@ -109,8 +119,9 @@ public class ParagraphData {
         public void apply(XSLFTextRun run) {
             if (fontColor != null)
                 run.setFontColor(getColor(fontColor));
-            if (fontFamily != null)
-                run.setFontFamily(this.fontFamily);
+            for (Map.Entry<FontGroup, String> entry : this.fontFamilies.entrySet()) {
+                run.setFontFamily(entry.getValue(), entry.getKey());
+            }
             if (characterSpacing != null)
                 run.setCharacterSpacing(this.characterSpacing);
             if (fontSize != null)
