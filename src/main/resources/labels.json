@@ -60,6 +60,11 @@
         "buttonChangeSize": "Large UI/Small UI",
         "settingsEditorTitle": "Settings"
     },
+    "errorLog": {
+        "containerTitle": "Error Log",
+        "buttonClear": "Clear",
+        "buttonExport": "Export to error.log"
+    },
     "jsonEditor": {
         "buttonReload": "Reload",
         "buttonSave": "Save"

@@ -45,7 +45,8 @@ public class App extends JFrame {
             new Pair<>("bible.containerTitle", BibleTab::new),
             new Pair<>("program.containerTitle", ProgramTab::new),
             new Pair<>("formatter.containerTitle", FormatterTab::new),
-            new Pair<>("configs.containerTitle", ConfigsTab::new)
+            new Pair<>("configs.containerTitle", ConfigsTab::new),
+            new Pair<>("errorLog.containerTitle", ErrorLogTab::new)
         );
 
         // Track which tabs have been loaded
