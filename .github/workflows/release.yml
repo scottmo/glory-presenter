@@ -6,29 +6,6 @@ on:
       - 'v*'
 
 jobs:
-  build-mac:
-    name: Build macOS DMG
-    runs-on: macos-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Set up Java
-        uses: actions/setup-java@v4
-        with:
-          java-version: '17'
-          distribution: 'temurin'
-          cache: 'maven'
-
-      - name: Build with Maven
-        run: mvn clean package -Pjpackage -Djpackage.type=dmg
-
-      - name: Upload macOS DMG Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: mac-dmg
-          path: target/dist/*.dmg
-
   build-windows:
     name: Build Windows EXE
     runs-on: windows-latest
@@ -59,19 +36,13 @@ jobs:
 
   create-release:
     name: Create GitHub Release
-    needs: [build-mac, build-windows]
+    needs: [build-windows]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
-      - name: Download macOS DMG
-        uses: actions/download-artifact@v4
-        with:
-          name: mac-dmg
-          path: release-artifacts
 
       - name: Download Windows EXE
         uses: actions/download-artifact@v4
