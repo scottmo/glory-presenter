@@ -24,4 +24,8 @@ public interface SongService extends Service {
 
     void importSong(String filePath) throws IOException;
 
+    String serializeToYaml(Song song) throws IOException;
+
+    String getExportFilename(Song song, List<String> locales);
+
 }

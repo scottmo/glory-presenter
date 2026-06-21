@@ -60,6 +60,7 @@ public final class SongTab extends JPanel {
 
     private final JButton buttonImport = new JButton(Labels.get("songs.buttonImport"));
     private final JButton buttonExport = new JButton(Labels.get("songs.buttonExport"));
+    private final JButton buttonExportYaml = new JButton(Labels.get("songs.buttonExportYaml"));
 
     private final JButton buttonGeneratePPT = new JButton(Labels.get("songs.buttonGeneratePPT"));
     private final JSpinner inputLinesPerSlide = new JSpinner(new SpinnerNumberModel(2, 1, 10, 1));
@@ -159,6 +160,26 @@ public final class SongTab extends JPanel {
             }
         });
 
+        buttonExportYaml.addActionListener(evt -> {
+            List<String> exportedSongs = new ArrayList<>();
+            for (String songName : songList.getSelectedItems()) {
+                Integer songId = songIdMap.get(songName);
+                if (songId == null) {
+                    Dialog.error(String.format("Unable to export %s. Song cannot be found!", songName));
+                } else {
+                    try {
+                        exportSongToYaml(songId);
+                        exportedSongs.add(songName);
+                    } catch (IOException ioe) {
+                        Dialog.error(String.format("Failed to export %s to YAML!", songName), ioe);
+                    }
+                }
+            }
+            if (!exportedSongs.isEmpty()) {
+                Dialog.info(String.format("Exported songs to YAML: %s", StringUtils.join(exportedSongs)));
+            }
+        });
+
         buttonDeselect.addActionListener(e -> {
             songList.selectAll(false);
             updateButtonState();
@@ -199,6 +220,7 @@ public final class SongTab extends JPanel {
                 cell(new JSeparator()),
                 cell(buttonImport),
                 cell(buttonExport),
+                cell(buttonExportYaml),
                 cell(new JSeparator()),
                 cell(new JLabel(Labels.get("songs.inputLinesPerSlide"))),
                 cell(inputLinesPerSlide),
@@ -233,6 +255,7 @@ public final class SongTab extends JPanel {
         buttonDeleteSong.setEnabled(hasSelection);
         buttonDeselect.setEnabled(hasSelection);
         buttonExport.setEnabled(hasSelection);
+        buttonExportYaml.setEnabled(onlyOneSelected);
     }
 
     private void showSongEditor(Song song) {
@@ -280,6 +303,14 @@ public final class SongTab extends JPanel {
         String outputPath = configService.getOutputPath(StringUtils.sanitizeFilename(song.getTitle()) + ".xml");
         String songXML = songService.serialize(song);
         Files.writeString(Path.of(outputPath), songXML, StandardCharsets.UTF_8);
+    }
+
+    private void exportSongToYaml(Integer id) throws IOException {
+        Song song = songService.get(id);
+        String filename = songService.getExportFilename(song, configService.getConfig().getLocales());
+        Path outputPath = Path.of(filename);
+        String songYaml = songService.serializeToYaml(song);
+        Files.writeString(outputPath, songYaml, StandardCharsets.UTF_8);
     }
 
     private Map<String, Integer> getSongIdMap() {

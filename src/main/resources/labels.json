@@ -9,8 +9,9 @@
         "buttonDuplicate": "Duplicate",
         "buttonGenerateGSlide": "Generate GSlide",
         "buttonGeneratePPT": "Generate PPT",
-        "buttonImport": "Import",
-        "buttonExport": "Export",
+        "buttonImport": "Import OpenLyrics",
+        "buttonExport": "Export OpenLyrics",
+        "buttonExportYaml": "Export YAML",
         "inputLinesPerSlide": "Lines/Slide",
         "inputTemplate": "PPT Template",
         "editor": {

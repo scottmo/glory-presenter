@@ -13,6 +13,10 @@ import com.scottmo.core.songs.api.song.Song;
 import com.scottmo.core.songs.impl.openLyrics.OpenLyricsConverter;
 import com.scottmo.core.songs.impl.store.SongStore;
 import com.scottmo.shared.Pair;
+import com.scottmo.shared.StringUtils;
+import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
 
 public class SongServiceImpl implements SongService {
     private ConfigService configService = ConfigService.get();
@@ -61,5 +65,38 @@ public class SongServiceImpl implements SongService {
     public void importSong(String openLyricsXML) throws IOException {
         Song song = openLyricsConverter.deserialize(openLyricsXML);
         store.store(song);
+    }
+
+    @Override
+    public String serializeToYaml(Song song) throws IOException {
+        YAMLFactory yamlFactory = new YAMLFactory()
+            .enable(YAMLGenerator.Feature.LITERAL_BLOCK_STYLE)
+            .enable(YAMLGenerator.Feature.MINIMIZE_QUOTES)
+            .disable(YAMLGenerator.Feature.SPLIT_LINES);
+        YAMLMapper yamlMapper = new YAMLMapper(yamlFactory);
+        return yamlMapper.writeValueAsString(song);
+    }
+
+    @Override
+    public String getExportFilename(Song song, List<String> locales) {
+        StringBuilder nameBuilder = new StringBuilder();
+        for (String locale : locales) {
+            String title = song.getTitle(locale);
+            if (title != null && !title.trim().isEmpty()) {
+                nameBuilder.append(title.trim());
+            }
+        }
+        
+        String rawName = nameBuilder.toString();
+        if (rawName.isEmpty()) {
+            rawName = song.getTitle();
+            if (rawName == null || rawName.trim().isEmpty()) {
+                rawName = "song_" + song.getId();
+            }
+        }
+        
+        String sanitizedName = rawName.replaceAll("\\s+", "");
+        sanitizedName = StringUtils.sanitizeFilename(sanitizedName);
+        return sanitizedName + ".yaml";
     }
 }
