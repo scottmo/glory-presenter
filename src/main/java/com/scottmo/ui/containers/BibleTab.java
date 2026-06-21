@@ -37,7 +37,6 @@ public final class BibleTab extends JPanel {
     private PowerpointService powerpointService = ServiceProvider.get(PowerpointService.class).get();
 
     private JButton buttonImport = new JButton(Labels.get("bible.buttonImport"));
-    private JButton buttonGenerateGSlide = new JButton(Labels.get("bible.buttonGenerateGSlide"));
     private JButton buttonGeneratePPT = new JButton(Labels.get("bible.buttonGeneratePPT"));
     private SuggestionPicker inputTemplate = new SuggestionPicker(10);
     private JTextField inputBibleRef = new JTextField();
@@ -82,7 +81,6 @@ public final class BibleTab extends JPanel {
             cell(namedLabel("bible.inputTemplate")),
             cell(inputTemplate),
             cell(buttonGeneratePPT),
-            cell(buttonGenerateGSlide),
             cell(new JSeparator()),
             cell(buttonImport)
         ).getComponent());

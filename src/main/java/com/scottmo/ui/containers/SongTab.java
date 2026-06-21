@@ -61,7 +61,6 @@ public final class SongTab extends JPanel {
     private final JButton buttonImport = new JButton(Labels.get("songs.buttonImport"));
     private final JButton buttonExport = new JButton(Labels.get("songs.buttonExport"));
 
-    private final JButton buttonGenerateGSlide = new JButton(Labels.get("songs.buttonGenerateGSlide"));
     private final JButton buttonGeneratePPT = new JButton(Labels.get("songs.buttonGeneratePPT"));
     private final JSpinner inputLinesPerSlide = new JSpinner(new SpinnerNumberModel(2, 1, 10, 1));
     private final SuggestionPicker inputTemplate = new SuggestionPicker(10);
@@ -166,6 +165,9 @@ public final class SongTab extends JPanel {
         });
 
         buttonGeneratePPT.addActionListener(evt -> {
+            if (songList.getSelectCount() != 1) {
+                return;
+            }
             String songName = songList.getSelectedItems().get(0);
             Integer songId = songIdMap.get(songName);
             try {
@@ -202,8 +204,7 @@ public final class SongTab extends JPanel {
                 cell(inputLinesPerSlide),
                 cell(new JLabel(Labels.get("songs.inputTemplate"))),
                 cell(inputTemplate),
-                cell(buttonGeneratePPT),
-                cell(buttonGenerateGSlide)
+                cell(buttonGeneratePPT)
             ).weightBy(1.0)
         ).getComponent();
         add(mainView, BorderLayout.CENTER);
@@ -218,6 +219,7 @@ public final class SongTab extends JPanel {
         songNames = new ArrayList<>(songIdMap.keySet());
         Collections.sort(songNames);
         songList.setItems(songNames);
+        updateButtonState();
     }
 
     private void updateButtonState() {
@@ -226,7 +228,6 @@ public final class SongTab extends JPanel {
 
         buttonEditSong.setEnabled(onlyOneSelected);
         buttonDuplicate.setEnabled(onlyOneSelected);
-        buttonGenerateGSlide.setEnabled(onlyOneSelected);
         buttonGeneratePPT.setEnabled(onlyOneSelected);
 
         buttonDeleteSong.setEnabled(hasSelection);
