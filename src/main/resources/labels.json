@@ -53,7 +53,8 @@
         "rangeStart": "Start Slide",
         "rangeEnd": "End Slide (Exclusive. 0 means all slides)",
         "inputMatcher": "Text Match Pattern",
-        "inputFormats": "Formats"
+        "inputFormats": "Formats",
+        "checkboxOverwrite": "Overwrite"
     },
     "configs": {
         "containerTitle": "Configurations",

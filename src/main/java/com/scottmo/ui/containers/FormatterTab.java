@@ -50,6 +50,7 @@ strikethrough: false
     private final JSpinner inputEndSlide = new JSpinner(new SpinnerNumberModel(0, 0, Integer.MAX_VALUE, 1));
     private final JTextArea inputFormats = new JTextArea(10, 20);
     private final SuggestionPicker inputMatcher = new SuggestionPicker(10);
+    private final JCheckBox inputOverwrite = new JCheckBox(Labels.get("formatter.checkboxOverwrite"));
     private final JButton buttonUpdate = new JButton(Labels.get("formatter.buttonUpdate"));
     private final JButton buttonNormalizeNewLine = new JButton(Labels.get("formatter.buttonNormalizeNewLine"));
 
@@ -175,12 +176,13 @@ strikethrough: false
             cell(inputMatcher),
             cell(new JLabel(Labels.get("formatter.inputFormats"))),
             cell(new JScrollPane(inputFormats)),
+            cell(inputOverwrite),
             cell(buttonUpdate),
             cell(buttonNormalizeNewLine)
         ).getComponent());
     }
 
     private String getOutputPath(String filePath) {
-        return filePath.replace(".pptx", ".mod.pptx");
+        return inputOverwrite.isSelected() ? filePath : filePath.replace(".pptx", ".mod.pptx");
     }
 }
