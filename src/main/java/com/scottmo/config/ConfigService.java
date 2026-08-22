@@ -34,6 +34,7 @@ public class ConfigService {
         if (!Files.exists(configPath)) {
             try (InputStream in = ConfigService.class.getClassLoader().getResourceAsStream(Config.CONFIG_FILENAME)) {
                 Files.copy(in, configPath);
+                System.out.println("Loading default config.json");
             } catch (IOException e) {
                 throw new RuntimeException("Unable to create config.json!");
             }
@@ -93,11 +94,12 @@ public class ConfigService {
     }
 
     public Path getConfigPath() {
-        return Path.of("./" + Config.CONFIG_FILENAME);
+        return Path.of(Config.CONFIG_FILENAME);
     }
 
     public void save() {
         try {
+            System.out.println("Saving config.json to " + getConfigPath().toFile().getAbsolutePath());
             JsonUtil.save(getConfigPath().toFile(), appConfig);
         } catch (IOException e) {
             throw new RuntimeException("Unable to save config file!", e);

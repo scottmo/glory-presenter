@@ -38,7 +38,6 @@ dependency-reduced-pom.xml
 .DS_Store
 
 # Testing
-config.json
 credentials.json
 /data
 temp
