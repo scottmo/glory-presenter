@@ -26,9 +26,9 @@ target/
 dependency-reduced-pom.xml
 
 # vs code
-.vscode
+.vscode/
 
-# IntelliJ project files 
+# IDE
 *.iml
 *.iws
 *.ipr
