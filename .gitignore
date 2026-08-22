@@ -40,4 +40,5 @@ dependency-reduced-pom.xml
 # Testing
 credentials.json
 /data
+/output
 temp
