@@ -48,6 +48,9 @@ public class Dialog {
         modalDialog.setSize(App.get().getWidth() - 100, App.get().getHeight() - 100);
         modalDialog.setMinimumSize(content.getMinimumSize());
         modalDialog.add(content);
+
+        UndoRedoHelper.attachUndoManager(modalDialog);
+        
         return modalDialog;
     }
 }

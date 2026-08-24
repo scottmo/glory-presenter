@@ -20,6 +20,7 @@ import com.scottmo.config.Labels;
 import com.scottmo.shared.Pair;
 import com.scottmo.ui.utils.Dialog;
 import com.scottmo.ui.utils.UiConfigurator;
+import com.scottmo.ui.utils.UndoRedoHelper;
 
 public class App extends JFrame {
     private static final int MARGIN = UI_GAP * 2;
@@ -64,6 +65,9 @@ public class App extends JFrame {
                 JPanel actualTab = tabFactories.get(index).value().get();
                 actualTab.setBorder(gapBorder(MARGIN));
                 tabs.setComponentAt(index, actualTab);
+    
+                UndoRedoHelper.attachUndoManager(actualTab);
+    
                 loaded[index] = true;
             }
         });
