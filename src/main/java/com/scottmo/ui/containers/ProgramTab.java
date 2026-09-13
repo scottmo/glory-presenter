@@ -7,14 +7,15 @@ import static org.httprpc.sierra.UIBuilder.row;
 
 import java.awt.BorderLayout;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.regex.Pattern;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-
-import java.nio.file.Path;
 
 import com.scottmo.config.Config;
 import com.scottmo.config.ConfigService;
@@ -54,6 +55,7 @@ public class ProgramTab extends JPanel {
     private PowerpointService powerpointService = ServiceProvider.get(PowerpointService.class).get();
 
     private JComboBox<String> bookComboBox = new JComboBox<>();
+    private JButton buttonPickProgramTemplate = new JButton("Pick Program Template");
     private JButton buttonPickFile = new JButton("Pick Template File");
     private JTextArea fieldInput = new JTextArea(SAMPLE_INPUT, 30, 30);
     private JButton buttonGeneratePPT = new JButton(Labels.get("program.buttonGeneratePPT"));
@@ -66,6 +68,35 @@ public class ProgramTab extends JPanel {
             if (selectedBook != null && !selectedBook.equals("Select Bible Book...")) {
                 insertBibleBlock(selectedBook);
                 bookComboBox.setSelectedIndex(0);
+            }
+        });
+
+        buttonPickProgramTemplate.addActionListener(evt -> {
+            Path templateDir = Path.of(configService.getConfig().getDataDir(), Config.TEMPLATE_DIR);
+            Pattern programPattern = Pattern.compile("^program-.*\\.txt$", Pattern.CASE_INSENSITIVE);
+            try (java.util.stream.Stream<Path> stream = java.nio.file.Files.walk(templateDir)) {
+                java.util.List<String> files = stream
+                    .filter(java.nio.file.Files::isRegularFile)
+                    .filter(p -> programPattern.matcher(p.getFileName().toString()).matches())
+                    .map(templateDir::relativize)
+                    .map(Path::toString)
+                    .map(s -> s.replace('\\', '/'))
+                    .sorted()
+                    .collect(java.util.stream.Collectors.toList());
+
+                if (files.isEmpty()) {
+                    Dialog.warn("No program-*.txt files found in templates directory.");
+                    return;
+                }
+
+                SearchableListDialog.show(
+                    javax.swing.SwingUtilities.getWindowAncestor(this),
+                    "Select Program Template", 
+                    files, 
+                    this::loadProgramTemplate
+                );
+            } catch (IOException e) {
+                Dialog.error("Error listing program templates", e);
             }
         });
 
@@ -104,12 +135,24 @@ public class ProgramTab extends JPanel {
         setLayout(new BorderLayout());
         add(column(UI_GAP,
             row(UI_GAP,
+                cell(buttonPickProgramTemplate),
                 cell(bookComboBox),
                 cell(buttonPickFile)
             ),
                 cell(new JScrollPane(fieldInput)).weightBy(1),
             cell(buttonGeneratePPT)
         ).getComponent());
+    }
+
+    private void loadProgramTemplate(String filePath) {
+        try {
+            Path templatePath = Path.of(configService.getConfig().getDataDir(), Config.TEMPLATE_DIR, filePath);
+            String content = Files.readString(templatePath);
+            fieldInput.setText(content);
+            fieldInput.setCaretPosition(0);
+        } catch (IOException e) {
+            Dialog.error("Error reading program template: " + filePath, e);
+        }
     }
 
     private void insertBibleBlock(String bookName) {
