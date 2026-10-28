@@ -87,7 +87,6 @@ public class JsonEditor extends JPanel {
 
     public void setOnReload(Supplier<String> onReload) {
         this.onReload = onReload;
-        reloadJson();
     }
 
     public void reloadFromSource() {

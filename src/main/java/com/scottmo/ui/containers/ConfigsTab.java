@@ -23,6 +23,7 @@ import com.scottmo.ui.components.JsonEditor;
 public final class ConfigsTab extends JPanel {
     public ConfigsTab() {
         ConfigOperations configOperations = ConfigOperations.forApplication();
+        configOperations.snapshotJson();
         Path configPath = ConfigService.get().getConfigPath();
         JsonEditor jsonEditor = new JsonEditor(configPath, Labels.get("configs.settingsEditorTitle"));
         jsonEditor.setOnSave(configOperations::saveJson);

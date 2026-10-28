@@ -40,46 +40,46 @@ public class UiConfigurator {
         if (GraphicsEnvironment.isHeadless()) {
             return;
         }
-        Runnable update = () -> {
-            System.setProperty("flatlaf.uiScale", config.getUiScale());
-            isDarkMode = config.isDarkMode();
-            try {
-                UIManager.setLookAndFeel(isDarkMode ? new FlatCarbonIJTheme() : new FlatCyanLightIJTheme());
-                initializeGlobalFont(config);
-                App app = App.get();
-                if (app != null) {
-                    SwingUtilities.updateComponentTreeUI(app);
-                    Config.AppSize size = config.getAppSize();
-                    app.setSize(size.width(), size.height());
-                }
-            } catch (Exception e) {
-                Dialog.error("Unable to apply configuration", e);
-            }
-        };
-        if (SwingUtilities.isEventDispatchThread()) {
-            update.run();
-        } else {
-            SwingUtilities.invokeLater(update);
-        }
+        SwingUtilities.invokeLater(() -> applyConfigurationNow(config));
     }
 
     public static void applyTheme(boolean darkMode) {
+        if (GraphicsEnvironment.isHeadless()) {
+            return;
+        }
         isDarkMode = darkMode;
-        Runnable update = () -> {
-            try {
-                UIManager.setLookAndFeel(darkMode ? new FlatCarbonIJTheme() : new FlatCyanLightIJTheme());
+        SwingUtilities.invokeLater(() -> {
+            if (applyLookAndFeel(darkMode, "Unable to change theme")) {
                 App app = App.get();
                 if (app != null) {
                     SwingUtilities.updateComponentTreeUI(app);
                 }
-            } catch (Exception e) {
-                Dialog.error("Unable to change theme", e);
             }
-        };
-        if (SwingUtilities.isEventDispatchThread()) {
-            update.run();
-        } else {
-            SwingUtilities.invokeLater(update);
+        });
+    }
+
+    private static void applyConfigurationNow(Config config) {
+        System.setProperty("flatlaf.uiScale", config.getUiScale());
+        isDarkMode = config.isDarkMode();
+        if (!applyLookAndFeel(isDarkMode, "Unable to apply configuration")) {
+            return;
+        }
+        initializeGlobalFont(config);
+        App app = App.get();
+        if (app != null) {
+            SwingUtilities.updateComponentTreeUI(app);
+            Config.AppSize size = config.getAppSize();
+            app.setSize(size.width(), size.height());
+        }
+    }
+
+    private static boolean applyLookAndFeel(boolean darkMode, String errorTitle) {
+        try {
+            UIManager.setLookAndFeel(darkMode ? new FlatCarbonIJTheme() : new FlatCyanLightIJTheme());
+            return true;
+        } catch (Exception e) {
+            Dialog.error(errorTitle, e);
+            return false;
         }
     }
 
