@@ -17,10 +17,10 @@ lock introduced with those tools.
   preserving the existing default list-of-maps format.
 - [x] Phase 5: formatter operations.
 - [x] Phase 6: application configuration read/save/reload and theme toggle.
-- [ ] Phase 7: error-log read/clear/export.
+- [x] Phase 7: error-log read/clear/export.
 
-UI-only cursor, focus, selection, and undo interactions do not represent separate application operations. Each
-phase should add its own focused implementation, tests, and commit after review.
+The seven phases cover the application's domain and configuration operations. UI mechanics such as cursor position,
+focus, selection, and undo history remain local interactions rather than separate MCP operations.
 
 ## Running
 

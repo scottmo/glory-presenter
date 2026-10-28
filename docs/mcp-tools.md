@@ -186,3 +186,28 @@ After editing the returned JSON document, submit the whole document as the `json
 ```json
 {"name":"config_set_dark_mode","arguments":{"darkMode":false}}
 ```
+
+## Application log
+
+`log_read` reads the current in-memory application log. It accepts an optional `limit` from 1 through 100000 and
+returns the most recent entries; without a limit it returns all entries. The response contains `count` (the number
+returned) and `logs`. The log is held in memory and is not loaded from a previous run.
+
+`log_clear` takes no arguments, clears the in-memory log, updates open Error Log views, and returns
+`clearedEntries`. `log_export` accepts an optional `path`; it writes the current log snapshot as UTF-8, creating parent
+directories and replacing an existing file. Without a path, it writes `error.log` in the process working directory.
+Relative paths are also resolved from the process working directory.
+
+Invalid limits and export filesystem errors return tool errors with `isError: true`.
+
+```json
+{"name":"log_read","arguments":{"limit":50}}
+```
+
+```json
+{"name":"log_clear","arguments":{}}
+```
+
+```json
+{"name":"log_export","arguments":{"path":"output/error.log"}}
+```

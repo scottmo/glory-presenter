@@ -16,23 +16,24 @@ point deck.
 
 ## Caveats
 
-As I'm developing this on my spare time, I haven't really got a chance to fully test everything. You can see that I have
-not really written any tests for it. All I can say is that so far it's been working well for my church. Do note that
-there is limited error handling, so you may see random errors happening and not sure what's going on. I'll try to patch
-them as I continue to improve it, but support will be limited.
+This application is developed in spare time and remains under active development. Error handling and supported
+workflows continue to evolve.
 
 ## Technology
 
+- Java Swing
 - Java 17
-- JavaFX 17
-- Sqlite
+- SQLite
 
 ## Features
 
-- UI for adding/editing songs
-- PPTX generation from bible verses or songs
-- support importing songs in Open Lyrics format, see <https://docs.openlyrics.org/>
-- support importing bible in OSIS format, see <https://crosswire.org/osis/>
+- Song library: add, edit, duplicate, delete, search, import OpenLyrics, and export OpenLyrics or YAML.
+- Bible library: import OSIS, inspect books and versions, and look up passages.
+- Program templates: browse/read text templates and generate decks from YAML.
+- PowerPoint creation from songs and Bible passages.
+- PowerPoint text formatting and newline normalization.
+- Application configuration, dark-mode toggle, and error-log viewing, clearing, and export.
+- Song import format: OpenLyrics (<https://docs.openlyrics.org/>); Bible import format: OSIS (<https://crosswire.org/osis/>).
 
 ## MCP Server
 
@@ -46,16 +47,50 @@ address is `http://127.0.0.1:8765/mcp`; set the Java system property `-Dglory.mc
 The HTTP server binds to 127.0.0.1 and rejects untrusted Host and Origin headers. Do not expose this local endpoint
 through a public or network-facing proxy.
 
-The server exposes song library, Bible query/import/generation, program template/generation, PowerPoint formatting,
-application configuration, and theme operations, plus `mcp_status`. See [the MCP tool reference](docs/mcp-tools.md)
-for schemas, examples, file behavior, and errors.
-The server uses MCP protocol version 2025-11-25 through the released Java SDK 2.1.0.
+The server exposes the song, Bible, program-template, PowerPoint-formatting, configuration/theme, and application-log
+operations, plus `mcp_status`. UI-only cursor position, focus, selection, and undo history are not separate operations.
+See [the MCP tool reference](docs/mcp-tools.md) for schemas, examples, file behavior, and errors. The server uses MCP
+protocol version 2025-11-25 through the released Java SDK 2.1.0.
+
+### Build and launch
+
+Use JDK 17 and Maven. From the repository root, run:
+
+```powershell
+mvn -B test
+mvn -B package
+java -jar target/glory-presenter-6.5.0-jar-with-dependencies.jar --mcp-server
+```
+
+Packaging creates the executable fat JAR at `target/glory-presenter-6.5.0-jar-with-dependencies.jar`. The application
+loads or creates `data/config.json` relative to its process working directory. The configured `dataDir` and
+`outputDir`, and other relative paths, are also resolved from that working directory. Run the server from the
+directory containing the intended `data/config.json` so it finds the intended config and stores.
+
+A typical STDIO MCP client command/args entry is:
+
+```json
+{
+  "command": "java",
+  "args": [
+    "-jar",
+    "C:/apps/glory-presenter/target/glory-presenter-6.5.0-jar-with-dependencies.jar",
+    "--mcp-server"
+  ]
+}
+```
+
+Set the client's working directory to the directory containing the intended `data/config.json` when the client
+supports that setting. Client support varies; otherwise use a platform-appropriate launcher script that changes to
+that directory before starting Java. STDIO clients communicate over stdin/stdout, so do not print launcher messages
+to stdout.
+
+For desktop use, open the Configurations tab and click **Start MCP** to start, or **Stop MCP** to stop, the local
+HTTP server. Its endpoint is `http://127.0.0.1:8765/mcp`; set `-Dglory.mcp.port=PORT` before launching Java to choose
+another port. The server binds to loopback and rejects untrusted Host and Origin headers. Do not expose this endpoint
+through a public or network-facing proxy.
 
 ## Sample App Config
-
-## Testing
-
-`mvn com.github.eirslett:frontend-maven-plugin:npm@run-frontend`
 
 ### Directory
 
