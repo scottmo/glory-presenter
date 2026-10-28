@@ -4,6 +4,8 @@ import static com.scottmo.config.Config.UI_GAP;
 import static com.scottmo.ui.utils.ComponentBuilder.gapBorder;
 
 import java.awt.KeyboardFocusManager;
+import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -87,6 +89,11 @@ public class App extends JFrame {
     }
 
     public static void main(String[] args) {
+        if (List.of(args).contains("--mcp-server")) {
+            runMcpServer();
+            return;
+        }
+
         System.setProperty("awt.useSystemAAFontSettings", "on");
         System.setProperty("swing.aatext", "true");
         System.setProperty("flatlaf.uiScale", ConfigService.get().getConfig().getUiScale());
@@ -104,5 +111,22 @@ public class App extends JFrame {
             INSTANCE = new App();
             INSTANCE.render();
         });
+    }
+
+    private static void runMcpServer() {
+        PrintStream protocolOutput = System.out;
+        // The application and its dependencies use stdout for diagnostics. Reserve the original
+        // stream exclusively for JSON-RPC so startup messages can never corrupt MCP framing.
+        System.setOut(new PrintStream(System.err, true, StandardCharsets.UTF_8));
+        try {
+            com.scottmo.mcp.McpStdioServer.run(System.in, protocolOutput);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            System.err.println("MCP server interrupted; shutting down.");
+        } catch (RuntimeException e) {
+            System.err.println("Unable to run MCP server: " + e.getMessage());
+            e.printStackTrace(System.err);
+            System.exit(1);
+        }
     }
 }

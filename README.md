@@ -34,6 +34,21 @@ them as I continue to improve it, but support will be limited.
 - support importing songs in Open Lyrics format, see <https://docs.openlyrics.org/>
 - support importing bible in OSIS format, see <https://crosswire.org/osis/>
 
+## MCP Server
+
+The official MCP Java SDK is integrated using STDIO and Streamable HTTP transports. To run the headless STDIO
+server, launch the packaged application with `--mcp-server` (for example, `java -jar target/glory-presenter-6.5.0-jar-with-dependencies.jar --mcp-server`).
+The server handles MCP over stdin/stdout and exits cleanly when the client closes stdin. Protocol messages are the
+only content written to stdout; diagnostics are sent to stderr.
+
+The desktop app can start or stop a loopback-only Streamable HTTP endpoint from the Configurations tab. Its default
+address is `http://127.0.0.1:8765/mcp`; set the Java system property `-Dglory.mcp.port=PORT` to use another port.
+The HTTP server binds to 127.0.0.1 and rejects untrusted Host and Origin headers. Do not expose this local endpoint
+through a public or network-facing proxy.
+
+Phase 1 currently exposes only `mcp_status` while the application operations are added in later implementation
+phases. The server uses MCP protocol version 2025-11-25 through the released Java SDK 2.1.0.
+
 ## Sample App Config
 
 ## Testing

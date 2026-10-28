@@ -60,7 +60,15 @@
         "containerTitle": "Configurations",
         "buttonToggleDarkMode": "Toggle Dark Mode",
         "buttonChangeSize": "Large UI/Small UI",
-        "settingsEditorTitle": "Settings"
+        "settingsEditorTitle": "Settings",
+        "mcpTitle": "MCP Server (loopback only)",
+        "mcpStart": "Start MCP",
+        "mcpStop": "Stop MCP",
+        "mcpStopped": "Stopped:",
+        "mcpRunning": "Running:",
+        "mcpStarting": "Starting MCP server...",
+        "mcpStopping": "Stopping MCP server...",
+        "mcpFailed": "MCP server error:"
     },
     "errorLog": {
         "containerTitle": "Error Log",
