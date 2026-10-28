@@ -31,6 +31,7 @@ final class McpToolRegistry {
         ProgramToolModule.register(server, com.scottmo.core.operations.ProgramOperations.configured(
             com.scottmo.core.ServiceProvider.get(com.scottmo.core.ppt.api.PowerpointService.class).get()));
         FormatterToolModule.register(server, com.scottmo.core.operations.FormatterOperations.forApplication());
+        ConfigToolModule.register(server, com.scottmo.core.operations.ConfigOperations.forApplication());
         return server;
     }
 

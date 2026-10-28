@@ -12,24 +12,84 @@ import javax.swing.plaf.FontUIResource;
 import com.formdev.flatlaf.intellijthemes.FlatCarbonIJTheme;
 import com.formdev.flatlaf.intellijthemes.FlatCyanLightIJTheme;
 import com.scottmo.App;
+import com.scottmo.config.Config;
 import com.scottmo.config.ConfigService;
 
 public class UiConfigurator {
-    private static boolean isDarkMode = true;
+    private static volatile boolean isDarkMode = true;
 
     public static void toggleDarkMode() {
+        boolean darkMode = !ConfigService.get().getConfig().isDarkMode();
+        com.scottmo.core.operations.ConfigOperations.forApplication().setDarkMode(darkMode);
+    }
+
+    public static void initializeTheme(boolean darkMode) {
+        isDarkMode = darkMode;
         try {
-            isDarkMode = !isDarkMode;
-            UIManager.setLookAndFeel(isDarkMode ? new FlatCarbonIJTheme() : new FlatCyanLightIJTheme());
-            SwingUtilities.updateComponentTreeUI(App.get()); 
+            if (darkMode) {
+                FlatCarbonIJTheme.setup();
+            } else {
+                FlatCyanLightIJTheme.setup();
+            }
         } catch (Exception e) {
-            Dialog.error("Unable to toggle dark mode", e);
+            Dialog.error("Unable to initialize theme", e);
+        }
+    }
+
+    public static void applyConfiguration(Config config) {
+        if (GraphicsEnvironment.isHeadless()) {
+            return;
+        }
+        Runnable update = () -> {
+            System.setProperty("flatlaf.uiScale", config.getUiScale());
+            isDarkMode = config.isDarkMode();
+            try {
+                UIManager.setLookAndFeel(isDarkMode ? new FlatCarbonIJTheme() : new FlatCyanLightIJTheme());
+                initializeGlobalFont(config);
+                App app = App.get();
+                if (app != null) {
+                    SwingUtilities.updateComponentTreeUI(app);
+                    Config.AppSize size = config.getAppSize();
+                    app.setSize(size.width(), size.height());
+                }
+            } catch (Exception e) {
+                Dialog.error("Unable to apply configuration", e);
+            }
+        };
+        if (SwingUtilities.isEventDispatchThread()) {
+            update.run();
+        } else {
+            SwingUtilities.invokeLater(update);
+        }
+    }
+
+    public static void applyTheme(boolean darkMode) {
+        isDarkMode = darkMode;
+        Runnable update = () -> {
+            try {
+                UIManager.setLookAndFeel(darkMode ? new FlatCarbonIJTheme() : new FlatCyanLightIJTheme());
+                App app = App.get();
+                if (app != null) {
+                    SwingUtilities.updateComponentTreeUI(app);
+                }
+            } catch (Exception e) {
+                Dialog.error("Unable to change theme", e);
+            }
+        };
+        if (SwingUtilities.isEventDispatchThread()) {
+            update.run();
+        } else {
+            SwingUtilities.invokeLater(update);
         }
     }
 
     public static void initializeGlobalFont() {
-        String uiFontFamily = ConfigService.get().getConfig().getUiFontFamily();
-        int fontSize = ConfigService.get().getConfig().getAppFontSize();
+        initializeGlobalFont(ConfigService.get().getConfig());
+    }
+
+    public static void initializeGlobalFont(Config config) {
+        String uiFontFamily = config.getUiFontFamily();
+        int fontSize = config.getAppFontSize();
 
         if (uiFontFamily != null && !uiFontFamily.isEmpty()) {
             Set<String> availableFonts = Set.of(

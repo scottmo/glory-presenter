@@ -16,14 +16,27 @@ import javax.swing.SwingWorker;
 
 import com.scottmo.config.ConfigService;
 import com.scottmo.config.Labels;
+import com.scottmo.core.operations.ConfigOperations;
 import com.scottmo.mcp.McpServerManager;
 import com.scottmo.ui.components.JsonEditor;
-import com.scottmo.ui.utils.UiConfigurator;
 
 public final class ConfigsTab extends JPanel {
     public ConfigsTab() {
+        ConfigOperations configOperations = ConfigOperations.forApplication();
+        Path configPath = ConfigService.get().getConfigPath();
+        JsonEditor jsonEditor = new JsonEditor(configPath, Labels.get("configs.settingsEditorTitle"));
+        jsonEditor.setOnSave(configOperations::saveJson);
+        jsonEditor.setOnReload(() -> {
+            configOperations.reload();
+            return configOperations.snapshotJson();
+        });
+
         JButton buttonToggleDarkMode = new JButton(Labels.get("configs.buttonToggleDarkMode"));
-        buttonToggleDarkMode.addActionListener(evt -> UiConfigurator.toggleDarkMode());
+        buttonToggleDarkMode.addActionListener(evt -> {
+            boolean darkMode = !ConfigService.get().getConfig().isDarkMode();
+            configOperations.setDarkMode(darkMode);
+            jsonEditor.reloadFromSource();
+        });
 
         JLabel mcpStatus = new JLabel();
         JButton toggleMcp = new JButton();
@@ -37,10 +50,6 @@ public final class ConfigsTab extends JPanel {
         };
         toggleMcp.addActionListener(evt -> runMcpLifecycle(mcpStatus, toggleMcp, refreshMcpStatus));
         refreshMcpStatus.run();
-
-        Path configPath = ConfigService.get().getConfigPath();
-        JsonEditor jsonEditor = new JsonEditor(configPath, Labels.get("configs.settingsEditorTitle"));
-        jsonEditor.setOnSave(content -> ConfigService.get().reload());
 
         setLayout(new BorderLayout());
         add(column(UI_GAP,

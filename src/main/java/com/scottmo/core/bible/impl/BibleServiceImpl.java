@@ -22,9 +22,14 @@ import com.scottmo.core.bible.impl.store.BibleStore;
 public class BibleServiceImpl implements BibleService, AutoCloseable {
     private final Supplier<Path> storeLocation;
     private volatile BibleStore store;
+    private Path activeStoreLocation;
 
     public BibleServiceImpl() {
-        this(() -> Path.of(ConfigService.get().getConfig().getDataDir()));
+        this(ConfigService.get());
+    }
+
+    public BibleServiceImpl(ConfigService configService) {
+        this(() -> Path.of(configService.getConfig().getDataDir()));
     }
 
     /** Creates a service backed by an explicit data directory, useful for isolated callers and tests. */
@@ -37,8 +42,19 @@ public class BibleServiceImpl implements BibleService, AutoCloseable {
     }
 
     private synchronized BibleStore getStore() {
+        Path location = storeLocation.get().toAbsolutePath().normalize();
+        if (store != null && !location.equals(activeStoreLocation)) {
+            try {
+                store.close();
+            } catch (SQLException e) {
+                throw new IllegalStateException("Unable to close Bible database before changing dataDir", e);
+            }
+            store = null;
+            activeStoreLocation = null;
+        }
         if (store == null) {
-            store = new BibleStore(storeLocation.get());
+            store = new BibleStore(location);
+            activeStoreLocation = location;
         }
         return store;
     }
@@ -80,6 +96,7 @@ public class BibleServiceImpl implements BibleService, AutoCloseable {
         if (store != null) {
             store.close();
             store = null;
+            activeStoreLocation = null;
         }
     }
 

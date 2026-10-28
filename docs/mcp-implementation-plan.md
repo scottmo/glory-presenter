@@ -16,7 +16,7 @@ lock introduced with those tools.
 - [x] Phase 4: program PowerPoint generation, template list/read operations, and YAML map-template editing while
   preserving the existing default list-of-maps format.
 - [x] Phase 5: formatter operations.
-- [ ] Phase 6: application configuration read/save/reload and theme toggle.
+- [x] Phase 6: application configuration read/save/reload and theme toggle.
 - [ ] Phase 7: error-log read/clear/export.
 
 UI-only cursor, focus, selection, and undo interactions do not represent separate application operations. Each

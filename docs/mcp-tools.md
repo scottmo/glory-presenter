@@ -147,3 +147,42 @@ tool errors before batch processing begins.
 ```json
 {"name":"pptx_normalize_newlines","arguments":{"paths":["C:/slides"],"overwrite":false}}
 ```
+
+## Application configuration and theme
+
+`config_get` returns a defensive snapshot of the complete application configuration. It includes the locale list,
+data/output paths, default templates, Bible locale mapping, formatter presets, UI settings, and `darkMode`. The
+runtime-only `templatePaths` list is derived from the templates directory and is not part of the JSON snapshot.
+
+`config_save` accepts `{ "json": "<complete JSON configuration>" }`. Treat the result from `config_get` as the
+starting document: edit the fields you intend to change, then submit the complete document. Saving a partial object
+does not merge omitted values. Configuration values are validated before any file is replaced. A successful save
+uses an atomic file replacement and activates the new settings; validation or filesystem errors leave the previous
+configuration file and active settings in place. Relative `dataDir` and `outputDir` values are kept relative to the
+application's working directory, so configurations remain portable. Changing `dataDir` switches cached song and
+Bible services to the new database directory on their next operation; it does not move or copy databases from the
+previous directory.
+
+`config_reload` validates and activates the configuration already on disk. If the file is invalid, the currently
+active settings remain in use. FlatLaf `uiScale` values may use a number (`1.5`), multiplier (`1.5x`), percentage
+(`150%`), or DPI value (`144dpi`), following [FlatLaf's system property syntax](https://www.formdev.com/flatlaf/system-properties/).
+
+`config_set_dark_mode` accepts `{ "darkMode": boolean }` and persists the theme preference. A running desktop
+instance queues theme, font, scale, and window-size updates on Swing's event thread. A headless MCP process stores
+the preference for the next desktop launch.
+
+Example read-modify-save flow:
+
+```json
+{"name":"config_get","arguments":{}}
+```
+
+After editing the returned JSON document, submit the whole document as the `json` string:
+
+```json
+{"name":"config_save","arguments":{"json":"{\"uiScale\":\"1.5x\",\"appDimensions\":\"1440x900\",\"appFontSize\":14,\"outputDir\":\"./output\",\"dataDir\":\"./data\",\"uiFontFamily\":\"Segoe UI\",\"darkMode\":true,\"locales\":[\"en_us\"],\"bibleVersionToLocale\":{\"niv\":\"en_us\"},\"defaultTemplates\":{\"song\":\"song.pptx\",\"bible\":\"bible.pptx\",\"default\":\"default.pptx\"},\"patternPresets\":{\"title\":\"^.+$\"},\"textFormatPresets\":{}}"}}
+```
+
+```json
+{"name":"config_set_dark_mode","arguments":{"darkMode":false}}
+```

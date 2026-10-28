@@ -28,6 +28,7 @@ public class Config {
     private String outputDir;
     private String dataDir;
     private String uiFontFamily = "Segoe UI, .AppleSystemUIFont, Helvetica Neue, SansSerif";
+    private boolean darkMode = true;
     private List<String> locales = new ArrayList<>();; // order matters to which locale comes first
     private Map<String, String> bibleVersionToLocale = new HashMap<>();
     private Map<String, String> defaultTemplates = new HashMap<>();
@@ -104,6 +105,14 @@ public class Config {
 
     public void setUiFontFamily(String uiFontFamily) {
         this.uiFontFamily = uiFontFamily;
+    }
+
+    public boolean isDarkMode() {
+        return darkMode;
+    }
+
+    public void setDarkMode(boolean darkMode) {
+        this.darkMode = darkMode;
     }
 
     public List<String> getLocales() {

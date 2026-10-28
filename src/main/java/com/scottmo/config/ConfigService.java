@@ -1,15 +1,15 @@
 package com.scottmo.config;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+import java.nio.file.AtomicMoveNotSupportedException;
+import java.util.Objects;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.scottmo.shared.JsonUtil;
-import com.scottmo.shared.LocaleUtil;
 
 public class ConfigService {
     // singleton
@@ -21,7 +21,7 @@ public class ConfigService {
     private final Path configPath;
 
     public ConfigService(Path configPath) {
-        this.configPath = configPath;
+        this.configPath = Objects.requireNonNull(configPath, "configPath");
     }
 
     // config object
@@ -35,50 +35,97 @@ public class ConfigService {
 
     // instantiate config
     public synchronized void reload() {
-        if (!Files.exists(configPath)) {
-            try {
-                Files.createDirectories(configPath.toAbsolutePath().getParent());
-            } catch (IOException e) {
-                throw new RuntimeException("Unable to create configuration directory", e);
-            }
-            try (InputStream in = ConfigService.class.getClassLoader().getResourceAsStream(Config.CONFIG_FILENAME)) {
-                if (in == null) {
-                    throw new RuntimeException("Default configuration resource is missing");
+        Config candidate = parseConfig(readConfigContent());
+        prepareDirectories(candidate);
+        refreshTemplatePaths(candidate);
+        appConfig = candidate;
+    }
+
+    /** Validate and atomically persist a replacement, activating it only after the write succeeds. */
+    public synchronized Config install(Config candidate) {
+        Config normalized = ConfigValidator.normalizeAndValidate(candidate);
+        prepareDirectories(normalized);
+        refreshTemplatePaths(normalized);
+        persist(normalized);
+        appConfig = normalized;
+        return normalized;
+    }
+
+    private Config parseConfig(String json) {
+        return ConfigValidator.parseAndNormalize(json);
+    }
+
+    private String readConfigContent() {
+        try {
+            if (!Files.exists(configPath)) {
+                try (InputStream in = ConfigService.class.getClassLoader().getResourceAsStream(Config.CONFIG_FILENAME)) {
+                    if (in == null) {
+                        throw new IOException("Default configuration resource is missing");
+                    }
+                    String defaults = new String(in.readAllBytes(), java.nio.charset.StandardCharsets.UTF_8);
+                    Config parsed = parseConfig(defaults);
+                    prepareDirectories(parsed);
+                    persist(parsed);
+                    System.out.println("Loading default config.json");
                 }
-                Files.copy(in, configPath);
-                System.out.println("Loading default config.json");
-            } catch (IOException e) {
-                throw new RuntimeException("Unable to create config.json!");
             }
-        }
-        try (BufferedReader bufferReader = Files.newBufferedReader(configPath)) {
-            appConfig = new ObjectMapper().readValue(bufferReader, Config.class);
+            return Files.readString(configPath, java.nio.charset.StandardCharsets.UTF_8);
         } catch (IOException e) {
-            throw new RuntimeException("Unable to load config file!", e);
+            throw new RuntimeException("Unable to read configuration file " + configPath, e);
         }
-        // set default locale
-        if (appConfig.getLocales().isEmpty()) {
-            appConfig.getLocales().add(LocaleUtil.DEFAULT_LOCALE);
-        }
-        // normalize locales
-        int i = 0;
-        for (String locale: appConfig.getLocales()) {
-            appConfig.getLocales().set(i++, LocaleUtil.normalize(locale));
-        }
-        // load template paths
-        File templateDir = Path.of(appConfig.getDataDir(), Config.TEMPLATE_DIR).toFile();
-        if (!templateDir.exists()) {
-            templateDir.mkdirs();
-        }
-        if (templateDir.isDirectory()) {
-            File[] files = templateDir.listFiles();
-            for (File file : files) {
-                appConfig.getTemplatePaths().add(file.getName());
+    }
+
+    private static void prepareDirectories(Config config) {
+        try {
+            Files.createDirectories(Path.of(config.getDataDir()));
+            Path templates = Path.of(config.getDataDir(), Config.TEMPLATE_DIR);
+            Files.createDirectories(templates);
+            if (!Files.isDirectory(templates)) {
+                throw new IOException("Template path is not a directory: " + templates);
             }
-        } else {
-            throw new Error("Unable to load pptx templates! Please fix templates dir and restart!");
+            Files.createDirectories(Path.of(config.getOutputDir()));
+            if (!Files.isDirectory(Path.of(config.getOutputDir()))) {
+                throw new IOException("Output path is not a directory: " + config.getOutputDir());
+            }
+        } catch (IOException | SecurityException e) {
+            throw new IllegalArgumentException("Unable to prepare configured directories: " + e.getMessage(), e);
         }
-        save();
+    }
+
+    private static void refreshTemplatePaths(Config config) {
+        File[] files = Path.of(config.getDataDir(), Config.TEMPLATE_DIR).toFile().listFiles();
+        if (files == null) {
+            throw new IllegalArgumentException("Unable to list templates directory");
+        }
+        config.getTemplatePaths().clear();
+        for (File file : files) {
+            config.getTemplatePaths().add(file.getName());
+        }
+    }
+
+    private void persist(Config config) {
+        Path parent = configPath.toAbsolutePath().normalize().getParent();
+        Path temporary = null;
+        try {
+            Files.createDirectories(parent);
+            temporary = Files.createTempFile(parent, configPath.getFileName().toString(), ".tmp");
+            Files.writeString(temporary, JsonUtil.saveToString(config), java.nio.charset.StandardCharsets.UTF_8);
+            try {
+                Files.move(temporary, configPath, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
+            } catch (AtomicMoveNotSupportedException e) {
+                Files.move(temporary, configPath, StandardCopyOption.REPLACE_EXISTING);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Unable to save configuration file " + configPath, e);
+        } finally {
+            if (temporary != null) {
+                try {
+                    Files.deleteIfExists(temporary);
+                } catch (IOException ignored) {
+                    // Best-effort cleanup after an atomic replace.
+                }
+            }
+        }
     }
 
     public String getRelativePath(String fileName) {
@@ -102,7 +149,7 @@ public class ConfigService {
     }
 
     public String getPrimaryLocale() {
-        return appConfig.getLocales().get(0);
+        return getConfig().getLocales().get(0);
     }
 
     public Path getConfigPath() {
@@ -110,11 +157,15 @@ public class ConfigService {
     }
 
     public synchronized void save() {
+        Config candidate;
         try {
-            System.out.println("Saving config.json to " + getConfigPath().toFile().getAbsolutePath());
-            JsonUtil.save(getConfigPath().toFile(), appConfig);
+            candidate = parseConfig(JsonUtil.saveToString(getConfig()));
         } catch (IOException e) {
-            throw new RuntimeException("Unable to save config file!", e);
+            throw new IllegalStateException("Unable to serialize application configuration", e);
         }
+        prepareDirectories(candidate);
+        refreshTemplatePaths(candidate);
+        persist(candidate);
+        appConfig = candidate;
     }
 }

@@ -22,10 +22,15 @@ public class SongServiceImpl implements SongService, AutoCloseable {
     private final ConfigService configService;
     private final Path configuredDataDir;
     private SongStore store;
+    private Path storeDataDir;
     private final OpenLyricsConverter openLyricsConverter = new OpenLyricsConverter();
 
     public SongServiceImpl() {
-        this.configService = ConfigService.get();
+        this(ConfigService.get());
+    }
+
+    public SongServiceImpl(ConfigService configService) {
+        this.configService = configService;
         this.configuredDataDir = null;
     }
 
@@ -34,21 +39,27 @@ public class SongServiceImpl implements SongService, AutoCloseable {
         this.configuredDataDir = dataDir;
     }
 
-    private SongStore getStore() {
-        if (store == null) {
-            Path dataDir = configuredDataDir == null
+    private synchronized SongStore getStore() {
+        Path dataDir = configuredDataDir == null
                 ? Path.of(configService.getConfig().getDataDir())
                 : configuredDataDir;
+        dataDir = dataDir.toAbsolutePath().normalize();
+        if (store != null && !dataDir.equals(storeDataDir)) {
+            close();
+        }
+        if (store == null) {
             store = new SongStore(dataDir);
+            storeDataDir = dataDir;
         }
         return store;
     }
 
     @Override
-    public void close() {
+    public synchronized void close() {
         if (store != null) {
             store.close();
             store = null;
+            storeDataDir = null;
         }
     }
 

@@ -16,6 +16,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -43,6 +44,7 @@ public class JsonEditor extends JPanel {
     private final JLabel statusLabel;
     private final Map<String, FieldEntry> fieldMap = new LinkedHashMap<>();
     private Consumer<String> onSave;
+    private Supplier<String> onReload;
 
     public JsonEditor(Path filePath, String title) {
         this.filePath = filePath;
@@ -83,15 +85,24 @@ public class JsonEditor extends JPanel {
         this.onSave = onSave;
     }
 
+    public void setOnReload(Supplier<String> onReload) {
+        this.onReload = onReload;
+        reloadJson();
+    }
+
+    public void reloadFromSource() {
+        reloadJson();
+    }
+
     private void reloadJson() {
         try {
-            String content = Files.readString(filePath);
+            String content = onReload == null ? Files.readString(filePath) : onReload.get();
             Map<String, Object> json = JsonUtil.mapper().readValue(content,
                     new TypeReference<LinkedHashMap<String, Object>>() {
                     });
             buildFields(json);
             setStatus("Loaded from " + filePath.getFileName(), false);
-        } catch (IOException e) {
+        } catch (IOException | RuntimeException e) {
             setStatus("Failed to load: " + e.getMessage(), true);
         }
     }
@@ -183,7 +194,6 @@ public class JsonEditor extends JPanel {
     private void saveJson() {
         try {
             // Read original to preserve structure
-            // Read original to preserve structure
             String originalContent = Files.readString(filePath);
             Map<String, Object> json = JsonUtil.mapper().readValue(originalContent,
                     new TypeReference<LinkedHashMap<String, Object>>() {
@@ -192,17 +202,18 @@ public class JsonEditor extends JPanel {
             // Update values from fields
             updateJsonFromFields(json, "");
 
-            // Write back
-            // Write back
             String newContent = JsonUtil.saveToString(json);
-            Files.writeString(filePath, newContent);
-
-            setStatus("Saved to " + filePath.getFileName(), false);
             if (onSave != null) {
                 onSave.accept(newContent);
+                if (onReload != null) {
+                    reloadJson();
+                }
+            } else {
+                Files.writeString(filePath, newContent);
             }
-            Dialog.info("Saved successfully. Some changes may require app restart.");
-        } catch (IOException e) {
+            setStatus("Saved to " + filePath.getFileName(), false);
+            Dialog.info("Saved successfully.");
+        } catch (IOException | RuntimeException e) {
             setStatus("Failed to save: " + e.getMessage(), true);
             Dialog.error("Failed to save: " + e.getMessage());
         }

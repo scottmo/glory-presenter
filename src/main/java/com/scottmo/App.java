@@ -16,7 +16,6 @@ import javax.swing.SwingUtilities;
 import com.scottmo.ui.containers.*;
 import org.httprpc.sierra.ScrollingKeyboardFocusManager;
 
-import com.formdev.flatlaf.intellijthemes.FlatCarbonIJTheme;
 import com.scottmo.config.ConfigService;
 import com.scottmo.config.Labels;
 import com.scottmo.shared.Pair;
@@ -100,7 +99,7 @@ public class App extends JFrame {
         System.setProperty("awt.useSystemAAFontSettings", "on");
         System.setProperty("swing.aatext", "true");
         System.setProperty("flatlaf.uiScale", ConfigService.get().getConfig().getUiScale());
-        FlatCarbonIJTheme.setup();
+        UiConfigurator.initializeTheme(ConfigService.get().getConfig().isDarkMode());
 
         UiConfigurator.initializeGlobalFont();
 
