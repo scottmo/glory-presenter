@@ -10,13 +10,14 @@ lock introduced with those tools.
 
 - [x] Phase 1: lifecycle, STDIO dispatch before Swing initialization, protocol-safe stdout, loopback HTTP start/stop,
   status tool, protocol handshake, Host/Origin validation, initial usage docs.
-- [ ] Phase 2: song list/search, read, create, update, delete, duplicate, verse-order generation, OpenLyrics import,
+- [x] Phase 2: song list/search, read, create, update, delete, duplicate, verse-order generation, OpenLyrics import,
   XML/YAML export, and song PowerPoint generation.
 - [ ] Phase 3: Bible versions/books/verse queries, OSIS import, and Bible PowerPoint generation.
 - [ ] Phase 4: program PowerPoint generation, template list/read operations, and YAML map-template editing while
   preserving the existing default list-of-maps format.
-- [ ] Phase 5: formatter operations, application configuration read/save/reload, theme toggle, and error-log
-  read/clear/export.
+- [ ] Phase 5: formatter operations.
+- [ ] Phase 6: application configuration read/save/reload and theme toggle.
+- [ ] Phase 7: error-log read/clear/export.
 
 UI-only cursor, focus, selection, and undo interactions do not represent separate application operations. Each
 phase should add its own focused implementation, tests, and commit after review.

@@ -30,6 +30,7 @@ import com.scottmo.config.Labels;
 import com.scottmo.core.songs.api.song.Song;
 import com.scottmo.core.songs.api.song.SongTitle;
 import com.scottmo.core.songs.api.song.SongVerse;
+import com.scottmo.core.songs.operations.SongVerseOrder;
 import com.scottmo.shared.StringUtils;
 
 public class SongEditor extends JPanel {
@@ -64,7 +65,7 @@ public class SongEditor extends JPanel {
         }
 
         buttonUpdateVerseOrder.addActionListener(evt -> {
-            List<String> verseOrder = generateVerseOrderFromLyrics();
+            List<String> verseOrder = SongVerseOrder.generate(getVersesFromForm());
             fieldVerseOrder.setText(StringUtils.join(verseOrder));
         });
 
@@ -235,28 +236,6 @@ public class SongEditor extends JPanel {
             localizedFieldsPane.addTab(locale, lyricPanel);
         }
         return localizedFieldsPane;
-    }
-
-    private List<String> generateVerseOrderFromLyrics() {
-        List<String> verseOrder = new ArrayList<>();
-        List<String> verseNames = new ArrayList<>();
-        List<String> chorusNames = new ArrayList<>();
-
-        getVersesFromForm().stream()
-            .map(SongVerse::getName)
-            .distinct()
-            .sorted()
-            .forEach(name -> {
-                if (name.startsWith("v")) verseNames.add(name);
-                else if (name.startsWith("c")) chorusNames.add(name);
-            });
-
-        // one verse followed by all choruses
-        for (String verseName : verseNames) {
-            verseOrder.add(verseName);
-            verseOrder.addAll(chorusNames);
-        }
-        return verseOrder;
     }
 
     private record LocalizedFields(JTextField title, JTextArea lyrics) {}

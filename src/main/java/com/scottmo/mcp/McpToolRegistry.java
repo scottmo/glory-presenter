@@ -26,6 +26,7 @@ final class McpToolRegistry {
         server.toolCall(statusTool, (exchange, request) -> McpSchema.CallToolResult.builder()
                 .content(java.util.List.of(new McpSchema.TextContent("Glory Presenter MCP server 6.5.0")))
                 .build());
+        SongToolModule.register(server, com.scottmo.core.songs.operations.SongOperations.forApplication());
         return server;
     }
 

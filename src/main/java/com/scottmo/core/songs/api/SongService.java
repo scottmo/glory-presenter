@@ -14,15 +14,21 @@ public interface SongService extends Service {
 
     Song get(int songId);
 
+    boolean exists(int songId);
+
     int store(Song song);
 
     boolean delete(int songId);
+
+    boolean delete(List<Integer> songIds);
 
     String serialize(Song song);
 
     void importSong(File file) throws IOException;
 
     void importSong(String filePath) throws IOException;
+
+    int importSongAndGetId(String openLyricsXml) throws IOException;
 
     String serializeToYaml(Song song) throws IOException;
 

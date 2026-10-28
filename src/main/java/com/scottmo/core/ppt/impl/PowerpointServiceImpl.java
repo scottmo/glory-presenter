@@ -20,17 +20,26 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 import java.util.regex.Pattern;
 
 public class PowerpointServiceImpl implements PowerpointService {
 
     private final ConfigService configService = ConfigService.get();
     private final BibleVerseHelper bibleVerseHelper = new BibleVerseHelper();
-    private final SongHelper songHelper = new SongHelper();
+    private final SongHelper songHelper;
 
     private final YAMLMapper yamlMapper = new YAMLMapper();
 
     private final Logger logger = Logger.getLogger(PowerpointServiceImpl.class.getName());
+
+    public PowerpointServiceImpl() {
+        this.songHelper = new SongHelper();
+    }
+
+    public PowerpointServiceImpl(Supplier<List<String>> locales, com.scottmo.core.songs.api.SongService songs) {
+        this.songHelper = new SongHelper(locales, songs);
+    }
 
     @Override
     public void generate(List<Map<String, String>> contents, String tmplFilePath, String outputFilePath)

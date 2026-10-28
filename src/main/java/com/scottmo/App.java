@@ -63,14 +63,17 @@ public class App extends JFrame {
         // Lazy load on tab selection
         tabs.addChangeListener(e -> {
             int index = tabs.getSelectedIndex();
-            if (index >= 0 && !loaded[index]) {
-                JPanel actualTab = tabFactories.get(index).value().get();
-                actualTab.setBorder(gapBorder(MARGIN));
-                tabs.setComponentAt(index, actualTab);
-    
-                UndoRedoHelper.attachUndoManager(actualTab);
-    
-                loaded[index] = true;
+            if (index >= 0) {
+                if (!loaded[index]) {
+                    JPanel actualTab = tabFactories.get(index).value().get();
+                    actualTab.setBorder(gapBorder(MARGIN));
+                    tabs.setComponentAt(index, actualTab);
+
+                    UndoRedoHelper.attachUndoManager(actualTab);
+                    loaded[index] = true;
+                } else if (tabs.getComponentAt(index) instanceof SongTab songTab) {
+                    songTab.refreshSongList();
+                }
             }
         });
 

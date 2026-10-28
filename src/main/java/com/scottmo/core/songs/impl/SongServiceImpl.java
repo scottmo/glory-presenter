@@ -18,16 +18,38 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
 
-public class SongServiceImpl implements SongService {
-    private ConfigService configService = ConfigService.get();
+public class SongServiceImpl implements SongService, AutoCloseable {
+    private final ConfigService configService;
+    private final Path configuredDataDir;
     private SongStore store;
     private final OpenLyricsConverter openLyricsConverter = new OpenLyricsConverter();
 
+    public SongServiceImpl() {
+        this.configService = ConfigService.get();
+        this.configuredDataDir = null;
+    }
+
+    public SongServiceImpl(Path dataDir) {
+        this.configService = null;
+        this.configuredDataDir = dataDir;
+    }
+
     private SongStore getStore() {
         if (store == null) {
-            store = new SongStore(Path.of(configService.getConfig().getDataDir()));
+            Path dataDir = configuredDataDir == null
+                ? Path.of(configService.getConfig().getDataDir())
+                : configuredDataDir;
+            store = new SongStore(dataDir);
         }
         return store;
+    }
+
+    @Override
+    public void close() {
+        if (store != null) {
+            store.close();
+            store = null;
+        }
     }
 
     @Override
@@ -41,6 +63,11 @@ public class SongServiceImpl implements SongService {
     }
 
     @Override
+    public boolean exists(int songId) {
+        return getStore().exists(songId);
+    }
+
+    @Override
     public int store(Song song) {
         return getStore().store(song);
     }
@@ -48,6 +75,11 @@ public class SongServiceImpl implements SongService {
     @Override
     public boolean delete(int songId) {
         return getStore().delete(songId);
+    }
+
+    @Override
+    public boolean delete(List<Integer> songIds) {
+        return getStore().delete(songIds);
     }
 
     @Override
@@ -63,8 +95,13 @@ public class SongServiceImpl implements SongService {
 
     @Override
     public void importSong(String openLyricsXML) throws IOException {
+        importSongAndGetId(openLyricsXML);
+    }
+
+    @Override
+    public int importSongAndGetId(String openLyricsXML) throws IOException {
         Song song = openLyricsConverter.deserialize(openLyricsXML);
-        store.store(song);
+        return getStore().store(song);
     }
 
     @Override

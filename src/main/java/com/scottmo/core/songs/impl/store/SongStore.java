@@ -10,6 +10,7 @@ import org.apache.logging.log4j.util.Strings;
 import static com.scottmo.core.songs.impl.store.SongSchema.*;
 
 import java.nio.file.Path;
+import java.nio.file.Files;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -19,24 +20,37 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public final class SongStore {
+public final class SongStore implements AutoCloseable {
     private final Connection db;
+
+    @Override
+    public void close() {
+        try {
+            db.close();
+        } catch (SQLException e) {
+            throw new RuntimeException("Unable to close song database", e);
+        }
+    }
 
     public SongStore(Path storeLocation) {
         try {
+            Files.createDirectories(storeLocation);
             db = DriverManager.getConnection("jdbc:sqlite:" + storeLocation.resolve("%s.db".formatted(DB_NAME)));
             try (var stmt = db.createStatement()) {
                 stmt.executeUpdate(SongTable.createTable());
                 stmt.executeUpdate(TitlesTable.createTable());
                 stmt.executeUpdate(VersesTable.createTable());
             }
-        } catch (SQLException e) {
+        } catch (SQLException | java.io.IOException e) {
             throw new RuntimeException(e);
         }
     }
 
     public List<Pair<Integer, String>> getAllSongDescriptors(List<String> locales) {
         List<Pair<Integer, String>> songDescriptors = new ArrayList<>();
+        if (locales == null || locales.isEmpty()) {
+            return songDescriptors;
+        }
 
         String delimiter = " - ";
         String sql = String.join(" ",
@@ -45,15 +59,17 @@ public final class SongStore {
                 "INNER JOIN (",
                     "SELECT %s, GROUP_CONCAT(%s, '%s') AS %s".formatted(TitlesTable.SONG_ID, TitlesTable.TEXT, delimiter, TitlesTable.TEXT),
                     "FROM %s".formatted(TitlesTable.TABLE),
-                    "WHERE %s".formatted(locales.stream()
-                            .map(locale -> "%s == '%s'".formatted(TitlesTable.LOCALE, locale))
-                            .collect(Collectors.joining(" OR "))),
+                    "WHERE %s IN (%s)".formatted(TitlesTable.LOCALE,
+                        String.join(",", java.util.Collections.nCopies(locales.size(), "?"))),
                     "GROUP BY %s".formatted(TitlesTable.SONG_ID),
                 ") AS joinedTitles",
                 "ON %s.%s = joinedTitles.%s".formatted(SongTable.TABLE, SongTable.ID, TitlesTable.SONG_ID)
                 );
-        try (var stmt = db.createStatement()) {
-            var res = stmt.executeQuery(sql);
+        try (var stmt = db.prepareStatement(sql)) {
+            for (int i = 0; i < locales.size(); i++) {
+                stmt.setString(i + 1, locales.get(i));
+            }
+            var res = stmt.executeQuery();
             while (res.next()) {
                 int songId = res.getInt(SongTable.ID);
                 String songbook = res.getString(SongTable.SONGBOOK);
@@ -120,6 +136,17 @@ public final class SongStore {
         return song;
     }
 
+    public boolean exists(int songId) {
+        try (var stmt = db.prepareStatement("SELECT 1 FROM " + SongTable.TABLE + " WHERE " + SongTable.ID + "=?")) {
+            stmt.setInt(1, songId);
+            try (ResultSet result = stmt.executeQuery()) {
+                return result.next();
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Unable to check song in DB!", e);
+        }
+    }
+
     public int store(Song song) {
         if (song.getId() > -1) {
              return update(song);
@@ -128,8 +155,7 @@ public final class SongStore {
     }
 
     private int insert(Song song) {
-        int songId = -1;
-        try {
+        return inTransaction(() -> {
             List<String> nonEmptyFieldKeys = new ArrayList<>();
             List<String> nonEmptyFields = new ArrayList<>();
             if (!song.getAuthors().isEmpty()) {
@@ -160,11 +186,13 @@ public final class SongStore {
                 nonEmptyFieldKeys.add(SongTable.VERSE_ORDER);
                 nonEmptyFields.add(String.join(",", song.getVerseOrder()));
             }
-            String sql = String.join(" ",
+            String sql = nonEmptyFieldKeys.isEmpty()
+                ? "INSERT INTO " + SongTable.TABLE + " DEFAULT VALUES"
+                : String.join(" ",
                     "INSERT INTO %s".formatted(SongTable.TABLE),
                     "(%s)".formatted(String.join(",", nonEmptyFieldKeys)),
-                    "VALUES(%s)".formatted(String.join(",", "?".repeat(nonEmptyFieldKeys.size()).split("")))
-                    );
+                    "VALUES(%s)".formatted(String.join(",", java.util.Collections.nCopies(nonEmptyFieldKeys.size(), "?"))));
+            int songId;
             try (var stmt = db.prepareStatement(sql)) {
                 for (int i = 0; i < nonEmptyFields.size(); i++) {
                     stmt.setString(i + 1, nonEmptyFields.get(i));
@@ -172,20 +200,19 @@ public final class SongStore {
                 stmt.executeUpdate();
 
                 // return song id
-                ResultSet res = stmt.getGeneratedKeys();
+                try (ResultSet res = stmt.getGeneratedKeys()) {
                 if (res.next()) {
                     songId = res.getInt(1);
                 } else {
                     throw new RuntimeException("Failed to retrieve id from new song");
                 }
+                }
             }
 
             insertTitles(songId, song);
             insertVerses(songId, song);
-        } catch (SQLException e) {
-            throw new RuntimeException("Unable to insert song to DB!", e);
-        }
-        return songId;
+            return songId;
+        });
     }
 
     private void insertTitles(int songId, Song song) throws SQLException {
@@ -226,11 +253,9 @@ public final class SongStore {
     }
 
     private int update(Song song) {
-        var locales = song.getLocales();
-        if (!locales.isEmpty()) {
-            delete(song.getId(), true);
-        }
-        List<String> keys = List.of(
+        return inTransaction(() -> {
+            deleteRelated(song.getId());
+            List<String> keys = List.of(
                 SongTable.AUTHORS,
                 SongTable.COPYRIGHT,
                 SongTable.PUBLISHER,
@@ -239,7 +264,7 @@ public final class SongStore {
                 SongTable.COMMENTS,
                 SongTable.VERSE_ORDER
         );
-        List<String> values = List.of(
+            List<String> values = List.of(
                 String.join(",", song.getAuthors()),
                 song.getCopyright(),
                 song.getPublisher(),
@@ -248,44 +273,86 @@ public final class SongStore {
                 song.getComments(),
                 String.join(",", song.getVerseOrder())
         );
-        String sql = String.join(" ",
+            String sql = String.join(" ",
                 "UPDATE %s SET".formatted(SongTable.TABLE),
                 keys.stream().map(s -> s + "=?").collect(Collectors.joining(",")),
                 "WHERE %s = %d".formatted(SongTable.ID, song.getId())
         );
-        try (var stmt = db.prepareStatement(sql)) {
-            for (int i = 0; i < values.size(); i++) {
-                stmt.setString(i + 1, values.get(i));
-            }
-            stmt.executeUpdate();
+            try (var stmt = db.prepareStatement(sql)) {
+                for (int i = 0; i < values.size(); i++) {
+                    stmt.setString(i + 1, values.get(i));
+                }
+                if (stmt.executeUpdate() != 1) {
+                    throw new IllegalArgumentException("Song " + song.getId() + " does not exist");
+                }
 
-            insertTitles(song.getId(), song);
-            insertVerses(song.getId(), song);
-        } catch (SQLException e) {
-            throw new RuntimeException("Unable to update song!", e);
-        }
-        return song.getId();
+                insertTitles(song.getId(), song);
+                insertVerses(song.getId(), song);
+            }
+            return song.getId();
+        });
     }
 
     public boolean delete(int songId) {
-        return delete(songId, false);
+        return delete(List.of(songId));
     }
 
-    private boolean delete(int songId, boolean preserveMetadata) {
-        String deleteSql = "DELETE FROM %s WHERE %s = %d";
-        String deleteSong = deleteSql.formatted(SongTable.TABLE, SongTable.ID, songId);
-        String deleteTitles = deleteSql.formatted(TitlesTable.TABLE, TitlesTable.SONG_ID, songId);
-        String deleteVerses = deleteSql.formatted(VersesTable.TABLE, VersesTable.SONG_ID, songId);
-        try (var stmt = db.createStatement()) {
-            stmt.addBatch(deleteTitles);
-            stmt.addBatch(deleteVerses);
-            if (!preserveMetadata) {
-                stmt.addBatch(deleteSong);
+    public boolean delete(List<Integer> songIds) {
+        return inTransaction(() -> {
+            for (Integer songId : songIds) {
+                if (songId == null) {
+                    throw new IllegalArgumentException("Song id must not be null");
+                }
+                deleteRelated(songId);
+                try (var stmt = db.prepareStatement("DELETE FROM " + SongTable.TABLE + " WHERE " + SongTable.ID + "=?")) {
+                    stmt.setInt(1, songId);
+                    if (stmt.executeUpdate() != 1) {
+                        throw new IllegalArgumentException("Song " + songId + " does not exist");
+                    }
+                }
             }
-            stmt.executeBatch();
-        } catch (SQLException e) {
-            throw new RuntimeException("Unable to delete song!", e);
+            return !songIds.isEmpty();
+        });
+    }
+
+    private void deleteRelated(int songId) throws SQLException {
+        try (var titles = db.prepareStatement("DELETE FROM " + TitlesTable.TABLE + " WHERE " + TitlesTable.SONG_ID + "=?");
+             var verses = db.prepareStatement("DELETE FROM " + VersesTable.TABLE + " WHERE " + VersesTable.SONG_ID + "=?")) {
+            titles.setInt(1, songId);
+            verses.setInt(1, songId);
+            titles.executeUpdate();
+            verses.executeUpdate();
         }
-        return true;
+    }
+
+    private <T> T inTransaction(SqlWork<T> operation) {
+        try {
+            boolean originalAutoCommit = db.getAutoCommit();
+            db.setAutoCommit(false);
+            try {
+                T result = operation.run();
+                db.commit();
+                return result;
+            } catch (SQLException | RuntimeException e) {
+                try {
+                    db.rollback();
+                } catch (SQLException rollbackError) {
+                    e.addSuppressed(rollbackError);
+                }
+                if (e instanceof RuntimeException runtimeException) {
+                    throw runtimeException;
+                }
+                throw new RuntimeException("Song database transaction failed", e);
+            } finally {
+                db.setAutoCommit(originalAutoCommit);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Unable to perform song database transaction", e);
+        }
+    }
+
+    @FunctionalInterface
+    private interface SqlWork<T> {
+        T run() throws SQLException;
     }
 }

@@ -13,15 +13,20 @@ import com.scottmo.shared.LocaleUtil;
 
 public class ConfigService {
     // singleton
-    private static ConfigService INSTANCE = new ConfigService();
+    private static final ConfigService INSTANCE = new ConfigService(Path.of(Config.CONFIG_FILENAME));
     public static ConfigService get() {
         return INSTANCE;
     }
-    private ConfigService() {}
+
+    private final Path configPath;
+
+    public ConfigService(Path configPath) {
+        this.configPath = configPath;
+    }
 
     // config object
-    private Config appConfig;
-    public Config getConfig() {
+    private volatile Config appConfig;
+    public synchronized Config getConfig() {
         if (appConfig == null) {
             reload();
         }
@@ -29,10 +34,17 @@ public class ConfigService {
     }
 
     // instantiate config
-    public void reload() {
-        Path configPath = getConfigPath();
+    public synchronized void reload() {
         if (!Files.exists(configPath)) {
+            try {
+                Files.createDirectories(configPath.toAbsolutePath().getParent());
+            } catch (IOException e) {
+                throw new RuntimeException("Unable to create configuration directory", e);
+            }
             try (InputStream in = ConfigService.class.getClassLoader().getResourceAsStream(Config.CONFIG_FILENAME)) {
+                if (in == null) {
+                    throw new RuntimeException("Default configuration resource is missing");
+                }
                 Files.copy(in, configPath);
                 System.out.println("Loading default config.json");
             } catch (IOException e) {
@@ -94,10 +106,10 @@ public class ConfigService {
     }
 
     public Path getConfigPath() {
-        return Path.of(Config.CONFIG_FILENAME);
+        return configPath;
     }
 
-    public void save() {
+    public synchronized void save() {
         try {
             System.out.println("Saving config.json to " + getConfigPath().toFile().getAbsolutePath());
             JsonUtil.save(getConfigPath().toFile(), appConfig);

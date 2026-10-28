@@ -103,7 +103,7 @@ public class Song {
     }
 
     public List<String> getAuthors() {
-        return Collections.unmodifiableList(this.authors);
+        return this.authors == null ? null : Collections.unmodifiableList(this.authors);
     }
 
     public Song setAuthors(List<String> authors) {

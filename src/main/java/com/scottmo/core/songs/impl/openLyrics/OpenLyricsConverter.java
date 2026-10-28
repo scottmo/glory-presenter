@@ -9,6 +9,7 @@ import com.scottmo.core.songs.impl.openLyrics.model.OpenLyricsSongBook;
 import com.scottmo.core.songs.impl.openLyrics.model.OpenLyricsTitle;
 import com.scottmo.core.songs.impl.openLyrics.model.OpenLyricsVerse;
 import com.scottmo.shared.StringUtils;
+import com.scottmo.shared.LocaleUtil;
 
 import java.util.List;
 
@@ -24,7 +25,9 @@ public class OpenLyricsConverter {
             OpenLyricsSong olsong = xmlMapper.readValue(sourceXML, OpenLyricsSong.class);
             Song song = new Song();
             for (OpenLyricsTitle title : olsong.getProperties().getTitles()) {
-                song.setTitle(title.getLang(), title.getValue());
+                String locale = title.getLang() == null || title.getLang().isBlank()
+                    ? LocaleUtil.DEFAULT_LOCALE : title.getLang();
+                song.setTitle(locale, title.getValue());
             }
             song.setAuthors(olsong.getProperties().getAuthors());
             song.setCopyright(olsong.getProperties().getCopyright());
@@ -37,10 +40,11 @@ public class OpenLyricsConverter {
             song.setComments(olsong.getProperties().getComments());
             song.setVerseOrder(StringUtils.split(olsong.getProperties().getVerseOrder()));
             song.setVerses(olsong.getVerses().stream()
-                    .map(v -> new SongVerse(v.getName(), v.getLines(), v.getLang())).toList());
+                    .map(v -> new SongVerse(v.getName(), v.getLines(),
+                        v.getLang() == null || v.getLang().isBlank() ? LocaleUtil.DEFAULT_LOCALE : v.getLang())).toList());
             return song;
         } catch (JsonProcessingException e) {
-            throw new RuntimeException("Failed to load song from openLyrics format", e);
+            throw new IllegalArgumentException("Failed to load song from OpenLyrics format", e);
         }
     }
 

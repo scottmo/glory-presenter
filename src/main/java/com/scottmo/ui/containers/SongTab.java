@@ -8,11 +8,8 @@ import static org.httprpc.sierra.UIBuilder.strut;
 
 import java.awt.BorderLayout;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,10 +28,8 @@ import org.httprpc.sierra.SuggestionPicker;
 
 import com.scottmo.config.ConfigService;
 import com.scottmo.config.Labels;
-import com.scottmo.core.ServiceProvider;
-import com.scottmo.core.ppt.api.PowerpointService;
-import com.scottmo.core.songs.api.SongService;
 import com.scottmo.core.songs.api.song.Song;
+import com.scottmo.core.songs.operations.SongOperations;
 import com.scottmo.shared.StringUtils;
 import com.scottmo.ui.components.ListView;
 import com.scottmo.ui.components.SongEditor;
@@ -43,8 +38,7 @@ import com.scottmo.ui.utils.FilePicker;
 
 public final class SongTab extends JPanel {
     private final ConfigService configService = ConfigService.get();
-    private final SongService songService = ServiceProvider.get(SongService.class).get();
-    private final PowerpointService powerpointService = ServiceProvider.get(PowerpointService.class).get();
+    private final SongOperations songOperations = SongOperations.forApplication();
 
     // cache to look up song id
     private Map<String, Integer> songIdMap = new HashMap<>();
@@ -95,7 +89,7 @@ public final class SongTab extends JPanel {
             if (songId == null) {
                 Dialog.error(String.format("Unable to edit %s. Song cannot be found!", songName));
             } else {
-                showSongEditor(songService.get(songId));
+                showSongEditor(songOperations.get(songId));
             }
         });
 
@@ -105,24 +99,25 @@ public final class SongTab extends JPanel {
             if (songId == null) {
                 Dialog.error(String.format("Unable to duplicate %s. Song cannot be found!", songName));
             } else {
-                Song song = songService.get(songId);
-                song.resetId();
+                Song song = songOperations.duplicateDraft(songId);
                 showSongEditor(song);
             }
         });
 
         buttonDeleteSong.addActionListener(e -> {
             List<String> deletedSongs = new ArrayList<>();
+            List<Integer> deletedSongIds = new ArrayList<>();
             for (String songName : songList.getSelectedItems()) {
                 Integer songId = songIdMap.get(songName);
                 if (songId == null) {
                     Dialog.error(String.format("Unable to delete %s. Song cannot be found!", songName));
                 } else {
-                    songService.delete(songId);
+                    deletedSongIds.add(songId);
                     deletedSongs.add(songName);
                 }
             }
-            if (!deletedSongs.isEmpty()) {
+            if (!deletedSongIds.isEmpty()) {
+                songOperations.delete(deletedSongIds);
                 Dialog.info(String.format("Deleted songs: %s", StringUtils.join(deletedSongs)));
                 loadSongList();
             }
@@ -192,7 +187,8 @@ public final class SongTab extends JPanel {
             String songName = songList.getSelectedItems().get(0);
             Integer songId = songIdMap.get(songName);
             try {
-                String outputPath = generatePowerpoint(songId, songName, getLinesPerSlide(), inputTemplate.getText());
+                String outputPath = songOperations.generatePowerpoint(songId, getLinesPerSlide(),
+                    inputTemplate.getText(), null);
                 Dialog.info("Successfully generated ppt at " + outputPath);
             } catch (IOException e) {
                 Dialog.error("Unable to generate ppt", e);
@@ -239,9 +235,13 @@ public final class SongTab extends JPanel {
     private void loadSongList() {
         songIdMap = getSongIdMap();
         songNames = new ArrayList<>(songIdMap.keySet());
-        Collections.sort(songNames);
+        songNames.sort(String.CASE_INSENSITIVE_ORDER);
         songList.setItems(songNames);
         updateButtonState();
+    }
+
+    public void refreshSongList() {
+        loadSongList();
     }
 
     private void updateButtonState() {
@@ -263,7 +263,7 @@ public final class SongTab extends JPanel {
 
         songEditor.addCancelListener(this::restoreMainView);
         songEditor.addSaveListener((Song modifiedSong) -> {
-            songService.store(modifiedSong);
+            songOperations.save(modifiedSong);
             Dialog.info(String.format("Saved song '%s' successfully!", modifiedSong.getTitle()));
             restoreMainView();
             loadSongList(); // refresh song list
@@ -289,47 +289,33 @@ public final class SongTab extends JPanel {
             throw new IllegalArgumentException("Please select a file to upload");
         }
 
-        // TODO handle importing a zip of songs
         try {
-            String content = Files.readString(Path.of(filePath));
-            songService.importSong(content);
+            songOperations.importOpenLyrics(Path.of(filePath));
         } catch (IOException e) {
             throw new RuntimeException("Failed to import song [%s]!".formatted(filePath), e);
         }
     }
 
     private void exportSong(Integer id) throws IOException {
-        Song song = songService.get(id);
-        String outputPath = configService.getOutputPath(StringUtils.sanitizeFilename(song.getTitle()) + ".xml");
-        String songXML = songService.serialize(song);
-        Files.writeString(Path.of(outputPath), songXML, StandardCharsets.UTF_8);
+        songOperations.exportOpenLyrics(id, Path.of(songOperations.defaultOpenLyricsPath(id)));
     }
 
     private void exportSongToYaml(Integer id) throws IOException {
-        Song song = songService.get(id);
-        String filename = songService.getExportFilename(song, configService.getConfig().getLocales());
-        Path outputPath = Path.of(filename);
-        String songYaml = songService.serializeToYaml(song);
-        Files.writeString(outputPath, songYaml, StandardCharsets.UTF_8);
+        songOperations.exportYaml(id, Path.of(songOperations.defaultYamlPath(id)));
     }
 
     private Map<String, Integer> getSongIdMap() {
         Map<String, Integer> titles = new HashMap<>();
-        for (var title : songService.getAllSongDescriptors(configService.getConfig().getLocales())) {
-            titles.put(title.value(), title.key());
+        List<SongOperations.SongSummary> songs = songOperations.list(null, null);
+        Map<String, Long> counts = songs.stream().collect(Collectors.groupingBy(
+            SongOperations.SongSummary::descriptor, Collectors.counting()));
+        for (SongOperations.SongSummary song : songs) {
+            String label = song.descriptor();
+            if (counts.getOrDefault(label, 0L) > 1) {
+                label = label + " [#" + song.id() + "]";
+            }
+            titles.put(label, song.id());
         }
         return titles;
-    }
-
-    private String generatePowerpoint(Integer id, String songName, Integer linesPerSlide, String templatePath)
-            throws IOException {
-        Song song = songService.get(id);
-        String outputPath = configService.getOutputPath(StringUtils.sanitizeFilename(songName) + ".pptx");
-        if (!templatePath.contains("/")) {
-            templatePath = configService.getPowerpointTemplate(templatePath);
-        }
-        powerpointService.generate(song, templatePath, outputPath, linesPerSlide);
-    
-        return outputPath;
     }
 }

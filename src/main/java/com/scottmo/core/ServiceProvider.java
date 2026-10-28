@@ -19,15 +19,17 @@ public class ServiceProvider {
     @SuppressWarnings("unchecked")
     public static <T extends Service> Supplier<T> get(Class<T> clazz) {
         return () -> {
-            T service;
-            if (services.containsKey(clazz)) {
-                return (T) services.get(clazz);
+            synchronized (services) {
+                T service;
+                if (services.containsKey(clazz)) {
+                    return (T) services.get(clazz);
+                }
+                service = getRaw(clazz);
+                if (service != null) {
+                    services.put(clazz, service);
+                }
+                return service;
             }
-            service = getRaw(clazz);
-            if (service != null) {
-                services.put(clazz, service);
-            }
-            return service;
         };
     }
 

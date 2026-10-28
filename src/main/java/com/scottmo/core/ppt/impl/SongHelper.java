@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.function.Supplier;
 
 import com.scottmo.config.ConfigService;
 import com.scottmo.core.ServiceProvider;
@@ -24,8 +25,17 @@ class SongHelper {
     private static final String COPYRIGHT = "copyright";
     private static final String PUBLISHER = "publisher";
 
-    private final ConfigService configService = ConfigService.get();
-    private final SongService songService = ServiceProvider.get(SongService.class).get();
+    private final Supplier<List<String>> locales;
+    private final SongService songService;
+
+    SongHelper() {
+        this(() -> ConfigService.get().getConfig().getLocales(), ServiceProvider.get(SongService.class).get());
+    }
+
+    SongHelper(Supplier<List<String>> locales, SongService songService) {
+        this.locales = locales;
+        this.songService = songService;
+    }
 
     List<Map<String, String>> toSlideContents(int songId, int maxLines) {
         Song song = songService.get(songId);
@@ -33,6 +43,9 @@ class SongHelper {
     }
 
     List<Map<String, String>> toSlideContents(Song song, int maxLines) {
+        if (maxLines < 1) {
+            throw new IllegalArgumentException("linesPerSlide must be at least 1");
+        }
         // song metadata for all slides
         Map<String, String> songMetadata = new HashMap<>();
         songMetadata.put(SONGBOOK, song.getSongBook());
@@ -44,7 +57,7 @@ class SongHelper {
         }
 
         // lyrics
-        List<String> textGroups = configService.getConfig().getLocales().stream().map(s -> VERSE_PREFIX + s).toList();
+        List<String> textGroups = locales.get().stream().map(s -> VERSE_PREFIX + s).toList();
         List<Map<String, String>> lyrics = getSectionTexts(getOrderedVerses(song), textGroups, maxLines);
         // make song metadata also available to verse slides
         for (Map<String, String> verse : lyrics) {
