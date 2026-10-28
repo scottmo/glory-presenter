@@ -346,10 +346,8 @@ final class TemplatingUtil {
     }
 
     static void loadSlideShow(String filePath, IOConsumer<XMLSlideShow> onLoad) throws IOException {
-        try (var is = new FileInputStream(filePath)) {
-            XMLSlideShow ppt = new XMLSlideShow(is);
+        try (var is = new FileInputStream(filePath); var ppt = new XMLSlideShow(is)) {
             onLoad.accept(ppt);
-            ppt.close();
         }
     }
 

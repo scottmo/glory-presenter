@@ -115,3 +115,35 @@ song content is a YAML map with `songId` and `linesPerSlide`.
 ```json
 {"name":"program_generate","arguments":{"yaml":"- type: default\n  template: worship/default.pptx\n  content: |\n    - {}\n    - title-en: Welcome\n      subtitle-en: Sunday Service\n- type: bible\n  template: bible.pptx\n  content: john 1:1-3\n","outputPath":"sunday-service.pptx"}}
 ```
+
+## PowerPoint formatter
+
+`pptx_format_text` accepts `paths` (a nonempty array of `.pptx` paths and/or directories), optional `startSlide` and
+`endSlide`, `matcher`, `format`, and optional `overwrite`. Directories include their immediate `.pptx` files. Slide
+indexes are zero-based; `startSlide` is inclusive and defaults to 0, while `endSlide` is exclusive and defaults to 0.
+An `endSlide` of 0 means all slides from `startSlide` onward. `matcher` is a name from the configured
+`patternPresets` map or a Java regular expression. `format` is a configured `textFormatPresets` name or a YAML/JSON
+`TextFormat` object with optional `fontFamily`, `fontSize`, `fontColor` (`"R, G, B"`), `bold`, `italic`,
+`underlined`, `strikethrough`, and `smallCaps` fields.
+
+`pptx_normalize_newlines` accepts the same `paths` array and optional `overwrite`; it converts newlines inside text
+shapes into separate paragraphs. With `overwrite: false` (the default), both tools write a sibling file with
+`.mod.pptx` appended before the extension, preserving the original extension's casing (for example,
+`slides.PPTX` becomes `slides.mod.PPTX`). With `overwrite: true`, the input is replaced.
+
+Both tools return `successes` and `failures` arrays. Each success includes its input and resolved output paths; each
+failure includes the input path, intended output path, and error message. The result is marked `isError: true` if any
+file fails, while preserving other files' results. Invalid ranges, matcher patterns, or format values are reported as
+tool errors before batch processing begins.
+
+```json
+{"name":"pptx_format_text","arguments":{"paths":["C:/slides/service.PPTX"],"startSlide":1,"endSlide":0,"matcher":"title","format":"worshipTitle"}}
+```
+
+```json
+{"name":"pptx_format_text","arguments":{"paths":["C:/slides/service.pptx"],"matcher":"\\bAmen\\b","format":"fontFamily: Arial\nfontSize: 28\nfontColor: 255, 255, 255\nbold: true"}}
+```
+
+```json
+{"name":"pptx_normalize_newlines","arguments":{"paths":["C:/slides"],"overwrite":false}}
+```

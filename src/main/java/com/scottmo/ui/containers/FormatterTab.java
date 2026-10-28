@@ -1,49 +1,49 @@
 package com.scottmo.ui.containers;
 
-import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
-import com.scottmo.config.ConfigService;
-import com.scottmo.config.Labels;
-import com.scottmo.core.ServiceProvider;
-import com.scottmo.core.ppt.api.PowerpointService;
-import com.scottmo.shared.Range;
-import com.scottmo.shared.TextFormat;
-import com.scottmo.ui.utils.Dialog;
-import org.httprpc.sierra.SuggestionPicker;
+import static com.scottmo.config.Config.UI_GAP;
+import static org.httprpc.sierra.UIBuilder.cell;
+import static org.httprpc.sierra.UIBuilder.column;
+import static org.httprpc.sierra.UIBuilder.row;
 
-import javax.swing.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
-import java.awt.*;
-import java.io.File;
+import java.awt.BorderLayout;
 import java.io.IOException;
+import java.io.File;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
-import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
+
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JFileChooser;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JSpinner;
+import javax.swing.JTextArea;
+import javax.swing.SpinnerNumberModel;
+import javax.swing.filechooser.FileNameExtensionFilter;
+
+import org.httprpc.sierra.SuggestionPicker;
 
 import com.scottmo.config.Config;
-
-import static com.scottmo.config.Config.UI_GAP;
-import static org.httprpc.sierra.UIBuilder.*;
+import com.scottmo.config.ConfigService;
+import com.scottmo.config.Labels;
+import com.scottmo.core.operations.FormatterOperations;
+import com.scottmo.ui.utils.Dialog;
 
 public class FormatterTab extends JPanel {
-
     private static final String SAMPLE_FORMATS = """
-fontFamily: KaiTi
-fontSize: 12
-fontColor: 255, 255, 255
-italic: false
-bold: false
-underlined: false
-strikethrough: false
-""";
+        fontFamily: KaiTi
+        fontSize: 12
+        fontColor: 255, 255, 255
+        italic: false
+        bold: false
+        underlined: false
+        strikethrough: false
+        """;
 
     private final ConfigService configService = ConfigService.get();
-    private final PowerpointService powerpointService = ServiceProvider.get(PowerpointService.class).get();
-    private final YAMLMapper yamlMapper = new YAMLMapper();
-
+    private final FormatterOperations formatterOperations = FormatterOperations.forApplication();
     private final JFileChooser fileChooser = new JFileChooser();
     private final JButton buttonFilePicker = new JButton(Labels.get("formatter.filePicker"));
     private final JSpinner inputStartSlide = new JSpinner(new SpinnerNumberModel(0, 0, Integer.MAX_VALUE, 1));
@@ -57,9 +57,8 @@ strikethrough: false
     private List<String> targetFilePaths = new ArrayList<>();
 
     public FormatterTab() {
-        Map<String, String> patternPresets = configService.getConfig().getPatternPresets();
-        List<String> patternPresetNames = new ArrayList<>(patternPresets.keySet());
-        inputMatcher.setText(patternPresetNames.get(0));
+        List<String> patternPresetNames = formatterOperations.listPatternPresetNames();
+        inputMatcher.setText(patternPresetNames.isEmpty() ? "" : patternPresetNames.get(0));
         inputMatcher.setSuggestions(patternPresetNames);
 
         fileChooser.setFileFilter(new FileNameExtensionFilter("PowerPoint Files (*.pptx)", "pptx"));
@@ -73,89 +72,41 @@ strikethrough: false
 
             if (result == JFileChooser.APPROVE_OPTION) {
                 File selected = fileChooser.getSelectedFile();
-                targetFilePaths.clear();
-                if (selected.isDirectory()) {
-                    File[] pptxFiles = selected.listFiles((dir, name) -> name.toLowerCase().endsWith(".pptx"));
-                    if (pptxFiles != null) {
-                        Arrays.stream(pptxFiles).map(File::getAbsolutePath).forEach(targetFilePaths::add);
-                    }
-                    buttonFilePicker.setText(selected.getAbsolutePath() + " (" + targetFilePaths.size() + " files)");
-                } else {
-                    targetFilePaths.add(selected.getAbsolutePath());
-                    buttonFilePicker.setText(selected.getAbsolutePath());
+                try {
+                    List<Path> selectedFiles = formatterOperations.collectFiles(List.of(selected.getAbsolutePath()));
+                    targetFilePaths = selectedFiles.stream().map(Path::toString).toList();
+                    buttonFilePicker.setText(selected.getAbsolutePath() + (selected.isDirectory()
+                        ? " (" + targetFilePaths.size() + " files)"
+                        : ""));
+                } catch (Exception e) {
+                    Dialog.error("Unable to select PowerPoint files: " + e.getMessage());
                 }
             }
         });
 
         buttonUpdate.addActionListener(evt -> {
-            if (targetFilePaths.isEmpty()) {
-                Dialog.error("No file selected!");
-                return;
-            }
-
-            String textFormatsStr = inputFormats.getText();
-            if (textFormatsStr == null || textFormatsStr.isEmpty()) {
-                Dialog.error("No text formats specified!");
-                return;
-            }
-
-            TextFormat textFormats;
             try {
-                Map<String, TextFormat> textFormatPresets = configService.getConfig().getTextFormatPresets();
-                textFormats = textFormatPresets.containsKey(textFormatsStr)
-                    ? textFormatPresets.get(textFormatsStr)
-                    : yamlMapper.readValue(textFormatsStr, TextFormat.class);
-            } catch (Exception e) {
-                Dialog.error("Invalid format: " + e.getMessage());
-                return;
-            }
-
-            Pattern textMatchPattern;
-            try {
-                String inputMatcherText = inputMatcher.getText();
-                textMatchPattern = (patternPresets.containsKey(inputMatcherText))
-                    ? Pattern.compile(patternPresets.get(inputMatcherText))
-                    : Pattern.compile(inputMatcherText);
-            } catch (PatternSyntaxException e) {
-                Dialog.error("Invalid text pattern!");
-                return;
-            }
-
-            List<String> errors = new ArrayList<>();
-            int start = (Integer) inputStartSlide.getValue();
-            int end = (Integer) inputEndSlide.getValue();
-            for (String filePath : targetFilePaths) {
-                try {
-                    powerpointService.updateTextFormats(filePath, getOutputPath(filePath), new Range(start, end), textMatchPattern, textFormats);
-                } catch (IOException e) {
-                    errors.add(filePath + ": " + e.getMessage());
-                }
-            }
-            if (errors.isEmpty()) {
-                Dialog.info("Updated " + targetFilePaths.size() + " file(s) successfully!");
-            } else {
-                Dialog.error("Failed to update " + errors.size() + " file(s):\n" + String.join("\n", errors));
+                FormatterOperations.BatchResult result = formatterOperations.formatText(
+                    targetFilePaths,
+                    (Integer) inputStartSlide.getValue(),
+                    (Integer) inputEndSlide.getValue(),
+                    inputMatcher.getText(),
+                    inputFormats.getText(),
+                    inputOverwrite.isSelected()
+                );
+                showResult("text formatting", result);
+            } catch (IllegalArgumentException | IOException e) {
+                Dialog.error("Unable to format PowerPoint text: " + e.getMessage());
             }
         });
 
         buttonNormalizeNewLine.addActionListener(evt -> {
-            if (targetFilePaths.isEmpty()) {
-                Dialog.error("No file selected!");
-                return;
-            }
-
-            List<String> errors = new ArrayList<>();
-            for (String filePath : targetFilePaths) {
-                try {
-                    powerpointService.normalizeNewLines(filePath, getOutputPath(filePath));
-                } catch (IOException e) {
-                    errors.add(filePath + ": " + e.getMessage());
-                }
-            }
-            if (errors.isEmpty()) {
-                Dialog.info("Updated " + targetFilePaths.size() + " file(s) successfully!");
-            } else {
-                Dialog.error("Failed to update " + errors.size() + " file(s):\n" + String.join("\n", errors));
+            try {
+                FormatterOperations.BatchResult result = formatterOperations.normalizeNewlines(
+                    targetFilePaths, inputOverwrite.isSelected());
+                showResult("newline normalization", result);
+            } catch (IllegalArgumentException | IOException e) {
+                Dialog.error("Unable to normalize PowerPoint newlines: " + e.getMessage());
             }
         });
 
@@ -182,7 +133,15 @@ strikethrough: false
         ).getComponent());
     }
 
-    private String getOutputPath(String filePath) {
-        return inputOverwrite.isSelected() ? filePath : filePath.replace(".pptx", ".mod.pptx");
+    private void showResult(String operation, FormatterOperations.BatchResult result) {
+        if (result.failures().isEmpty()) {
+            Dialog.info("Completed " + operation + " for " + result.successes().size() + " file(s).");
+            return;
+        }
+        String failures = result.failures().stream()
+            .map(failure -> failure.inputPath() + ": " + failure.error())
+            .collect(java.util.stream.Collectors.joining("\n"));
+        Dialog.error("Completed " + operation + " for " + result.successes().size()
+            + " file(s); failed for " + result.failures().size() + ":\n" + failures);
     }
 }
