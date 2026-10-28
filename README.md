@@ -38,7 +38,7 @@ workflows continue to evolve.
 ## MCP Server
 
 The official MCP Java SDK is integrated using STDIO and Streamable HTTP transports. To run the headless STDIO
-server, launch the packaged application with `--mcp-server` (for example, `java -jar target/glory-presenter-6.5.0-jar-with-dependencies.jar --mcp-server`).
+server, launch the packaged application with `--mcp-server` (for example, `java -jar target/app.jar --mcp-server`).
 The server handles MCP over stdin/stdout and exits cleanly when the client closes stdin. Protocol messages are the
 only content written to stdout; diagnostics are sent to stderr.
 
@@ -59,10 +59,10 @@ Use JDK 17 and Maven. From the repository root, run:
 ```powershell
 mvn -B test
 mvn -B package
-java -jar target/glory-presenter-6.5.0-jar-with-dependencies.jar --mcp-server
+java -jar target/app.jar --mcp-server
 ```
 
-Packaging creates the executable fat JAR at `target/glory-presenter-6.5.0-jar-with-dependencies.jar`. The application
+Packaging creates the executable fat JAR at `target/app.jar`. The application
 loads or creates `data/config.json` relative to its process working directory. The configured `dataDir` and
 `outputDir`, and other relative paths, are also resolved from that working directory. Run the server from the
 directory containing the intended `data/config.json` so it finds the intended config and stores.
@@ -74,7 +74,7 @@ A typical STDIO MCP client command/args entry is:
   "command": "java",
   "args": [
     "-jar",
-    "C:/apps/glory-presenter/target/glory-presenter-6.5.0-jar-with-dependencies.jar",
+    "C:/apps/glory-presenter/target/app.jar",
     "--mcp-server"
   ]
 }
@@ -95,7 +95,7 @@ through a public or network-facing proxy.
 ### Directory
 
 - glory-presenter
-  - glory-presenter.jar
+  - app.jar
   - config.json
   - output
   - data

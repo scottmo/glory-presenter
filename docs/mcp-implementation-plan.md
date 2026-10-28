@@ -25,8 +25,8 @@ focus, selection, and undo history remain local interactions rather than separat
 ## Running
 
 ```powershell
-java -jar target/glory-presenter-6.5.0-jar-with-dependencies.jar --mcp-server
-java -Dglory.mcp.port=8766 -jar target/glory-presenter-6.5.0-jar-with-dependencies.jar
+java -jar target/app.jar --mcp-server
+java -Dglory.mcp.port=8766 -jar target/app.jar
 ```
 
 The second command changes the desktop application's local HTTP MCP port. The default is 8765. Keep the endpoint
