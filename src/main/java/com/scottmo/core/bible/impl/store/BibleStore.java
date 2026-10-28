@@ -1,6 +1,8 @@
 package com.scottmo.core.bible.impl.store;
 
 import java.nio.file.Path;
+import java.nio.file.Files;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -15,41 +17,56 @@ import com.scottmo.core.bible.api.bibleMetadata.BibleVerse;
 import com.scottmo.core.bible.api.bibleReference.BibleReference;
 import com.scottmo.core.bible.api.bibleReference.VerseRange;
 
-public final class BibleStore {
+public final class BibleStore implements AutoCloseable {
     private static final String DB_NAME = "bible";
 
     private final BibleVerseTable bibleVerseTable;
     private final BookNamesTable bookNamesTable;
+    private final Connection db;
     private List<Map<String, String>> bookNames = Collections.emptyList(); // cache
 
     public BibleStore(Path storeLocation) {
         try {
-            Connection conn = DriverManager.getConnection("jdbc:sqlite:" + storeLocation.resolve("%s.db".formatted(DB_NAME)));
-            bibleVerseTable = new BibleVerseTable(conn);
-            bookNamesTable = new BookNamesTable(conn);
-        } catch (SQLException e) {
+            Files.createDirectories(storeLocation);
+            db = DriverManager.getConnection("jdbc:sqlite:" + storeLocation.resolve("%s.db".formatted(DB_NAME)));
+            bibleVerseTable = new BibleVerseTable(db);
+            bookNamesTable = new BookNamesTable(db);
+        } catch (SQLException | IOException e) {
             throw new RuntimeException(e);
         }
     }
 
     public int insert(Map<String, List<List<String>>> bible, String version) {
-
+        boolean originalAutoCommit;
+        try {
+            originalAutoCommit = db.getAutoCommit();
+            db.setAutoCommit(false);
+        } catch (SQLException e) {
+            throw new RuntimeException("Unable to begin Bible import transaction.", e);
+        }
         try {
             int insertedCount = bookNamesTable.insert(version, new ArrayList<>(bible.keySet()));
             System.out.printf("Inserted %d book names.%n", insertedCount);
-        } catch (SQLException e) {
-            System.err.println("Failed to insert book names!");
-            e.printStackTrace();
-            return 0;
-        }
-
-        try {
             int insertedVerseCount = bibleVerseTable.insert(version, bible);
             System.out.printf("Inserted %d bible verses.%n", insertedVerseCount);
+            db.commit();
             bookNames = Collections.emptyList();
             return insertedVerseCount;
-        } catch (SQLException e) {
-            throw new RuntimeException("Failed to insert bible verses!\n", e);
+        } catch (SQLException | RuntimeException e) {
+            try {
+                db.rollback();
+            } catch (SQLException rollbackError) {
+                e.addSuppressed(rollbackError);
+            }
+            throw e instanceof RuntimeException runtime
+                ? runtime
+                : new RuntimeException("Failed to insert Bible verses.", e);
+        } finally {
+            try {
+                db.setAutoCommit(originalAutoCommit);
+            } catch (SQLException e) {
+                throw new RuntimeException("Unable to restore Bible database transaction state.", e);
+            }
         }
     }
 
@@ -94,5 +111,10 @@ public final class BibleStore {
         return bookIndex >= 0
                 ? this.bookNames.get(bookIndex)
                 : Collections.emptyMap();
+    }
+
+    @Override
+    public void close() throws SQLException {
+        db.close();
     }
 }

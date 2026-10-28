@@ -17,8 +17,9 @@ final class BookNamesTable {
 
     private final Connection db;
 
-    BookNamesTable(Connection conn) {
+    BookNamesTable(Connection conn) throws SQLException {
         this.db = conn;
+        createTable();
     }
 
     private void createTable() throws SQLException {
@@ -49,8 +50,13 @@ final class BookNamesTable {
         try (Statement stmt = db.createStatement()) {
             ResultSet res = stmt.executeQuery(sql);
             while (res.next()) {
-                bookNames.get(res.getInt("id"))
-                        .put(res.getString("version"), res.getString("name"));
+                String name = res.getString("name");
+                int canonicalIndex = BibleMetadata.getBookIndex(name);
+                int storedIndex = res.getInt("id");
+                int index = canonicalIndex >= 0 ? canonicalIndex : storedIndex;
+                if (index >= 0 && index < bookNames.size()) {
+                    bookNames.get(index).put(res.getString("version"), name);
+                }
             }
         }
 
@@ -73,11 +79,15 @@ final class BookNamesTable {
         createTable();
 
         int inserted;
-        String sql = "INSERT INTO %s (id, name, version) VALUES (?, ?, ?)".formatted(TABLE_NAME);
+        String sql = "INSERT OR REPLACE INTO %s (id, name, version) VALUES (?, ?, ?)".formatted(TABLE_NAME);
         try (PreparedStatement stmt = db.prepareStatement(sql)) {
-            for (int i = 0; i < bookNames.size(); i++) {
-                stmt.setInt(1, i);
-                stmt.setString(2, bookNames.get(i));
+            for (String bookName : bookNames) {
+                int bookIndex = BibleMetadata.getBookIndex(bookName);
+                if (bookIndex < 0) {
+                    throw new IllegalArgumentException("Unknown Bible book id: " + bookName);
+                }
+                stmt.setInt(1, bookIndex);
+                stmt.setString(2, bookName);
                 stmt.setString(3, version);
                 stmt.addBatch();
             }

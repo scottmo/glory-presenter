@@ -9,11 +9,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import com.scottmo.core.bible.api.bibleMetadata.BibleMetadata;
 import com.scottmo.core.bible.api.bibleMetadata.BibleVerse;
 
 final class BibleVerseTable {
+    private static final Pattern SAFE_VERSION = Pattern.compile("[A-Za-z0-9_]+(?:-[A-Za-z0-9_]+)*");
     private final Connection db;
 
     BibleVerseTable(Connection conn) {
@@ -36,13 +38,19 @@ final class BibleVerseTable {
     }
 
     private String getTableName(String version) {
-        return "bible_" + version;
+        if (version == null || !SAFE_VERSION.matcher(version).matches()) {
+            throw new IllegalArgumentException("Invalid Bible version name: " + version);
+        }
+        return "\"bible_" + version + "\"";
     }
 
     int insert(String version, Map<String, List<List<String>>> bible) throws SQLException {
         List<BibleVerse> verses = new ArrayList<>();
         for (String book : bible.keySet()) {
             int bookIndex = BibleMetadata.getBookIndex(book);
+            if (bookIndex < 0) {
+                throw new IllegalArgumentException("Unknown Bible book id: " + book);
+            }
             List<List<String>> chapters = bible.get(book);
             for (int c = 0; c < chapters.size(); c++) {
                 List<String> chapter = chapters.get(c);
@@ -55,7 +63,7 @@ final class BibleVerseTable {
         createTable(tableName);
 
         int inserted;
-        String sql = "INSERT INTO %s (bookIndex, chapter, verse, text) VALUES (?, ?, ?, ?)".formatted(tableName);
+        String sql = "INSERT OR REPLACE INTO %s (bookIndex, chapter, verse, text) VALUES (?, ?, ?, ?)".formatted(tableName);
         try (PreparedStatement stmt = db.prepareStatement(sql)) {
             for (BibleVerse bvt : verses) {
                 stmt.setInt(1, bvt.bookIndex());
@@ -74,13 +82,18 @@ final class BibleVerseTable {
         List<BibleVerse> bibleVerses = new ArrayList<>();
 
         String tableName = getTableName(version);
-        String sql = "SELECT * FROM %s WHERE bookIndex = ? AND chapter = ?".formatted(tableName);
+        String sql = "SELECT * FROM %s WHERE CAST(bookIndex AS INTEGER) = ? AND chapter = ?".formatted(tableName);
         if (!verses.isEmpty()) {
             String verseNumberPlaceholder = String.join(",", "?".repeat(verses.size()).split(""));
             sql += " AND verse IN (%s)".formatted(verseNumberPlaceholder);
         }
+        sql += " ORDER BY chapter, verse";
         try (PreparedStatement stmt = db.prepareStatement(sql)) {
-            stmt.setString(1, BibleMetadata.getBookIndex(bookId) + ".0"); // .0 because bookIndex was initially a string, TODO: FIX THIS
+            int bookIndex = BibleMetadata.getBookIndex(bookId);
+            if (bookIndex < 0) {
+                throw new IllegalArgumentException("Unknown Bible book id: " + bookId);
+            }
+            stmt.setInt(1, bookIndex);
             stmt.setInt(2, chapter);
             for (int i = 0; i < verses.size(); i++) {
                 stmt.setInt(3 + i, verses.get(i));

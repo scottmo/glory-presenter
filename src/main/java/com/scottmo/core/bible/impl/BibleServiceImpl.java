@@ -4,9 +4,12 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.function.Supplier;
 
 import com.scottmo.config.ConfigService;
 import com.scottmo.core.bible.api.BibleService;
@@ -16,13 +19,26 @@ import com.scottmo.core.bible.api.bibleOsis.Osis;
 import com.scottmo.core.bible.api.bibleReference.BibleReference;
 import com.scottmo.core.bible.impl.store.BibleStore;
 
-public class BibleServiceImpl implements BibleService {
-    private ConfigService configService = ConfigService.get();
-    private BibleStore store;
+public class BibleServiceImpl implements BibleService, AutoCloseable {
+    private final Supplier<Path> storeLocation;
+    private volatile BibleStore store;
 
-    private BibleStore getStore() {
+    public BibleServiceImpl() {
+        this(() -> Path.of(ConfigService.get().getConfig().getDataDir()));
+    }
+
+    /** Creates a service backed by an explicit data directory, useful for isolated callers and tests. */
+    public BibleServiceImpl(Path dataDirectory) {
+        this(() -> dataDirectory);
+    }
+
+    private BibleServiceImpl(Supplier<Path> storeLocation) {
+        this.storeLocation = Objects.requireNonNull(storeLocation, "storeLocation");
+    }
+
+    private synchronized BibleStore getStore() {
         if (store == null) {
-            store = new BibleStore(Path.of(configService.getConfig().getDataDir()));
+            store = new BibleStore(storeLocation.get());
         }
         return store;
     }
@@ -56,7 +72,15 @@ public class BibleServiceImpl implements BibleService {
     public void importBible(String osisFilePath) throws IOException {
         String osisXML = Files.readString(Path.of(osisFilePath), StandardCharsets.UTF_8);
         Osis bibleOsis = Osis.of(osisXML);
-        store.insert(bibleOsis.getVerses(), bibleOsis.getId());
+        getStore().insert(bibleOsis.getVerses(), bibleOsis.getId());
+    }
+
+    @Override
+    public synchronized void close() throws SQLException {
+        if (store != null) {
+            store.close();
+            store = null;
+        }
     }
 
     @Override

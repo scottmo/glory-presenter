@@ -45,3 +45,42 @@ paths resolve beneath the configured output directory; supplied destinations can
 
 IDs returned from `song_create` can be passed to `song_get`, `song_update`, `song_duplicate`, exports, slide generation,
 and `songs_delete`.
+
+## Bible library
+
+`bible_list_versions` returns imported Bible version IDs. `bible_list_books` returns the canonical English book IDs
+supported by the application. `bible_get_book_names` accepts `{ "bookId": "john" }` and returns a map from version ID to
+the stored display name for that book.
+
+`bible_get_verses` accepts `{ "reference": "john 1:1-3;3:16" }` and optionally a `versions` string array. An explicit
+version prefix in the reference, such as `niv,cuv - john 1:1-3`, selects versions directly. Without a prefix, the
+tool uses `versions` when supplied or the configured `bibleVersionToLocale` keys otherwise. Do not supply both a
+prefix and `versions`. References support chapter-only, verse, comma-separated verse lists/ranges, and semicolon
+separated chapter ranges. Chapter and verse bounds are checked against the canonical book metadata. The result maps
+each version to a list of `{ "bookIndex", "chapter", "index", "text" }` verse records.
+
+`bible_import_osis` accepts `{ "filePaths": ["/path/to/bible.xml", ...] }`. Files are imported independently; the
+result contains `imported` paths and a `failures` map from path to error message. If any file fails, the result still
+contains successes and is marked `isError: true`. OSIS imports may replace existing verses for the same version.
+
+`bible_generate_pptx` accepts `{ "reference": "niv - john 1:1-3" }`, with optional `template` and `outputPath`. The
+configured Bible template is used when `template` is omitted. A relative template name is resolved beneath
+`<dataDir>/templates`; an absolute local template path is also accepted. Without `outputPath`, the configured output
+directory and reference determine the filename. Relative output paths resolve beneath the configured output
+directory; supplied destinations can be overwritten.
+
+```json
+{"name":"bible_list_versions","arguments":{}}
+```
+
+```json
+{"name":"bible_get_verses","arguments":{"reference":"john 1:1-3","versions":["niv"]}}
+```
+
+```json
+{"name":"bible_import_osis","arguments":{"filePaths":["C:/bibles/niv.xml","C:/bibles/cuv.xml"]}}
+```
+
+```json
+{"name":"bible_generate_pptx","arguments":{"reference":"niv - john 1:1-3","template":"bible.pptx"}}
+```

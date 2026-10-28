@@ -46,9 +46,9 @@ address is `http://127.0.0.1:8765/mcp`; set the Java system property `-Dglory.mc
 The HTTP server binds to 127.0.0.1 and rejects untrusted Host and Origin headers. Do not expose this local endpoint
 through a public or network-facing proxy.
 
-The server currently exposes song library operations and `mcp_status`. See [the MCP tool reference](docs/mcp-tools.md)
-for schemas, examples, file behavior, and errors. The server uses MCP protocol version 2025-11-25 through the
-released Java SDK 2.1.0.
+The server currently exposes song library and Bible query, OSIS import, and PowerPoint generation operations, plus
+`mcp_status`. See [the MCP tool reference](docs/mcp-tools.md) for schemas, examples, file behavior, and errors. The
+server uses MCP protocol version 2025-11-25 through the released Java SDK 2.1.0.
 
 ## Sample App Config
 
