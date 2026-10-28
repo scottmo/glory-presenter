@@ -6,11 +6,6 @@ import static org.httprpc.sierra.UIBuilder.column;
 import static org.httprpc.sierra.UIBuilder.row;
 
 import java.awt.BorderLayout;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.regex.Pattern;
-
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
@@ -22,6 +17,7 @@ import com.scottmo.config.ConfigService;
 import com.scottmo.config.Labels;
 import com.scottmo.core.ServiceProvider;
 import com.scottmo.core.bible.api.BibleService;
+import com.scottmo.core.operations.ProgramOperations;
 import com.scottmo.core.ppt.api.PowerpointService;
 import com.scottmo.ui.utils.Dialog;
 import com.scottmo.ui.utils.SearchableListDialog;
@@ -53,6 +49,7 @@ public class ProgramTab extends JPanel {
     private ConfigService configService = ConfigService.get();
     private BibleService bibleService = ServiceProvider.get(BibleService.class).get();
     private PowerpointService powerpointService = ServiceProvider.get(PowerpointService.class).get();
+    private ProgramOperations programOperations = ProgramOperations.configured(powerpointService);
 
     private JComboBox<String> bookComboBox = new JComboBox<>();
     private JButton buttonPickProgramTemplate = new JButton("Pick Program Template");
@@ -72,18 +69,8 @@ public class ProgramTab extends JPanel {
         });
 
         buttonPickProgramTemplate.addActionListener(evt -> {
-            Path templateDir = Path.of(configService.getConfig().getDataDir(), Config.TEMPLATE_DIR);
-            Pattern programPattern = Pattern.compile("^program-.*\\.txt$", Pattern.CASE_INSENSITIVE);
-            try (java.util.stream.Stream<Path> stream = java.nio.file.Files.walk(templateDir)) {
-                java.util.List<String> files = stream
-                    .filter(java.nio.file.Files::isRegularFile)
-                    .filter(p -> programPattern.matcher(p.getFileName().toString()).matches())
-                    .map(templateDir::relativize)
-                    .map(Path::toString)
-                    .map(s -> s.replace('\\', '/'))
-                    .sorted()
-                    .collect(java.util.stream.Collectors.toList());
-
+            try {
+                java.util.List<String> files = programOperations.listProgramTemplates();
                 if (files.isEmpty()) {
                     Dialog.warn("No program-*.txt files found in templates directory.");
                     return;
@@ -95,39 +82,30 @@ public class ProgramTab extends JPanel {
                     files, 
                     this::loadProgramTemplate
                 );
-            } catch (IOException e) {
+            } catch (Exception e) {
                 Dialog.error("Error listing program templates", e);
             }
         });
 
         buttonPickFile.addActionListener(evt -> {
-            Path templateDir = Path.of(configService.getConfig().getDataDir(), Config.TEMPLATE_DIR);
-            try (java.util.stream.Stream<Path> stream = java.nio.file.Files.walk(templateDir)) {
-                java.util.List<String> files = stream
-                    .filter(java.nio.file.Files::isRegularFile)
-                    .map(templateDir::relativize)
-                    .map(Path::toString)
-                    .map(s -> s.replace('\\', '/'))
-                    .sorted()
-                    .collect(java.util.stream.Collectors.toList());
-
+            try {
+                java.util.List<String> files = programOperations.listTemplates();
                 SearchableListDialog.show(
                     javax.swing.SwingUtilities.getWindowAncestor(this),
                     "Select Template", 
                     files, 
                     this::insertTextAtCursor
                 );
-            } catch (IOException e) {
+            } catch (Exception e) {
                 Dialog.error("Error listing templates", e);
             }
         });
 
         buttonGeneratePPT.addActionListener(evt -> {
             try {
-                String outPath = configService.getOutputPath("output.pptx");
-                powerpointService.generateFromYamlConfigs(fieldInput.getText(), outPath);
+                String outPath = programOperations.generate(fieldInput.getText()).toString();
                 Dialog.info("Generated slides at " + outPath);
-            } catch (IOException e) {
+            } catch (Exception e) {
                 Dialog.error("Error generating program slides", e); 
             }
         });
@@ -146,11 +124,10 @@ public class ProgramTab extends JPanel {
 
     private void loadProgramTemplate(String filePath) {
         try {
-            Path templatePath = Path.of(configService.getConfig().getDataDir(), Config.TEMPLATE_DIR, filePath);
-            String content = Files.readString(templatePath);
+            String content = programOperations.readProgramTemplate(filePath);
             fieldInput.setText(content);
             fieldInput.setCaretPosition(0);
-        } catch (IOException e) {
+        } catch (Exception e) {
             Dialog.error("Error reading program template: " + filePath, e);
         }
     }

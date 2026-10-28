@@ -84,3 +84,34 @@ directory; supplied destinations can be overwritten.
 ```json
 {"name":"bible_generate_pptx","arguments":{"reference":"niv - john 1:1-3","template":"bible.pptx"}}
 ```
+
+## Program templates and generation
+
+`program_list_templates` lists files recursively under `<dataDir>/templates` using paths relative to that directory.
+`program_list_program_templates` returns only files whose basename matches `program-*.txt` (case-insensitive), also
+including nested directories. `program_read_template` reads any listed relative template path;
+`program_read_program_template` additionally requires a `program-*.txt` basename. Absolute paths and paths that
+escape the templates directory are rejected.
+
+`program_generate` accepts `{ "yaml": "..." }` and optional `outputPath`. The YAML is a list of slide-set objects
+with `type` (`default`, `styles`, `bible`, or `song`), optional `template`, and `content`. A missing `type` defaults
+to `default`; a missing template uses the matching configured default. Template names are relative to
+`<dataDir>/templates`. Without `outputPath`, the merged deck is written to `<outputDir>/output.pptx`; relative output
+paths resolve beneath `<outputDir>`, and the destination may be overwritten.
+
+For `default` and `styles` slide sets, `content` is a YAML list of maps. The first map supplies metadata for the first
+and last template slides; subsequent maps supply content slides. Preserve this list-of-maps format. When the first
+and last slides have no placeholders, use an empty first map written as `- {}`. Bible content is a Bible reference;
+song content is a YAML map with `songId` and `linesPerSlide`.
+
+```json
+{"name":"program_list_program_templates","arguments":{}}
+```
+
+```json
+{"name":"program_read_template","arguments":{"path":"worship/program-sunday.txt"}}
+```
+
+```json
+{"name":"program_generate","arguments":{"yaml":"- type: default\n  template: worship/default.pptx\n  content: |\n    - {}\n    - title-en: Welcome\n      subtitle-en: Sunday Service\n- type: bible\n  template: bible.pptx\n  content: john 1:1-3\n","outputPath":"sunday-service.pptx"}}
+```

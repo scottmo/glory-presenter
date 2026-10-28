@@ -28,6 +28,8 @@ final class McpToolRegistry {
                 .build());
         SongToolModule.register(server, com.scottmo.core.songs.operations.SongOperations.forApplication());
         BibleToolModule.register(server, com.scottmo.core.operations.BibleOperations.forApplication());
+        ProgramToolModule.register(server, com.scottmo.core.operations.ProgramOperations.configured(
+            com.scottmo.core.ServiceProvider.get(com.scottmo.core.ppt.api.PowerpointService.class).get()));
         return server;
     }
 
