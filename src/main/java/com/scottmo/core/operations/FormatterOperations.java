@@ -1,8 +1,10 @@
 package com.scottmo.core.operations;
 
 import java.io.IOException;
+import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -87,6 +89,31 @@ public final class FormatterOperations {
             return apply(files, overwrite, (input, output) ->
                 powerpointService.normalizeNewLines(input.toString(), output.toString()));
         });
+    }
+
+    /** Formats every immediate PPTX in a directory in place after creating a full backup. */
+    public DirectoryResult formatDirectory(
+        String directory,
+        int startSlide,
+        int endSlide,
+        String matcher,
+        String format
+    ) throws IOException {
+        return executionLock.io(() -> {
+            validateRange(startSlide, endSlide);
+            Config config = configSupplier.get();
+            Pattern pattern = resolvePattern(matcher, config);
+            TextFormat textFormat = resolveTextFormat(format, config);
+            Range range = new Range(startSlide, endSlide);
+            return applyDirectory(directory, (input, output) ->
+                powerpointService.updateTextFormats(input.toString(), output.toString(), range, pattern, textFormat));
+        });
+    }
+
+    /** Normalizes every immediate PPTX in a directory in place after creating a full backup. */
+    public DirectoryResult normalizeDirectory(String directory) throws IOException {
+        return executionLock.io(() -> applyDirectory(directory, (input, output) ->
+            powerpointService.normalizeNewLines(input.toString(), output.toString())));
     }
 
     private List<Path> collectFilesLocked(List<String> inputs) {
@@ -187,6 +214,75 @@ public final class FormatterOperations {
         return new BatchResult(successes, failures);
     }
 
+    private DirectoryResult applyDirectory(String directory, FileOperation operation) throws IOException {
+        Path target = requireDirectory(directory);
+        List<Path> files = collectDirectoryFiles(target);
+        Path backup = backupFiles(target, files);
+        BatchResult result = apply(files, true, (input, output) -> {
+            Path stagedOutput = Files.createTempFile(input.getParent(), ".formatter-", ".tmp");
+            try {
+                operation.apply(input, stagedOutput);
+                try {
+                    Files.move(stagedOutput, output, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
+                } catch (AtomicMoveNotSupportedException e) {
+                    Files.move(stagedOutput, output, StandardCopyOption.REPLACE_EXISTING);
+                }
+            } finally {
+                try {
+                    Files.deleteIfExists(stagedOutput);
+                } catch (IOException ignored) {
+                    // A failed temporary-file cleanup must not hide the operation result.
+                }
+            }
+        });
+        return new DirectoryResult(result, backup.toString());
+    }
+
+    private Path requireDirectory(String value) {
+        if (value == null || value.isBlank()) {
+            throw new IllegalArgumentException("Provide a PowerPoint directory.");
+        }
+        Path directory = Path.of(value).toAbsolutePath().normalize();
+        if (!Files.isDirectory(directory)) {
+            throw new IllegalArgumentException("PowerPoint directory does not exist: " + directory);
+        }
+        return directory;
+    }
+
+    private List<Path> collectDirectoryFiles(Path directory) {
+        List<Path> files = collectFilesLocked(List.of(directory.toString())).stream()
+            .filter(file -> !Files.isSymbolicLink(file))
+            .toList();
+        if (files.isEmpty()) {
+            throw new IllegalArgumentException("No non-symlink .pptx files were found in the selected directory.");
+        }
+        return files;
+    }
+
+    private Path backupFiles(Path directory, List<Path> files) throws IOException {
+        Path backup = Files.createTempDirectory(directory, "formatter-backup-");
+        try {
+            for (Path file : files) {
+                Files.copy(file, backup.resolve(file.getFileName()), StandardCopyOption.COPY_ATTRIBUTES);
+            }
+        } catch (IOException e) {
+            try (Stream<Path> entries = Files.list(backup)) {
+                for (Path entry : entries.toList()) {
+                    Files.deleteIfExists(entry);
+                }
+            } catch (IOException ignored) {
+                // Preserve the original backup error.
+            }
+            try {
+                Files.deleteIfExists(backup);
+            } catch (IOException ignored) {
+                // Preserve the original backup error.
+            }
+            throw new IOException("Unable to back up directory PowerPoint files before overwriting: " + message(e), e);
+        }
+        return backup;
+    }
+
     private static Path modifiedOutputPath(Path input) {
         String filename = input.getFileName().toString();
         int suffixStart = filename.length() - ".pptx".length();
@@ -211,4 +307,5 @@ public final class FormatterOperations {
     public record FileSuccess(String inputPath, String outputPath) {}
     public record FileFailure(String inputPath, String outputPath, String error) {}
     public record BatchResult(List<FileSuccess> successes, List<FileFailure> failures) {}
+    public record DirectoryResult(BatchResult result, String backupDirectory) {}
 }

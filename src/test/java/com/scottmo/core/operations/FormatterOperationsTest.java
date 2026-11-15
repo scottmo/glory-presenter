@@ -1,5 +1,6 @@
 package com.scottmo.core.operations;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -94,6 +95,42 @@ class FormatterOperationsTest {
             assertEquals("first", shape.getTextParagraphs().get(0).getText());
             assertEquals("second", shape.getTextParagraphs().get(1).getText());
         }
+    }
+
+    @Test
+    void directoryNormalizationBacksUpAllImmediateFilesBeforeOverwritingAndSkipsSubdirectories() throws Exception {
+        Path directory = Files.createDirectory(tempDir.resolve("overwrite-batch"));
+        Path first = directory.resolve("first.pptx");
+        Path second = directory.resolve("second.pptx");
+        createDeck(first, List.of(List.of("first\nline")));
+        createDeck(second, List.of(List.of("second\nline")));
+        byte[] originalFirst = Files.readAllBytes(first);
+        byte[] originalSecond = Files.readAllBytes(second);
+        Path nested = Files.createDirectory(directory.resolve("nested"));
+        Path skipped = nested.resolve("skipped.pptx");
+        createDeck(skipped, List.of(List.of("nested\nline")));
+        byte[] skippedBefore = Files.readAllBytes(skipped);
+        FormatterOperations operations = operations(config());
+
+        FormatterOperations.DirectoryResult result = operations.normalizeDirectory(directory.toString());
+
+        Path backup = Path.of(result.backupDirectory());
+        assertEquals(directory, backup.getParent());
+        assertTrue(Files.isDirectory(backup));
+        try (var backupFiles = Files.list(backup)) {
+            assertEquals(List.of("first.pptx", "second.pptx"), backupFiles
+                .map(path -> path.getFileName().toString()).sorted().toList());
+        }
+        assertArrayEquals(originalFirst, Files.readAllBytes(backup.resolve("first.pptx")));
+        assertArrayEquals(originalSecond, Files.readAllBytes(backup.resolve("second.pptx")));
+        assertEquals(2, result.result().successes().size());
+        assertTrue(result.result().failures().isEmpty());
+        assertEquals(first.toAbsolutePath().toString(), result.result().successes().get(0).outputPath());
+        try (XMLSlideShow normalized = new XMLSlideShow(Files.newInputStream(first))) {
+            XSLFTextShape normalizedShape = (XSLFTextShape) normalized.getSlides().get(0).getShapes().get(0);
+            assertEquals(2, normalizedShape.getTextParagraphs().size());
+        }
+        assertArrayEquals(skippedBefore, Files.readAllBytes(skipped));
     }
 
     @Test
