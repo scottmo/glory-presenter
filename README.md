@@ -52,6 +52,29 @@ operations, plus `mcp_status`. UI-only cursor position, focus, selection, and un
 See [the MCP tool reference](docs/mcp-tools.md) for schemas, examples, file behavior, and errors. The server uses MCP
 protocol version 2025-11-25 through the released Java SDK 2.1.0.
 
+## Program Generation CLI
+
+Generate a PowerPoint deck without opening the desktop interface:
+
+```powershell
+java -jar target/app.jar program generate --config path/to/program.yaml
+```
+
+`--config` names the program YAML file in the same format used by the Program tab and
+`program_generate` MCP tool. It is separate from the application settings file at
+`data/config.json`. The command prints the generated deck path to stdout and sends diagnostics to stderr.
+Use `--json` to print `{"outputPath":"..."}` instead. Pass `--output path/to/deck.pptx` to choose a
+destination; absolute paths are used as supplied, while relative paths are resolved under the configured
+`outputDir`. Without `--output`, the command writes `output.pptx` under `outputDir`.
+The command exits with status `0` on success, `1` when reading or generating fails, and `2` for invalid
+command usage or options. Program YAML input and console output use UTF-8.
+On Windows, some JVM launchers may decode non-ASCII command-line paths incorrectly. Use ASCII paths for
+`--config` and `--output`; UTF-8 YAML content and Unicode paths in `data/config.json` are supported.
+
+Run `java -jar target/app.jar --help` or `java -jar target/app.jar program generate --help` for command help.
+As with the desktop app and MCP server, run the command from the directory containing the intended
+`data/config.json`; relative `dataDir` and `outputDir` settings are resolved from that working directory.
+
 ### Build and launch
 
 Use JDK 17 and Maven. From the repository root, run:
@@ -60,6 +83,7 @@ Use JDK 17 and Maven. From the repository root, run:
 mvn -B test
 mvn -B package
 java -jar target/app.jar --mcp-server
+java -jar target/app.jar program generate --config path/to/program.yaml --json
 ```
 
 Packaging creates the executable fat JAR at `target/app.jar`. The application

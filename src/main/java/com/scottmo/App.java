@@ -91,8 +91,16 @@ public class App extends JFrame {
     }
 
     public static void main(String[] args) {
-        if (List.of(args).contains("--mcp-server")) {
+        if (args.length == 1 && "--mcp-server".equals(args[0])) {
             runMcpServer();
+            return;
+        }
+
+        if (args.length > 0) {
+            PrintStream utf8Out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
+            PrintStream utf8Err = new PrintStream(System.err, true, StandardCharsets.UTF_8);
+            int exitCode = com.scottmo.cli.ProgramGenerateCli.run(args, utf8Out, utf8Err);
+            if (exitCode != 0) System.exit(exitCode);
             return;
         }
 
